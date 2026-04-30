@@ -134,7 +134,7 @@ func get_card_description(selected_target: BaseCombatant = null) -> String:
 		# use the card's preview overrides
 		card_description_preview_data = card_data.card_description_preview_overrides
 	
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_card_owner_player(card_data)
 	
 	# iterate over the preview data to determine any differences in the card's values
 	for preview_data in card_description_preview_data:
@@ -170,7 +170,10 @@ func get_card_description(selected_target: BaseCombatant = null) -> String:
 	
 	# replace energy icon with external image bbcode
 	if card_data.card_description.contains(ENERGY_ICON_KEYWORD):
-		var character_data: CharacterData = Global.get_character_data(Global.player_data.player_character_object_id)
+		var character_object_id: String = Global.player_data.player_character_object_id
+		if card_data.card_owner_character_object_id != "":
+			character_object_id = card_data.card_owner_character_object_id
+		var character_data: CharacterData = Global.get_character_data(character_object_id)
 		if character_data != null:
 			var image_bb_code: String = "[img width={0}]{1}[/img]".format([CARD_TEXT_IMAGE_SIZE, character_data.character_text_energy_texture_path])
 			modified_description_bb_code = modified_description_bb_code.replace(ENERGY_ICON_KEYWORD, image_bb_code)

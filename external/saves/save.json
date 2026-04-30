@@ -598,7 +598,7 @@
 			"location_1_3": {
 				"location_act": 1,
 				"location_background_texture_path": "",
-				"location_event_object_id": "",
+				"location_event_object_id": "event_act_1_easy_combat_4",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 1,
 				"location_id": "location_1_3",
@@ -1271,7 +1271,7 @@
 					1000.0
 				],
 				"location_type": 1,
-				"location_visited": false,
+				"location_visited": true,
 				"object_id": ""
 			},
 			"location_1_8": {
@@ -1328,7 +1328,7 @@
 			}
 		},
 		"object_id": "player_red",
-		"object_uid": "Player-1777572565244.07754-1",
+		"object_uid": "Player-1777575250626.04867-1",
 		"player_act": 1,
 		"player_act_id": "act_1",
 		"player_act_max": 3,
@@ -1348,6 +1348,7 @@
 			"artifact_shop_blue",
 			"artifact_shop_green",
 			"artifact_boss_green",
+			"artifact_retain_hand",
 			"artifact_boss_red",
 			"artifact_boss_white",
 			"artifact_shop_white",
@@ -1359,21 +1360,28 @@
 			"artifact_shop_red"
 		],
 		"player_artifact_uid_to_artifact_data": {
-			"Artifact-1777572569872.012382-20": {
+			"Artifact-1777575250627.04868-19": {
 				"artifact_add_actions": [],
 				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
+				"artifact_color_id": "color_red",
 				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
+				"artifact_counter_max": 3,
+				"artifact_counter_reset_on_combat_end": 0,
+				"artifact_counter_reset_on_turn_start": 0,
 				"artifact_counter_wraparound": true,
-				"artifact_description": "Cards will be retained end of turn",
+				"artifact_description": "Grants 5 block every 3 attacks",
 				"artifact_end_of_combat_actions": [],
 				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Retain Hand",
-				"artifact_rarity": 4,
+				"artifact_max_counter_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 2
+						}
+					}
+				],
+				"artifact_name": "Artifact Block on Attacks",
+				"artifact_rarity": 1,
 				"artifact_remove_actions": [],
 				"artifact_right_click_actions": [],
 				"artifact_right_click_validators": [
@@ -1383,12 +1391,12 @@
 						}
 					}
 				],
-				"artifact_script_path": "res://scripts/artifacts/ArtifactRetainHand.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
+				"artifact_script_path": "res://scripts/artifacts/ArtifactBlockOnAttacks.gd",
+				"artifact_texture_path": "external/sprites/artifacts/artifact_red.png",
 				"artifact_turn_end_actions": [],
 				"artifact_turn_start_actions": [],
-				"object_id": "artifact_retain_hand",
-				"object_uid": "Artifact-1777572569872.012382-20"
+				"object_id": "artifact_block_on_attacks",
+				"object_uid": "Artifact-1777575250627.04868-19"
 			}
 		},
 		"player_available_rest_action_object_ids": [
@@ -1466,7 +1474,7 @@
 					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777572565244.07755-3"
+				"object_uid": "Card-1777575250626.04867-3"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1530,7 +1538,7 @@
 					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777572565244.07755-4"
+				"object_uid": "Card-1777575250626.04867-4"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1594,7 +1602,7 @@
 					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777572565244.07755-5"
+				"object_uid": "Card-1777575250626.04867-5"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1666,7 +1674,7 @@
 					"number_of_attacks": 1
 				},
 				"object_id": "card_requires_adjacency",
-				"object_uid": "Card-1777572565244.07755-6"
+				"object_uid": "Card-1777575250626.04868-6"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1756,7 +1764,7 @@
 					"number_of_attacks": 1
 				},
 				"object_id": "attack_with_conditional_block_card",
-				"object_uid": "Card-1777572565245.07755-7"
+				"object_uid": "Card-1777575250626.04868-7"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1819,7 +1827,7 @@
 					"status_effect_object_id": "status_effect_damage_increase"
 				},
 				"object_id": "card_damage_increase",
-				"object_uid": "Card-1777572565245.07755-8"
+				"object_uid": "Card-1777575250626.04868-8"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1886,7 +1894,7 @@
 					"time_delay": 0.1
 				},
 				"object_id": "ignore_damage_increase_attack_card",
-				"object_uid": "Card-1777572565245.07756-9"
+				"object_uid": "Card-1777575250626.04868-9"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1951,7 +1959,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-10"
+				"object_uid": "Card-1777575250626.04868-10"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2016,7 +2024,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-11"
+				"object_uid": "Card-1777575250627.04868-11"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2081,7 +2089,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-12"
+				"object_uid": "Card-1777575250627.04868-12"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2146,7 +2154,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-13"
+				"object_uid": "Card-1777575250627.04868-13"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2211,7 +2219,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-14"
+				"object_uid": "Card-1777575250627.04868-14"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2276,7 +2284,7 @@
 					"block": 5
 				},
 				"object_id": "card_block_basic",
-				"object_uid": "Card-1777572565245.07756-15"
+				"object_uid": "Card-1777575250627.04868-15"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2339,7 +2347,7 @@
 					"status_effect_object_id": "status_effect_weaken"
 				},
 				"object_id": "card_weaken_enemies",
-				"object_uid": "Card-1777572565245.07756-16"
+				"object_uid": "Card-1777575250627.04868-16"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2402,7 +2410,7 @@
 					"status_effect_object_id": "status_effect_vulnerable"
 				},
 				"object_id": "card_vulnerable_enemies",
-				"object_uid": "Card-1777572565245.07756-17"
+				"object_uid": "Card-1777575250627.04868-17"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -2463,23 +2471,27 @@
 					"energy_amount": 2
 				},
 				"object_id": "card_grant_energy",
-				"object_uid": "Card-1777572565245.07756-18"
+				"object_uid": "Card-1777575250627.04868-18"
 			}
 		],
 		"player_energy_max": 10,
 		"player_event_blacklisted_ids": [],
 		"player_event_pools": {
-
+			"event_pool_act_1_easy": [
+				"event_act_1_easy_combat_1",
+				"event_act_1_easy_combat_2",
+				"event_act_1_easy_combat_3"
+			]
 		},
-		"player_health": 80,
+		"player_health": 75,
 		"player_health_max": 80,
-		"player_location_id": "location_1_3",
-		"player_money": 999,
+		"player_location_id": "location_1_7",
+		"player_money": 1095,
 		"player_party_members": [
 			{
 				"object_id": "",
 				"party_member_character_object_id": "character_red",
-				"party_member_health": 80,
+				"party_member_health": 75,
 				"party_member_health_max": 80,
 				"party_member_name": "Red Guy",
 				"party_member_party_index": 0,
@@ -2493,7 +2505,59 @@
 				]
 			}
 		],
-		"player_previous_combat_stats": [],
+		"player_previous_combat_stats": [
+			{
+				"event_object_id": "",
+				"object_id": "",
+				"total_stats": {
+					"CARDS_BANISHED": 0,
+					"CARDS_CREATED": 0,
+					"CARDS_DISCARDED": 0,
+					"CARDS_DRAWN": 5,
+					"CARDS_EXHAUSTED": 0,
+					"CARDS_PLAYED": 3,
+					"CARDS_RETAINED": 0,
+					"CARDS_UPGRADED": 0,
+					"CUSTOM_STAT_SPECIAL_DISCARD": 0,
+					"DECK_RESHUFFLED": 0,
+					"ENEMIES_KILLED": 1,
+					"ENEMY_BLOCKED_AMOUNT": 0,
+					"ENEMY_BLOCKED_COUNT": 0,
+					"ENEMY_BLOCK_BROKEN_COUNT": 0,
+					"ENEMY_DAMAGED_AMOUNT": 45,
+					"ENEMY_DAMAGED_COUNT": 3,
+					"PLAYER_BLOCKED_AMOUNT": 0,
+					"PLAYER_BLOCKED_COUNT": 0,
+					"PLAYER_BLOCK_BROKEN_COUNT": 0,
+					"PLAYER_DAMAGED_AMOUNT": 0,
+					"PLAYER_DAMAGED_COUNT": 0
+				},
+				"turn_count": 1,
+				"turn_stats": {
+					"CARDS_BANISHED": 0,
+					"CARDS_CREATED": 0,
+					"CARDS_DISCARDED": 0,
+					"CARDS_DRAWN": 5,
+					"CARDS_EXHAUSTED": 0,
+					"CARDS_PLAYED": 3,
+					"CARDS_RETAINED": 0,
+					"CARDS_UPGRADED": 0,
+					"CUSTOM_STAT_SPECIAL_DISCARD": 0,
+					"DECK_RESHUFFLED": 0,
+					"ENEMIES_KILLED": 1,
+					"ENEMY_BLOCKED_AMOUNT": 0,
+					"ENEMY_BLOCKED_COUNT": 0,
+					"ENEMY_BLOCK_BROKEN_COUNT": 0,
+					"ENEMY_DAMAGED_AMOUNT": 45,
+					"ENEMY_DAMAGED_COUNT": 3,
+					"PLAYER_BLOCKED_AMOUNT": 0,
+					"PLAYER_BLOCKED_COUNT": 0,
+					"PLAYER_BLOCK_BROKEN_COUNT": 0,
+					"PLAYER_DAMAGED_AMOUNT": 0,
+					"PLAYER_DAMAGED_COUNT": 0
+				}
+			}
+		],
 		"player_rare_card_increment_rate": 1.5,
 		"player_rare_card_modifier_base": 0.0,
 		"player_rare_card_modifier_current": 0.0,
@@ -2504,9 +2568,37 @@
 				"1234567890123456",
 				"8580059094936064824"
 			],
+			"rng_enemy_attack_patterns": [
+				"1234567890123456",
+				"-600081790001879031"
+			],
+			"rng_enemy_spawning": [
+				"1234567890123456",
+				"-600081790001879031"
+			],
+			"rng_enemy_targeting": [
+				"1234567890123456",
+				"-8977863440570618542"
+			],
+			"rng_event_pool": [
+				"1234567890123456",
+				"7929087461675476966"
+			],
+			"rng_reward_card_drafts": [
+				"1234567890123456",
+				"-3934056887847968755"
+			],
+			"rng_reward_money": [
+				"1234567890123456",
+				"-600081790001879031"
+			],
 			"rng_run_start_options": [
 				"1234567890123456",
 				"8013364682693980235"
+			],
+			"rng_shuffle": [
+				"1234567890123456",
+				"9183250231855148834"
 			],
 			"rng_world_generation": [
 				"1234567890123456",

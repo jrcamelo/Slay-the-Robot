@@ -207,6 +207,8 @@ func _on_combat_ended() -> void:
 	if player_current_combat_stats != null:
 		player_previous_combat_stats.append(player_current_combat_stats)
 	player_current_combat_stats = null
+	if has_party_members() and not are_all_party_members_dead():
+		revive_dead_party_members_after_combat(1)
 
 func add_money(amount: int) -> void:
 	player_money = max(player_money + amount, 0)

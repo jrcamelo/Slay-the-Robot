@@ -362,6 +362,12 @@ func get_living_players() -> Array[Player]:
 			living_players.append(player)
 	return living_players
 
+func get_primary_living_player() -> Player:
+	var living_players: Array[Player] = get_living_players()
+	if len(living_players) == 0:
+		return null
+	return living_players[0]
+
 func get_player_by_party_index(party_index: int) -> Player:
 	for player: Player in get_players():
 		if player.has_method("get_party_member_index") and player.get_party_member_index() == party_index:

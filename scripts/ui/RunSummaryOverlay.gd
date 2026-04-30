@@ -33,6 +33,8 @@ func _on_run_victory():
 	player_run_end_state = Global.RUN_ENDS.VICTORY
 	
 func _on_player_death_animation_finished(_player: Player):
+	if not Global.player_data.are_all_party_members_dead():
+		return
 	victory_label.visible = false
 	defeat_label.visible = true
 	visible = true

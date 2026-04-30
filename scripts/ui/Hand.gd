@@ -272,6 +272,14 @@ func _prompt_target(_card: Card):
 func _unprompt_target():
 	select_target_label.visible = false
 
+func _get_card_owner_combatant(card_data: CardData) -> BaseCombatant:
+	if card_data == null:
+		return player
+	var owner_player: Player = Global.get_card_owner_player(card_data)
+	if owner_player != null:
+		return owner_player
+	return player
+
 ### Playing Cards
 
 func _play_card(card_play_request: CardPlayRequest) -> void:
@@ -284,11 +292,12 @@ func _play_card(card_play_request: CardPlayRequest) -> void:
 	
 	# store the state of the hand at play time in the play request
 	card_play_request.hand_at_play_time = Global.player_data.player_hand.duplicate(false)
+	var owner_combatant: BaseCombatant = _get_card_owner_combatant(card_play_request.card_data)
 	
 	# generate dummy card play action and intercept it
 	# this allows some interceptors to access a card play as it's happening
 	var action_data: Array[Dictionary] = [{Scripts.ACTION_CARD_PLAY: {}}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(player, card_play_request, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(owner_combatant, card_play_request, [], action_data, null)[0]
 	var _action_interceptor_processors: Array[ActionInterceptorProcessor] = generated_action._intercept_action([])
 	
 	# find out where the card came from
@@ -312,7 +321,7 @@ func _play_card(card_play_request: CardPlayRequest) -> void:
 	
 	### generate and perform play card actions
 	# generate the card actions
-	var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, targets, card_play_request.card_data.card_play_actions, null)
+	var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(owner_combatant, card_play_request, targets, card_play_request.card_data.card_play_actions, null)
 	# generate a special action which signifies the end of the card play, to be done after all the other card actions
 	var card_played_finished_action: Array[BaseAction] = [ActionGenerator.generate_card_play_finished(card_play_request)]
 	
@@ -444,7 +453,7 @@ func _perform_card_right_click_actions(card: Card) -> void:
 		card_play_request.card_data = card.card_data
 		card_play_request.selected_target = null
 		# generate card actions
-		var card_right_click_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card.card_data.card_right_click_actions, null)
+		var card_right_click_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card.card_data), card_play_request, [], card.card_data.card_right_click_actions, null)
 		ActionHandler.add_actions(card_right_click_actions)
 		
 		if ActionHandler.actions_being_performed:
@@ -602,7 +611,7 @@ func draw_cards(card_number: int, hand_card_count_max: int = PlayerData.PLAYER_D
 		card_play_request.selected_target = null
 		
 		# perform draw actions
-		var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_draw_actions, null)
+		var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card_data), card_play_request, [], card_data.card_draw_actions, null)
 		ActionHandler.add_actions(card_play_actions)
 		
 		Signals.card_drawn.emit(card_data)
@@ -705,7 +714,7 @@ func discard_cards(cards: Array[CardData], is_manual_discard: bool = false) -> v
 			card_play_request.card_data = card_data
 			card_play_request.selected_target = null
 			
-			var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_discard_actions, null)
+			var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card_data), card_play_request, [], card_data.card_discard_actions, null)
 			ActionHandler.add_actions(card_play_actions)
 		
 		Signals.card_discarded.emit(card_data, is_manual_discard)
@@ -723,7 +732,7 @@ func exhaust_cards(cards: Array[CardData]) -> void:
 		card_play_request.card_data = card_data
 		card_play_request.selected_target = null
 		# perform exhaust actions
-		var card_exhaust_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_exhaust_actions, null)
+		var card_exhaust_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card_data), card_play_request, [], card_data.card_exhaust_actions, null)
 		ActionHandler.add_actions(card_exhaust_actions)
 		
 		Signals.card_exhausted.emit(card_data)
@@ -823,7 +832,7 @@ func perform_end_of_turn_hand_actions() -> void:
 		card_play_request.card_data = card_data
 		card_play_request.selected_target = null
 		
-		var card_end_of_turn_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_end_of_turn_actions, null)
+		var card_end_of_turn_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card_data), card_play_request, [], card_data.card_end_of_turn_actions, null)
 		ActionHandler.add_actions(card_end_of_turn_actions)
 	
 	# get all ethereal cards and exhaust them
@@ -854,7 +863,7 @@ func perform_end_of_turn_hand_actions() -> void:
 			card_play_request.card_data = card_data
 			card_play_request.selected_target = null
 			# perform retain actions
-			var card_retain_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_retain_actions, null)
+			var card_retain_actions: Array[BaseAction] = ActionGenerator.create_actions(_get_card_owner_combatant(card_data), card_play_request, [], card_data.card_retain_actions, null)
 			ActionHandler.add_actions(card_retain_actions)
 		
 			Signals.card_retained.emit(card_data)
@@ -909,7 +918,36 @@ func _on_card_turn_energy_changed(card_data: CardData):
 			cards_with_modified_turn_energy.append(card_data)
 
 func _on_player_killed(_player: Player):
-	discard_hand(false)
+	if Global.player_data.are_all_party_members_dead():
+		discard_hand(false)
+		return
+	var dead_party_member_index: int = _player.get_party_member_index()
+	if current_selected_card != null and current_selected_card.card_data.card_owner_party_index == dead_party_member_index:
+		current_selected_card = null
+		_unprompt_target()
+	
+	var refunded_energy: int = 0
+	for queued_card_play_request in card_play_queue.duplicate():
+		if queued_card_play_request.card_data.card_owner_party_index == dead_party_member_index:
+			refunded_energy += max(queued_card_play_request.refundable_energy, 0)
+			card_play_queue_reserved_energy_total -= max(queued_card_play_request.refundable_energy, 0)
+			card_play_queue.erase(queued_card_play_request)
+	if refunded_energy > 0:
+		Global.player_data.player_energy += refunded_energy
+	
+	var dead_owner_cards: Array[CardData] = []
+	for pile_card: CardData in Global.player_data.player_hand:
+		if pile_card.card_owner_party_index == dead_party_member_index:
+			dead_owner_cards.append(pile_card)
+	for pile_card: CardData in Global.player_data.player_draw:
+		if pile_card.card_owner_party_index == dead_party_member_index:
+			dead_owner_cards.append(pile_card)
+	for pile_card: CardData in Global.player_data.player_discard:
+		if pile_card.card_owner_party_index == dead_party_member_index:
+			dead_owner_cards.append(pile_card)
+	if len(dead_owner_cards) > 0:
+		exhaust_cards(dead_owner_cards)
+	update_hand_card_display()
 
 ### Helpers
 

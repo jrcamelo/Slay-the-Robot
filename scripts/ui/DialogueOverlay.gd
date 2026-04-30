@@ -166,7 +166,8 @@ func _on_run_started():
 	reset_dialogue()
 
 func _on_player_killed(_player: Player):
-	visible = false
+	if Global.player_data.are_all_party_members_dead():
+		visible = false
 
 func _on_map_location_selected(_location_data: LocationData):
 	if _location_data.location_type != LocationData.LOCATION_TYPES.EVENT:

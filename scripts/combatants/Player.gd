@@ -7,6 +7,8 @@ class_name Player
 
 const INTENT_UPDATES_LAZILY: bool = true	# batches intent updates
 var _intent_is_updating: bool = false
+var party_member_index: int = 0
+var _death_reported: bool = false
 
 func _ready():
 	super()
@@ -22,41 +24,53 @@ func _ready():
 ## bypass_block = true will do damage directly to health.
 func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 	var player_data: PlayerData = Global.player_data
+	var party_member_data: PartyMemberData = get_party_member_data()
 	
 	var bypassed_damage: int = _damage # raw unblocked damage
 	var bypassed_damage_capped: int = 0 # damage done that does not factor in overkill damage
 	var overkill_damage: int = 0 # damage done past 0
+	var current_block: int = get_block()
+	var current_health: int = _get_health()
 
-	if player_data.player_block > 0 and not bypass_block:
-		if player_data.player_block > _damage:
+	if current_block > 0 and not bypass_block:
+		if current_block > _damage:
 			# damage less than block
-			player_data.player_block -= _damage
+			set_block(current_block - _damage)
 			bypassed_damage = 0
 			create_block_text()
 			Signals.combatant_blocked.emit(self, _damage)
 		else:
 			# damage exceeds block
-			bypassed_damage = _damage - player_data.player_block
-			player_data.player_block = 0
+			bypassed_damage = _damage - current_block
+			set_block(0)
 			Signals.combatant_block_broken.emit(self)
-	
-	block.visible = player_data.player_block > 0
-	block_amount.text = str(player_data.player_block)
 	
 	if bypassed_damage <= 0:
 		return [0,0,0]
 	
 	create_damage_text(bypassed_damage)
-	overkill_damage = max(0, bypassed_damage - player_data.player_health)
+	overkill_damage = max(0, bypassed_damage - current_health)
 	bypassed_damage_capped = bypassed_damage - overkill_damage
 	
-	if player_data.player_health > 0:
-		player_data.add_health(-bypassed_damage)
+	if current_health > 0:
+		if party_member_data != null:
+			party_member_data.add_health(-bypassed_damage)
+			_sync_primary_member_state_if_needed()
+			Signals.player_health_changed.emit()
+		else:
+			player_data.add_health(-bypassed_damage)
 		Signals.combatant_damaged.emit(self, bypassed_damage)
 		
 	return [bypassed_damage, bypassed_damage_capped, overkill_damage]
 
 func set_block(amount: int) -> void:
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		party_member_data.party_member_block = max(0, amount)
+		_sync_primary_member_state_if_needed()
+		block.visible = party_member_data.party_member_block > 0
+		block_amount.text = str(party_member_data.party_member_block)
+		return
 	Global.player_data.player_block = amount
 	Global.player_data.player_block = max(0, Global.player_data.player_block)
 	
@@ -64,19 +78,23 @@ func set_block(amount: int) -> void:
 	block_amount.text = str(Global.player_data.player_block)
 
 func get_block() -> int:
-	return 	Global.player_data.player_block
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		return party_member_data.party_member_block
+	return Global.player_data.player_block
 
 func add_block(amount: int) -> void:
-	set_block(Global.player_data.player_block + amount)
+	set_block(get_block() + amount)
 	if amount > 0:
 		Signals.combatant_block_added.emit(self)
 
 func update_health_bar(as_damage: bool = false) -> void:
-	var player_data: PlayerData = Global.player_data
+	var player_health: int = _get_health()
+	var player_health_max: int = _get_health_max()
 	if as_damage:
-		layered_health_bar.apply_damage(player_data.player_health, player_data.player_health_max, status_id_to_status_effects)
+		layered_health_bar.apply_damage(player_health, player_health_max, status_id_to_status_effects)
 	else:
-		layered_health_bar.update_health_layers(player_data.player_health, player_data.player_health_max, status_id_to_status_effects)
+		layered_health_bar.update_health_layers(player_health, player_health_max, status_id_to_status_effects)
 
 func update_player_display(_player_data: PlayerData):
 	update_health_bar(false)
@@ -106,7 +124,34 @@ func update_incoming_damage_amount(recalculate_enemy_intent: bool = true) -> voi
 	incoming_damage.visible = incoming_damage_amount > 0
 
 func is_alive() -> bool:
-	return Global.player_data.player_health > 0
+	return _get_health() > 0
+
+func get_party_member_index() -> int:
+	return party_member_index
+
+func set_party_member_index(new_party_member_index: int) -> void:
+	party_member_index = max(0, new_party_member_index)
+
+func get_party_member_data() -> PartyMemberData:
+	if Global.player_data.has_party_members():
+		return Global.player_data.get_party_member(party_member_index)
+	return null
+
+func _get_health() -> int:
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		return party_member_data.party_member_health
+	return Global.player_data.player_health
+
+func _get_health_max() -> int:
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		return party_member_data.party_member_health_max
+	return Global.player_data.player_health_max
+
+func _sync_primary_member_state_if_needed() -> void:
+	if Global.player_data.has_party_members() and party_member_index == 0:
+		Global.player_data.synchronize_legacy_primary_member_state()
 
 func create_artifact_fade(artifact_id: String) -> void:
 	var artifact_fade: ArtifactFade = Scenes.ARTIFACT_FADE.instantiate()
@@ -128,15 +173,19 @@ func register_run_modifier_interceptors() -> void:
 
 func _on_run_started():
 	var character_data: CharacterData = Global.get_player_character_data()
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		character_data = Global.get_character_data(party_member_data.party_member_character_object_id)
 	sprite.texture = FileLoader.load_texture(character_data.character_texture_path)
+	visible = party_member_index == 0
 	
 	reset_block()
 	clear_all_status_effects()
 	unregister_all_custom_ui()
+	_death_reported = false
 	
 	# reinitialize healthbar
-	var player_data: PlayerData = Global.player_data
-	layered_health_bar.init(player_data.player_health, player_data.player_health_max)
+	layered_health_bar.init(_get_health(), _get_health_max())
 	update_health_bar(false)
 	
 	update_incoming_damage_amount(true)
@@ -152,14 +201,18 @@ func _on_run_ended():
 	reset_block()
 	clear_all_status_effects()
 	unregister_all_custom_ui()
+	_death_reported = false
+	visible = true
 
 func _on_combat_started(_event_id: String):
 	clear_all_status_effects()
+	_death_reported = false
 	
 func _on_combat_ended():
 	clear_all_status_effects()
 	reset_block()
 	update_incoming_damage_amount()
+	_death_reported = false
 
 func _on_enemy_intent_changed():
 	update_incoming_damage_amount(true)
@@ -169,7 +222,11 @@ func _on_enemy_death_animation_finished(_enemy: Enemy):
 
 func _on_player_health_changed():
 	update_health_bar(true)
-	if Global.player_data.player_health <= 0:
+	if is_alive():
+		_death_reported = false
+		return
+	if not _death_reported:
+		_death_reported = true
 		if not animation_player.is_playing():
 			animation_player.play("death")
 			Signals.player_killed.emit(self)

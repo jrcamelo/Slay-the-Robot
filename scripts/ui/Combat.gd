@@ -29,6 +29,7 @@ extends Control
 
 @onready var end_turn_button: Button = $EndTurnButton
 var end_turn_object: CombatEndTurn = null
+var proxy_players: Array[Player] = []
 
 func _ready():
 	Signals.player_money_changed.connect(_on_player_money_changed)
@@ -159,6 +160,27 @@ func _on_player_money_changed():
 func _on_player_health_changed():
 	health_label.text = "%s / %s" % [Global.player_data.player_health, Global.player_data.player_health_max]
 
+func _ensure_party_player_proxies() -> void:
+	_clear_party_player_proxies()
+	player.set_party_member_index(0)
+	player.visible = true
+	if not Global.player_data.has_party_members():
+		return
+	for party_member_index: int in range(1, Global.player_data.get_party_member_count()):
+		var proxy_player: Player = Scenes.PLAYER.instantiate()
+		proxy_player.name = "PlayerPartyProxy_%s" % party_member_index
+		proxy_player.set_party_member_index(party_member_index)
+		proxy_player.visible = false
+		player.get_parent().add_child(proxy_player)
+		proxy_players.append(proxy_player)
+		proxy_player._on_run_started()
+
+func _clear_party_player_proxies() -> void:
+	for proxy_player: Player in proxy_players:
+		if is_instance_valid(proxy_player):
+			proxy_player.queue_free()
+	proxy_players.clear()
+
 ### Deck Buttons
 
 func _on_deck_button_up():
@@ -211,6 +233,8 @@ func _on_combat_started(event_id: String):
 	update_combat_display()
 	
 func _on_combat_ended():
+	if not Global.player_data.are_all_party_members_dead():
+		Global.player_data.revive_dead_party_members_after_combat(1)
 	set_combat_display_visibility(false)
 	
 
@@ -273,7 +297,10 @@ func perform_enemy_turn():
 			)
 			
 			# perform them and wait
-			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, [player], enemy_actions_data, null)
+			var enemy_target: Player = enemy.get_intent_target_player()
+			if enemy_target == null:
+				return
+			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, [enemy_target], enemy_actions_data, null)
 			ActionHandler.add_actions(enemy_attack_actions)
 			if ActionHandler.actions_being_performed:
 				await ActionHandler.actions_ended
@@ -285,7 +312,7 @@ func perform_enemy_turn():
 				await ActionHandler.actions_ended 
 		
 		# if player is dead stop
-		if Global.player_data.player_health <= 0:
+		if Global.player_data.are_all_party_members_dead():
 			return
 	
 	# all enemies dead
@@ -336,7 +363,8 @@ func _on_player_turn_started():
 			card_play_request.selected_target = null
 			
 			# perform initial actions
-			var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_initial_combat_actions, null)
+			var card_owner: Player = Global.get_card_owner_player(card_data)
+			var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(card_owner, card_play_request, [], card_data.card_initial_combat_actions, null)
 			ActionHandler.add_actions(card_play_actions)
 	
 		# wait for first turn actions
@@ -345,8 +373,9 @@ func _on_player_turn_started():
 	
 	# perform pre draw actions
 	player.update_incoming_damage_amount(true)
-	player.generate_reset_block_action()
-	player.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
+	for player_combatant: Player in Global.get_living_players():
+		player_combatant.generate_reset_block_action()
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
@@ -356,7 +385,8 @@ func _on_player_turn_started():
 		await ActionHandler.actions_ended
 	
 	# perform post draw actions
-	player.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
+	for player_combatant: Player in Global.get_living_players():
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
 	
 	# unlock and update hand
 	hand.hand_disabled = false
@@ -371,7 +401,8 @@ func _on_player_turn_ended():
 		await ActionHandler.actions_ended
 	
 	# perform all end of turn actions and await
-	player.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PLAYER_END_TURN)
+	for player_combatant: Player in Global.get_living_players():
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PLAYER_END_TURN)
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
@@ -422,11 +453,13 @@ func _reset_turn_end_queue() -> void:
 		end_turn_object = null
 
 func _on_run_started():
+	_ensure_party_player_proxies()
 	visible = true
 	_on_player_health_changed()
 	_on_player_money_changed()
 	
 func _on_run_ended():
+	_clear_party_player_proxies()
 	visible = false
 	_reset_turn_end_queue()
 

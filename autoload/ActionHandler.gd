@@ -148,7 +148,8 @@ func _on_combat_ended():
 	_clear_current_async_action()
 
 func _on_player_killed(_player: Player):
-	clear_all_actions()
+	if Global.player_data.are_all_party_members_dead():
+		clear_all_actions()
 
 func _on_run_ended():
 	clear_all_action_interceptors()

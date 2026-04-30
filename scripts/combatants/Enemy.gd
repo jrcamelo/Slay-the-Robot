@@ -11,6 +11,7 @@ var enemy_slot: int = 0 # the spawn slot the enemy is in
 
 var enemy_intent_attack_damage: int = 0
 var enemy_intent_number_of_attacks: int = 0
+var enemy_intent_target_party_member_index: int = 0
 
 func init(_enemy_data: EnemyData):
 	enemy_data = _enemy_data
@@ -97,6 +98,7 @@ func update_health_bar(as_damage: bool = false) -> void:
 
 func cycle_enemy_intent():
 	enemy_data.cycle_next_attack_state()
+	roll_intent_target()
 	update_enemy_intent()
 	Signals.enemy_intent_changed.emit()
 
@@ -109,7 +111,12 @@ func update_enemy_intent():
 	var attack_damage: int = attack_damages[0]
 	var number_of_attacks: int = attack_damages[1]
 	
-	var player: Player = Global.get_player()
+	var player: Player = get_intent_target_player()
+	if player == null:
+		enemy_intent_attack_damage = 0
+		enemy_intent_number_of_attacks = 0
+		enemy_intent.visible = false
+		return
 	
 	### damage
 	# intercept an attack action in preview mode
@@ -156,11 +163,28 @@ func update_enemy_intent():
 func is_alive() -> bool:
 	return enemy_data.enemy_health > 0
 
+func roll_intent_target() -> void:
+	var living_players: Array[Player] = Global.get_living_players()
+	if len(living_players) == 0:
+		enemy_intent_target_party_member_index = 0
+		return
+	var rng_targeting: RandomNumberGenerator = Global.player_data.get_player_rng("rng_enemy_targeting")
+	living_players = Random.shuffle_array(rng_targeting, living_players)
+	var selected_player: Player = living_players[0]
+	enemy_intent_target_party_member_index = selected_player.get_party_member_index()
+
+func get_intent_target_player() -> Player:
+	var target_player: Player = Global.get_player_by_party_index(enemy_intent_target_party_member_index)
+	if target_player == null or not target_player.is_alive():
+		roll_intent_target()
+		target_player = Global.get_player_by_party_index(enemy_intent_target_party_member_index)
+	return target_player
+
 func is_attacking() -> bool:
 	return enemy_intent_number_of_attacks > 0
 
 func _on_combat_started(_event_id: String):
-	pass
+	roll_intent_target()
 
 func _on_combat_ended():
 	queue_free()

@@ -37,7 +37,7 @@ signal action_async_finished	# allows for async callbacks
 enum TARGET_OVERRIDES {
 	SELECTED_TARGETS,	# default. This will use the targets fed into the action
 	PARENT,	# the parent combatant of the action is used as the target
-	PLAYER,	# the player is used as the target
+	PLAYER,	# a single player target. Uses selected targets if supplied, otherwise the first living player.
 	ALL_COMBATANTS, # enemies and players
 	ALL_ENEMIES,
 	LEFTMOST_ENEMY,	# the target fallback will be leftmost if possible
@@ -114,11 +114,15 @@ func get_adjusted_action_targets() -> Array[BaseCombatant]:
 		TARGET_OVERRIDES.PARENT:
 			return [parent_combatant]
 		TARGET_OVERRIDES.PLAYER:
-			for player in Global.get_tree().get_nodes_in_group("players"):
-				if player.is_alive():
+			for target in targets:
+				if is_instance_valid(target) and target is Player and target.is_alive():
+					returned_targets.append(target)
+			if len(returned_targets) == 0:
+				var player: Player = Global.get_primary_living_player()
+				if player != null:
 					returned_targets.append(player)
 		TARGET_OVERRIDES.ALL_COMBATANTS:
-			for player in Global.get_tree().get_nodes_in_group("players"):
+			for player in Global.get_living_players():
 				if player.is_alive():
 					returned_targets.append(player)
 			for enemy in Global.get_tree().get_nodes_in_group("enemies"):
