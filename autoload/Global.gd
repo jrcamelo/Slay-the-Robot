@@ -193,11 +193,30 @@ func _ready():
 #region Run
 ## Starts a new run under a given seed with a given character
 func start_run(character_object_id: String, run_seed: int, difficulty_level: int = 0, custom_run_modifier_object_ids: Array[String] = []) -> void:
-	var character_data: CharacterData = get_character_data(character_object_id)
+	start_party_run([character_object_id], run_seed, difficulty_level, custom_run_modifier_object_ids)
+
+## Starts a new run with a shared deck/energy state across multiple characters.
+## TODO: Run-start UI still chooses one character; party selection wiring comes later.
+func start_party_run(character_object_ids: Array[String], run_seed: int, difficulty_level: int = 0, custom_run_modifier_object_ids: Array[String] = []) -> void:
+	assert(len(character_object_ids) > 0)
+	var first_character_data: CharacterData = get_character_data(character_object_ids[0])
 	
-	# initialize player data from a prototype
-	player_data = get_player_data_from_prototype(character_data.character_player_id)
+	# initialize player data from the first character's prototype, then overwrite the fields
+	# that become shared-party state.
+	player_data = get_player_data_from_prototype(first_character_data.character_player_id)
 	is_run = true
+	player_data.player_party_members = []
+	player_data.player_deck = []
+	player_data.player_draw = []
+	player_data.player_discard = []
+	player_data.player_hand = []
+	player_data.player_exhaust = []
+	player_data.player_artifact_uid_to_artifact_data = {}
+	player_data.player_artifact_pack_ids = []
+	player_data.reward_draft_card_pack_ids = []
+	player_data.player_reward_draft_card_id_blacklist = []
+	player_data.player_reward_draft_card_id_whitelist = []
+	player_data.player_money = 0
 	
 	### Once per run data stuff
 	# initialize run rng
@@ -206,24 +225,45 @@ func start_run(character_object_id: String, run_seed: int, difficulty_level: int
 	# generate artifact pool for the run
 	player_data.initialize_artifact_pool()
 	
-	# add starting artifacts to player
-	for artifact_id in character_data.character_starting_artifact_ids:
-		player_data.add_artifact(artifact_id)
+	for i: int in range(len(character_object_ids)):
+		var character_object_id: String = character_object_ids[i]
+		var character_data: CharacterData = get_character_data(character_object_id)
+		if character_data == null:
+			push_error("No CharacterData with id of ", character_object_id)
+			continue
+		
+		var character_player_data: PlayerData = get_player_data_from_prototype(character_data.character_player_id)
+		var party_member_data: PartyMemberData = PartyMemberData.new()
+		party_member_data.party_member_party_index = i
+		party_member_data.party_member_character_object_id = character_object_id
+		party_member_data.party_member_name = character_data.character_name
+		party_member_data.party_member_health = character_data.character_starting_health
+		party_member_data.party_member_health_max = character_data.character_starting_health
+		party_member_data.party_member_reward_draft_card_pack_ids.assign(character_data.character_starting_card_draft_card_pack_ids)
+		party_member_data.party_member_reward_draft_card_id_blacklist.assign(character_player_data.player_reward_draft_card_id_blacklist.duplicate(true))
+		party_member_data.party_member_reward_draft_card_id_whitelist.assign(character_player_data.player_reward_draft_card_id_whitelist.duplicate(true))
+		party_member_data.party_member_rare_card_modifier_current = character_player_data.player_rare_card_modifier_current
+		party_member_data.party_member_rare_card_modifier_base = character_player_data.player_rare_card_modifier_base
+		party_member_data.party_member_rare_card_increment_rate = character_player_data.player_rare_card_increment_rate
+		player_data.player_party_members.append(party_member_data)
+		
+		for card_object_id: String in character_data.character_starting_card_object_ids:
+			var card_data: CardData = get_card_data_from_prototype(card_object_id)
+			player_data.assign_card_owner(card_data, i)
+			player_data.player_deck.append(card_data)
+		
+		for artifact_pack_id: String in character_data.character_starting_artifact_pack_ids:
+			if not player_data.player_artifact_pack_ids.has(artifact_pack_id):
+				player_data.player_artifact_pack_ids.append(artifact_pack_id)
+		
+		# TODO: Shared money policy is a design choice. Summing is the least surprising prototype default.
+		player_data.player_money += character_data.character_starting_money
+		
+		# add starting artifacts after the pool is initialized so they can consume from it consistently
+		for artifact_id: String in character_data.character_starting_artifact_ids:
+			player_data.add_artifact(artifact_id)
 	
-	# add starting cards to player
-	for card_object_id in character_data.character_starting_card_object_ids:
-		player_data.player_deck.append(get_card_data_from_prototype(card_object_id))
-	
-	# card draft
-	player_data.reward_draft_card_pack_ids.assign(character_data.character_starting_card_draft_card_pack_ids)
-	
-	# artifact draft
-	player_data.player_artifact_pack_ids.assign(character_data.character_starting_artifact_pack_ids)
-	
-	# money and health
-	player_data.player_money = character_data.character_starting_money
-	player_data.player_health_max = character_data.character_starting_health
-	player_data.player_health = character_data.character_starting_health
+	player_data.synchronize_legacy_primary_member_state()
 	
 	# test stuff
 	# add_test_cards_to_player_deck()
@@ -303,7 +343,40 @@ func unpause_game() -> void:
 
 ## Gets the BaseCombatant representing the player character
 func get_player() -> Player:
-	return Global.get_tree().get_first_node_in_group("players")
+	var players: Array[Player] = get_players()
+	if len(players) == 0:
+		return null
+	return players[0]
+
+func get_players() -> Array[Player]:
+	var players: Array[Player] = []
+	for node in Global.get_tree().get_nodes_in_group("players"):
+		if node is Player:
+			players.append(node)
+	return players
+
+func get_living_players() -> Array[Player]:
+	var living_players: Array[Player] = []
+	for player: Player in get_players():
+		if player.is_alive():
+			living_players.append(player)
+	return living_players
+
+func get_player_by_party_index(party_index: int) -> Player:
+	for player: Player in get_players():
+		if player.has_method("get_party_member_index") and player.get_party_member_index() == party_index:
+			return player
+	# TODO: Once combat instantiates one Player node per ally, remove this fallback.
+	if party_index == 0:
+		return get_player()
+	return null
+
+func get_card_owner_player(card_data: CardData) -> Player:
+	if card_data != null and card_data.card_owner_party_index >= 0:
+		var owner_player: Player = get_player_by_party_index(card_data.card_owner_party_index)
+		if owner_player != null:
+			return owner_player
+	return get_player()
 
 #region Combat Stats
 func get_combat_stats() -> CombatStatsData:

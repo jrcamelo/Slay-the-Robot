@@ -7,6 +7,7 @@ class_name PlayerData
 @export var player_character_object_id: String = ""
 @export var player_health: int = 50
 @export var player_health_max: int = 50
+@export var player_party_members: Array[PartyMemberData] = []
 
 @export var player_money: int = 0
 
@@ -188,6 +189,14 @@ func _connect_signals() -> void:
 
 ## Forces a regeneration of all internal cached data structures.
 func generate_cache() -> void:
+	if has_party_members():
+		_sync_party_member_indices()
+		for party_member_data: PartyMemberData in player_party_members:
+			party_member_data.regenerate_card_draft_card_filter()
+		# TODO: A few older card-draft call sites still read the legacy shared reward cache.
+		# Keep rebuilding that combined cache until those systems become owner-aware.
+		rebuild_shared_reward_draft_configuration()
+		synchronize_legacy_primary_member_state()
 	regenerate_card_draft_card_filter()
 	regenerate_artifact_available_id_cache()
 
@@ -320,18 +329,164 @@ func get_consumable_in_slot(consumable_slot: int) -> ConsumableData:
 func get_empty_consumable_slot_count() -> int:
 	return player_consumable_slot_count - len(player_consumable_slot_to_consumable_object_id.keys())
 
+### Party
+
+func has_party_members() -> bool:
+	return len(player_party_members) > 0
+
+func get_party_member_count() -> int:
+	return len(player_party_members)
+
+func get_party_member(party_member_index: int) -> PartyMemberData:
+	if party_member_index < 0 or party_member_index >= len(player_party_members):
+		return null
+	return player_party_members[party_member_index]
+
+func get_primary_party_member() -> PartyMemberData:
+	if has_party_members():
+		return player_party_members[0]
+	return null
+
+func get_party_member_by_character_object_id(character_object_id: String) -> PartyMemberData:
+	for party_member_data: PartyMemberData in player_party_members:
+		if party_member_data.party_member_character_object_id == character_object_id:
+			return party_member_data
+	return null
+
+func get_party_member_for_card(card_data: CardData) -> PartyMemberData:
+	if card_data == null:
+		return get_primary_party_member()
+	if card_data.card_owner_party_index >= 0:
+		var party_member_data: PartyMemberData = get_party_member(card_data.card_owner_party_index)
+		if party_member_data != null:
+			return party_member_data
+	if card_data.card_owner_character_object_id != "":
+		return get_party_member_by_character_object_id(card_data.card_owner_character_object_id)
+	return get_primary_party_member()
+
+func get_party_member_index_for_character_object_id(character_object_id: String) -> int:
+	for party_member_data: PartyMemberData in player_party_members:
+		if party_member_data.party_member_character_object_id == character_object_id:
+			return party_member_data.party_member_party_index
+	return -1
+
+func get_living_party_members() -> Array[PartyMemberData]:
+	var living_party_members: Array[PartyMemberData] = []
+	for party_member_data: PartyMemberData in player_party_members:
+		if party_member_data.is_alive():
+			living_party_members.append(party_member_data)
+	return living_party_members
+
+func are_all_party_members_dead() -> bool:
+	if not has_party_members():
+		return player_health <= 0
+	for party_member_data: PartyMemberData in player_party_members:
+		if party_member_data.is_alive():
+			return false
+	return true
+
+func assign_card_owner(card_data: CardData, party_member_index: int) -> CardData:
+	if card_data == null:
+		return null
+	var party_member_data: PartyMemberData = get_party_member(party_member_index)
+	if party_member_data == null:
+		party_member_data = get_primary_party_member()
+	if party_member_data != null:
+		card_data.card_owner_party_index = party_member_data.party_member_party_index
+		card_data.card_owner_character_object_id = party_member_data.party_member_character_object_id
+	return card_data
+
+func ensure_card_has_owner(card_data: CardData) -> CardData:
+	if card_data == null:
+		return null
+	if has_party_members():
+		if card_data.card_owner_party_index >= 0:
+			return assign_card_owner(card_data, card_data.card_owner_party_index)
+		if card_data.card_owner_character_object_id != "":
+			var party_member_index: int = get_party_member_index_for_character_object_id(card_data.card_owner_character_object_id)
+			if party_member_index >= 0:
+				return assign_card_owner(card_data, party_member_index)
+		if card_data.parent_card != null:
+			ensure_card_has_owner(card_data.parent_card)
+			if card_data.parent_card.card_owner_party_index >= 0:
+				return assign_card_owner(card_data, card_data.parent_card.card_owner_party_index)
+		return assign_card_owner(card_data, 0)
+	if card_data.card_owner_character_object_id == "":
+		card_data.card_owner_character_object_id = player_character_object_id
+	if card_data.card_owner_party_index < 0:
+		card_data.card_owner_party_index = 0
+	return card_data
+
+func revive_dead_party_members_after_combat(revive_health: int = 1) -> void:
+	for party_member_data: PartyMemberData in player_party_members:
+		party_member_data.revive_after_combat_if_dead(revive_health)
+		party_member_data.party_member_block = 0
+	synchronize_legacy_primary_member_state()
+
+func synchronize_legacy_primary_member_state() -> void:
+	var primary_party_member: PartyMemberData = get_primary_party_member()
+	if primary_party_member == null:
+		return
+	player_character_object_id = primary_party_member.party_member_character_object_id
+	player_health = primary_party_member.party_member_health
+	player_health_max = primary_party_member.party_member_health_max
+	player_block = primary_party_member.party_member_block
+	player_rare_card_modifier_current = primary_party_member.party_member_rare_card_modifier_current
+	player_rare_card_modifier_base = primary_party_member.party_member_rare_card_modifier_base
+	player_rare_card_increment_rate = primary_party_member.party_member_rare_card_increment_rate
+
+func rebuild_shared_reward_draft_configuration() -> void:
+	if not has_party_members():
+		return
+	var shared_pack_ids: Array[String] = []
+	var shared_blacklist: Array[String] = []
+	var shared_whitelist: Array[String] = []
+	for party_member_data: PartyMemberData in player_party_members:
+		for reward_draft_card_pack_id: String in party_member_data.party_member_reward_draft_card_pack_ids:
+			if not shared_pack_ids.has(reward_draft_card_pack_id):
+				shared_pack_ids.append(reward_draft_card_pack_id)
+		for blacklisted_card_object_id: String in party_member_data.party_member_reward_draft_card_id_blacklist:
+			if not shared_blacklist.has(blacklisted_card_object_id):
+				shared_blacklist.append(blacklisted_card_object_id)
+		for whitelisted_card_object_id: String in party_member_data.party_member_reward_draft_card_id_whitelist:
+			if not shared_whitelist.has(whitelisted_card_object_id):
+				shared_whitelist.append(whitelisted_card_object_id)
+	reward_draft_card_pack_ids = shared_pack_ids
+	player_reward_draft_card_id_blacklist = shared_blacklist
+	player_reward_draft_card_id_whitelist = shared_whitelist
+
+func _sync_party_member_indices() -> void:
+	for i: int in range(len(player_party_members)):
+		player_party_members[i].party_member_party_index = i
+
 ### Health
 
 func heal_percentage(percent: float):
-	var percentage_health: int = int(ceil(float(Global.player_data.player_health_max) * percent))
+	var health_max: int = player_health_max
+	var primary_party_member: PartyMemberData = get_primary_party_member()
+	if primary_party_member != null:
+		health_max = primary_party_member.party_member_health_max
+	var percentage_health: int = int(ceil(float(health_max) * percent))
 	add_health(percentage_health, 0)
 
 func add_health(health_amount: int, health_amount_max: int = 0) -> void:
 	# wrapper method
 	# adds or removes relative health
+	var primary_party_member: PartyMemberData = get_primary_party_member()
+	if primary_party_member != null:
+		primary_party_member.set_health(primary_party_member.party_member_health + health_amount, primary_party_member.party_member_health_max + health_amount_max)
+		synchronize_legacy_primary_member_state()
+		Signals.player_health_changed.emit()
+		return
 	set_health(player_health + health_amount, player_health_max + health_amount_max)
 
 func set_health(health_amount: int, health_amount_max: int = player_health_max) -> void:
+	var primary_party_member: PartyMemberData = get_primary_party_member()
+	if primary_party_member != null:
+		primary_party_member.set_health(health_amount, health_amount_max)
+		synchronize_legacy_primary_member_state()
+		Signals.player_health_changed.emit()
+		return
 	player_health_max = max(1, health_amount_max)
 	player_health = clamp(0, health_amount, player_health_max)
 	Signals.player_health_changed.emit()
@@ -366,12 +521,13 @@ func get_pile(card_pick_type: int) -> Array[CardData]:
 
 
 func add_card_to_deck(card_data: CardData) -> void:
+	card_data = ensure_card_has_owner(card_data)
 	player_deck.append(card_data)
 	
 	var card_play_request: CardPlayRequest = CardPlayRequest.new()
 	card_play_request.card_data = card_data
 	card_play_request.selected_target = null
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_card_owner_player(card_data)
 	var card_add_to_deck_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_add_to_deck_actions, null)
 	ActionHandler.add_actions(card_add_to_deck_actions)
 	
@@ -383,7 +539,7 @@ func remove_card_from_deck(card_data: CardData) -> void:
 	var card_play_request: CardPlayRequest = CardPlayRequest.new()
 	card_play_request.card_data = card_data
 	card_play_request.selected_target = null
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_card_owner_player(card_data)
 	var card_remove_from_deck_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_remove_from_deck_actions, null)
 	ActionHandler.add_actions(card_remove_from_deck_actions)
 	
@@ -394,7 +550,7 @@ func transform_card_in_deck(card_data: CardData, new_card_object_id: String) -> 
 	var card_play_request: CardPlayRequest = CardPlayRequest.new()
 	card_play_request.card_data = card_data
 	card_play_request.selected_target = null
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_card_owner_player(card_data)
 	var card_transform_in_deck_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], card_data.card_transform_in_deck_actions, null)
 	ActionHandler.add_actions(card_transform_in_deck_actions)
 	
@@ -551,6 +707,7 @@ func generate_combat_deck() -> Array[CardData]:
 	for card_data in player_deck:
 		var copied_card = card_data.duplicate(true)
 		copied_card.parent_card = card_data
+		ensure_card_has_owner(copied_card)
 		combat_deck.append(copied_card)
 	return combat_deck
 
@@ -566,6 +723,8 @@ func set_player_rare_card_modifier_base(value: float) -> void:
 ## affect the pool of cards available to the player.
 ## NOTE: This implementation may not be the most efficienct, consider revision.
 func regenerate_card_draft_card_filter() -> void:
+	if has_party_members():
+		rebuild_shared_reward_draft_configuration()
 	# merge all the card pack card ids together
 	var card_unique_object_ids: Dictionary[String, Variant] = {}
 	for reward_draft_card_pack_id: String in reward_draft_card_pack_ids:

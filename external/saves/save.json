@@ -4,49 +4,49 @@
 	},
 	"properties": {
 		"location_id_to_location_data": {
-			"location_2_51": {
-				"location_act": 2,
+			"location_0": {
+				"location_act": 1,
 				"location_background_texture_path": "",
-				"location_event_object_id": "event_act_1_boss_1",
-				"location_event_pool_object_id": "event_pool_act_1_boss",
-				"location_floor": 11,
-				"location_id": "location_2_51",
+				"location_event_object_id": "event_act_1_easy_combat_1",
+				"location_event_pool_object_id": "",
+				"location_floor": 0,
+				"location_id": "location_0",
 				"location_index": [
 					2.0,
-					10.0
+					-1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_1",
-					"location_3_2",
-					"location_3_3",
-					"location_3_4",
-					"location_3_5"
+					"location_1_1",
+					"location_1_2",
+					"location_1_3",
+					"location_1_4",
+					"location_1_5"
 				],
 				"location_obfuscated": false,
 				"location_position": [
 					400.0,
-					100.0
+					1000.0
 				],
-				"location_type": 3,
-				"location_visited": true,
+				"location_type": 0,
+				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_1": {
-				"location_act": 3,
+			"location_1_1": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 1,
-				"location_id": "location_3_1",
+				"location_id": "location_1_1",
 				"location_index": [
 					0.0,
 					0.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_6",
-					"location_3_7"
+					"location_1_6",
+					"location_1_7"
 				],
 				"location_obfuscated": true,
 				"location_position": [
@@ -57,46 +57,46 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_10": {
-				"location_act": 3,
+			"location_1_10": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_dialogue",
+				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 2,
-				"location_id": "location_3_10",
+				"location_id": "location_1_10",
 				"location_index": [
 					4.0,
 					1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_14",
-					"location_3_15"
+					"location_1_14",
+					"location_1_15"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					600.0,
 					1000.0
 				],
-				"location_type": 4,
+				"location_type": 1,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_11": {
-				"location_act": 3,
+			"location_1_11": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 3,
-				"location_id": "location_3_11",
+				"location_id": "location_1_11",
 				"location_index": [
 					0.0,
 					2.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_16",
-					"location_3_17"
+					"location_1_16",
+					"location_1_17"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -107,48 +107,48 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_12": {
-				"location_act": 3,
+			"location_1_12": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_dialogue",
+				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 3,
-				"location_id": "location_3_12",
+				"location_id": "location_1_12",
 				"location_index": [
 					1.0,
 					2.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_16",
-					"location_3_17",
-					"location_3_18"
+					"location_1_16",
+					"location_1_17",
+					"location_1_18"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					300.0,
 					900.0
 				],
-				"location_type": 4,
+				"location_type": 1,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_13": {
-				"location_act": 3,
+			"location_1_13": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 3,
-				"location_id": "location_3_13",
+				"location_id": "location_1_13",
 				"location_index": [
 					2.0,
 					2.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_17",
-					"location_3_18",
-					"location_3_19"
+					"location_1_17",
+					"location_1_18",
+					"location_1_19"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -159,47 +159,47 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_14": {
-				"location_act": 3,
+			"location_1_14": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 3,
-				"location_id": "location_3_14",
+				"location_id": "location_1_14",
 				"location_index": [
 					3.0,
 					2.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_18",
-					"location_3_19",
-					"location_3_20"
+					"location_1_18",
+					"location_1_19",
+					"location_1_20"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					500.0,
 					900.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_15": {
-				"location_act": 3,
+			"location_1_15": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 3,
-				"location_id": "location_3_15",
+				"location_id": "location_1_15",
 				"location_index": [
 					4.0,
 					2.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_19",
-					"location_3_20"
+					"location_1_19",
+					"location_1_20"
 				],
 				"location_obfuscated": true,
 				"location_position": [
@@ -210,21 +210,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_16": {
-				"location_act": 3,
+			"location_1_16": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 4,
-				"location_id": "location_3_16",
+				"location_id": "location_1_16",
 				"location_index": [
 					0.0,
 					3.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_21",
-					"location_3_22"
+					"location_1_21",
+					"location_1_22"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -235,22 +235,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_17": {
-				"location_act": 3,
+			"location_1_17": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 4,
-				"location_id": "location_3_17",
+				"location_id": "location_1_17",
 				"location_index": [
 					1.0,
 					3.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_21",
-					"location_3_22",
-					"location_3_23"
+					"location_1_21",
+					"location_1_22",
+					"location_1_23"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -261,22 +261,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_18": {
-				"location_act": 3,
+			"location_1_18": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 4,
-				"location_id": "location_3_18",
+				"location_id": "location_1_18",
 				"location_index": [
 					2.0,
 					3.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_22",
-					"location_3_23",
-					"location_3_24"
+					"location_1_22",
+					"location_1_23",
+					"location_1_24"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -287,22 +287,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_19": {
-				"location_act": 3,
+			"location_1_19": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 4,
-				"location_id": "location_3_19",
+				"location_id": "location_1_19",
 				"location_index": [
 					3.0,
 					3.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_23",
-					"location_3_24",
-					"location_3_25"
+					"location_1_23",
+					"location_1_24",
+					"location_1_25"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -313,24 +313,24 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_2": {
-				"location_act": 3,
+			"location_1_2": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 1,
-				"location_id": "location_3_2",
+				"location_id": "location_1_2",
 				"location_index": [
 					1.0,
 					0.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_6",
-					"location_3_7",
-					"location_3_8"
+					"location_1_6",
+					"location_1_7",
+					"location_1_8"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					300.0,
 					1100.0
@@ -339,21 +339,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_20": {
-				"location_act": 3,
+			"location_1_20": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 4,
-				"location_id": "location_3_20",
+				"location_id": "location_1_20",
 				"location_index": [
 					4.0,
 					3.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_24",
-					"location_3_25"
+					"location_1_24",
+					"location_1_25"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -364,21 +364,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_21": {
-				"location_act": 3,
+			"location_1_21": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_miniboss",
 				"location_floor": 5,
-				"location_id": "location_3_21",
+				"location_id": "location_1_21",
 				"location_index": [
 					0.0,
 					4.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_26",
-					"location_3_27"
+					"location_1_26",
+					"location_1_27"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -389,22 +389,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_22": {
-				"location_act": 3,
+			"location_1_22": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_miniboss",
 				"location_floor": 5,
-				"location_id": "location_3_22",
+				"location_id": "location_1_22",
 				"location_index": [
 					1.0,
 					4.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_26",
-					"location_3_27",
-					"location_3_28"
+					"location_1_26",
+					"location_1_27",
+					"location_1_28"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -415,22 +415,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_23": {
-				"location_act": 3,
+			"location_1_23": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_miniboss",
 				"location_floor": 5,
-				"location_id": "location_3_23",
+				"location_id": "location_1_23",
 				"location_index": [
 					2.0,
 					4.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_27",
-					"location_3_28",
-					"location_3_29"
+					"location_1_27",
+					"location_1_28",
+					"location_1_29"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -441,22 +441,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_24": {
-				"location_act": 3,
+			"location_1_24": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_miniboss",
 				"location_floor": 5,
-				"location_id": "location_3_24",
+				"location_id": "location_1_24",
 				"location_index": [
 					3.0,
 					4.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_28",
-					"location_3_29",
-					"location_3_30"
+					"location_1_28",
+					"location_1_29",
+					"location_1_30"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -467,21 +467,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_25": {
-				"location_act": 3,
+			"location_1_25": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_miniboss",
 				"location_floor": 5,
-				"location_id": "location_3_25",
+				"location_id": "location_1_25",
 				"location_index": [
 					4.0,
 					4.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_29",
-					"location_3_30"
+					"location_1_29",
+					"location_1_30"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -492,21 +492,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_26": {
-				"location_act": 3,
+			"location_1_26": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 6,
-				"location_id": "location_3_26",
+				"location_id": "location_1_26",
 				"location_index": [
 					0.0,
 					5.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_31",
-					"location_3_32"
+					"location_1_31",
+					"location_1_32"
 				],
 				"location_obfuscated": true,
 				"location_position": [
@@ -517,24 +517,24 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_27": {
-				"location_act": 3,
+			"location_1_27": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 6,
-				"location_id": "location_3_27",
+				"location_id": "location_1_27",
 				"location_index": [
 					1.0,
 					5.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_31",
-					"location_3_32",
-					"location_3_33"
+					"location_1_31",
+					"location_1_32",
+					"location_1_33"
 				],
-				"location_obfuscated": false,
+				"location_obfuscated": true,
 				"location_position": [
 					300.0,
 					600.0
@@ -543,24 +543,24 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_28": {
-				"location_act": 3,
+			"location_1_28": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 6,
-				"location_id": "location_3_28",
+				"location_id": "location_1_28",
 				"location_index": [
 					2.0,
 					5.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_32",
-					"location_3_33",
-					"location_3_34"
+					"location_1_32",
+					"location_1_33",
+					"location_1_34"
 				],
-				"location_obfuscated": false,
+				"location_obfuscated": true,
 				"location_position": [
 					400.0,
 					600.0
@@ -569,24 +569,24 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_29": {
-				"location_act": 3,
+			"location_1_29": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 6,
-				"location_id": "location_3_29",
+				"location_id": "location_1_29",
 				"location_index": [
 					3.0,
 					5.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_33",
-					"location_3_34",
-					"location_3_35"
+					"location_1_33",
+					"location_1_34",
+					"location_1_35"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					500.0,
 					600.0
@@ -595,22 +595,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_3": {
-				"location_act": 3,
+			"location_1_3": {
+				"location_act": 1,
 				"location_background_texture_path": "",
-				"location_event_object_id": "event_act_1_easy_combat_4",
+				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 1,
-				"location_id": "location_3_3",
+				"location_id": "location_1_3",
 				"location_index": [
 					2.0,
 					0.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_7",
-					"location_3_8",
-					"location_3_9"
+					"location_1_7",
+					"location_1_8",
+					"location_1_9"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -621,23 +621,23 @@
 				"location_visited": true,
 				"object_id": ""
 			},
-			"location_3_30": {
-				"location_act": 3,
+			"location_1_30": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 6,
-				"location_id": "location_3_30",
+				"location_id": "location_1_30",
 				"location_index": [
 					4.0,
 					5.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_34",
-					"location_3_35"
+					"location_1_34",
+					"location_1_35"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					600.0,
 					600.0
@@ -646,21 +646,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_31": {
-				"location_act": 3,
+			"location_1_31": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 7,
-				"location_id": "location_3_31",
+				"location_id": "location_1_31",
 				"location_index": [
 					0.0,
 					6.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_36",
-					"location_3_37"
+					"location_1_36",
+					"location_1_37"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -671,22 +671,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_32": {
-				"location_act": 3,
+			"location_1_32": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 7,
-				"location_id": "location_3_32",
+				"location_id": "location_1_32",
 				"location_index": [
 					1.0,
 					6.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_36",
-					"location_3_37",
-					"location_3_38"
+					"location_1_36",
+					"location_1_37",
+					"location_1_38"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -697,22 +697,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_33": {
-				"location_act": 3,
+			"location_1_33": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 7,
-				"location_id": "location_3_33",
+				"location_id": "location_1_33",
 				"location_index": [
 					2.0,
 					6.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_37",
-					"location_3_38",
-					"location_3_39"
+					"location_1_37",
+					"location_1_38",
+					"location_1_39"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -723,22 +723,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_34": {
-				"location_act": 3,
+			"location_1_34": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 7,
-				"location_id": "location_3_34",
+				"location_id": "location_1_34",
 				"location_index": [
 					3.0,
 					6.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_38",
-					"location_3_39",
-					"location_3_40"
+					"location_1_38",
+					"location_1_39",
+					"location_1_40"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -749,21 +749,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_35": {
-				"location_act": 3,
+			"location_1_35": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "",
 				"location_floor": 7,
-				"location_id": "location_3_35",
+				"location_id": "location_1_35",
 				"location_index": [
 					4.0,
 					6.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_39",
-					"location_3_40"
+					"location_1_39",
+					"location_1_40"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -774,75 +774,75 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_36": {
-				"location_act": 3,
+			"location_1_36": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 8,
-				"location_id": "location_3_36",
+				"location_id": "location_1_36",
 				"location_index": [
 					0.0,
 					7.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_41",
-					"location_3_42"
+					"location_1_41",
+					"location_1_42"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					200.0,
 					400.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_37": {
-				"location_act": 3,
+			"location_1_37": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 8,
-				"location_id": "location_3_37",
+				"location_id": "location_1_37",
 				"location_index": [
 					1.0,
 					7.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_41",
-					"location_3_42",
-					"location_3_43"
+					"location_1_41",
+					"location_1_42",
+					"location_1_43"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					300.0,
 					400.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_38": {
-				"location_act": 3,
+			"location_1_38": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 8,
-				"location_id": "location_3_38",
+				"location_id": "location_1_38",
 				"location_index": [
 					2.0,
 					7.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_42",
-					"location_3_43",
-					"location_3_44"
+					"location_1_42",
+					"location_1_43",
+					"location_1_44"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					400.0,
 					400.0
@@ -851,203 +851,203 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_39": {
-				"location_act": 3,
+			"location_1_39": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 8,
-				"location_id": "location_3_39",
+				"location_id": "location_1_39",
 				"location_index": [
 					3.0,
 					7.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_43",
-					"location_3_44",
-					"location_3_45"
+					"location_1_43",
+					"location_1_44",
+					"location_1_45"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					500.0,
 					400.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_4": {
-				"location_act": 3,
+			"location_1_4": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 1,
-				"location_id": "location_3_4",
+				"location_id": "location_1_4",
 				"location_index": [
 					3.0,
 					0.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_8",
-					"location_3_9",
-					"location_3_10"
+					"location_1_8",
+					"location_1_9",
+					"location_1_10"
 				],
-				"location_obfuscated": false,
+				"location_obfuscated": true,
 				"location_position": [
 					500.0,
 					1100.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_40": {
-				"location_act": 3,
+			"location_1_40": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 8,
-				"location_id": "location_3_40",
+				"location_id": "location_1_40",
 				"location_index": [
 					4.0,
 					7.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_44",
-					"location_3_45"
+					"location_1_44",
+					"location_1_45"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					600.0,
 					400.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_41": {
-				"location_act": 3,
+			"location_1_41": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 9,
-				"location_id": "location_3_41",
+				"location_id": "location_1_41",
 				"location_index": [
 					0.0,
 					8.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_46",
-					"location_3_47"
+					"location_1_46",
+					"location_1_47"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					200.0,
 					300.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_42": {
-				"location_act": 3,
+			"location_1_42": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_dialogue",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 9,
-				"location_id": "location_3_42",
+				"location_id": "location_1_42",
 				"location_index": [
 					1.0,
 					8.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_46",
-					"location_3_47",
-					"location_3_48"
+					"location_1_46",
+					"location_1_47",
+					"location_1_48"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					300.0,
-					300.0
-				],
-				"location_type": 4,
-				"location_visited": false,
-				"object_id": ""
-			},
-			"location_3_43": {
-				"location_act": 3,
-				"location_background_texture_path": "",
-				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
-				"location_floor": 9,
-				"location_id": "location_3_43",
-				"location_index": [
-					2.0,
-					8.0
-				],
-				"location_initial_combat_actions": [],
-				"location_next_location_ids": [
-					"location_3_47",
-					"location_3_48",
-					"location_3_49"
-				],
-				"location_obfuscated": true,
-				"location_position": [
-					400.0,
 					300.0
 				],
 				"location_type": 1,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_44": {
-				"location_act": 3,
+			"location_1_43": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 9,
-				"location_id": "location_3_44",
+				"location_id": "location_1_43",
 				"location_index": [
-					3.0,
+					2.0,
 					8.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_48",
-					"location_3_49",
-					"location_3_50"
+					"location_1_47",
+					"location_1_48",
+					"location_1_49"
 				],
 				"location_obfuscated": true,
 				"location_position": [
-					500.0,
+					400.0,
 					300.0
 				],
 				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_45": {
-				"location_act": 3,
+			"location_1_44": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 9,
-				"location_id": "location_3_45",
+				"location_id": "location_1_44",
+				"location_index": [
+					3.0,
+					8.0
+				],
+				"location_initial_combat_actions": [],
+				"location_next_location_ids": [
+					"location_1_48",
+					"location_1_49",
+					"location_1_50"
+				],
+				"location_obfuscated": true,
+				"location_position": [
+					500.0,
+					300.0
+				],
+				"location_type": 1,
+				"location_visited": false,
+				"object_id": ""
+			},
+			"location_1_45": {
+				"location_act": 1,
+				"location_background_texture_path": "",
+				"location_event_object_id": "",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
+				"location_floor": 9,
+				"location_id": "location_1_45",
 				"location_index": [
 					4.0,
 					8.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_49",
-					"location_3_50"
+					"location_1_49",
+					"location_1_50"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					600.0,
 					300.0
@@ -1056,20 +1056,20 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_46": {
-				"location_act": 3,
+			"location_1_46": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 10,
-				"location_id": "location_3_46",
+				"location_id": "location_1_46",
 				"location_index": [
 					0.0,
 					9.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_51"
+					"location_1_51"
 				],
 				"location_obfuscated": true,
 				"location_position": [
@@ -1080,20 +1080,20 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_47": {
-				"location_act": 3,
+			"location_1_47": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 10,
-				"location_id": "location_3_47",
+				"location_id": "location_1_47",
 				"location_index": [
 					1.0,
 					9.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_51"
+					"location_1_51"
 				],
 				"location_obfuscated": true,
 				"location_position": [
@@ -1104,22 +1104,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_48": {
-				"location_act": 3,
+			"location_1_48": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 10,
-				"location_id": "location_3_48",
+				"location_id": "location_1_48",
 				"location_index": [
 					2.0,
 					9.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_51"
+					"location_1_51"
 				],
-				"location_obfuscated": false,
+				"location_obfuscated": true,
 				"location_position": [
 					400.0,
 					200.0
@@ -1128,22 +1128,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_49": {
-				"location_act": 3,
+			"location_1_49": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 10,
-				"location_id": "location_3_49",
+				"location_id": "location_1_49",
 				"location_index": [
 					3.0,
 					9.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_51"
+					"location_1_51"
 				],
-				"location_obfuscated": true,
+				"location_obfuscated": false,
 				"location_position": [
 					500.0,
 					200.0
@@ -1152,21 +1152,21 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_5": {
-				"location_act": 3,
+			"location_1_5": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 1,
-				"location_id": "location_3_5",
+				"location_id": "location_1_5",
 				"location_index": [
 					4.0,
 					0.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_9",
-					"location_3_10"
+					"location_1_9",
+					"location_1_10"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -1177,20 +1177,20 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_50": {
-				"location_act": 3,
+			"location_1_50": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_hard",
 				"location_floor": 10,
-				"location_id": "location_3_50",
+				"location_id": "location_1_50",
 				"location_index": [
 					4.0,
 					9.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_51"
+					"location_1_51"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -1201,13 +1201,13 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_51": {
-				"location_act": 3,
+			"location_1_51": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_boss",
 				"location_floor": 11,
-				"location_id": "location_3_51",
+				"location_id": "location_1_51",
 				"location_index": [
 					2.0,
 					10.0
@@ -1223,23 +1223,23 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_6": {
-				"location_act": 3,
+			"location_1_6": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 2,
-				"location_id": "location_3_6",
+				"location_id": "location_1_6",
 				"location_index": [
 					0.0,
 					1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_11",
-					"location_3_12"
+					"location_1_11",
+					"location_1_12"
 				],
-				"location_obfuscated": false,
+				"location_obfuscated": true,
 				"location_position": [
 					200.0,
 					1000.0
@@ -1248,22 +1248,22 @@
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_7": {
-				"location_act": 3,
+			"location_1_7": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
 				"location_event_pool_object_id": "event_pool_act_1_easy",
 				"location_floor": 2,
-				"location_id": "location_3_7",
+				"location_id": "location_1_7",
 				"location_index": [
 					1.0,
 					1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_11",
-					"location_3_12",
-					"location_3_13"
+					"location_1_11",
+					"location_1_12",
+					"location_1_13"
 				],
 				"location_obfuscated": false,
 				"location_position": [
@@ -1271,330 +1271,95 @@
 					1000.0
 				],
 				"location_type": 1,
-				"location_visited": true,
+				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_8": {
-				"location_act": 3,
+			"location_1_8": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 2,
-				"location_id": "location_3_8",
+				"location_id": "location_1_8",
 				"location_index": [
 					2.0,
 					1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_12",
-					"location_3_13",
-					"location_3_14"
+					"location_1_12",
+					"location_1_13",
+					"location_1_14"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					400.0,
 					1000.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			},
-			"location_3_9": {
-				"location_act": 3,
+			"location_1_9": {
+				"location_act": 1,
 				"location_background_texture_path": "",
 				"location_event_object_id": "",
-				"location_event_pool_object_id": "event_pool_act_1_easy",
+				"location_event_pool_object_id": "event_pool_act_1_dialogue",
 				"location_floor": 2,
-				"location_id": "location_3_9",
+				"location_id": "location_1_9",
 				"location_index": [
 					3.0,
 					1.0
 				],
 				"location_initial_combat_actions": [],
 				"location_next_location_ids": [
-					"location_3_13",
-					"location_3_14",
-					"location_3_15"
+					"location_1_13",
+					"location_1_14",
+					"location_1_15"
 				],
 				"location_obfuscated": true,
 				"location_position": [
 					500.0,
 					1000.0
 				],
-				"location_type": 1,
+				"location_type": 4,
 				"location_visited": false,
 				"object_id": ""
 			}
 		},
-		"object_id": "player_orange",
-		"object_uid": "Player-1777332199251.026196-1",
-		"player_act": 3,
-		"player_act_id": "act_3",
+		"object_id": "player_red",
+		"object_uid": "Player-1777572565244.07754-1",
+		"player_act": 1,
+		"player_act_id": "act_1",
 		"player_act_max": 3,
 		"player_artifact_pack_ids": [
 			"artifact_pack_white",
-			"artifact_pack_orange"
+			"artifact_pack_red"
 		],
 		"player_artifact_pool": [
 			"artifact_boss_blue",
+			"artifact_increase_attack_on_rest",
 			"artifact_right_click_shuffle_deck",
+			"artifact_see_top_of_draw_pile",
+			"artifact_boss_orange",
 			"artifact_draw_on_combat_start",
+			"artifact_full_heal",
+			"artifact_shop_orange",
 			"artifact_shop_blue",
 			"artifact_shop_green",
 			"artifact_boss_green",
 			"artifact_boss_red",
+			"artifact_boss_white",
+			"artifact_shop_white",
 			"artifact_easy_mode",
-			"artifact_block_on_attacks",
+			"artifact_draw_on_kill",
+			"artifact_top_deck_attack_card",
+			"artifact_heal_on_combat_ended",
+			"artifact_add_money",
 			"artifact_shop_red"
 		],
 		"player_artifact_uid_to_artifact_data": {
-			"Artifact-1777332205650.032596-22": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_orange",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Test Orange Boss Artifact.",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Orange Boss",
-				"artifact_rarity": 4,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_orange.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_boss_orange",
-				"object_uid": "Artifact-1777332205650.032596-22"
-			},
-			"Artifact-1777332373787.0200733-45": {
-				"artifact_add_actions": [
-					{
-						"res://scripts/actions/player_actions/ActionAddMoney.gd": {
-							"money_amount": 200.0
-						}
-					}
-				],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Adds money when obtained",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Add Money",
-				"artifact_rarity": 1,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_add_money",
-				"object_uid": "Artifact-1777332373787.0200733-45"
-			},
-			"Artifact-1777332376821.0203767-52": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Test White Shop Artifact.",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact White Shop",
-				"artifact_rarity": 5,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_shop_white",
-				"object_uid": "Artifact-1777332376821.0203767-52"
-			},
-			"Artifact-1777332378029.0204976-56": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Grants 5 health when combat is over",
-				"artifact_end_of_combat_actions": [
-					{
-						"res://scripts/actions/ActionAddHealth.gd": {
-							"health_amount": 5.0
-						}
-					}
-				],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Heal On Combat End",
-				"artifact_rarity": 1,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_heal_on_combat_ended",
-				"object_uid": "Artifact-1777332378029.0204976-56"
-			},
-			"Artifact-1777332429005.0255951-63": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Draws a card when an enemy is killed",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Draw on Kill",
-				"artifact_rarity": 2,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/ArtifactDrawOnKill.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_draw_on_kill",
-				"object_uid": "Artifact-1777332429005.0255951-63"
-			},
-			"Artifact-1777332443605.0270551-68": {
-				"artifact_add_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionChangeCardProperties.gd": {
-										"card_properties": {
-											"card_first_shuffle_priority": 1.0,
-											"card_unremovable_from_deck": true,
-											"card_untransformable_from_deck": true
-										},
-										"change_parent_card": false
-									}
-								}
-							],
-							"card_pick_text": "Choose a card to make top deck",
-							"card_pick_type": 1.0,
-							"max_card_amount": 1.0,
-							"min_card_amount": 1.0,
-							"min_cards_are_required_for_action": true,
-							"quick_pick": true,
-							"random_selection": false,
-							"validator_data": [
-								{
-									"res://scripts/validators/card/ValidatorCardType.gd": {
-										"card_types": [
-											0.0
-										]
-									}
-								},
-								{
-									"res://scripts/validators/card/ValidatorCardRarity.gd": {
-										"card_rarities_exclude": [
-											4.0
-										]
-									}
-								},
-								{
-									"res://scripts/validators/card/ValidatorCardProperties.gd": {
-										"card_property_name": "card_unremovable_from_deck",
-										"comparison_value": false,
-										"operator": "=="
-									}
-								}
-							]
-						}
-					}
-				],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Select an attack card to make appear at the top of your deck.",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Make Attack Card Innate",
-				"artifact_rarity": 1,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_top_deck_attack_card",
-				"object_uid": "Artifact-1777332443605.0270551-68"
-			},
-			"Artifact-1777332683710.0510655-107": {
+			"Artifact-1777572569872.012382-20": {
 				"artifact_add_actions": [],
 				"artifact_appears_in_artifact_packs": true,
 				"artifact_color_id": "color_white",
@@ -1623,120 +1388,18 @@
 				"artifact_turn_end_actions": [],
 				"artifact_turn_start_actions": [],
 				"object_id": "artifact_retain_hand",
-				"object_uid": "Artifact-1777332683710.0510655-107"
-			},
-			"Artifact-1777332721759.0548705-127": {
-				"artifact_add_actions": [
-					{
-						"res://scripts/actions/ActionHealPercent.gd": {
-							"percentage_heal_amount": 1.0
-						}
-					}
-				],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Fully heals player when obtained",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Full Heal",
-				"artifact_rarity": 3,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_full_heal",
-				"object_uid": "Artifact-1777332721759.0548705-127"
-			},
-			"Artifact-1777332723696.0550643-131": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_orange",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Test Orange Shop Artifact.",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact Orange Shop",
-				"artifact_rarity": 5,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_orange.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_shop_orange",
-				"object_uid": "Artifact-1777332723696.0550643-131"
-			},
-			"Artifact-1777332987819.0814766-186": {
-				"artifact_add_actions": [],
-				"artifact_appears_in_artifact_packs": true,
-				"artifact_color_id": "color_white",
-				"artifact_counter": 0,
-				"artifact_counter_max": 1,
-				"artifact_counter_reset_on_combat_end": -1,
-				"artifact_counter_reset_on_turn_start": -1,
-				"artifact_counter_wraparound": true,
-				"artifact_description": "Test White Boss Artifact.",
-				"artifact_end_of_combat_actions": [],
-				"artifact_first_turn_actions": [],
-				"artifact_max_counter_actions": [],
-				"artifact_name": "Artifact White Boss",
-				"artifact_rarity": 4,
-				"artifact_remove_actions": [],
-				"artifact_right_click_actions": [],
-				"artifact_right_click_validators": [
-					{
-						"res://scripts/validators/ValidatorPlayerTurn.gd": {
-
-						}
-					}
-				],
-				"artifact_script_path": "res://scripts/artifacts/BaseArtifact.gd",
-				"artifact_texture_path": "external/sprites/artifacts/artifact_white.png",
-				"artifact_turn_end_actions": [],
-				"artifact_turn_start_actions": [],
-				"object_id": "artifact_boss_white",
-				"object_uid": "Artifact-1777332987819.0814766-186"
+				"object_uid": "Artifact-1777572569872.012382-20"
 			}
 		},
 		"player_available_rest_action_object_ids": [
 			"rest_action_rest",
 			"rest_action_upgrade_card",
 			"rest_action_remove_cards",
-			"rest_action_add_random_consumable",
-			"rest_action_increase_attack_on_rest"
+			"rest_action_add_random_consumable"
 		],
-		"player_character_object_id": "character_orange",
+		"player_character_object_id": "character_red",
 		"player_consumable_slot_count": 3,
 		"player_consumable_slot_to_consumable_object_id": {
-			"0": "consumable_heal",
-			"1": "consumable_damaging",
 			"2": "consumable_multi_damaging"
 		},
 		"player_current_combat_stats": null,
@@ -1770,6 +1433,8 @@
 				"card_keyword_object_ids": [],
 				"card_listeners": [],
 				"card_name": "Basic Attack",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
 						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
@@ -1790,18 +1455,18 @@
 				"card_type": 0,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
 					"damage": 1,
 					"number_of_attacks": 1
 				},
 				"card_values": {
-					"damage": 26.0,
-					"number_of_attacks": 2.0
+					"damage": 25,
+					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777332199253.026199-4"
+				"object_uid": "Card-1777572565244.07755-3"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1832,6 +1497,8 @@
 				"card_keyword_object_ids": [],
 				"card_listeners": [],
 				"card_name": "Basic Attack",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
 						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
@@ -1852,18 +1519,18 @@
 				"card_type": 0,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
 					"damage": 1,
 					"number_of_attacks": 1
 				},
 				"card_values": {
-					"damage": 26.0,
-					"number_of_attacks": 2.0
+					"damage": 25,
+					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777332199254.026199-5"
+				"object_uid": "Card-1777572565244.07755-4"
 			},
 			{
 				"card_add_to_deck_actions": [],
@@ -1882,7 +1549,7 @@
 				"card_energy_cost_variable_upper_bound": -1,
 				"card_exhaust_actions": [],
 				"card_exhausts": false,
-				"card_first_shuffle_priority": 1,
+				"card_first_shuffle_priority": 0,
 				"card_first_upgrade_property_changes": {
 
 				},
@@ -1894,6 +1561,8 @@
 				"card_keyword_object_ids": [],
 				"card_listeners": [],
 				"card_name": "Basic Attack",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
 						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
@@ -1912,26 +1581,26 @@
 				"card_texture_path": "",
 				"card_transform_in_deck_actions": [],
 				"card_type": 0,
-				"card_unremovable_from_deck": true,
-				"card_untransformable_from_deck": true,
-				"card_upgrade_amount": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
 					"damage": 1,
 					"number_of_attacks": 1
 				},
 				"card_values": {
-					"damage": 26.0,
-					"number_of_attacks": 2.0
+					"damage": 25,
+					"number_of_attacks": 1
 				},
 				"object_id": "card_attack_basic",
-				"object_uid": "Card-1777332199254.026199-6"
+				"object_uid": "Card-1777572565244.07755-5"
 			},
 			{
 				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": false,
-				"card_color_id": "color_white",
-				"card_description": "Restarts Combat",
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_red",
+				"card_description": "Attack for [damage] damage. Can only be played if next to at least 1 attack card.",
 				"card_description_preview_overrides": [],
 				"card_discard_actions": [],
 				"card_draw_actions": [],
@@ -1943,7 +1612,7 @@
 				"card_energy_cost_until_turn": -1,
 				"card_energy_cost_variable_upper_bound": -1,
 				"card_exhaust_actions": [],
-				"card_exhausts": true,
+				"card_exhausts": false,
 				"card_first_shuffle_priority": 0,
 				"card_first_upgrade_property_changes": {
 
@@ -1955,304 +1624,55 @@
 				"card_is_retained": false,
 				"card_keyword_object_ids": [],
 				"card_listeners": [],
-				"card_name": "Restart Combat",
+				"card_name": "Attack with Adjacency",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
-						"res://scripts/actions/world_interaction_actions/ActionStartCombat.gd": {
-
+						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+							"time_delay": 0.0
 						}
 					}
 				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-
-				},
-				"object_id": "card_restart_combat",
-				"object_uid": "Card-1777332199254.026200-7"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_white",
-				"card_description": "Add [block] block",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
-				"card_listeners": [],
-				"card_name": "Basic Block",
-				"card_play_actions": [
+				"card_play_validators": [
 					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"block": 5.0,
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 0,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"block": 3
-				},
-				"card_values": {
-					"block": 8.0
-				},
-				"object_id": "card_block_basic",
-				"object_uid": "Card-1777332199254.026200-8"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_white",
-				"card_description": "Add [block] block",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
-				"card_listeners": [],
-				"card_name": "Basic Block",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"block": 5.0,
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 0,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"block": 3
-				},
-				"card_values": {
-					"block": 8.0
-				},
-				"object_id": "card_block_basic",
-				"object_uid": "Card-1777332199254.026200-9"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_white",
-				"card_description": "Add [block] block",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
-				"card_listeners": [],
-				"card_name": "Basic Block",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"block": 5.0,
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 0,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"block": 3
-				},
-				"card_values": {
-					"block": 8.0
-				},
-				"object_id": "card_block_basic",
-				"object_uid": "Card-1777332199254.026200-10"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_orange",
-				"card_description": "Select [min_card_amount] cards to retain end of turn.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_retain"
-				],
-				"card_listeners": [],
-				"card_name": "Retain Cards",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionRetainCards.gd": {
-
-									}
-								}
+						"res://scripts/validators/hand/ValidatorCardTypeAdjacentInHand.gd": {
+							"card_types": [
+								0
 							],
-							"card_pick_text": "Choose {0} card(s) to retain. {1} cards selected",
-							"card_pick_type": 0.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
+							"invert_validation": false,
+							"requires_surrounded": false
 						}
 					}
 				],
-				"card_play_validators": [],
 				"card_rarity": 1,
 				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
+				"card_requires_target": true,
 				"card_retain_actions": [],
 				"card_right_click_actions": [],
 				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/orange/card_orange.png",
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
 				"card_transform_in_deck_actions": [],
-				"card_type": 1,
+				"card_type": 0,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
-					"max_card_amount": 1,
-					"min_card_amount": 1
+					"damage": 5
 				},
 				"card_values": {
-					"max_card_amount": 3.0,
-					"min_card_amount": 3.0
+					"damage": 10,
+					"number_of_attacks": 1
 				},
-				"object_id": "retain_hand_card",
-				"object_uid": "Card-1777332199254.026200-11"
+				"object_id": "card_requires_adjacency",
+				"object_uid": "Card-1777572565244.07755-6"
 			},
 			{
 				"card_add_to_deck_actions": [],
 				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Generate [block] Block. Play a card from discard pile.",
+				"card_color_id": "color_red",
+				"card_description": "Attack for [damage]. If the targeted enemy is attacking, block for [block]",
 				"card_description_preview_overrides": [],
 				"card_discard_actions": [],
 				"card_draw_actions": [],
@@ -2269,38 +1689,111 @@
 				"card_first_upgrade_property_changes": {
 
 				},
-				"card_glow_validators": [],
+				"card_glow_validators": [
+					{
+						"res://scripts/validators/ValidatorEnemyAttacking.gd": {
+
+						}
+					}
+				],
 				"card_initial_combat_actions": [],
 				"card_is_ethereal": false,
 				"card_is_playable": true,
 				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
+				"card_keyword_object_ids": [],
 				"card_listeners": [],
-				"card_name": "Play From Discard",
+				"card_name": "Block on Attack",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"target_override": 1.0,
-							"time_delay": 0.5
+						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+							"actions_on_lethal": [],
+							"time_delay": 0.0
 						}
 					},
 					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
+						"res://scripts/actions/meta_actions/ActionValidator.gd": {
+							"passed_action_data": [
 								{
-									"res://scripts/actions/cardset_actions/ActionPlayCards.gd": {
-
+									"res://scripts/actions/ActionBlock.gd": {
+										"target_override": 1
 									}
 								}
 							],
-							"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
-							"card_pick_type": 4.0,
-							"max_card_amount": 1.0,
-							"min_card_amount": 1.0,
-							"min_cards_are_required_for_action": true,
-							"random_selection": false
+							"time_delay": 0.0,
+							"validator_data": [
+								{
+									"res://scripts/validators/card_plays/ValidatorCardPlayEnemyAttacking.gd": {
+
+									}
+								}
+							]
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 1,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": true,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
+				"card_transform_in_deck_actions": [],
+				"card_type": 0,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3,
+					"damage": 3
+				},
+				"card_values": {
+					"block": 5,
+					"damage": 10,
+					"number_of_attacks": 1
+				},
+				"object_id": "attack_with_conditional_block_card",
+				"object_uid": "Card-1777572565245.07755-7"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_purple",
+				"card_description": "Increases attack damage by [status_charge_amount]",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 0,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [],
+				"card_listeners": [],
+				"card_name": "Damage Increase",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+							"target_override": 1,
+							"time_delay": 0.5
 						}
 					}
 				],
@@ -2311,27 +1804,28 @@
 				"card_retain_actions": [],
 				"card_right_click_actions": [],
 				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
+				"card_texture_path": "",
 				"card_transform_in_deck_actions": [],
-				"card_type": 1,
+				"card_type": 2,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
-					"block": 2
+					"status_charge_amount": 3
 				},
 				"card_values": {
-					"block": 5.0
+					"status_charge_amount": 5,
+					"status_effect_object_id": "status_effect_damage_increase"
 				},
-				"object_id": "card_play_from_discard",
-				"object_uid": "Card-1777332199254.026200-12"
+				"object_id": "card_damage_increase",
+				"object_uid": "Card-1777572565245.07755-8"
 			},
 			{
 				"card_add_to_deck_actions": [],
 				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Draw [draw_count] cards",
+				"card_color_id": "color_red",
+				"card_description": "Attack for [damage] damage [number_of_attacks] times",
 				"card_description_preview_overrides": [],
 				"card_discard_actions": [],
 				"card_draw_actions": [],
@@ -2355,73 +1849,599 @@
 				"card_is_retained": false,
 				"card_keyword_object_ids": [],
 				"card_listeners": [],
-				"card_name": "Draw",
+				"card_name": "Flat Damage Attack",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
 				"card_play_actions": [
 					{
-						"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
-							"draw_count": 3.0
+						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+							"actions_on_lethal": [],
+							"time_delay": 0.1
 						}
 					}
 				],
 				"card_play_validators": [],
 				"card_rarity": 1,
 				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
+				"card_requires_target": true,
 				"card_retain_actions": [],
 				"card_right_click_actions": [],
 				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
 				"card_transform_in_deck_actions": [],
-				"card_type": 1,
+				"card_type": 0,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
-					"draw_count": 1
+					"number_of_attacks": 5
 				},
 				"card_values": {
-					"draw_count": 4.0
+					"damage": 1,
+					"ignored_interceptor_ids": [
+						"interceptor_damage_increase"
+					],
+					"number_of_attacks": 10,
+					"time_delay": 0.1
 				},
-				"object_id": "card_draw",
-				"object_uid": "Card-1777332199254.026200-13"
+				"object_id": "ignore_damage_increase_attack_card",
+				"object_uid": "Card-1777572565245.07756-9"
 			},
 			{
 				"card_add_to_deck_actions": [],
 				"card_appears_in_card_packs": true,
-				"card_color_id": "color_orange",
-				"card_description": "Unplayable\nGives [energy_icon][energy_icon][energy_icon] when drawn",
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
 				"card_description_preview_overrides": [],
 				"card_discard_actions": [],
-				"card_draw_actions": [
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-10"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-11"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-12"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-13"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-14"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_white",
+				"card_description": "Add [block] block",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [
+					"keyword_block"
+				],
+				"card_listeners": [],
+				"card_name": "Basic Block",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/ActionBlock.gd": {
+							"block": 5,
+							"target_override": 1,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 0,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": false,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"block": 3
+				},
+				"card_values": {
+					"block": 5
+				},
+				"object_id": "card_block_basic",
+				"object_uid": "Card-1777572565245.07756-15"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_red",
+				"card_description": "Apply [status_charge_amount] weaknesss",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [],
+				"card_listeners": [],
+				"card_name": "Weaken Enemies",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+							"target_override": 0,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 1,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": true,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"status_charge_amount": 1
+				},
+				"card_values": {
+					"status_charge_amount": 1,
+					"status_effect_object_id": "status_effect_weaken"
+				},
+				"object_id": "card_weaken_enemies",
+				"object_uid": "Card-1777572565245.07756-16"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_red",
+				"card_description": "Apply [status_charge_amount] vulnerable",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 1,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [],
+				"card_listeners": [],
+				"card_name": "Vulnerable Enemies",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
+					{
+						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+							"target_override": 0,
+							"time_delay": 0.5
+						}
+					}
+				],
+				"card_play_validators": [],
+				"card_rarity": 1,
+				"card_remove_from_deck_actions": [],
+				"card_requires_target": true,
+				"card_retain_actions": [],
+				"card_right_click_actions": [],
+				"card_tags": [],
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
+				"card_transform_in_deck_actions": [],
+				"card_type": 1,
+				"card_unremovable_from_deck": false,
+				"card_untransformable_from_deck": false,
+				"card_upgrade_amount": 0,
+				"card_upgrade_amount_max": 1,
+				"card_upgrade_value_improvements": {
+					"status_charge_amount": 1
+				},
+				"card_values": {
+					"status_charge_amount": 1,
+					"status_effect_object_id": "status_effect_vulnerable"
+				},
+				"object_id": "card_vulnerable_enemies",
+				"object_uid": "Card-1777572565245.07756-17"
+			},
+			{
+				"card_add_to_deck_actions": [],
+				"card_appears_in_card_packs": true,
+				"card_color_id": "color_red",
+				"card_description": "Gives [energy_icon][energy_icon] when played",
+				"card_description_preview_overrides": [],
+				"card_discard_actions": [],
+				"card_draw_actions": [],
+				"card_end_of_turn_actions": [],
+				"card_energy_cost": 0,
+				"card_energy_cost_is_variable": false,
+				"card_energy_cost_until_combat": -1,
+				"card_energy_cost_until_played": -1,
+				"card_energy_cost_until_turn": -1,
+				"card_energy_cost_variable_upper_bound": -1,
+				"card_exhaust_actions": [],
+				"card_exhausts": false,
+				"card_first_shuffle_priority": 0,
+				"card_first_upgrade_property_changes": {
+					"card_description": "Gives [energy_icon][energy_icon][energy_icon] when played"
+				},
+				"card_glow_validators": [],
+				"card_initial_combat_actions": [],
+				"card_is_ethereal": false,
+				"card_is_playable": true,
+				"card_is_retained": false,
+				"card_keyword_object_ids": [],
+				"card_listeners": [],
+				"card_name": "Energy Card",
+				"card_owner_character_object_id": "character_red",
+				"card_owner_party_index": 0,
+				"card_play_actions": [
 					{
 						"res://scripts/actions/ActionAddEnergy.gd": {
 
 						}
 					}
 				],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-					"card_description": "Unplayable\nGives [energy_icon][energy_icon][energy_icon] when drawn"
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": false,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Energy Draw Card",
-				"card_play_actions": [],
 				"card_play_validators": [],
 				"card_rarity": 2,
 				"card_remove_from_deck_actions": [],
@@ -2429,2526 +2449,72 @@
 				"card_retain_actions": [],
 				"card_right_click_actions": [],
 				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/orange/card_orange.png",
+				"card_texture_path": "external/sprites/cards/red/card_red.png",
 				"card_transform_in_deck_actions": [],
 				"card_type": 1,
 				"card_unremovable_from_deck": false,
 				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
+				"card_upgrade_amount": 0,
 				"card_upgrade_amount_max": 1,
 				"card_upgrade_value_improvements": {
 					"energy_amount": 1
 				},
 				"card_values": {
-					"energy_amount": 3.0
+					"energy_amount": 2
 				},
-				"object_id": "card_energy_on_draw",
-				"object_uid": "Card-1777332199254.026200-14"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_green",
-				"card_description": "Top Deck. Add [block] block. Improve amount blocked by 1 this combat",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 1,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
-				"card_listeners": [],
-				"card_name": "Improving Block",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					},
-					{
-						"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
-							"card_value_improvements": {
-								"block": 1.0
-							},
-							"improve_parent_card": false,
-							"pick_played_card": true,
-							"time_delay": 0.1
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/green/card_green.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"block": 5.0
-				},
-				"object_id": "card_improving_block",
-				"object_uid": "Card-1777332199254.026200-15"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Block for [block] and attack for [damage] damage. Improves damage and block by 2 on kill",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 2,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Improving Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-							"actions_on_lethal": [
-								{
-									"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
-										"card_value_improvements": {
-											"block": 2.0,
-											"damage": 2.0
-										},
-										"improve_parent_card": true,
-										"pick_played_card": true,
-										"time_delay": 0.1
-									}
-								}
-							],
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": true,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"block": 5.0,
-					"damage": 5.0,
-					"number_of_attacks": 1.0
-				},
-				"object_id": "card_improving_attack",
-				"object_uid": "Card-1777332199254.026200-16"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_red",
-				"card_description": "Play 2 cards randomly from your hand.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Play Random Hand",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionPlayCards.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
-							"card_pick_type": 0.0,
-							"max_card_amount": 2.0,
-							"min_card_amount": 2.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": true
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/red/card_red.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-
-				},
-				"object_id": "card_play_random_from_hand",
-				"object_uid": "Card-1777332199254.026200-17"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_green",
-				"card_description": "In [status_charge_amount] turns, do [status_secondary_charge_amount] damage to all enemies",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_bomb"
-				],
-				"card_listeners": [],
-				"card_name": "Bomb",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/green/card_green.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"status_secondary_charge_amount": 20
-				},
-				"card_values": {
-					"status_charge_amount": 3.0,
-					"status_effect_object_id": "status_effect_bomb",
-					"status_force_apply_new_effect": true,
-					"status_secondary_charge_amount": 50.0
-				},
-				"object_id": "card_bomb",
-				"object_uid": "Card-1777332199254.026200-18"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Pick 2 cards from discard pile and randomly insert them into draw pile",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Pick From Discard",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionAddCardsToDraw.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose {0} card(s) to add to draw. {1} cards selected",
-							"card_pick_type": 4.0,
-							"max_card_amount": 2.0,
-							"min_card_amount": 1.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"card_destination": 3.0
-				},
-				"object_id": "add_to_draw_from_discard_card",
-				"object_uid": "Card-1777332199254.026200-19"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Pick 2 cards from discard pile and randomly insert them into draw pile",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Pick From Discard",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionAddCardsToDraw.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose {0} card(s) to add to draw. {1} cards selected",
-							"card_pick_type": 4.0,
-							"max_card_amount": 2.0,
-							"min_card_amount": 1.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"card_destination": 3.0
-				},
-				"object_id": "add_to_draw_from_discard_card",
-				"object_uid": "Card-1777332199254.026200-20"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_red",
-				"card_description": "Banish up to [max_card_amount] attack cards and do [damage] damage to all enemies for each",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_banish"
-				],
-				"card_listeners": [],
-				"card_name": "Banish Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/meta_actions/ActionVariableCardsetModifier.gd": {
-										"action_data": [
-											{
-												"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-													"number_of_attacks": 1.0,
-													"target_override": 4.0,
-													"time_delay": 0.5
-												}
-											}
-										],
-										"multiplied_values": [
-											"number_of_attacks"
-										]
-									}
-								},
-								{
-									"res://scripts/actions/cardset_actions/ActionBanishCards.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose up to {0} card(s) to banish. {1} cards selected",
-							"card_pick_type": 0.0,
-							"min_card_amount": 0.0,
-							"validator_data": [
-								{
-									"res://scripts/validators/card/ValidatorCardType.gd": {
-										"card_types": [
-											0.0
-										]
-									}
-								}
-							]
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/red/card_red.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"damage": 2,
-					"max_card_amount": 1
-				},
-				"card_values": {
-					"damage": 10.0,
-					"max_card_amount": 4.0
-				},
-				"object_id": "card_banish_attack",
-				"object_uid": "Card-1777332199254.026200-21"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_orange",
-				"card_description": "Discard up to [max_card_amount] cards and emit a custom signal for each",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_discard"
-				],
-				"card_listeners": [],
-				"card_name": "Special Discard",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/meta_actions/ActionVariableCardsetModifier.gd": {
-										"action_data": [
-											{
-												"res://scripts/actions/meta_actions/ActionEmitCustomSignal.gd": {
-													"custom_signal_object_id": "custom_signal_special_discard",
-													"custom_signal_value": 1.0,
-													"time_delay": 0.0
-												}
-											}
-										],
-										"multiplied_values": [
-											"custom_signal_value"
-										]
-									}
-								},
-								{
-									"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose up to {0} card(s) to discard. {1} cards selected",
-							"card_pick_type": 0.0,
-							"min_card_amount": 0.0,
-							"validator_data": []
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/orange/card_orange.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"max_card_amount": 4
-				},
-				"card_values": {
-					"max_card_amount": 7.0
-				},
-				"object_id": "card_special_discard",
-				"object_uid": "Card-1777332209136.036082-25"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_purple",
-				"card_description": "Upgrades all cards in deck for the rest of combat. Exhaust.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 3,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": true,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Upgrade Combat Deck",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickUpgradeCards.gd": {
-							"card_pick_text": "Choose {0} card(s) to upgrade. {1} cards selected",
-							"card_pick_type": 2.0,
-							"max_card_amount": 999.0,
-							"min_card_amount": 999.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"upgrade_parent_card": false
-				},
-				"object_id": "upgrade_entire_deck_card",
-				"object_uid": "Card-1777332247097.074042-27"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_red",
-				"card_description": "Duplicate the next [status_charge_amount] attacks this turn",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Duplicate Atttacks",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/red/card_red.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"status_charge_amount": 1
-				},
-				"card_values": {
-					"status_charge_amount": 2.0,
-					"status_effect_object_id": "status_effect_duplicate_attacks"
-				},
-				"object_id": "card_duplicate_attacks",
-				"object_uid": "Card-1777332249764.076710-32"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Discard hand. Draw [draw_count] cards.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 0,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-					"card_energy_cost": 0.0
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Discard Hand Card",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
-
-						}
-					},
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "",
-							"card_pick_type": 0.0,
-							"max_card_amount": 10.0,
-							"min_card_amount": 10.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"draw_count": 1
-				},
-				"card_values": {
-					"draw_count": 3.0
-				},
-				"object_id": "card_discard_hand",
-				"object_uid": "Card-1777332382554.0209499-60"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Shuffle discard back into draw pile.\nDraw [draw_count] cards",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 0,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Reshuffle and Draw",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/ActionReshuffle.gd": {
-							"shuffle_discard_into_draw": true
-						},
-						"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
-							"draw_count": 3.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"draw_count": 1
-				},
-				"card_values": {
-					"draw_count": 2.0
-				},
-				"object_id": "card_reshuffle_draw",
-				"object_uid": "Card-1777332431961.0258907-66"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Draw [draw_count] cards",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Draw",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
-							"draw_count": 3.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"draw_count": 1
-				},
-				"card_values": {
-					"draw_count": 4.0
-				},
-				"object_id": "card_draw",
-				"object_uid": "Card-1777332519351.0346296-82"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_red",
-				"card_description": "Transforms the cards in hand",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Transform Hand",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionTransformCards.gd": {
-
-									}
-								}
-							],
-							"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
-							"card_pick_type": 0.0,
-							"max_card_amount": 10.0,
-							"min_card_amount": 10.0,
-							"min_cards_are_required_for_action": false,
-							"random_selection": false
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/red/card_red.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"keep_color": false,
-					"keep_rarity": false,
-					"keep_type": false,
-					"transform_parent_card": false
-				},
-				"object_id": "transform_hand_card",
-				"object_uid": "Card-1777332530331.0357278-86"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_green",
-				"card_description": "Duplicate the first card played each turn",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Duplicate Plays",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 3,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/green/card_green.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 2,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"status_charge_amount": 3
-				},
-				"card_values": {
-					"status_charge_amount": 4.0,
-					"status_effect_object_id": "status_effect_duplicate_card_plays",
-					"status_secondary_charge_amount": 0.0
-				},
-				"object_id": "card_duplicate_plays",
-				"object_uid": "Card-1777332548263.0375209-91"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_green",
-				"card_description": "Select one of 3 attack cards and add it to hand.\nIt costs 0 for the rest of combat",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 0,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": true,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-					"card_energy_cost": 0.0
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_exhaust"
-				],
-				"card_listeners": [],
-				"card_name": "Draft Attack Card",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {
-
-									}
-								},
-								{
-									"res://scripts/actions/cardset_actions/ActionChangeCardEnergies.gd": {
-										"card_energy_cost_until_combat": 0.0
-									}
-								}
-							],
-							"card_pick_text": "Select An Attack Card",
-							"card_pick_type": 8.0,
-							"draft_from_card_pool": true,
-							"draft_max_card_amount": 3.0,
-							"max_card_amount": 1.0,
-							"min_card_amount": 1.0,
-							"min_cards_are_required_for_action": true,
-							"quick_pick": true,
-							"random_selection": false,
-							"validator_data": [
-								{
-									"res://scripts/validators/card/ValidatorCardType.gd": {
-										"card_types": [
-											0.0
-										]
-									}
-								},
-								{
-									"res://scripts/validators/card/ValidatorCardRarity.gd": {
-										"card_rarities_exclude": [
-											4.0
-										]
-									}
-								}
-							]
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/green/card_green.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-
-				},
-				"object_id": "card_draft_random_attack",
-				"object_uid": "Card-1777332705896.0532842-115"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Attack for [damage] + [damage_random] damage",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "RNG Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-							"actions_on_lethal": [],
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": true,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"damage_random": 5
-				},
-				"card_values": {
-					"damage": 10.0,
-					"damage_random": 10.0,
-					"number_of_attacks": 1.0
-				},
-				"object_id": "card_attack_rng",
-				"object_uid": "Card-1777332720314.0547260-118"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_green",
-				"card_description": "Create [number_of_cards] legally distinct Shoves and add them to hand",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Shove Dance",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/pick_card_actions/ActionCreateCards.gd": {
-							"action_data": [
-								{
-									"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {
-
-									}
-								}
-							]
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/green/card_green.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"number_of_cards": 1
-				},
-				"card_values": {
-					"created_card_object_id": "card_shove",
-					"number_of_cards": 4.0
-				},
-				"object_id": "card_generate_shoves",
-				"object_uid": "Card-1777332720314.0547260-120"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "At the start of combat attaches itself to a random enemy\nAttack for [damage] damage",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 0,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [
-					{
-						"res://scripts/actions/cardset_actions/ActionAttachCardsOntoEnemy.gd": {
-							"pick_played_card": true,
-							"target_override": 7.0,
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Self Attaching Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": true,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"damage": 20.0,
-					"number_of_attacks": 1.0
-				},
-				"object_id": "self_attaching_attack_card",
-				"object_uid": "Card-1777332744718.0571664-133"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "At the start of combat attaches itself to a random enemy\nAttack for [damage] damage",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 0,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [
-					{
-						"res://scripts/actions/cardset_actions/ActionAttachCardsOntoEnemy.gd": {
-							"pick_played_card": true,
-							"target_override": 7.0,
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Self Attaching Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 2,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": true,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 1,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-
-				},
-				"card_values": {
-					"damage": 20.0,
-					"number_of_attacks": 1.0
-				},
-				"object_id": "self_attaching_attack_card",
-				"object_uid": "Card-1777332806803.0633750-145"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_blue",
-				"card_description": "Draw [draw_count] cards",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [],
-				"card_name": "Draw",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
-							"draw_count": 3.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/blue/card_blue.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 0,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"draw_count": 1
-				},
-				"card_values": {
-					"draw_count": 3.0
-				},
-				"object_id": "card_draw",
-				"object_uid": "Card-1777332821906.0648852-149"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_white",
-				"card_description": "Block twice. Add [custom_block_1] block. Add [custom_block_2] block.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 1,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [
-					"keyword_block"
-				],
-				"card_listeners": [],
-				"card_name": "Custom Block",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"custom_key_names": {
-								"block": "custom_block_1"
-							},
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					},
-					{
-						"res://scripts/actions/ActionBlock.gd": {
-							"custom_key_names": {
-								"block": "custom_block_2"
-							},
-							"target_override": 1.0,
-							"time_delay": 0.5
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": false,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "",
-				"card_transform_in_deck_actions": [],
-				"card_type": 1,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 0,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"custom_block_1": 5,
-					"custom_block_2": 5
-				},
-				"card_values": {
-					"custom_block_1": 3.0,
-					"custom_block_2": 4.0
-				},
-				"object_id": "custom_block_card",
-				"object_uid": "Card-1777332877369.0704315-165"
-			},
-			{
-				"card_add_to_deck_actions": [],
-				"card_appears_in_card_packs": true,
-				"card_color_id": "color_red",
-				"card_description": "Attack for [damage] damage. Cost lowered for each card discarded this turn.",
-				"card_description_preview_overrides": [],
-				"card_discard_actions": [],
-				"card_draw_actions": [],
-				"card_end_of_turn_actions": [],
-				"card_energy_cost": 7,
-				"card_energy_cost_is_variable": false,
-				"card_energy_cost_until_combat": -1,
-				"card_energy_cost_until_played": -1,
-				"card_energy_cost_until_turn": -1,
-				"card_energy_cost_variable_upper_bound": -1,
-				"card_exhaust_actions": [],
-				"card_exhausts": false,
-				"card_first_shuffle_priority": 0,
-				"card_first_upgrade_property_changes": {
-
-				},
-				"card_glow_validators": [],
-				"card_initial_combat_actions": [],
-				"card_is_ethereal": false,
-				"card_is_playable": true,
-				"card_is_retained": false,
-				"card_keyword_object_ids": [],
-				"card_listeners": [
-					{
-						"res://scripts/card_listeners/ListenerCardCostModifier.gd": {
-							"energy_per_stat": -2,
-							"is_turn_stat": true,
-							"modifiy_card_energy_cost_until_combat": false,
-							"modifiy_card_energy_cost_until_played": false,
-							"modifiy_card_energy_cost_until_turn": true,
-							"stat_enum": 13
-						}
-					}
-				],
-				"card_name": "Lowering Energy Attack",
-				"card_play_actions": [
-					{
-						"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
-							"actions_on_lethal": [],
-							"time_delay": 0.0
-						}
-					}
-				],
-				"card_play_validators": [],
-				"card_rarity": 1,
-				"card_remove_from_deck_actions": [],
-				"card_requires_target": true,
-				"card_retain_actions": [],
-				"card_right_click_actions": [],
-				"card_tags": [],
-				"card_texture_path": "external/sprites/cards/red/card_red.png",
-				"card_transform_in_deck_actions": [],
-				"card_type": 0,
-				"card_unremovable_from_deck": false,
-				"card_untransformable_from_deck": false,
-				"card_upgrade_amount": 0,
-				"card_upgrade_amount_max": 1,
-				"card_upgrade_value_improvements": {
-					"damage": 10
-				},
-				"card_values": {
-					"damage": 30,
-					"number_of_attacks": 1
-				},
-				"object_id": "attack_lower_cost_on_discard_card",
-				"object_uid": "Card-1777333914923.02029-4"
+				"object_id": "card_grant_energy",
+				"object_uid": "Card-1777572565245.07756-18"
 			}
 		],
 		"player_energy_max": 10,
 		"player_event_blacklisted_ids": [],
 		"player_event_pools": {
-			"event_pool_act_1_boss": [],
-			"event_pool_act_1_dialogue": [],
-			"event_pool_act_1_easy": [
-				"event_act_1_easy_combat_1",
-				"event_act_1_easy_combat_3"
-			],
-			"event_pool_act_1_hard": [
-				"event_act_1_easy_combat_3"
-			],
-			"event_pool_act_1_miniboss": []
+
 		},
-		"player_health": 70,
-		"player_health_max": 70,
-		"player_location_id": "location_3_7",
-		"player_money": 1033,
-		"player_previous_combat_stats": [
+		"player_health": 80,
+		"player_health_max": 80,
+		"player_location_id": "location_1_3",
+		"player_money": 999,
+		"player_party_members": [
 			{
-				"event_object_id": "",
 				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 5.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 122.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 5.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 122.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 3.0,
-					"CARDS_DRAWN": 31.0,
-					"CARDS_EXHAUSTED": 2.0,
-					"CARDS_PLAYED": 21.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 19.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 3.0,
-					"DECK_RESHUFFLED": 1.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 3.0,
-					"ENEMY_DAMAGED_AMOUNT": 174.0,
-					"ENEMY_DAMAGED_COUNT": 9.0,
-					"PLAYER_BLOCKED_AMOUNT": 16.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 1.0,
-					"PLAYER_DAMAGED_AMOUNT": 20.0,
-					"PLAYER_DAMAGED_COUNT": 6.0
-				},
-				"turn_count": 4,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 6.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 1.0,
-					"ENEMY_DAMAGED_AMOUNT": 105.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 3.0,
-					"PLAYER_DAMAGED_COUNT": 1.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 1.0,
-					"CARDS_DRAWN": 15.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 12.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 20.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 1.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 2.0,
-					"ENEMY_DAMAGED_AMOUNT": 164.0,
-					"ENEMY_DAMAGED_COUNT": 7.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 1.0,
-					"PLAYER_DAMAGED_AMOUNT": 5.0,
-					"PLAYER_DAMAGED_COUNT": 1.0
-				},
-				"turn_count": 2,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 8.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 20.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 2.0,
-					"ENEMY_DAMAGED_AMOUNT": 139.0,
-					"ENEMY_DAMAGED_COUNT": 6.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 3.0,
-					"CARDS_DRAWN": 15.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 9.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 176.0,
-					"ENEMY_DAMAGED_COUNT": 7.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 3.0,
-					"CARDS_DRAWN": 15.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 9.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 176.0,
-					"ENEMY_DAMAGED_COUNT": 7.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 39.0,
-					"CARDS_EXHAUSTED": 2.0,
-					"CARDS_PLAYED": 36.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 2.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 1.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 4.0,
-					"ENEMY_DAMAGED_AMOUNT": 349.0,
-					"ENEMY_DAMAGED_COUNT": 15.0,
-					"PLAYER_BLOCKED_AMOUNT": 20.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 2.0,
-					"PLAYER_DAMAGED_AMOUNT": 16.0,
-					"PLAYER_DAMAGED_COUNT": 5.0
-				},
-				"turn_count": 4,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 18.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 13.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 3.0,
-					"ENEMY_DAMAGED_AMOUNT": 180.0,
-					"ENEMY_DAMAGED_COUNT": 7.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 17.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 9.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 3.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 2.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 17.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 9.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 3.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 2.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 3.0,
-					"CARDS_DISCARDED": 2.0,
-					"CARDS_DRAWN": 18.0,
-					"CARDS_EXHAUSTED": 5.0,
-					"CARDS_PLAYED": 21.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 2.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 4.0,
-					"ENEMY_BLOCKED_COUNT": 1.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 1.0,
-					"ENEMY_DAMAGED_AMOUNT": 189.0,
-					"ENEMY_DAMAGED_COUNT": 11.0,
-					"PLAYER_BLOCKED_AMOUNT": 4.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 1.0,
-					"PLAYER_DAMAGED_AMOUNT": 1.0,
-					"PLAYER_DAMAGED_COUNT": 1.0
-				},
-				"turn_count": 2,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 3.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 13.0,
-					"CARDS_EXHAUSTED": 5.0,
-					"CARDS_PLAYED": 18.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 4.0,
-					"ENEMY_BLOCKED_COUNT": 1.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 1.0,
-					"ENEMY_DAMAGED_AMOUNT": 137.0,
-					"ENEMY_DAMAGED_COUNT": 9.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 11.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 6.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 118.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 11.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 6.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 118.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 15.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 12.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 151.0,
-					"ENEMY_DAMAGED_COUNT": 15.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 15.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 12.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 151.0,
-					"ENEMY_DAMAGED_COUNT": 15.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 10.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 4.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 2.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0.0,
-					"ENEMY_DAMAGED_AMOUNT": 124.0,
-					"ENEMY_DAMAGED_COUNT": 5.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 28.0,
-					"CARDS_EXHAUSTED": 1.0,
-					"CARDS_PLAYED": 25.0,
-					"CARDS_RETAINED": 6.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 4.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 2.0,
-					"ENEMY_DAMAGED_AMOUNT": 337.0,
-					"ENEMY_DAMAGED_COUNT": 14.0,
-					"PLAYER_BLOCKED_AMOUNT": 8.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 1.0,
-					"PLAYER_DAMAGED_AMOUNT": 4.0,
-					"PLAYER_DAMAGED_COUNT": 1.0
-				},
-				"turn_count": 3,
-				"turn_stats": {
-					"CARDS_BANISHED": 0.0,
-					"CARDS_CREATED": 0.0,
-					"CARDS_DISCARDED": 0.0,
-					"CARDS_DRAWN": 11.0,
-					"CARDS_EXHAUSTED": 0.0,
-					"CARDS_PLAYED": 8.0,
-					"CARDS_RETAINED": 0.0,
-					"CARDS_UPGRADED": 0.0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0.0,
-					"DECK_RESHUFFLED": 0.0,
-					"ENEMIES_KILLED": 3.0,
-					"ENEMY_BLOCKED_AMOUNT": 0.0,
-					"ENEMY_BLOCKED_COUNT": 0.0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 2.0,
-					"ENEMY_DAMAGED_AMOUNT": 194.0,
-					"ENEMY_DAMAGED_COUNT": 7.0,
-					"PLAYER_BLOCKED_AMOUNT": 0.0,
-					"PLAYER_BLOCKED_COUNT": 0.0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0.0,
-					"PLAYER_DAMAGED_AMOUNT": 0.0,
-					"PLAYER_DAMAGED_COUNT": 0.0
-				}
-			},
-			{
-				"event_object_id": "",
-				"object_id": "",
-				"total_stats": {
-					"CARDS_BANISHED": 0,
-					"CARDS_CREATED": 0,
-					"CARDS_DISCARDED": 0,
-					"CARDS_DRAWN": 5,
-					"CARDS_EXHAUSTED": 0,
-					"CARDS_PLAYED": 3,
-					"CARDS_RETAINED": 0,
-					"CARDS_UPGRADED": 0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0,
-					"DECK_RESHUFFLED": 0,
-					"ENEMIES_KILLED": 1,
-					"ENEMY_BLOCKED_AMOUNT": 0,
-					"ENEMY_BLOCKED_COUNT": 0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0,
-					"ENEMY_DAMAGED_AMOUNT": 72,
-					"ENEMY_DAMAGED_COUNT": 3,
-					"PLAYER_BLOCKED_AMOUNT": 0,
-					"PLAYER_BLOCKED_COUNT": 0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0,
-					"PLAYER_DAMAGED_AMOUNT": 0,
-					"PLAYER_DAMAGED_COUNT": 0
-				},
-				"turn_count": 1,
-				"turn_stats": {
-					"CARDS_BANISHED": 0,
-					"CARDS_CREATED": 0,
-					"CARDS_DISCARDED": 0,
-					"CARDS_DRAWN": 5,
-					"CARDS_EXHAUSTED": 0,
-					"CARDS_PLAYED": 3,
-					"CARDS_RETAINED": 0,
-					"CARDS_UPGRADED": 0,
-					"CUSTOM_STAT_SPECIAL_DISCARD": 0,
-					"DECK_RESHUFFLED": 0,
-					"ENEMIES_KILLED": 1,
-					"ENEMY_BLOCKED_AMOUNT": 0,
-					"ENEMY_BLOCKED_COUNT": 0,
-					"ENEMY_BLOCK_BROKEN_COUNT": 0,
-					"ENEMY_DAMAGED_AMOUNT": 72,
-					"ENEMY_DAMAGED_COUNT": 3,
-					"PLAYER_BLOCKED_AMOUNT": 0,
-					"PLAYER_BLOCKED_COUNT": 0,
-					"PLAYER_BLOCK_BROKEN_COUNT": 0,
-					"PLAYER_DAMAGED_AMOUNT": 0,
-					"PLAYER_DAMAGED_COUNT": 0
-				}
+				"party_member_character_object_id": "character_red",
+				"party_member_health": 80,
+				"party_member_health_max": 80,
+				"party_member_name": "Red Guy",
+				"party_member_party_index": 0,
+				"party_member_rare_card_increment_rate": 1.5,
+				"party_member_rare_card_modifier_base": 0.0,
+				"party_member_rare_card_modifier_current": 0.0,
+				"party_member_reward_draft_card_id_blacklist": [],
+				"party_member_reward_draft_card_id_whitelist": [],
+				"party_member_reward_draft_card_pack_ids": [
+					"card_pack_red"
+				]
 			}
 		],
+		"player_previous_combat_stats": [],
 		"player_rare_card_increment_rate": 1.5,
 		"player_rare_card_modifier_base": 0.0,
-		"player_rare_card_modifier_current": 27.0,
+		"player_rare_card_modifier_current": 0.0,
 		"player_reward_draft_card_id_blacklist": [],
 		"player_reward_draft_card_id_whitelist": [],
 		"player_rng": {
-			"rng_act_selection": [
-				"1234567890123456",
-				"-8977863440570618542"
-			],
 			"rng_artifact_rewards": [
 				"1234567890123456",
-				"-2546528159648030676"
-			],
-			"rng_card_picking": [
-				"1234567890123456",
-				"-4404745940637162566"
-			],
-			"rng_card_transforming": [
-				"1234567890123456",
-				"5252985539956057672"
-			],
-			"rng_damage": [
-				"1234567890123456",
-				"7929087461675476966"
-			],
-			"rng_enemy_attack_patterns": [
-				"1234567890123456",
-				"4233248233827509720"
-			],
-			"rng_enemy_spawning": [
-				"1234567890123456",
-				"2233782237861116643"
-			],
-			"rng_event_pool": [
-				"1234567890123456",
-				"3171489382214596996"
-			],
-			"rng_events": [
-				"1234567890123456",
-				"9183250231855148834"
-			],
-			"rng_non_reward_card_drafting": [
-				"1234567890123456",
-				"-4682559121157831026"
-			],
-			"rng_pile_insert": [
-				"1234567890123456",
-				"-1985101550695362596"
-			],
-			"rng_reward_card_drafts": [
-				"1234567890123456",
-				"843870617745446821"
-			],
-			"rng_reward_money": [
-				"1234567890123456",
-				"3171489382214596996"
+				"8580059094936064824"
 			],
 			"rng_run_start_options": [
 				"1234567890123456",
 				"8013364682693980235"
 			],
-			"rng_shop": [
-				"1234567890123456",
-				"5308957963932755133"
-			],
-			"rng_shuffle": [
-				"1234567890123456",
-				"4808903396878898966"
-			],
-			"rng_targeting": [
-				"1234567890123456",
-				"-2933642619444945506"
-			],
 			"rng_world_generation": [
 				"1234567890123456",
-				"6812210899449427816"
+				"-2992668190105492044"
 			]
 		},
-		"player_run_difficulty_level": 1,
-		"player_run_modifier_object_ids": [
-			"run_modifier_difficulty_1",
-			"run_modifier_draft_all_colors"
-		],
+		"player_run_difficulty_level": 0,
+		"player_run_modifier_object_ids": [],
 		"player_run_seed": 1234567890123456,
 		"player_shop_data": null,
 		"player_values": {
@@ -4956,8 +2522,7 @@
 		},
 		"reward_cards_per_draft": 3,
 		"reward_draft_card_pack_ids": [
-			"card_pack_orange",
-			"card_pack_prismatic"
+			"card_pack_red"
 		],
 		"reward_drafts": 1
 	}

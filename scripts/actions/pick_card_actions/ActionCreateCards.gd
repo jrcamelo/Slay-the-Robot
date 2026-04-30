@@ -12,6 +12,15 @@ func perform_action():
 		if created_card_object_id != "":
 			for i in number_of_cards:
 				var card_data: CardData = Global.get_card_data_from_prototype(created_card_object_id)
+				if Global.player_data.has_party_members():
+					if card_play_request != null and card_play_request.card_data != null:
+						var source_party_member: PartyMemberData = Global.player_data.get_party_member_for_card(card_play_request.card_data)
+						if source_party_member != null:
+							Global.player_data.assign_card_owner(card_data, source_party_member.party_member_party_index)
+						else:
+							Global.player_data.ensure_card_has_owner(card_data)
+					else:
+						Global.player_data.ensure_card_has_owner(card_data)
 				picked_cards.append(card_data)
 	
 	# overwrite picked_cards action value with the generated cards, for child cardset actions

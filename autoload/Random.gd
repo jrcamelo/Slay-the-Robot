@@ -123,66 +123,69 @@ const CARD_DRAFT_RARITY_WEIGHTS: Dictionary = {
 	
 }	# affects the chances of a card being seen during a rarity weighted draft
 
-func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_cards, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true) -> Array[CardData]:
-	# randomly gets a number of cards from the card pool and returns a list of them
-	# factors in card rarity and a pity system
-	var returned_cards: Array[CardData] = []
-	
-	# get the desired loot table weights
+func _build_card_draft_loot_table(card_draft_table_type: int, rare_card_modifier_current: float = 0.0, use_pity_system: bool = true) -> Dictionary[Variant, int]:
 	var loot_table: Dictionary[Variant, int] = {}
 	loot_table.assign(CARD_DRAFT_RARITY_WEIGHTS[card_draft_table_type].duplicate(true))
-	# get cards available to player sorted by rarity, duplicated to allow mutation
-	var player_reward_card_rarity_cache: Dictionary[int, Array] = Global.player_data.player_reward_card_rarity_cache.duplicate(true)
-	var card_ids_in_draft: Array[String] = []
-	
 	if use_pity_system:
-		# rare cards show up and commons show up less
-		var player_rare_card_modifier_current: int = int(floor(Global.player_data.player_rare_card_modifier_current))
+		var pity_modifier: int = int(floor(rare_card_modifier_current))
 		var rare: Variant = CardData.CARD_RARITIES.RARE # typecasting into Variant to get around Dict[Variant,] bug
 		var common: Variant = CardData.CARD_RARITIES.COMMON # typecasting into Variant to get around Dict[Variant,] bug
-		loot_table[rare] = loot_table[rare] + player_rare_card_modifier_current
-		loot_table[common] = loot_table[common] - player_rare_card_modifier_current
-	
-	
-	var rarity_to_card_pool: Dictionary = {} # cached card pools per rarity ensures no duplicates
+		loot_table[rare] = loot_table[rare] + pity_modifier
+		loot_table[common] = loot_table[common] - pity_modifier
+	return loot_table
+
+func _generate_rarity_weighted_card_draft_from_cache(rng: RandomNumberGenerator, number_of_cards: int, reward_card_rarity_cache: Dictionary[int, Array], rare_card_modifier_current: float, rare_card_increment_rate: float, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true) -> Dictionary:
+	var loot_table: Dictionary[Variant, int] = _build_card_draft_loot_table(card_draft_table_type, rare_card_modifier_current, use_pity_system)
+	var local_reward_card_rarity_cache: Dictionary[int, Array] = reward_card_rarity_cache.duplicate(true)
+	var card_ids_in_draft: Array[String] = []
+	var local_rare_card_modifier_current: float = rare_card_modifier_current
 	var rare_card_found: bool = false
 	
-	# get all the card ids for this draft, using randomly weighted selection of rarity buckets
-	for i in number_of_cards:
-		# determine what bucket of rarity the roll falls in
+	for _i: int in range(number_of_cards):
 		var selected_card_rarity: int = CardData.CARD_RARITIES.COMMON
 		selected_card_rarity = get_weighted_selection(rng, loot_table)
 		
-		
-		if player_reward_card_rarity_cache.has(selected_card_rarity):
-			# get the cards in the selected rarity bucket
-			var card_id_bucket: Array = player_reward_card_rarity_cache[selected_card_rarity]
+		if local_reward_card_rarity_cache.has(selected_card_rarity):
+			var card_id_bucket: Array = local_reward_card_rarity_cache[selected_card_rarity]
 			shuffle_array(rng, card_id_bucket)
 			var selected_card_id: String = ""
 			
-			# go through the bucket until emptied or a non duplicate card is found
 			while selected_card_id == "" and len(card_id_bucket) > 0:
 				selected_card_id = card_id_bucket.pop_back()
 				if card_ids_in_draft.has(selected_card_id):
 					selected_card_id = ""
 			
 			if selected_card_id == "":
-				DebugLogger.log_warning("Random.generate_rarity_weighted_card_draft(): Insufficient cards IDs in rarity bucket {0} for drafting".format([selected_card_rarity]))
+				DebugLogger.log_warning("Random._generate_rarity_weighted_card_draft_from_cache(): Insufficient card IDs in rarity bucket {0} for drafting".format([selected_card_rarity]))
 			else:
 				card_ids_in_draft.append(selected_card_id)
-			
-				# pity system
+				
 				if use_pity_system:
 					if selected_card_rarity == CardData.CARD_RARITIES.RARE:
 						rare_card_found = true
 					if selected_card_rarity == CardData.CARD_RARITIES.COMMON:
-						# finding a common card increases the pity weighting
-						Global.player_data.player_rare_card_modifier_current += Global.player_data.player_rare_card_increment_rate
+						local_rare_card_modifier_current += rare_card_increment_rate
 	
-	# convert card ids into card prototypes
-	returned_cards = Global.get_card_data_from_prototypes(card_ids_in_draft)
-	
-	return returned_cards
+	return {
+		"cards": Global.get_card_data_from_prototypes(card_ids_in_draft),
+		"rare_card_modifier_current": local_rare_card_modifier_current,
+		"rare_card_found": rare_card_found,
+	}
+
+func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_cards, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true) -> Array[CardData]:
+	# randomly gets a number of cards from the card pool and returns a list of them
+	# factors in card rarity and a pity system
+	var draft_result: Dictionary = _generate_rarity_weighted_card_draft_from_cache(
+		rng,
+		number_of_cards,
+		Global.player_data.player_reward_card_rarity_cache,
+		Global.player_data.player_rare_card_modifier_current,
+		Global.player_data.player_rare_card_increment_rate,
+		card_draft_table_type,
+		use_pity_system
+	)
+	Global.player_data.player_rare_card_modifier_current = draft_result["rare_card_modifier_current"]
+	return draft_result["cards"]
 
 
 ### Artifacts
@@ -245,7 +248,26 @@ func get_location_card_rewards(location_data: LocationData = Global.get_player_l
 	
 	var rng_reward_card_drafts: RandomNumberGenerator = Global.player_data.get_player_rng("rng_reward_card_drafts")
 	for i in number_of_drafts:
-		var card_draft: Array[CardData] = generate_rarity_weighted_card_draft(rng_reward_card_drafts, cards_per_draft, card_draft_table_type, true)
+		var card_draft: Array[CardData] = []
+		if Global.player_data.has_party_members():
+			# TODO: If the prototype ever supports non-party rewards, branch on reward type instead of party presence.
+			for party_member_data: PartyMemberData in Global.player_data.player_party_members:
+				var party_member_draft_result: Dictionary = _generate_rarity_weighted_card_draft_from_cache(
+					rng_reward_card_drafts,
+					1,
+					party_member_data.party_member_reward_card_rarity_cache,
+					party_member_data.party_member_rare_card_modifier_current,
+					party_member_data.party_member_rare_card_increment_rate,
+					card_draft_table_type,
+					true
+				)
+				party_member_data.party_member_rare_card_modifier_current = party_member_draft_result["rare_card_modifier_current"]
+				var owner_cards: Array = party_member_draft_result["cards"]
+				for card_data: CardData in owner_cards:
+					Global.player_data.assign_card_owner(card_data, party_member_data.party_member_party_index)
+					card_draft.append(card_data)
+		else:
+			card_draft = generate_rarity_weighted_card_draft(rng_reward_card_drafts, cards_per_draft, card_draft_table_type, true)
 		card_draft_rewards.append(card_draft)
 		
 	return card_draft_rewards

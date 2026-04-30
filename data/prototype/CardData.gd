@@ -3,6 +3,8 @@ extends PrototypeData
 class_name CardData
 
 var parent_card: CardData = null	# the parent card in the player's true deck that this one was copied from. This is used for cards copied from the player's deck in combat. This is not the prototype the card is made from. This should only ever be one layer deep at most. Mainly used for meta scaling cards.
+@export var card_owner_party_index: int = -1
+@export var card_owner_character_object_id: String = ""
 @export var card_name: String = ""
 @export var card_description: String = ""
 @export var card_texture_path: String = ""
@@ -228,6 +230,8 @@ func upgrade_card() -> void:
 func transform_card(new_card_object_id: String) -> void:
 	# transforms a card, overwriting the values of a card with that of a new card prototype id's values
 	var old_uid: String = object_uid
+	var old_owner_party_index: int = card_owner_party_index
+	var old_owner_character_object_id: String = card_owner_character_object_id
 	var card_data: CardData = Global.get_card_data_from_prototype(new_card_object_id)
 	var exported_properties: Dictionary = card_data.get_serializable_properties()
 	for property_name in exported_properties.keys():
@@ -235,6 +239,8 @@ func transform_card(new_card_object_id: String) -> void:
 		set(property_name, property_value)
 	
 	object_uid = old_uid # preserve the uid between transforms
+	card_owner_party_index = old_owner_party_index
+	card_owner_character_object_id = old_owner_character_object_id
 	Signals.card_transformed.emit(self)
 
 func add_card_tag(card_tag: String) -> void:

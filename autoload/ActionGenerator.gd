@@ -28,7 +28,8 @@ func generate_card_play_finished(card_play_request: CardPlayRequest) -> BaseActi
 	var action_data: Array[Dictionary] = [{
 		Scripts.ACTION_CARD_PLAY_END: {}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), card_play_request, [], action_data, null)[0]
+	var action_owner: Player = Global.get_card_owner_player(card_play_request.card_data)
+	var generated_action: BaseAction = ActionGenerator.create_actions(action_owner, card_play_request, [], action_data, null)[0]
 	
 	return generated_action
 
