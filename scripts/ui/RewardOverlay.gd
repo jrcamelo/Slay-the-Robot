@@ -118,7 +118,7 @@ func _on_reward_group_selected(reward_group: int):
 #region Reward Data
 func add_location_rewards() -> void:
 	# adds rewards from the location to the end of combat rewards
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_default_player_combatant()
 	var action_data: Array[Dictionary] = [{
 	Scripts.ACTION_GRANT_REWARDS: {
 		"reward_group": 0,
@@ -127,7 +127,7 @@ func add_location_rewards() -> void:
 		"artifact_ids": Random.get_location_artifact_rewards(),
 		}
 	}]
-	var grant_reward_action: BaseAction = ActionGenerator.create_actions(player, null, [player], action_data, null)[0]
+	var grant_reward_action: BaseAction = ActionGenerator.create_actions(player, null, [], action_data, null)[0]
 	grant_reward_action.perform_action()
 
 func add_rewards(reward_group: int, money_amount: int, card_drafts: Array[Array], artifact_ids: Array[String], custom_action_data: Array[Array]):

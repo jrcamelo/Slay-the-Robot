@@ -7,4 +7,7 @@ func perform_action() -> void:
 	for action_interceptor_processor in action_interceptor_processors:
 		var picked_cards: Array[CardData] = _get_picked_cards()
 		var card_destination: int = action_interceptor_processor.get_shadowed_action_values("card_destination", CardPlayRequest.CARD_PLAY_DESTINATIONS.DRAW_TOP)
+		if Global.player_data.has_party_members():
+			for card_data: CardData in picked_cards:
+				_assign_cardset_owner(card_data)
 		Signals.card_add_to_draw_requested.emit(picked_cards, card_destination)

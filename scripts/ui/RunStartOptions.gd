@@ -87,8 +87,8 @@ func clear_run_start_options() -> void:
 		child.queue_free()
 	
 func _on_dialogue_option_clicked(dialogue_option: DialogueOption):
-	var player: Player = Global.get_player()
-	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(player, null, [player], dialogue_option.action_data, null)
+	var player: Player = Global.get_default_player_combatant()
+	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(player, null, [], dialogue_option.action_data, null)
 	ActionHandler.add_actions(generated_actions)
 	clear_run_start_options()
 	visible = false
@@ -96,8 +96,9 @@ func _on_dialogue_option_clicked(dialogue_option: DialogueOption):
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
-	map.can_travel = true
-	map.show_map()
+	if not Global.player_data.are_all_party_members_dead():
+		map.can_travel = true
+		map.show_map()
 	
 func _on_run_started():
 	visible = false

@@ -15,7 +15,7 @@ func perform_action():
 			# perform actions of consumable
 			if consumable_data != null:
 				var action_data: Array[Dictionary] = consumable_data.consumable_actions
-				var player: Player = Global.get_player()
+				var player: Player = Global.get_default_player_combatant()
 				
 				var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(player, null, targets, action_data, null)
 				ActionHandler.add_actions(generated_actions)

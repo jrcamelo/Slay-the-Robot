@@ -41,7 +41,7 @@ func generate_start_of_turn_draw_actions(number_of_cards: int = PlayerData.PLAYE
 			"is_start_of_turn_draw": true # use interceptors checking this flag to adjust number_of_cards
 		}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -55,7 +55,7 @@ func generate_act(act_id: String, act_number: int = 1) -> void:
 			"act_number": act_number,
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -85,7 +85,7 @@ func generate_visit_location(location_id: String, autosave_before_visit = true) 
 			"autosave_before_visit": autosave_before_visit
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -111,7 +111,7 @@ func generate_chest_open() -> void:
 			"chest_cards_per_draft": Global.player_data.reward_cards_per_draft,
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -131,7 +131,7 @@ shop_consumable_ids: Array[String], shop_consumable_prices: Array[int]) -> void:
 			"shop_consumable_prices": shop_consumable_prices,
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -146,7 +146,7 @@ func generate_combat_start(event_object_id: String) -> void:
 			"event_object_id": event_object_id
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -158,7 +158,7 @@ func generate_use_consumable(selected_target: BaseCombatant, consumable_slot_ind
 			"consumable_slot_index": consumable_slot_index
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [selected_target], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [selected_target], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()
@@ -171,7 +171,7 @@ func generate_decay_status_effect(selected_target: BaseCombatant, status_effect_
 			"status_charge_amount": decay_amount
 			}
 		}]
-	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_player(), null, [selected_target], action_data, null)[0]
+	var generated_action: BaseAction = ActionGenerator.create_actions(Global.get_default_player_combatant(), null, [selected_target], action_data, null)[0]
 	
 	# immediately process this action without ActionHandler
 	generated_action.perform_action()

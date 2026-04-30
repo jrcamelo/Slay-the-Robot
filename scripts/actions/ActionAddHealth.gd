@@ -4,8 +4,11 @@ extends BaseAction
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	var party_member_data: PartyMemberData = null
-	if Global.player_data.has_party_members() and card_play_request != null and card_play_request.card_data != null:
-		party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
+	if Global.player_data.has_party_members():
+		if parent_combatant is Player:
+			party_member_data = parent_combatant.get_party_member_data()
+		if party_member_data == null and card_play_request != null and card_play_request.card_data != null:
+			party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
 	# TODO: Generalize health actions to target specific allies once ally-targeting UI exists.
 	
 	for action_interceptor_processor in action_interceptor_processors:
@@ -13,7 +16,8 @@ func perform_action():
 		var health_max_amount: int = action_interceptor_processor.get_shadowed_action_values("health_max_amount", 0)
 		if party_member_data != null:
 			party_member_data.add_health(health_amount, health_max_amount)
-			Global.player_data.synchronize_legacy_primary_member_state()
+			if party_member_data.party_member_party_index == 0:
+				Global.player_data.synchronize_legacy_primary_member_state()
 			Signals.player_health_changed.emit()
 		else:
 			Global.player_data.add_health(health_amount, health_max_amount)

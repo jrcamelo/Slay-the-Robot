@@ -10,5 +10,5 @@ func perform_action() -> void:
 		var picked_cards: Array[CardData] = _get_picked_cards()
 		if Global.player_data.has_party_members():
 			for card_data: CardData in picked_cards:
-				Global.player_data.ensure_card_has_owner(card_data)
+				_assign_cardset_owner(card_data)
 		Signals.card_add_to_hand_requested.emit(picked_cards, hand_card_count_max)

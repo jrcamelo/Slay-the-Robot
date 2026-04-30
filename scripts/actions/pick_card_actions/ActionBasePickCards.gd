@@ -36,6 +36,17 @@ const DECK_PICK_TYPES: Array = [
 	CARD_PICK_TYPES.PLAYED_LAST_TURN,
 	]
 
+func _assign_generated_card_owners(cards: Array[CardData]) -> Array[CardData]:
+	if not Global.player_data.has_party_members():
+		return cards
+	var source_party_member: PartyMemberData = Global.get_context_party_member(null, parent_combatant, self)
+	for card_data: CardData in cards:
+		if source_party_member != null:
+			Global.player_data.assign_card_owner(card_data, source_party_member.party_member_party_index)
+		else:
+			Global.player_data.ensure_card_has_owner(card_data)
+	return cards
+
 ### Override These
 
 func perform_async_action() -> void:
@@ -154,6 +165,7 @@ func perform_action():
 ## or filter all cards using validator criteria.
 func get_drafted_cards() -> Array[CardData]:
 	var filtered_card_draft: Array[CardData] = []
+	var source_party_member: PartyMemberData = Global.get_context_party_member(null, parent_combatant, self)
 	
 	# a specific card pack to use
 	# for complex queries you may wish to generate a card pack specific for the draft rather
@@ -179,9 +191,9 @@ func get_drafted_cards() -> Array[CardData]:
 		var draft_probability_is_weighted: bool = get_action_value("draft_is_weighted", false)
 		var draft_use_pity_system: bool = get_action_value("draft_use_pity_system", false)
 		if draft_probability_is_weighted:
-			filtered_card_draft = Random.generate_rarity_weighted_card_draft(rng_non_reward_card_drafting, draft_max_card_amount, Random.CARD_DRAFT_TABLE_TYPES.STANDARD, draft_use_pity_system)
+			filtered_card_draft = Random.generate_rarity_weighted_card_draft(rng_non_reward_card_drafting, draft_max_card_amount, Random.CARD_DRAFT_TABLE_TYPES.STANDARD, draft_use_pity_system, source_party_member)
 		else:
-			filtered_card_draft = Random.generate_unweighted_card_draft(rng_non_reward_card_drafting, draft_max_card_amount)	
+			filtered_card_draft = Random.generate_unweighted_card_draft(rng_non_reward_card_drafting, draft_max_card_amount, source_party_member)	
 	else:
 		# generate a draft from all cards and narrow using validators
 		var card_validator_data: Array = get_card_pick_validator_data()
@@ -191,7 +203,7 @@ func get_drafted_cards() -> Array[CardData]:
 		# generate the card instances
 		filtered_card_draft = Global.get_card_data_from_prototypes(card_ids)
 	
-	return filtered_card_draft
+	return _assign_generated_card_owners(filtered_card_draft)
 
 ### Picking Validation Methods
 

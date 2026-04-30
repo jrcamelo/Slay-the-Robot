@@ -113,15 +113,15 @@ func _on_dialogue_option_clicked(dialogue_option: DialogueOption) -> void:
 	var dialogue_option_data: DialogueOptionData = current_dialogue_data.get_dialogue_option(dialogue_option_object_id)
 	
 	# perform dialogue option actions
-	var player: Player = Global.get_player()
-	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(player, null, [player], dialogue_option.action_data, null)
+	var player: Player = Global.get_default_player_combatant()
+	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(player, null, [], dialogue_option.action_data, null)
 	ActionHandler.add_actions(generated_actions)
 	
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
 	# check if player dead
-	if not player.is_alive():
+	if Global.player_data.are_all_party_members_dead():
 		end_dialogue()
 		return
 	

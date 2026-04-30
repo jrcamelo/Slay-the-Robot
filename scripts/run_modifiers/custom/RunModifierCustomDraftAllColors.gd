@@ -11,6 +11,6 @@ func run_start_modification() -> void:
 		}}
 	]
 	
-	var player: Player = Global.get_player()
-	var generated_action: BaseAction = ActionGenerator.create_actions(player, null, [player], action_data, null)[0]
+	var player: Player = Global.get_default_player_combatant()
+	var generated_action: BaseAction = ActionGenerator.create_actions(player, null, [], action_data, null)[0]
 	generated_action.perform_action()

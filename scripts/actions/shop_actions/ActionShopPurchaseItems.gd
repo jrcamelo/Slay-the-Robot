@@ -15,7 +15,7 @@ func perform_action():
 		var shop_data: ShopData = Global.get_shop_at_player_location()
 		if shop_data != null:
 			var player_money: int = Global.player_data.player_money
-			var player: Player = Global.get_player()
+			var player: Player = Global.get_default_player_combatant()
 			var action_data: Array[Dictionary] = []
 			
 			# purchasing cards

@@ -72,11 +72,14 @@ func test_weighted_selection(weights: Dictionary[Variant, int]) -> void:
 
 ## Randomly gets a number of cards from the player's card pool and returns a list of them.
 ## This ignores weighting.
-func generate_unweighted_card_draft(rng: RandomNumberGenerator, number_of_cards: int) -> Array[CardData]:
+func generate_unweighted_card_draft(rng: RandomNumberGenerator, number_of_cards: int, party_member_data: PartyMemberData = null) -> Array[CardData]:
 	var returned_cards: Array[CardData] = []
 	
 	# randomize ordered list of all player card pool
-	var card_pool_ids: Array = Global.player_data.player_reward_card_filter_cache.convert_to_unique_card_object_ids()
+	var card_pool_filter: CardFilter = Global.player_data.player_reward_card_filter_cache
+	if party_member_data != null and party_member_data.party_member_reward_card_filter_cache != null:
+		card_pool_filter = party_member_data.party_member_reward_card_filter_cache
+	var card_pool_ids: Array = card_pool_filter.convert_to_unique_card_object_ids()
 	card_pool_ids = shuffle_slice_array(rng, card_pool_ids, number_of_cards)
 	returned_cards = Global.get_card_data_from_prototypes(card_pool_ids)
 	return returned_cards
@@ -172,19 +175,29 @@ func _generate_rarity_weighted_card_draft_from_cache(rng: RandomNumberGenerator,
 		"rare_card_found": rare_card_found,
 	}
 
-func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_cards, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true) -> Array[CardData]:
+func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_cards, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true, party_member_data: PartyMemberData = null) -> Array[CardData]:
 	# randomly gets a number of cards from the card pool and returns a list of them
 	# factors in card rarity and a pity system
+	var reward_card_rarity_cache: Dictionary[int, Array] = Global.player_data.player_reward_card_rarity_cache
+	var rare_card_modifier_current: float = Global.player_data.player_rare_card_modifier_current
+	var rare_card_increment_rate: float = Global.player_data.player_rare_card_increment_rate
+	if party_member_data != null:
+		reward_card_rarity_cache = party_member_data.party_member_reward_card_rarity_cache
+		rare_card_modifier_current = party_member_data.party_member_rare_card_modifier_current
+		rare_card_increment_rate = party_member_data.party_member_rare_card_increment_rate
 	var draft_result: Dictionary = _generate_rarity_weighted_card_draft_from_cache(
 		rng,
 		number_of_cards,
-		Global.player_data.player_reward_card_rarity_cache,
-		Global.player_data.player_rare_card_modifier_current,
-		Global.player_data.player_rare_card_increment_rate,
+		reward_card_rarity_cache,
+		rare_card_modifier_current,
+		rare_card_increment_rate,
 		card_draft_table_type,
 		use_pity_system
 	)
-	Global.player_data.player_rare_card_modifier_current = draft_result["rare_card_modifier_current"]
+	if party_member_data != null:
+		party_member_data.party_member_rare_card_modifier_current = draft_result["rare_card_modifier_current"]
+	else:
+		Global.player_data.player_rare_card_modifier_current = draft_result["rare_card_modifier_current"]
 	return draft_result["cards"]
 
 

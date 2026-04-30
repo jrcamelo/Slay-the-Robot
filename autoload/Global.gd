@@ -368,6 +368,14 @@ func get_primary_living_player() -> Player:
 		return null
 	return living_players[0]
 
+func get_default_player_combatant(allow_dead_fallback: bool = true) -> Player:
+	var player: Player = get_primary_living_player()
+	if player != null:
+		return player
+	if allow_dead_fallback:
+		return get_player()
+	return null
+
 func get_player_by_party_index(party_index: int) -> Player:
 	for player: Player in get_players():
 		if player.has_method("get_party_member_index") and player.get_party_member_index() == party_index:
@@ -383,6 +391,29 @@ func get_card_owner_player(card_data: CardData) -> Player:
 		if owner_player != null:
 			return owner_player
 	return get_player()
+
+func get_party_member_for_combatant(combatant: BaseCombatant) -> PartyMemberData:
+	if not player_data.has_party_members():
+		return null
+	if combatant is Player:
+		return combatant.get_party_member_data()
+	return null
+
+func get_context_party_member(card_data: CardData = null, combatant: BaseCombatant = null, action: BaseAction = null) -> PartyMemberData:
+	if not player_data.has_party_members():
+		return null
+	if action != null:
+		var action_party_member: PartyMemberData = get_party_member_for_combatant(action.parent_combatant)
+		if action_party_member != null:
+			return action_party_member
+		if action.card_play_request != null and action.card_play_request.card_data != null:
+			return player_data.get_party_member_for_card(action.card_play_request.card_data)
+	var combatant_party_member: PartyMemberData = get_party_member_for_combatant(combatant)
+	if combatant_party_member != null:
+		return combatant_party_member
+	if card_data != null:
+		return player_data.get_party_member_for_card(card_data)
+	return player_data.get_primary_party_member()
 
 #region Combat Stats
 func get_combat_stats() -> CombatStatsData:

@@ -79,7 +79,7 @@ func increment_artifact_counter(increment: int) -> void:
 ## Automatically includes itself and the counter in the payload.
 func perform_artifact_actions(action_data: Array[Dictionary]) -> void:
 	if len(action_data) > 0:
-		var player: Player = Global.get_player()
+		var player: Player = Global.get_default_player_combatant()
 		var card_play_request: CardPlayRequest = CardPlayRequest.new() # dummy card play request
 		# You can use custom_key_names in the artifact's action payloads to convert
 		# artifact_counter into a parameter of the action
@@ -88,16 +88,44 @@ func perform_artifact_actions(action_data: Array[Dictionary]) -> void:
 			"artifact_counter": artifact_counter
 		}
 		
-		var actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], action_data, null)
+		var artifact_action_groups: Dictionary = _split_artifact_actions_by_player_target(action_data)
+		var actions: Array[BaseAction] = []
+		var untargeted_actions: Array[Dictionary] = artifact_action_groups["untargeted_actions"]
+		if len(untargeted_actions) > 0:
+			actions.append_array(ActionGenerator.create_actions(player, card_play_request, [], untargeted_actions, null))
+		var player_targeted_actions: Array[Dictionary] = artifact_action_groups["player_targeted_actions"]
+		if len(player_targeted_actions) > 0:
+			var player_targets: Array[BaseCombatant] = []
+			for player_target: Player in Global.get_living_players():
+				player_targets.append(player_target)
+			if len(player_targets) == 0 and player != null:
+				player_targets.append(player)
+			actions.append_array(ActionGenerator.create_actions(player, card_play_request, player_targets, player_targeted_actions, null))
 		ActionHandler.add_actions(actions, true)
 		
 		Signals.artifact_proc.emit(self)
+
+func _split_artifact_actions_by_player_target(action_data: Array[Dictionary]) -> Dictionary:
+	var player_targeted_actions: Array[Dictionary] = []
+	var untargeted_actions: Array[Dictionary] = []
+	for action_data_entry: Dictionary in action_data:
+		for action_path: String in action_data_entry:
+			var action_values: Dictionary = action_data_entry[action_path]
+			var target_override: int = action_values.get("target_override", BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS)
+			if target_override == BaseAction.TARGET_OVERRIDES.PLAYER:
+				player_targeted_actions.append(action_data_entry)
+			else:
+				untargeted_actions.append(action_data_entry)
+	return {
+		"player_targeted_actions": player_targeted_actions,
+		"untargeted_actions": untargeted_actions,
+	}
 
 ## Creates an interceptable artifact increment action which is added to the action stack.
 ## This provides an alternate way of changing the counter in a way that can be manipulated and
 ## consistent with the stack, compared to increment_artifact_counter()
 func create_artifact_counter_increment_action(increment_amount: int) -> void:
-	var player: Player = Global.get_player()
+	var player: Player = Global.get_default_player_combatant()
 	var card_play_request: CardPlayRequest = CardPlayRequest.new() # dummy card play request
 	var action_data: Array[Dictionary] = [{Scripts.ACTION_INCREASE_ARTIFACT_CHARGE: {}}]
 	# You can use custom_key_names in the artifact's action payloads to convert

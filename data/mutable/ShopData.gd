@@ -56,6 +56,8 @@ func visit_shop() -> void:
 		
 		### Generate Items
 		# generates shop cards
+		# TODO: Decide whether party-mode shops should offer owner-specific cards or a shared pool.
+		# The current prototype keeps the legacy shared draft behavior here.
 		var generated_cards: Array[CardData] = Random.generate_rarity_weighted_card_draft(rng_shop, ShopData.GENERATED_CARD_COUNT, Random.CARD_DRAFT_TABLE_TYPES.SHOP, false)
 		
 		# generate regular artifacts from player artifact pool

@@ -49,5 +49,15 @@ func _get_picked_cards() -> Array[CardData]:
 	
 	return []
 
+func _assign_cardset_owner(card_data: CardData) -> CardData:
+	if card_data == null:
+		return null
+	if Global.player_data.has_party_members():
+		var source_party_member: PartyMemberData = Global.get_context_party_member(card_data, parent_combatant, self)
+		if source_party_member != null:
+			return Global.player_data.assign_card_owner(card_data, source_party_member.party_member_party_index)
+		return Global.player_data.ensure_card_has_owner(card_data)
+	return card_data
+
 func _to_string():
 	return "BaseCardset Action"

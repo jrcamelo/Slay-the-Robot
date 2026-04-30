@@ -6,9 +6,10 @@ func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	var party_member_data: PartyMemberData = null
 	if Global.player_data.has_party_members():
-		if card_play_request != null and card_play_request.card_data != null:
+		if parent_combatant is Player:
+			party_member_data = parent_combatant.get_party_member_data()
+		if party_member_data == null and card_play_request != null and card_play_request.card_data != null:
 			party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
-		# TODO: Once player combatants expose party-member indices, also resolve from parent_combatant.
 	
 	for action_interceptor_processor: ActionInterceptorProcessor in action_interceptor_processors:
 		# option to reset to character's starting card packs
@@ -67,8 +68,8 @@ func perform_action():
 				if not Global.player_data.player_reward_draft_card_id_whitelist.has(whitelist_card_object_id):
 					Global.player_data.player_reward_draft_card_id_whitelist.append(whitelist_card_object_id)
 				# remove blacklisted cards if whitelisted
-				if Global.player_data.player_event_blacklisted_ids.has(whitelist_card_object_id):
-					Global.player_data.player_event_blacklisted_ids.erase(whitelist_card_object_id)
+				if Global.player_data.player_reward_draft_card_id_blacklist.has(whitelist_card_object_id):
+					Global.player_data.player_reward_draft_card_id_blacklist.erase(whitelist_card_object_id)
 		
 		# blacklist card ids
 		var blacklist_card_object_ids: Array[String] = []

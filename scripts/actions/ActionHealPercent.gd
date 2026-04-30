@@ -4,8 +4,11 @@ extends BaseAction
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	var party_member_data: PartyMemberData = null
-	if Global.player_data.has_party_members() and card_play_request != null and card_play_request.card_data != null:
-		party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
+	if Global.player_data.has_party_members():
+		if parent_combatant is Player:
+			party_member_data = parent_combatant.get_party_member_data()
+		if party_member_data == null and card_play_request != null and card_play_request.card_data != null:
+			party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
 	# TODO: Generalize percentage healing to target specific allies once ally-targeting UI exists.
 	
 	for action_interceptor_processor in action_interceptor_processors:
@@ -13,7 +16,8 @@ func perform_action():
 		if party_member_data != null:
 			var percentage_health: int = int(ceil(float(party_member_data.party_member_health_max) * percentage_heal_amount))
 			party_member_data.add_health(percentage_health, 0)
-			Global.player_data.synchronize_legacy_primary_member_state()
+			if party_member_data.party_member_party_index == 0:
+				Global.player_data.synchronize_legacy_primary_member_state()
 			Signals.player_health_changed.emit()
 		else:
 			Global.player_data.heal_percentage(percentage_heal_amount)

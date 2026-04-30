@@ -88,9 +88,9 @@ func perform_action() -> void:
 		}
 		
 		# adds rewards
-		var player: Player = Global.get_player()
+		var player: Player = Global.get_default_player_combatant()
 		var action_data: Array[Dictionary] = [{
 		Scripts.ACTION_GRANT_REWARDS: chest_contents
 		}]
-		var grant_reward_action: BaseAction = ActionGenerator.create_actions(player, null, [player], action_data, null)[0]
+		var grant_reward_action: BaseAction = ActionGenerator.create_actions(player, null, [], action_data, null)[0]
 		grant_reward_action.perform_action()

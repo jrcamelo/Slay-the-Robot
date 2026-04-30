@@ -117,6 +117,8 @@ func update_incoming_damage_amount(recalculate_enemy_intent: bool = true) -> voi
 		
 		if recalculate_enemy_intent:
 			enemy.update_enemy_intent()
+		if enemy.get_intent_target_player() != self:
+			continue
 		
 		incoming_damage_amount += enemy.enemy_intent_attack_damage * enemy.enemy_intent_number_of_attacks
 

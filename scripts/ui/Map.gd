@@ -108,8 +108,7 @@ func _on_shop_opened():
 	can_travel = true
 
 func _on_dialogue_ended():
-	var player: Player = Global.get_player()
-	if player.is_alive():
+	if not Global.player_data.are_all_party_members_dead():
 		can_travel = true
 		show_map()
 	else:
