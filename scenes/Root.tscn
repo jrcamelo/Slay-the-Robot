@@ -597,7 +597,6 @@ disabled = true
 text = "Consumables"
 
 [node name="RunScreen" type="Control" parent="." unique_id=1832602911]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0

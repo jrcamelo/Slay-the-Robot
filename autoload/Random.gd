@@ -200,6 +200,29 @@ func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_c
 		Global.player_data.player_rare_card_modifier_current = draft_result["rare_card_modifier_current"]
 	return draft_result["cards"]
 
+func _get_random_party_member(rng: RandomNumberGenerator) -> PartyMemberData:
+	if not Global.player_data.has_party_members():
+		return null
+	var party_members: Array[PartyMemberData] = Global.player_data.player_party_members.duplicate()
+	if len(party_members) == 0:
+		return null
+	party_members = Random.shuffle_array(rng, party_members)
+	return party_members[0]
+
+func generate_random_party_owned_weighted_card_draft(rng: RandomNumberGenerator, number_of_cards: int, card_draft_table_type: int = CARD_DRAFT_TABLE_TYPES.STANDARD, use_pity_system: bool = true) -> Array[CardData]:
+	var returned_cards: Array[CardData] = []
+	if not Global.player_data.has_party_members():
+		return generate_rarity_weighted_card_draft(rng, number_of_cards, card_draft_table_type, use_pity_system)
+	for _i: int in range(number_of_cards):
+		var party_member_data: PartyMemberData = _get_random_party_member(rng)
+		if party_member_data == null:
+			continue
+		var owner_cards: Array[CardData] = generate_rarity_weighted_card_draft(rng, 1, card_draft_table_type, use_pity_system, party_member_data)
+		for card_data: CardData in owner_cards:
+			Global.player_data.assign_card_owner(card_data, party_member_data.party_member_party_index)
+			returned_cards.append(card_data)
+	return returned_cards
+
 
 ### Artifacts
 
@@ -263,22 +286,8 @@ func get_location_card_rewards(location_data: LocationData = Global.get_player_l
 	for i in number_of_drafts:
 		var card_draft: Array[CardData] = []
 		if Global.player_data.has_party_members():
-			# TODO: If the prototype ever supports non-party rewards, branch on reward type instead of party presence.
-			for party_member_data: PartyMemberData in Global.player_data.player_party_members:
-				var party_member_draft_result: Dictionary = _generate_rarity_weighted_card_draft_from_cache(
-					rng_reward_card_drafts,
-					1,
-					party_member_data.party_member_reward_card_rarity_cache,
-					party_member_data.party_member_rare_card_modifier_current,
-					party_member_data.party_member_rare_card_increment_rate,
-					card_draft_table_type,
-					true
-				)
-				party_member_data.party_member_rare_card_modifier_current = party_member_draft_result["rare_card_modifier_current"]
-				var owner_cards: Array = party_member_draft_result["cards"]
-				for card_data: CardData in owner_cards:
-					Global.player_data.assign_card_owner(card_data, party_member_data.party_member_party_index)
-					card_draft.append(card_data)
+			# Party rewards choose a random member for each slot, then draft from that member's pool.
+			card_draft = generate_random_party_owned_weighted_card_draft(rng_reward_card_drafts, cards_per_draft, card_draft_table_type, true)
 		else:
 			card_draft = generate_rarity_weighted_card_draft(rng_reward_card_drafts, cards_per_draft, card_draft_table_type, true)
 		card_draft_rewards.append(card_draft)
