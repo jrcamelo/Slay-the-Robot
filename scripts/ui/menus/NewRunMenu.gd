@@ -18,6 +18,9 @@ extends Control
 @onready var custom_run_modifier_button_container = $CustomRunModifierButtonContainer
 
 @onready var character_button_container = $CharacterButtonContainer
+@onready var selected_characters_container: ScrollContainer = $SelectedCharactersContainer
+@onready var selected_characters_grid_container: GridContainer = $SelectedCharactersContainer/GridContainer
+@onready var select_character_button: Button = $SelectCharacterButton
 
 @onready var start_run_button: Button = $StartRunButton
 @onready var seed_input: LineEdit = $SeedInput
@@ -25,10 +28,12 @@ extends Control
 
 var selected_character_object_id: String = ""
 var selected_difficulty_level: int = 0
+var selected_party_character_object_ids: Array[String] = []
 
 func _ready():
 	start_run_button.button_up.connect(_on_start_run_button_up)
 	back_button.button_up.connect(_on_back_button_up)
+	select_character_button.button_up.connect(_on_select_character_button_up)
 	
 	decrease_difficulty_button.button_up.connect(_on_decrease_difficulty_button)
 	increase_difficulty_button.button_up.connect(_on_increase_difficulty_button)
@@ -37,6 +42,7 @@ func _ready():
 	
 	Signals.character_selected.connect(_on_character_selected)
 	Signals.run_ended.connect(_on_run_ended)
+	_update_party_ui()
 
 func _on_seed_input_text_changed(new_text: String):
 	# validate the input of the line edit
@@ -47,6 +53,7 @@ func _on_seed_input_text_changed(new_text: String):
 func _on_character_selected(character_object_id: String):
 	selected_character_object_id = character_object_id
 	populate_character_info(selected_character_object_id)
+	_update_party_ui()
 
 func _on_decrease_difficulty_button():
 	selected_difficulty_level = max(0, selected_difficulty_level -1)
@@ -56,8 +63,10 @@ func _on_increase_difficulty_button():
 	difficulty_label.text = "Difficulty " + str(selected_difficulty_level)
 
 func populate_new_run_menu() -> void:
+	selected_party_character_object_ids.clear()
 	character_button_container.populate_character_buttons()
 	custom_run_modifier_button_container.populate_custom_run_modifiers()
+	_update_party_ui()
 
 func populate_character_info(character_object_id: String) -> void:
 	var character_data: CharacterData = Global.get_character_data(character_object_id)
@@ -76,9 +85,11 @@ func populate_character_info(character_object_id: String) -> void:
 				character_artifact_description_label.text = artifact_data.artifact_description
 
 func _on_start_run_button_up():
+	if len(selected_party_character_object_ids) == 0:
+		return
 	# get the seed and start the run
 	var run_seed: int = seed_input.text.to_int()
-	Global.start_run(selected_character_object_id, run_seed, selected_difficulty_level, custom_run_modifier_button_container.selected_custom_run_modififers)
+	Global.start_party_run(selected_party_character_object_ids, run_seed, selected_difficulty_level, custom_run_modifier_button_container.selected_custom_run_modififers)
 
 func _on_back_button_up():
 	title_screen.show_main_menu()
@@ -88,3 +99,37 @@ func _on_run_ended():
 	var has_save_file: bool = FileLoader.has_save_file()
 	visible = not has_save_file
 	populate_new_run_menu()
+
+func _on_select_character_button_up() -> void:
+	if selected_character_object_id == "":
+		return
+	if selected_party_character_object_ids.has(selected_character_object_id):
+		selected_party_character_object_ids.erase(selected_character_object_id)
+	else:
+		selected_party_character_object_ids.append(selected_character_object_id)
+	_update_party_ui()
+
+func _update_party_ui() -> void:
+	_clear_selected_characters()
+	for character_object_id: String in selected_party_character_object_ids:
+		var character_selection_button: TextureButton = Scenes.CHARACTER_SELECTION_BUTTON.instantiate()
+		selected_characters_grid_container.add_child(character_selection_button)
+		character_selection_button.init(character_object_id)
+		character_selection_button.disabled = true
+	start_run_button.disabled = len(selected_party_character_object_ids) == 0
+	select_character_button.disabled = selected_character_object_id == ""
+	if selected_character_object_id == "":
+		select_character_button.text = "Select Character"
+	else:
+		var character_data: CharacterData = Global.get_character_data(selected_character_object_id)
+		var character_name: String = selected_character_object_id
+		if character_data != null:
+			character_name = character_data.character_name
+		if selected_party_character_object_ids.has(selected_character_object_id):
+			select_character_button.text = "Remove %s from party" % character_name
+		else:
+			select_character_button.text = "Add %s to party" % character_name
+
+func _clear_selected_characters() -> void:
+	for child in selected_characters_grid_container.get_children():
+		child.queue_free()

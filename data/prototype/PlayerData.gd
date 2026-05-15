@@ -652,7 +652,7 @@ func remove_artifact_from_pool(artifact_object_id: String) -> void:
 
 ### Player Artifacts
 
-func add_artifact(artifact_id: String) -> void:
+func add_artifact(artifact_id: String, artifact_owner_party_index: int = -1, artifact_owner_character_object_id: String = "") -> void:
 	# adds an artifact to the player as if they obtained it
 	if not player_artifact_uid_to_artifact_data.has(artifact_id):
 		var artifact_data: ArtifactData = Global.get_artifact_data_from_prototype(artifact_id)
@@ -660,6 +660,8 @@ func add_artifact(artifact_id: String) -> void:
 		if artifact_data == null:
 			push_error("No artifact of id ", artifact_id)
 		else:
+			artifact_data.artifact_owner_party_index = artifact_owner_party_index
+			artifact_data.artifact_owner_character_object_id = artifact_owner_character_object_id
 			player_artifact_uid_to_artifact_data[artifact_data.object_uid] = artifact_data
 		
 			# use a temp artifact script to perform any logic if the artifact has effect when added

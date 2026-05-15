@@ -261,7 +261,7 @@ func start_party_run(character_object_ids: Array[String], run_seed: int, difficu
 		
 		# add starting artifacts after the pool is initialized so they can consume from it consistently
 		for artifact_id: String in character_data.character_starting_artifact_ids:
-			player_data.add_artifact(artifact_id)
+			player_data.add_artifact(artifact_id, i, character_data.object_id)
 	
 	player_data.synchronize_legacy_primary_member_state()
 	

@@ -5,7 +5,6 @@ extends Control
 const CARD_TWEEN_TIME: float = 0.2
 
 ### General Nodes
-@onready var player: BaseCombatant = $%Player
 @onready var combat = $%Combat
 
 # a debugging component for displaying hand's physical size
@@ -272,13 +271,16 @@ func _prompt_target(_card: Card):
 func _unprompt_target():
 	select_target_label.visible = false
 
+func _get_default_player_combatant() -> BaseCombatant:
+	return Global.get_default_player_combatant()
+
 func _get_card_owner_combatant(card_data: CardData) -> BaseCombatant:
 	if card_data == null:
-		return player
+		return _get_default_player_combatant()
 	var owner_player: Player = Global.get_card_owner_player(card_data)
 	if owner_player != null:
 		return owner_player
-	return player
+	return _get_default_player_combatant()
 
 ### Playing Cards
 

@@ -9,6 +9,8 @@ class_name ArtifactData
 @export var artifact_counter_max: int = 1
 @export var artifact_counter_reset_on_turn_start: int = -1 # the value to reset the counter to on the start of player's turn. Negative for no reset
 @export var artifact_counter_reset_on_combat_end: int = -1 # the value to reset the counter to on combat end. Negative for no reset
+@export var artifact_owner_party_index: int = -1
+@export var artifact_owner_character_object_id: String = ""
 ## If enabled, incrementing the artifact's charges to max or decrementing to negative will loop the value
 ## around. This can in turn allow for multiple procs of artifact_max_counter_actions.
 ## eg counter_max of 3 with increment of 9 will trigger 3 procs, if false only 1 proc.
@@ -79,7 +81,7 @@ func increment_artifact_counter(increment: int) -> void:
 ## Automatically includes itself and the counter in the payload.
 func perform_artifact_actions(action_data: Array[Dictionary]) -> void:
 	if len(action_data) > 0:
-		var player: Player = Global.get_default_player_combatant()
+		var player: Player = _get_artifact_owner_player()
 		var card_play_request: CardPlayRequest = CardPlayRequest.new() # dummy card play request
 		# You can use custom_key_names in the artifact's action payloads to convert
 		# artifact_counter into a parameter of the action
@@ -96,9 +98,10 @@ func perform_artifact_actions(action_data: Array[Dictionary]) -> void:
 		var player_targeted_actions: Array[Dictionary] = artifact_action_groups["player_targeted_actions"]
 		if len(player_targeted_actions) > 0:
 			var player_targets: Array[BaseCombatant] = []
-			for player_target: Player in Global.get_living_players():
-				player_targets.append(player_target)
-			if len(player_targets) == 0 and player != null:
+			if player != null and player.is_alive():
+				player_targets.append(player)
+			elif player != null:
+				# TODO: Decide whether owner-bound artifact effects should fizzle or retarget if the owner is dead.
 				player_targets.append(player)
 			actions.append_array(ActionGenerator.create_actions(player, card_play_request, player_targets, player_targeted_actions, null))
 		ActionHandler.add_actions(actions, true)
@@ -125,7 +128,7 @@ func _split_artifact_actions_by_player_target(action_data: Array[Dictionary]) ->
 ## This provides an alternate way of changing the counter in a way that can be manipulated and
 ## consistent with the stack, compared to increment_artifact_counter()
 func create_artifact_counter_increment_action(increment_amount: int) -> void:
-	var player: Player = Global.get_default_player_combatant()
+	var player: Player = _get_artifact_owner_player()
 	var card_play_request: CardPlayRequest = CardPlayRequest.new() # dummy card play request
 	var action_data: Array[Dictionary] = [{Scripts.ACTION_INCREASE_ARTIFACT_CHARGE: {}}]
 	# You can use custom_key_names in the artifact's action payloads to convert
@@ -137,3 +140,10 @@ func create_artifact_counter_increment_action(increment_amount: int) -> void:
 	
 	var actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], action_data, null)
 	ActionHandler.add_actions(actions, true)
+
+func _get_artifact_owner_player() -> Player:
+	if artifact_owner_party_index >= 0:
+		var owner_player: Player = Global.get_player_by_party_index(artifact_owner_party_index)
+		if owner_player != null:
+			return owner_player
+	return Global.get_default_player_combatant()

@@ -21,6 +21,7 @@ const ENERGY_ICON_KEYWORD: String = "[energy_icon]"	# tells description to displ
 @onready var card_description: RichLabelAutoSizer = %CardDescription
 @onready var card_energy_cost: Label = %EnergyCost
 @onready var card_color: ColorRect = %ColorBackground
+@onready var card_owner_sprite: TextureRect = %CardOwnerSprite
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var card_glow: ColorRect = %CardGlow
@@ -76,6 +77,8 @@ func update_card_display(selected_enemy: Enemy = null) -> void:
 	# update visuals
 	if card_data.card_texture_path != "":
 		card_texture.texture = FileLoader.load_texture(card_data.card_texture_path)
+	if card_data.card_owner_character_object_id != "":
+		card_owner_sprite.texture = FileLoader.load_texture(Global.get_character_data(card_data.card_owner_character_object_id).character_icon_texture_path)	
 	
 	# updates the card's display
 	card_name.set_bbcode("[center]" + card_data.get_card_name() + "[/center]")

@@ -3,8 +3,10 @@ class_name Enemy
 
 @onready var enemy_intent: Control = $Visible/Intent
 @onready var enemy_intent_amount_text: Label = $Visible/Intent/IntentAmount
+@onready var enemy_intent_texture: TextureRect = $Visible/Intent/IntentTexture
 
 @onready var name_label = $Visible/Sprite/NameLabel
+
 
 var enemy_data: EnemyData
 var enemy_slot: int = 0 # the spawn slot the enemy is in
@@ -117,6 +119,11 @@ func update_enemy_intent():
 		enemy_intent_number_of_attacks = 0
 		enemy_intent.visible = false
 		return
+	
+	enemy_intent_texture.set_texture(
+		FileLoader.load_texture(Global.get_character_data(
+			player.get_party_member_data().party_member_character_object_id)
+			.character_texture_path))
 	
 	### damage
 	# intercept an attack action in preview mode

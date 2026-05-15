@@ -19,8 +19,9 @@ extends Control
 
 @onready var combat_animation_player: AnimationPlayer = $CombatAnimation
 @onready var enemy_container = $EnemyContainer
+@onready var party_container: PlayerPartyContainer = %PartyContainer
 
-@onready var player = $Player
+@onready var base_player_node: Player = get_node_or_null("Player")
 @onready var hand = $Hand
 @onready var chest = $Chest
 @onready var shop = $Shop
@@ -29,7 +30,6 @@ extends Control
 
 @onready var end_turn_button: Button = $EndTurnButton
 var end_turn_object: CombatEndTurn = null
-var proxy_players: Array[Player] = []
 
 func _ready():
 	Signals.player_money_changed.connect(_on_player_money_changed)
@@ -49,9 +49,12 @@ func _ready():
 	Signals.end_turn_requested.connect(_on_end_turn_requested)
 	
 	end_turn_button.button_up.connect(_on_end_turn_button_up)
+	_initialize_party_container()
 	
 	update_combat_display()
-	player.update_player_display(Global.player_data)
+	var primary_player: Player = party_container.get_primary_player()
+	if primary_player != null:
+		primary_player.update_player_display(Global.player_data)
 	
 	# pile buttons
 	deck_button.button_up.connect(_on_deck_button_up)
@@ -160,26 +163,9 @@ func _on_player_money_changed():
 func _on_player_health_changed():
 	health_label.text = "%s / %s" % [Global.player_data.player_health, Global.player_data.player_health_max]
 
-func _ensure_party_player_proxies() -> void:
-	_clear_party_player_proxies()
-	player.set_party_member_index(0)
-	player.visible = true
-	if not Global.player_data.has_party_members():
-		return
-	for party_member_index: int in range(1, Global.player_data.get_party_member_count()):
-		var proxy_player: Player = Scenes.PLAYER.instantiate()
-		proxy_player.name = "PlayerPartyProxy_%s" % party_member_index
-		proxy_player.set_party_member_index(party_member_index)
-		proxy_player.visible = false
-		player.get_parent().add_child(proxy_player)
-		proxy_players.append(proxy_player)
-		proxy_player._on_run_started()
-
-func _clear_party_player_proxies() -> void:
-	for proxy_player: Player in proxy_players:
-		if is_instance_valid(proxy_player):
-			proxy_player.queue_free()
-	proxy_players.clear()
+func _initialize_party_container() -> void:
+	if base_player_node != null:
+		party_container.register_base_player(base_player_node)
 
 ### Deck Buttons
 
@@ -330,6 +316,10 @@ func _on_player_turn_started():
 	
 	# first turn actions
 	if Global.get_combat_stats().turn_count == 1:
+		var primary_player: Player = party_container.get_primary_player()
+		if primary_player == null:
+			primary_player = Global.get_default_player_combatant()
+		
 		# location initial actions
 		var location_data: LocationData = Global.get_player_location_data()
 		assert(location_data != null)
@@ -339,7 +329,7 @@ func _on_player_turn_started():
 			card_play_request.selected_target = null
 			
 			# perform location initial actions
-			var location_initial_combat_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], location_data.location_initial_combat_actions, null)
+			var location_initial_combat_actions: Array[BaseAction] = ActionGenerator.create_actions(primary_player, card_play_request, [], location_data.location_initial_combat_actions, null)
 			ActionHandler.add_actions(location_initial_combat_actions)
 		
 			# wait for first turn actions
@@ -348,7 +338,7 @@ func _on_player_turn_started():
 			
 			# perform event initial actions
 			var event_data: EventData = Global.get_player_event_data()
-			var event_initial_combat_actions: Array[BaseAction] = ActionGenerator.create_actions(player, card_play_request, [], event_data.event_initial_combat_actions, null)
+			var event_initial_combat_actions: Array[BaseAction] = ActionGenerator.create_actions(primary_player, card_play_request, [], event_data.event_initial_combat_actions, null)
 			ActionHandler.add_actions(event_initial_combat_actions)
 			
 			# wait for first turn actions
@@ -372,7 +362,8 @@ func _on_player_turn_started():
 			await ActionHandler.actions_ended
 	
 	# perform pre draw actions
-	player.update_incoming_damage_amount(true)
+	for player_combatant: Player in Global.get_players():
+		player_combatant.update_incoming_damage_amount(true)
 	for player_combatant: Player in Global.get_living_players():
 		player_combatant.generate_reset_block_action()
 		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
@@ -453,13 +444,13 @@ func _reset_turn_end_queue() -> void:
 		end_turn_object = null
 
 func _on_run_started():
-	_ensure_party_player_proxies()
+	party_container.populate_party_members()
 	visible = true
 	_on_player_health_changed()
 	_on_player_money_changed()
 	
 func _on_run_ended():
-	_clear_party_player_proxies()
+	party_container.clear_party_members(true)
 	visible = false
 	_reset_turn_end_queue()
 

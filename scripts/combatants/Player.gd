@@ -7,7 +7,7 @@ class_name Player
 
 const INTENT_UPDATES_LAZILY: bool = true	# batches intent updates
 var _intent_is_updating: bool = false
-var party_member_index: int = 0
+@export var party_member_index: int = 0
 var _death_reported: bool = false
 
 func _ready():
@@ -179,7 +179,7 @@ func _on_run_started():
 	if party_member_data != null:
 		character_data = Global.get_character_data(party_member_data.party_member_character_object_id)
 	sprite.texture = FileLoader.load_texture(character_data.character_texture_path)
-	visible = party_member_index == 0
+	visible = true
 	
 	reset_block()
 	clear_all_status_effects()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0sxkaemtqb5x"]
+[gd_scene format=3 uid="uid://c0sxkaemtqb5x"]
 
 [ext_resource type="Script" uid="uid://bu5jx208ipx8i" path="res://scripts/combatants/Player.gd" id="1_hkgmy"]
 [ext_resource type="Texture2D" uid="uid://nh32y87hcke5" path="res://icon.svg" id="2_snepv"]
@@ -83,7 +83,7 @@ _data = {
 &"run_start": SubResource("Animation_u2grh")
 }
 
-[node name="Player" type="Control" groups=["players"]]
+[node name="Player" type="Control" unique_id=105327021 groups=["players"]]
 custom_minimum_size = Vector2(200, 144)
 layout_mode = 3
 anchors_preset = 0
@@ -91,39 +91,36 @@ offset_right = 200.0
 offset_bottom = 144.0
 script = ExtResource("1_hkgmy")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_htloy")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2076119542]
+libraries/ = SubResource("AnimationLibrary_htloy")
 
-[node name="Visible" type="Control" parent="."]
+[node name="Visible" type="Control" parent="." unique_id=1533201272]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Sprite" type="Sprite2D" parent="Visible"]
+[node name="Sprite" type="Sprite2D" parent="Visible" unique_id=682936350]
 position = Vector2(64, 48)
 texture = ExtResource("2_snepv")
 
-[node name="LayeredHealthBar" parent="Visible/Sprite" instance=ExtResource("3_ef7si")]
+[node name="LayeredHealthBar" parent="Visible/Sprite" unique_id=1063659952 instance=ExtResource("3_ef7si")]
 
-[node name="SelectionButton" type="Button" parent="Visible/Sprite"]
+[node name="SelectionButton" type="Button" parent="Visible/Sprite" unique_id=1688853600]
 self_modulate = Color(1, 1, 1, 0)
 offset_left = -67.0
 offset_top = -64.0
 offset_right = 69.0
 offset_bottom = 64.0
 
-[node name="IncomingDamage" type="Control" parent="Visible"]
+[node name="IncomingDamage" type="Control" parent="Visible" unique_id=546075441]
 visible = false
-layout_mode = 3
 anchors_preset = 0
 offset_left = -40.0
 offset_top = -64.0
 offset_right = 168.0
 offset_bottom = -40.0
 
-[node name="TextureRect" type="TextureRect" parent="Visible/IncomingDamage"]
+[node name="TextureRect" type="TextureRect" parent="Visible/IncomingDamage" unique_id=2081447808]
 layout_mode = 0
 offset_left = 80.0
 offset_top = -16.0
@@ -132,7 +129,7 @@ offset_bottom = 32.0
 texture = ExtResource("2_snepv")
 expand_mode = 1
 
-[node name="IncomingDamageAmount" type="Label" parent="Visible/IncomingDamage"]
+[node name="IncomingDamageAmount" type="Label" parent="Visible/IncomingDamage" unique_id=1483510497]
 layout_mode = 0
 offset_left = 104.0
 offset_top = 16.0
@@ -140,17 +137,17 @@ offset_right = 144.0
 offset_bottom = 39.0
 text = "15"
 
-[node name="FadeContainer" type="Node2D" parent="Visible"]
+[node name="FadeContainer" type="Node2D" parent="Visible" unique_id=748891329]
 position = Vector2(64, -96)
 
-[node name="Block" type="Sprite2D" parent="Visible"]
+[node name="Block" type="Sprite2D" parent="Visible" unique_id=1886279931]
 visible = false
 self_modulate = Color(0.188235, 0.188235, 0.188235, 1)
 position = Vector2(128, 88)
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_snepv")
 
-[node name="BlockAmount" type="Label" parent="Visible/Block"]
+[node name="BlockAmount" type="Label" parent="Visible/Block" unique_id=22429167]
 offset_left = -64.0
 offset_top = -64.0
 offset_right = 64.0
@@ -160,7 +157,7 @@ text = "999"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StatusContainer" type="GridContainer" parent="Visible"]
+[node name="StatusContainer" type="GridContainer" parent="Visible" unique_id=1178820925]
 layout_mode = 0
 offset_left = -16.0
 offset_top = 144.0
@@ -168,8 +165,7 @@ offset_right = 24.0
 offset_bottom = 184.0
 columns = 6
 
-[node name="CustomUIContainer" type="Control" parent="Visible"]
-layout_mode = 3
+[node name="CustomUIContainer" type="Control" parent="Visible" unique_id=105624965]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
