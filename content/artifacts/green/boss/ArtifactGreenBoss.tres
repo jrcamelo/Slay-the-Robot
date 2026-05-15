@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_tiyuw"]
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_xgrc5"]
 
 [resource]
@@ -9,4 +10,7 @@ artifact_description = "Test Green Boss Artifact."
 artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
 artifact_color_id = "color_green"
 artifact_rarity = 4
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 object_id = "artifact_boss_green"

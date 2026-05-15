@@ -15,14 +15,14 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [],
 "merge_attacks": true,
 "time_delay": 0.0
 }
 }])
 card_listeners = Array[Dictionary]([{
-"res://scripts/card_listeners/ListenerCardValueModifier.gd": {
+"LISTENER_CARD_VALUE_MODIFIER": {
 "is_turn_stat": false,
 "multiplied_values": ["damage"],
 "multiplied_values_bases": {

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="KeywordData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/KeywordData.gd" id="1_abj1s"]
+
+[resource]
+script = ExtResource("1_abj1s")
+keyword_text_bb_code = "[color=orange]Bottom Deck[/color]
+Placed on bottom of deck at start of combat"
+object_id = "keyword_bottom_deck"

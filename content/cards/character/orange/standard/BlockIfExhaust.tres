@@ -17,13 +17,13 @@ card_values = {
 "block": 8
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1,
 "time_delay": 0.5
 }
 }])
 card_play_validators = Array[Dictionary]([{
-"res://scripts/validators/ValidatorCombatStats.gd": {
+"VALIDATOR_COMBAT_STATS": {
 "comparison_value": 1,
 "is_total_stat": false,
 "operator": ">=",

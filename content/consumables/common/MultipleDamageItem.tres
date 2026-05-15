@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/ConsumableData.gd" id="1_5lvrv"]
+
+[resource]
+script = ExtResource("1_5lvrv")
+consumable_name = "Multiple Damage Item"
+consumable_description = "Damages all enemies for 10"
+consumable_actions = Array[Dictionary]([{
+"ACTION_DIRECT_DAMAGE": {
+"bypass_block": false,
+"damage": 10,
+"target_override": 4
+}
+}])
+object_id = "consumable_multi_damaging"

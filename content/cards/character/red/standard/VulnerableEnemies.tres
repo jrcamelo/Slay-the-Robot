@@ -14,7 +14,7 @@ card_values = {
 "status_effect_object_id": "status_effect_vulnerable"
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"ACTION_APPLY_STATUS": {
 "target_override": 0,
 "time_delay": 0.5
 }

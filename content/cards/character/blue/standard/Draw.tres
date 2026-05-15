@@ -14,7 +14,7 @@ card_values = {
 "draw_count": 3
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"ACTION_DRAW_GENERATOR": {
 "draw_count": 3
 }
 }])

@@ -17,13 +17,13 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionAddHealth.gd": {
+"ACTION_ADD_HEALTH": {
 "custom_key_names": {
 "health_amount": "unblocked_damage_capped"
 }
 }
 }, {
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "target_override": 4,
 "time_delay": 0.3
 }

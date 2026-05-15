@@ -16,6 +16,6 @@ card_values = {
 "log_message_color_html": "2e8b57ff"
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/debug_actions/ActionDebugLog.gd": {}
+"ACTION_DEBUG_LOG": {}
 }])
 object_id = "card_debug_log"

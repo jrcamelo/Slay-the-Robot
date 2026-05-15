@@ -1,14 +1,18 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_3qwoo"]
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_vplo8"]
 
 [resource]
 script = ExtResource("1_3qwoo")
 artifact_name = "Artifact Add Money"
 artifact_description = "Adds money when obtained"
 artifact_add_actions = Array[Dictionary]([{
-"res://scripts/actions/player_actions/ActionAddMoney.gd": {
+"ACTION_ADD_MONEY": {
 "money_amount": 200
 }
+}])
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
 }])
 object_id = "artifact_add_money"

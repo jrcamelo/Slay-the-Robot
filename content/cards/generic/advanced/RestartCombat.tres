@@ -13,6 +13,6 @@ card_appears_in_card_packs = false
 card_exhausts = true
 card_requires_target = false
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/world_interaction_actions/ActionStartCombat.gd": {}
+"ACTION_START_COMBAT": {}
 }])
 object_id = "card_restart_combat"

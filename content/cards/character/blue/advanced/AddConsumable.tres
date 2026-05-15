@@ -17,7 +17,7 @@ card_values = {
 "random_consumable": true
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/player_actions/ActionAddConsumable.gd": {}
+"ACTION_ADD_CONSUMABLE": {}
 }])
 card_first_upgrade_property_changes = Dictionary[String, Variant]({
 "card_energy_cost": 0

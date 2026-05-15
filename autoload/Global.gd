@@ -156,14 +156,11 @@ func _ready():
 	
 	### Test data generators
 	add_test_rest_actions()
-	add_test_status_effects()
-	add_test_consumables()
 	add_test_events()
 	add_test_dialogue()
 	add_test_acts()
 	add_test_action_interceptors()
 	add_test_colors()
-	add_test_keywords()
 	add_test_player_data()
 	add_test_run_modifiers()
 	add_test_run_start_options()
@@ -187,7 +184,11 @@ func _ready():
 	# generate cached filters from ArtifactPackData
 	Global._generate_artifact_pack_cache()
 	
-	print(Global.compare_loaded_content_with_global())
+	Global.export_content_to_resources()
+	#print(Global.compare_loaded_content_with_global())
+	#print(Global.get_loaded_consumables_in_segments(["common"]))
+	#print(Global.get_loaded_keywords_in_segments([]))
+	#print(Global.get_loaded_status_effects_in_segments(["buff"]))
 	
 	### Exporting Data
 	# FileLoader.export_test_data() # uncomment to output all unexported test data to file
@@ -199,18 +200,24 @@ func _load_core_content_from_resources(content_root: String = "res://content") -
 	_register_core_content_table(loaded_content_database.characters_by_id)
 	_register_core_content_table(loaded_content_database.enemies_by_id)
 	_register_core_content_table(loaded_content_database.cards_by_id)
+	_register_core_content_table(loaded_content_database.keywords_by_id)
+	_register_core_content_table(loaded_content_database.consumables_by_id)
+	_register_core_content_table(loaded_content_database.status_effects_by_id)
 
 func _clear_core_content_tables() -> void:
 	_id_to_artifact_data.clear()
 	_id_to_character_data.clear()
 	_id_to_enemy_data.clear()
 	_id_to_card_data.clear()
+	_id_to_keyword_data.clear()
+	_id_to_consumable_data.clear()
+	_id_to_status_data.clear()
 
 func _register_core_content_table(content_table: Dictionary) -> void:
 	for content_id: String in content_table.keys():
 		var serializable_data: SerializableData = content_table[content_id]
 		register_rod(serializable_data, true)
-
+		
 
 #region Run
 ## Starts a new run under a given seed with a given character
@@ -218,7 +225,6 @@ func start_run(character_object_id: String, run_seed: int, difficulty_level: int
 	start_party_run([character_object_id], run_seed, difficulty_level, custom_run_modifier_object_ids)
 
 ## Starts a new run with a shared deck/energy state across multiple characters.
-## TODO: Run-start UI still chooses one character; party selection wiring comes later.
 func start_party_run(character_object_ids: Array[String], run_seed: int, difficulty_level: int = 0, custom_run_modifier_object_ids: Array[String] = []) -> void:
 	assert(len(character_object_ids) > 0)
 	var first_character_data: CharacterData = get_character_data(character_object_ids[0])
@@ -278,7 +284,6 @@ func start_party_run(character_object_ids: Array[String], run_seed: int, difficu
 			if not player_data.player_artifact_pack_ids.has(artifact_pack_id):
 				player_data.player_artifact_pack_ids.append(artifact_pack_id)
 		
-		# TODO: Shared money policy is a design choice. Summing is the least surprising prototype default.
 		player_data.player_money += character_data.character_starting_money
 		
 		# add starting artifacts after the pool is initialized so they can consume from it consistently
@@ -347,9 +352,9 @@ func perform_start_of_run_modifiers() -> void:
 		if run_modifier_data == null:
 			push_error("No RunData with id of ", run_modifier_object_id)
 		else:
-			var run_modifier_modifier_script_path: String = run_modifier_data.run_modifier_modifier_script_path
-			if run_modifier_modifier_script_path != "":
-				var run_modidifier_script_asset = load(run_modifier_modifier_script_path)
+			var run_modifier_modifier_script: Script = run_modifier_data.run_modifier_modifier_script
+			if run_modifier_modifier_script != null:
+				var run_modidifier_script_asset: Script = run_modifier_modifier_script
 				var run_modifier: BaseRunModifier = run_modidifier_script_asset.new()
 				run_modifier.run_start_modification()
 
@@ -470,71 +475,6 @@ func get_artifact_data_from_prototype(artifact_id: String) -> ArtifactData:
 #endregion
 
 #region Consumables
-func add_test_consumables() -> void:
-	# health consumable
-	var consumable_heal: ConsumableData = ConsumableData.new("consumable_heal")
-	consumable_heal.consumable_name = "Heal Item"
-	consumable_heal.consumable_description = "Heals 20%"
-	consumable_heal.consumable_requires_target = false
-	consumable_heal.consumable_rarity = ConsumableData.CONSUMABLE_RARITIES.COMMON
-	consumable_heal.consumable_actions = [
-		{
-		Scripts.ACTION_HEAL_PERCENT: {"percentage_heal_amount": 0.20}
-		}
-	]
-	register_rod(consumable_heal)
-	
-	# block consumable
-	var consumable_block: ConsumableData = ConsumableData.new("consumable_block")
-	consumable_block.consumable_name = "Block Item"
-	consumable_block.consumable_description = "Adds 10 block"
-	consumable_block.consumable_requires_target = false
-	consumable_block.consumable_rarity = ConsumableData.CONSUMABLE_RARITIES.COMMON
-	consumable_block.consumable_actions = [
-		{
-		Scripts.ACTION_BLOCK: {
-			"block": 10,
-			"target_override": BaseAction.TARGET_OVERRIDES.PLAYER
-			}
-		}
-	]
-	register_rod(consumable_block)
-	
-	# damaging consumable
-	var consumable_damaging: ConsumableData = ConsumableData.new("consumable_damaging")
-	consumable_damaging.consumable_name = "Damage Item"
-	consumable_damaging.consumable_description = "Damages a target for 10"
-	consumable_damaging.consumable_requires_target = true
-	consumable_damaging.consumable_rarity = ConsumableData.CONSUMABLE_RARITIES.COMMON
-	consumable_damaging.consumable_actions = [
-		{
-		Scripts.ACTION_DIRECT_DAMAGE: {
-			"damage": 10,
-			"bypass_block": false,
-			"target_override": BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS
-			}
-		}
-	]
-	register_rod(consumable_damaging)
-	
-	# multi enemy damaging consumable
-	var consumable_multi_damaging: ConsumableData = ConsumableData.new("consumable_multi_damaging")
-	consumable_multi_damaging.consumable_name = "Multiple Damage Item"
-	consumable_multi_damaging.consumable_description = "Damages all enemies for 10"
-	consumable_multi_damaging.consumable_requires_target = false
-	consumable_multi_damaging.consumable_rarity = ConsumableData.CONSUMABLE_RARITIES.COMMON
-	consumable_multi_damaging.consumable_actions = [
-		{
-		Scripts.ACTION_DIRECT_DAMAGE: 
-			{
-			"target_override": BaseAction.TARGET_OVERRIDES.ALL_ENEMIES,
-			"damage": 10,
-			"bypass_block": false,
-			}
-		}
-	]
-	register_rod(consumable_multi_damaging)
-	
 
 func get_consumable_data(consumable_object_id: String) -> ConsumableData:
 	return _id_to_consumable_data.get(consumable_object_id, null)
@@ -652,193 +592,6 @@ func get_rest_action_data(rest_action_object_id: String) -> RestActionData:
 #endregion
 
 #region Status Effects
-func add_test_status_effects() -> void:
-	# poison like effect
-	# example of status effect that reserves health bar
-	var status_effect_corrosion: StatusEffectData = StatusEffectData.new("status_effect_corrosion")
-	status_effect_corrosion.status_effect_name = "Corrosion"
-	status_effect_corrosion.status_effect_decay_rate = -2
-	# status_effect_corrosion.status_effect_decay_type = StatusEffectData.STATUS_EFFECT_DECAY_TYPES.HALF_LIFE_ROUND_UP # uncomment to change to half life decay
-	status_effect_corrosion.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF
-	status_effect_corrosion.status_effect_interceptor_ids = []
-	status_effect_corrosion.status_effect_healthbar_layer_color = Color.DARK_GREEN.to_html(false)
-	status_effect_corrosion.status_effect_healthbar_reserve_type = StatusEffectData.STATUS_EFFECT_HEALTHBAR_RESERVE_TYPES.STATUS_CHARGES
-	status_effect_corrosion.status_effect_action_process_times = [
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PLAYER_END_TURN,
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.ENEMY_START_TURN,
-	]
-	status_effect_corrosion.status_effect_player_actions = [
-		{
-		Scripts.ACTION_CORROSION: {
-			"custom_key_names": {
-						# convert the status charges, passed in from BaseStatusEffect, into poison damage
-						"damage": "invoking_status_effect_charges"
-					},
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-			}
-		}
-	]
-	status_effect_corrosion.status_effect_enemy_actions = status_effect_corrosion.status_effect_player_actions.duplicate()
-	
-	register_rod(status_effect_corrosion)
-	
-	# bomb effect that counts down and damages all enemies
-	# uses unique status logic
-	var status_effect_bomb: StatusEffectData = StatusEffectData.new("status_effect_bomb")
-	status_effect_bomb.status_effect_name = "Bomb"
-	status_effect_bomb.status_effect_script_path = "res://scripts/status_effects/StatusEffectBomb.gd"
-	status_effect_bomb.status_effect_decay_rate = -1
-	status_effect_bomb.status_effect_allows_multiples = true
-	status_effect_bomb.status_effect_action_process_times = [
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PLAYER_END_TURN,
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.ENEMY_END_TURN,
-	]
-	status_effect_bomb.status_effect_player_actions = [
-				{
-				Scripts.ACTION_DIRECT_DAMAGE: {
-					"custom_key_names": {
-						# convert the bomb's status secondary charges, passed in from BaseStatusEffect, into bomb damage
-						"damage": "invoking_status_effect_secondary_charges"
-					},
-					"bypass_block": false,
-					"time_delay": 0.5,
-					"target_override": BaseAction.TARGET_OVERRIDES.ALL_ENEMIES # player bombs hit all enemies
-					}
-				}
-			]
-	status_effect_bomb.status_effect_enemy_actions = [
-				{
-				Scripts.ACTION_DIRECT_DAMAGE: {
-					"custom_key_names": {
-						# convert the bomb's status secondary charges, passed in from BaseStatusEffect, into bomb damage
-						"damage": "invoking_status_effect_secondary_charges"
-					},
-					"bypass_block": false,
-					"time_delay": 0.5,
-					"target_override": BaseAction.TARGET_OVERRIDES.PLAYER # enemy bombs hit player
-					}
-				}
-			]
-	status_effect_bomb.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_bomb.status_effect_interceptor_ids = []
-	
-	register_rod(status_effect_bomb)
-	
-	# increases attack damage by charge amount
-	# uses an interceptor
-	var status_effect_damage_increase: StatusEffectData = StatusEffectData.new("status_effect_damage_increase")
-	status_effect_damage_increase.status_effect_name = "Damage Increase"
-	status_effect_damage_increase.status_effect_decay_rate = 0
-	status_effect_damage_increase.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_damage_increase.status_effect_interceptor_ids = ["interceptor_damage_increase"]
-	
-	register_rod(status_effect_damage_increase)
-	
-	# decreases damage done by attackers
-	# uses an interceptor
-	var status_effect_weaken: StatusEffectData = StatusEffectData.new("status_effect_weaken")
-	status_effect_weaken.status_effect_name = "Weaken"
-	status_effect_weaken.status_effect_decay_rate = -1
-	status_effect_weaken.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF
-	status_effect_weaken.status_effect_action_process_times = [
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PLAYER_END_TURN,
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.ENEMY_END_TURN,
-	]
-	status_effect_weaken.status_effect_interceptor_ids = ["interceptor_weaken"]
-	
-	register_rod(status_effect_weaken)
-	
-	# increases attack damage on attacked combatant
-	# uses an interceptor
-	var status_effect_vulnerable: StatusEffectData = StatusEffectData.new("status_effect_vulnerable")
-	status_effect_vulnerable.status_effect_name = "vulnerable"
-	status_effect_vulnerable.status_effect_decay_rate = -1
-	status_effect_vulnerable.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF
-	status_effect_weaken.status_effect_action_process_times = [
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN,
-		StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.ENEMY_END_TURN,
-	]
-	status_effect_vulnerable.status_effect_interceptor_ids = ["interceptor_vulnerable"]
-	
-	register_rod(status_effect_vulnerable)
-	
-	# status that binds a card to an enemy, adding it to the player's hand when killed
-	var status_effect_attached_card: StatusEffectData = StatusEffectData.new("status_effect_attached_card")
-	status_effect_attached_card.status_effect_name = "Attached Card"
-	status_effect_attached_card.status_effect_script_path = "res://scripts/status_effects/StatusEffectAttachedCard.gd"
-	status_effect_attached_card.status_effect_decay_rate = 0
-	status_effect_attached_card.status_effect_allows_multiples = true
-	status_effect_attached_card.status_effect_stacks = false
-	status_effect_attached_card.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.NEUTRAL
-	status_effect_attached_card.status_effect_interceptor_ids = []
-	
-	register_rod(status_effect_attached_card)
-	
-	# uses an interceptor to stop an attack from processing
-	var status_effect_negate_damage: StatusEffectData = StatusEffectData.new("status_effect_negate_damage")
-	status_effect_negate_damage.status_effect_name = "Negate Damage"
-	status_effect_negate_damage.status_effect_decay_rate = 0
-	status_effect_negate_damage.status_effect_can_be_negative = false
-	status_effect_negate_damage.status_effect_stacks = true
-	status_effect_negate_damage.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_negate_damage.status_effect_interceptor_ids = ["interceptor_negate_damage"]
-	
-	register_rod(status_effect_negate_damage)
-	
-	# uses an interceptor to prevent block from resetting
-	var status_effect_preserve_block: StatusEffectData = StatusEffectData.new("status_effect_preserve_block")
-	status_effect_preserve_block.status_effect_name = "Preserve Block"
-	status_effect_preserve_block.status_effect_decay_rate = 0
-	status_effect_preserve_block.status_effect_stacks = false
-	status_effect_preserve_block.status_effect_interceptor_ids = ["interceptor_preserve_block"]
-	
-	register_rod(status_effect_preserve_block)
-	
-	# uses an interceptor to stop a debuff from happening
-	var status_effect_negate_debuff: StatusEffectData = StatusEffectData.new("status_effect_negate_debuff")
-	status_effect_negate_debuff.status_effect_name = "Negate Debuff"
-	status_effect_negate_debuff.status_effect_decay_rate = 0
-	status_effect_negate_debuff.status_effect_can_be_negative = false
-	status_effect_negate_debuff.status_effect_stacks = true
-	status_effect_negate_debuff.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.NEUTRAL
-	status_effect_negate_debuff.status_effect_interceptor_ids = ["interceptor_negate_debuff"]
-	
-	register_rod(status_effect_negate_debuff)
-	
-	# uses an interceptor to duplicate the first card play each turn
-	var status_effect_duplicate_card_plays: StatusEffectData = StatusEffectData.new("status_effect_duplicate_card_plays")
-	status_effect_duplicate_card_plays.status_effect_name = "Duplicate Play"
-	status_effect_duplicate_card_plays.status_effect_script_path = "res://scripts/status_effects/StatusEffectDuplicateCardPlays.gd"
-	status_effect_duplicate_card_plays.status_effect_decay_rate = 0
-	status_effect_duplicate_card_plays.status_effect_can_be_negative = false
-	status_effect_duplicate_card_plays.status_effect_stacks = true
-	status_effect_duplicate_card_plays.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_duplicate_card_plays.status_effect_interceptor_ids = ["interceptor_duplicate_card_plays"]
-	
-	register_rod(status_effect_duplicate_card_plays)
-
-	# uses an interceptor to duplicate attack card plays
-	var status_effect_duplicate_attacks: StatusEffectData = StatusEffectData.new("status_effect_duplicate_attacks")
-	status_effect_duplicate_attacks.status_effect_name = "Duplicate Play"
-	status_effect_duplicate_attacks.status_effect_decay_rate = -999
-	status_effect_duplicate_attacks.status_effect_can_be_negative = false
-	status_effect_duplicate_attacks.status_effect_stacks = true
-	status_effect_duplicate_attacks.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_duplicate_attacks.status_effect_interceptor_ids = ["interceptor_duplicate_attacks"]
-	
-	register_rod(status_effect_duplicate_attacks)
-	
-	# uses an interceptor to duplicate attack card plays
-	var status_effect_block_on_special_discard: StatusEffectData = StatusEffectData.new("status_effect_block_on_special_discard")
-	status_effect_block_on_special_discard.status_effect_name = "Block on Special Discard"
-	status_effect_block_on_special_discard.status_effect_decay_rate = 0
-	status_effect_block_on_special_discard.status_effect_can_be_negative = false
-	status_effect_block_on_special_discard.status_effect_stacks = true
-	status_effect_block_on_special_discard.status_effect_type = StatusEffectData.STATUS_EFFECT_TYPES.BUFF
-	status_effect_block_on_special_discard.status_effect_interceptor_ids = ["interceptor_duplicate_attacks"]
-	
-	register_rod(status_effect_block_on_special_discard)
 
 func get_status_effect_data(status_effect_object_id: String) -> StatusEffectData:
 	return _id_to_status_data.get(status_effect_object_id, null)
@@ -1096,7 +849,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_damage_increase: ActionInterceptorData = ActionInterceptorData.new("interceptor_damage_increase")
 	interceptor_damage_increase.action_interceptor_priority = 10000
 	interceptor_damage_increase.action_interceptor_modifies_parent = true
-	interceptor_damage_increase.action_interceptor_script_path = Scripts.INTERCEPTOR_DAMAGE_INCREASE
+	interceptor_damage_increase.action_interceptor_script = load(Scripts.INTERCEPTOR_DAMAGE_INCREASE)
 	interceptor_damage_increase.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
 	
 	register_rod(interceptor_damage_increase)
@@ -1105,7 +858,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_weaken: ActionInterceptorData = ActionInterceptorData.new("interceptor_weaken")
 	interceptor_weaken.action_interceptor_priority = 9500
 	interceptor_weaken.action_interceptor_modifies_parent = true
-	interceptor_weaken.action_interceptor_script_path = Scripts.INTERCEPTOR_WEAKEN
+	interceptor_weaken.action_interceptor_script = load(Scripts.INTERCEPTOR_WEAKEN)
 	interceptor_weaken.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
 	
 	register_rod(interceptor_weaken)
@@ -1114,7 +867,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_vulnerable: ActionInterceptorData = ActionInterceptorData.new("interceptor_vulnerable")
 	interceptor_vulnerable.action_interceptor_priority = 9000
 	interceptor_vulnerable.action_interceptor_modifies_parent = false
-	interceptor_vulnerable.action_interceptor_script_path = Scripts.INTERCEPTOR_VULNERABLE
+	interceptor_vulnerable.action_interceptor_script = load(Scripts.INTERCEPTOR_VULNERABLE)
 	interceptor_vulnerable.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
 	
 	register_rod(interceptor_vulnerable)
@@ -1123,7 +876,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_negate_damage: ActionInterceptorData = ActionInterceptorData.new("interceptor_negate_damage")
 	interceptor_negate_damage.action_interceptor_priority = -10000
 	interceptor_negate_damage.action_interceptor_modifies_parent = false
-	interceptor_negate_damage.action_interceptor_script_path = Scripts.INTERCEPTOR_NEGATE_DAMAGE
+	interceptor_negate_damage.action_interceptor_script = load(Scripts.INTERCEPTOR_NEGATE_DAMAGE)
 	interceptor_negate_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_DIRECT_DAMAGE]
 	
 	register_rod(interceptor_negate_damage)
@@ -1132,7 +885,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_preserve_block: ActionInterceptorData = ActionInterceptorData.new("interceptor_preserve_block")
 	interceptor_preserve_block.action_interceptor_priority = 10000
 	interceptor_preserve_block.action_interceptor_modifies_parent = false
-	interceptor_preserve_block.action_interceptor_script_path = Scripts.INTERCEPTOR_PRESERVE_BLOCK
+	interceptor_preserve_block.action_interceptor_script = load(Scripts.INTERCEPTOR_PRESERVE_BLOCK)
 	interceptor_preserve_block.action_intercepted_action_paths = [Scripts.ACTION_RESET_BLOCK]
 	
 	register_rod(interceptor_preserve_block)
@@ -1141,7 +894,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_negate_debuff: ActionInterceptorData = ActionInterceptorData.new("interceptor_negate_debuff")
 	interceptor_negate_debuff.action_interceptor_priority = 10000
 	interceptor_negate_debuff.action_interceptor_modifies_parent = false
-	interceptor_negate_debuff.action_interceptor_script_path = Scripts.INTERCEPTOR_NEGATE_DEBUFF
+	interceptor_negate_debuff.action_interceptor_script = load(Scripts.INTERCEPTOR_NEGATE_DEBUFF)
 	interceptor_negate_debuff.action_intercepted_action_paths = [Scripts.ACTION_APPLY_STATUS]
 	
 	register_rod(interceptor_negate_debuff)
@@ -1150,7 +903,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_duplicate_card_plays: ActionInterceptorData = ActionInterceptorData.new("interceptor_duplicate_card_plays")
 	interceptor_duplicate_card_plays.action_interceptor_priority = 10000
 	interceptor_duplicate_card_plays.action_interceptor_modifies_parent = true
-	interceptor_duplicate_card_plays.action_interceptor_script_path = Scripts.INTERCEPTOR_DUPLICATE_CARD_PLAYS
+	interceptor_duplicate_card_plays.action_interceptor_script = load(Scripts.INTERCEPTOR_DUPLICATE_CARD_PLAYS)
 	interceptor_duplicate_card_plays.action_intercepted_action_paths = [Scripts.ACTION_CARD_PLAY]
 	
 	register_rod(interceptor_duplicate_card_plays)
@@ -1159,7 +912,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_duplicate_attacks: ActionInterceptorData = ActionInterceptorData.new("interceptor_duplicate_attacks")
 	interceptor_duplicate_attacks.action_interceptor_priority = 10000
 	interceptor_duplicate_attacks.action_interceptor_modifies_parent = true
-	interceptor_duplicate_attacks.action_interceptor_script_path = Scripts.INTERCEPTOR_DUPLICATE_ATTACKS
+	interceptor_duplicate_attacks.action_interceptor_script = load(Scripts.INTERCEPTOR_DUPLICATE_ATTACKS)
 	interceptor_duplicate_attacks.action_intercepted_action_paths = [Scripts.ACTION_CARD_PLAY]
 	
 	register_rod(interceptor_duplicate_attacks)
@@ -1204,50 +957,6 @@ func get_color_data(color_id: String) -> ColorData:
 func get_keyword_data(keyword_object_id: String) -> KeywordData:
 	return _id_to_keyword_data.get(keyword_object_id, null)
 
-func add_test_keywords() -> void:
-	var keyword_block: KeywordData = KeywordData.new("keyword_block")
-	keyword_block.keyword_text_bb_code = "[color=orange]Block[/color]\nPrevents Damage"
-	register_rod(keyword_block)
-	
-	var keyword_corrosion: KeywordData = KeywordData.new("keyword_corrosion")
-	keyword_corrosion.keyword_text_bb_code = "[color=orange]Corrosion[/color]\nDeals damage each turn "
-	register_rod(keyword_corrosion)
-	
-	var keyword_bomb: KeywordData = KeywordData.new("keyword_bomb")
-	keyword_bomb.keyword_text_bb_code = "[color=orange]Bomb[/color]\nDeals damage to all enemies when timer runs out "
-	register_rod(keyword_bomb)
-	
-	### These are automatically added to cards based on flags
-	var keyword_top_deck: KeywordData = KeywordData.new("keyword_top_deck")
-	keyword_top_deck.keyword_text_bb_code = "[color=orange]Top Deck[/color]\nPlaced on top of deck at start of combat"
-	register_rod(keyword_top_deck)
-	
-	var keyword_bottom_deck: KeywordData = KeywordData.new("keyword_bottom_deck")
-	keyword_bottom_deck.keyword_text_bb_code = "[color=orange]Bottom Deck[/color]\nPlaced on bottom of deck at start of combat"
-	register_rod(keyword_bottom_deck)
-		
-	var keyword_retain: KeywordData = KeywordData.new("keyword_retain")
-	keyword_retain.keyword_text_bb_code = "[color=orange]Retain[/color]\nNot discarded at end of turn"
-	register_rod(keyword_retain)
-	
-	var keyword_exhaust: KeywordData = KeywordData.new("keyword_exhaust")
-	keyword_exhaust.keyword_text_bb_code = "[color=orange]Exhaust[/color]\nUsed once per combat"
-	register_rod(keyword_exhaust)
-	
-	var keyword_discard: KeywordData = KeywordData.new("keyword_discard")
-	keyword_discard.keyword_text_bb_code = "[color=orange]Discard[/color]\nPlaced in discard pile"
-	register_rod(keyword_discard)
-	
-	var keyword_ethereal: KeywordData = KeywordData.new("keyword_ethereal")
-	keyword_ethereal.keyword_text_bb_code = "[color=orange]Ethereal[/color]\nExhausts if in hand end of turn"
-	keyword_ethereal.keyword_child_keyword_object_ids = ["keyword_exhaust"]
-	register_rod(keyword_ethereal)
-	
-	var keyword_banish: KeywordData = KeywordData.new("keyword_banish")
-	keyword_banish.keyword_text_bb_code = "[color=orange]Banish[/color]\nCompletely removes a card from play"
-	keyword_banish.keyword_child_keyword_object_ids = []
-	register_rod(keyword_banish)
-	
 #endregion
 
 #region Characters
@@ -1259,107 +968,6 @@ func get_player_character_data() -> CharacterData:
 	# gets the character data that the current player is playing as
 	var character_data: CharacterData = get_character_data(player_data.player_character_object_id)
 	return character_data
-
-	# red character
-	var character_red: CharacterData = CharacterData.new("character_red")
-	character_red.character_player_id = "player_red"
-	character_red.character_name = "Red Guy"
-	character_red.character_description = "Fought in the red guy wars"
-	character_red.character_color_id = "color_red"
-	character_red.character_starting_artifact_pack_ids = ["artifact_pack_white", "artifact_pack_red"]
-	
-	character_red.character_starting_health = 80
-	character_red.character_texture_path = "external/sprites/characters/character_red/character_red.png"
-	character_red.character_icon_texture_path = "external/sprites/characters/character_red/character_red_icon.png"
-	character_red.character_text_energy_texture_path = "external/sprites/characters/character_red/character_red_text_energy.png"
-	character_red.character_starting_artifact_ids = ["artifact_block_on_attacks"]
-	character_red.character_starting_card_object_ids = [
-		"card_attack_basic", "card_attack_basic", "card_attack_basic",
-		# "card_law", "card_law", "card_law", "card_law",
-		"card_requires_adjacency",
-		"attack_with_conditional_block_card",
-		#"cards_played_attack_card","cards_played_attack_card","cards_played_attack_card",
-		"card_damage_increase", "ignore_damage_increase_attack_card",
-		"card_block_basic", "card_block_basic", "card_block_basic",
-		"card_block_basic", "card_block_basic", "card_block_basic",
-		# "card_attack_in_center", "card_attack_big", "card_block_without_attacks",
-		"card_weaken_enemies", "card_vulnerable_enemies", "card_grant_energy",
-		#"card_add_consumable", "upgrade_entire_deck_card", "attack_increase_cost_on_damage_taken_card",
-		#"card_right_click_transform_mode_a", "card_banish_attack",
-	]
-	character_red.character_starting_card_draft_card_pack_ids = ["card_pack_red"]
-	
-	register_rod(character_red)
-	
-	# blue character
-	var character_blue: CharacterData = CharacterData.new("character_blue")
-	character_blue.character_player_id = "player_blue"
-	character_blue.character_name = "Blue Guy"
-	character_blue.character_description = "If they were green they would die."
-	character_blue.character_color_id = "color_blue"
-	character_blue.character_starting_health = 70
-	character_blue.character_texture_path = "external/sprites/characters/character_blue/character_blue.png"
-	character_blue.character_icon_texture_path = "external/sprites/characters/character_blue/character_blue_icon.png"
-	character_blue.character_text_energy_texture_path = "external/sprites/characters/character_blue/character_blue_text_energy.png"
-	character_blue.character_starting_artifact_ids = ["artifact_see_top_of_draw_pile"]
-	character_blue.character_starting_artifact_pack_ids = ["artifact_pack_white", "artifact_pack_blue"]
-	character_blue.character_starting_card_object_ids = [
-		#"card_attack_basic", "card_attack_basic", "card_attack_basic",
-		#"card_block_basic", "card_block_basic", "card_block_basic",
-		"improving_retain_block_card", "randomize_hand_card", "card_attack_corrosion",
-		 "end_turn_card", "add_health_card", "transform_hand_card", "card_reshuffle_draw",
-		 "card_duplicate_attacks", "card_attack_heal_unblocked_damage", "card_attack_rng",
-	]
-	character_blue.character_starting_card_draft_card_pack_ids = ["card_pack_blue"]
-	
-	register_rod(character_blue)
-	
-	# green character
-	var character_green: CharacterData = CharacterData.new("character_green")
-	character_green.character_player_id = "player_green"
-	character_green.character_name = "Green Guy"
-	character_green.character_description = "Puts pineapple on their pizza"
-	character_green.character_color_id = "color_green"
-	character_green.character_starting_health = 75
-	character_green.character_texture_path = "external/sprites/characters/character_green/character_green.png"
-	character_green.character_icon_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
-	character_green.character_text_energy_texture_path = "external/sprites/characters/character_green/character_green_text_energy.png"
-	character_green.character_starting_artifact_ids = ["artifact_draw_on_combat_start"]
-	character_green.character_starting_artifact_pack_ids = ["artifact_pack_white", "artifact_pack_green"]
-	character_green.character_starting_card_object_ids = [
-		"card_attack_basic", "card_attack_basic", "card_attack_basic",
-		#"card_block_basic", "card_block_basic", "card_block_basic",
-		#"variable_cost_attack_card", "card_discard_block", "card_attack_corrosion", "card_energy_on_discard",
-		"custom_block_card", "attack_lower_cost_on_discard_card", "card_preserve_block",
-		"card_duplicate_plays", "card_draft_random_attack",
-	]
-	character_green.character_starting_card_draft_card_pack_ids = ["card_pack_green"]
-	
-	register_rod(character_green)
-	
-	# orange character
-	var character_orange: CharacterData = CharacterData.new("character_orange")
-	character_orange.character_player_id = "player_orange"
-	character_orange.character_name = "Orange Guy"
-	character_orange.character_description = "Has a tragic backstory"
-	character_orange.character_color_id = "color_orange"
-	character_orange.character_starting_health = 70
-	character_orange.character_texture_path = "external/sprites/characters/character_orange/character_orange.png"
-	character_orange.character_icon_texture_path = "external/sprites/characters/character_orange/character_orange_icon.png"
-	character_orange.character_text_energy_texture_path = "external/sprites/characters/character_orange/character_orange_text_energy.png"
-	character_orange.character_starting_artifact_ids = ["artifact_increase_attack_on_rest", "artifact_see_top_of_draw_pile"]
-	character_orange.character_starting_artifact_pack_ids = ["artifact_pack_white", "artifact_pack_orange"]
-	character_orange.character_starting_card_object_ids = [
-		"card_attack_basic", "card_attack_basic", "card_attack_basic",
-		"card_restart_combat",
-		"card_block_basic", "card_block_basic", "card_block_basic",
-		"retain_hand_card", "card_play_from_discard", "card_draw", "card_energy_on_draw",
-		"card_improving_block", "card_improving_attack", "card_play_random_from_hand", "card_bomb",
-		"add_to_draw_from_discard_card", "add_to_draw_from_discard_card", "card_banish_attack",
-	]
-	character_orange.character_starting_card_draft_card_pack_ids = ["card_pack_orange"]
-	
-	register_rod(character_orange)
 #endregion
 
 #region Run Modifiers
@@ -1370,31 +978,31 @@ func get_run_modifier_data(run_modifier_object_id: String) -> RunModifierData:
 func add_test_run_modifiers() -> void:
 	var run_modifier_difficulty_1: RunModifierData = RunModifierData.new("run_modifier_difficulty_1")
 	run_modifier_difficulty_1.run_modifier_name = "Difficulty 1 (Increased Enemy Health)"
-	run_modifier_difficulty_1.run_modifier_modifier_script_path = "res://scripts/run_modifiers/difficulties/RunModifierDifficulty1.gd"
+	run_modifier_difficulty_1.run_modifier_modifier_script = load("res://scripts/run_modifiers/difficulties/RunModifierDifficulty1.gd")
 
 	register_rod(run_modifier_difficulty_1)
 	
 	var run_modifier_difficulty_2: RunModifierData = RunModifierData.new("run_modifier_difficulty_2")
 	run_modifier_difficulty_2.run_modifier_name = "Difficulty 2 (Increased Minibosss Health)"
-	run_modifier_difficulty_2.run_modifier_modifier_script_path = "res://scripts/run_modifiers/difficulties/RunModifierDifficulty2.gd"
+	run_modifier_difficulty_2.run_modifier_modifier_script = load("res://scripts/run_modifiers/difficulties/RunModifierDifficulty2.gd")
 
 	register_rod(run_modifier_difficulty_2)
 	
 	var run_modifier_difficulty_3: RunModifierData = RunModifierData.new("run_modifier_difficulty_3")
 	run_modifier_difficulty_3.run_modifier_name = "Difficulty 3 (Increased Boss Health)"
-	run_modifier_difficulty_3.run_modifier_modifier_script_path = "res://scripts/run_modifiers/difficulties/RunModifierDifficulty3.gd"
+	run_modifier_difficulty_3.run_modifier_modifier_script = load("res://scripts/run_modifiers/difficulties/RunModifierDifficulty3.gd")
 
 	register_rod(run_modifier_difficulty_3)
 	
 	var run_modifier_difficulty_4: RunModifierData = RunModifierData.new("run_modifier_difficulty_4")
 	run_modifier_difficulty_4.run_modifier_name = "Difficulty 4"
-	run_modifier_difficulty_4.run_modifier_modifier_script_path = "res://scripts/run_modifiers/difficulties/RunModifierDifficulty4.gd"
+	run_modifier_difficulty_4.run_modifier_modifier_script = load("res://scripts/run_modifiers/difficulties/RunModifierDifficulty4.gd")
 
 	register_rod(run_modifier_difficulty_4)
 	
 	var run_modifier_difficulty_5: RunModifierData = RunModifierData.new("run_modifier_difficulty_5")
 	run_modifier_difficulty_5.run_modifier_name = "Difficulty 5"
-	run_modifier_difficulty_5.run_modifier_modifier_script_path = "res://scripts/run_modifiers/difficulties/RunModifierDifficulty5.gd"
+	run_modifier_difficulty_5.run_modifier_modifier_script = load("res://scripts/run_modifiers/difficulties/RunModifierDifficulty5.gd")
 
 	register_rod(run_modifier_difficulty_5)
 	
@@ -1404,7 +1012,7 @@ func add_test_run_modifiers() -> void:
 	run_modifier_custom_easy_mode.run_modifier_description = "All enemies are set to 1HP"
 	run_modifier_custom_easy_mode.run_modifier_is_custom =  true
 	run_modifier_custom_easy_mode.run_modifier_exclusive_to_modifier_ids = []
-	run_modifier_custom_easy_mode.run_modifier_modifier_script_path = "res://scripts/run_modifiers/custom/RunModifierCustomEasyMode.gd"
+	run_modifier_custom_easy_mode.run_modifier_modifier_script = load("res://scripts/run_modifiers/custom/RunModifierCustomEasyMode.gd")
 
 	register_rod(run_modifier_custom_easy_mode)
 	
@@ -1413,7 +1021,7 @@ func add_test_run_modifiers() -> void:
 	run_modifier_endless_mode.run_modifier_description = "Run will only end when the player dies"
 	run_modifier_endless_mode.run_modifier_is_custom =  true
 	run_modifier_endless_mode.run_modifier_exclusive_to_modifier_ids = []
-	run_modifier_endless_mode.run_modifier_modifier_script_path = "res://scripts/run_modifiers/custom/RunModifierCustomEndlessMode.gd"
+	run_modifier_endless_mode.run_modifier_modifier_script = load("res://scripts/run_modifiers/custom/RunModifierCustomEndlessMode.gd")
 
 	register_rod(run_modifier_endless_mode)
 	
@@ -1422,7 +1030,7 @@ func add_test_run_modifiers() -> void:
 	run_modifier_custom_1.run_modifier_description = "Dummy modifier. Mutually exclusive with Custom 2"
 	run_modifier_custom_1.run_modifier_is_custom =  true
 	run_modifier_custom_1.run_modifier_exclusive_to_modifier_ids = ["run_modifier_custom_2"]
-	run_modifier_custom_1.run_modifier_modifier_script_path = "res://scripts/run_modifiers/custom/RunModifierCustom1.gd"
+	run_modifier_custom_1.run_modifier_modifier_script = load("res://scripts/run_modifiers/custom/RunModifierCustom1.gd")
 
 	register_rod(run_modifier_custom_1)
 	
@@ -1431,7 +1039,7 @@ func add_test_run_modifiers() -> void:
 	run_modifier_custom_2.run_modifier_description = "Dummy modifier. Mutually exclusive with Custom 1"
 	run_modifier_custom_2.run_modifier_is_custom =  true
 	run_modifier_custom_2.run_modifier_exclusive_to_modifier_ids = ["run_modifier_custom_1"]
-	run_modifier_custom_2.run_modifier_modifier_script_path = "res://scripts/run_modifiers/custom/RunModifierCustom2.gd"
+	run_modifier_custom_2.run_modifier_modifier_script = load("res://scripts/run_modifiers/custom/RunModifierCustom2.gd")
 
 	register_rod(run_modifier_custom_2)
 		
@@ -1440,7 +1048,7 @@ func add_test_run_modifiers() -> void:
 	run_modifier_draft_all_colors.run_modifier_description = "Draft all card colors"
 	run_modifier_draft_all_colors.run_modifier_is_custom =  true
 	run_modifier_draft_all_colors.run_modifier_exclusive_to_modifier_ids = []
-	run_modifier_draft_all_colors.run_modifier_modifier_script_path = "res://scripts/run_modifiers/custom/RunModifierCustomDraftAllColors.gd"
+	run_modifier_draft_all_colors.run_modifier_modifier_script = load("res://scripts/run_modifiers/custom/RunModifierCustomDraftAllColors.gd")
 
 	register_rod(run_modifier_draft_all_colors)
 	
@@ -1688,236 +1296,17 @@ func get_shop_at_player_location() -> ShopData:
 #endregion
 
 #region Enemies
-	var enemy_1: EnemyData = EnemyData.new("enemy_1")
-	enemy_1.enemy_name = "Red Enemy"
-	enemy_1.enemy_health_max = 20
-	enemy_1.enemy_health = 20
-	enemy_1.enemy_initial_status_effects = {}# {"status_effect_negate_damage": 1}
-	enemy_1.enemy_texture_path = "external/sprites/enemies/enemy_red_small.png"
-	enemy_1.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 25,
-		"enemy_health_max": 25,
-	}}
-	register_rod(enemy_1)
-	
-	var enemy_2: EnemyData = EnemyData.new("enemy_2")
-	enemy_2.enemy_name = "Blue Enemy"
-	enemy_2.enemy_health_max = 5
-	enemy_2.enemy_health = 5
-	enemy_2.enemy_initial_status_effects = {}
-	enemy_2.enemy_texture_path = "external/sprites/enemies/enemy_blue_small.png"
-	enemy_2.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 8,
-		"enemy_health_max": 8,
-	}}
-	
-	register_rod(enemy_2)
-	
-	var enemy_3: EnemyData = EnemyData.new("enemy_3")
-	enemy_3.enemy_health_max = 25
-	enemy_3.enemy_health = 25
-	enemy_3.enemy_name = "Green Enemy"
-	enemy_3.enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
-	enemy_3.enemy_initial_status_effects = {"status_effect_negate_debuff": 1}
-	enemy_3.enemy_actions_on_death = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"status_charge_amount": 5, "status_effect_object_id": "status_effect_corrosion", "time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.ALL_COMBATANTS}
-	}
-	]
-	enemy_3.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 30,
-		"enemy_health_max": 30,
-	}}
-	register_rod(enemy_3)
-	
-
-	var enemy_4: EnemyData = EnemyData.new("enemy_4")
-	enemy_4.enemy_health_max = 40
-	enemy_4.enemy_health = 40
-	enemy_4.enemy_name = "Big Attack Enemy"
-	enemy_4.enemy_texture_path = "external/sprites/enemies/enemy_purple_medium.png"
-	enemy_4.enemy_actions_on_death = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"status_charge_amount": 5, "status_effect_object_id": "status_effect_corrosion", "time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.ALL_COMBATANTS}
-	}
-	]
-	enemy_4.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 50,
-		"enemy_health_max": 50,
-	}}
-	enemy_4.enemy_attack_states = {
-		"initial":	# dummy state used for random attacks at start of combat
-		{
-		"attack_damage": 0,
-		"number_of_attacks": 0,
-		"block": 0,
-		"custom_actions": [],
-		"next_attack_weights": 
-			{
-			"1": 1
-			}
-		},
-		"1":
-		{
-		"attack_damage": 10,
-		"number_of_attacks": 1,
-		"block": 0,
-		"custom_actions": [
-			{
-			Scripts.ACTION_APPLY_STATUS: {"status_effect_object_id": "status_effect_vulnerable", "status_effect_charges": 2, "target_override": BaseAction.TARGET_OVERRIDES.PLAYER}
-			}
-		],
-		"next_attack_weights": 
-			{
-			"2": 1,
-			}
-		},
-		"2":
-		{
-		"attack_damage": 4,
-		"number_of_attacks": 2,
-		"block": 0,
-		"custom_actions": [],
-		"next_attack_weights": 
-			{
-			"2": 1,
-			"3": 1,
-			}
-		},
-		"3":
-		{
-		"attack_damage": 0,
-		"number_of_attacks": 0,
-		"block": 10,
-		"custom_actions": [],
-		"next_attack_weights": 
-			{
-			"1": 1,
-			}
-		}
-	}
-	register_rod(enemy_4)
-
-	var enemy_act_1_miniboss_1: EnemyData = EnemyData.new("enemy_act_1_miniboss_1")
-	enemy_act_1_miniboss_1.enemy_health_max = 100
-	enemy_act_1_miniboss_1.enemy_health = 100
-	enemy_act_1_miniboss_1.enemy_type = EnemyData.ENEMY_TYPES.MINIBOSS
-	enemy_act_1_miniboss_1.enemy_name = "Act 1 Miniboss"
-	enemy_act_1_miniboss_1.enemy_texture_path = "external/sprites/enemies/enemy_green_medium.png"
-	enemy_act_1_miniboss_1.enemy_difficulty_to_enemy_modfiers = {
-	"2": {
-		"enemy_health": 120,
-		"enemy_health_max": 120,
-	}}
-	register_rod(enemy_act_1_miniboss_1)
-	
-	var enemy_act_1_miniboss_2: EnemyData = EnemyData.new("enemy_act_1_miniboss_2")
-	enemy_act_1_miniboss_2.enemy_health_max = 45
-	enemy_act_1_miniboss_2.enemy_health = 45
-	enemy_act_1_miniboss_2.enemy_type = EnemyData.ENEMY_TYPES.MINIBOSS
-	enemy_act_1_miniboss_2.enemy_name = "Act 1 Miniboss"
-	enemy_act_1_miniboss_2.enemy_texture_path = "external/sprites/enemies/enemy_red_medium.png"
-	enemy_act_1_miniboss_2.enemy_difficulty_to_enemy_modfiers = {
-	"2": {
-		"enemy_health": 55,
-		"enemy_health_max": 55,
-	}}
-	register_rod(enemy_act_1_miniboss_2)
-	
-	# boss that summons minions
-	var enemy_act_1_boss_1: EnemyData = EnemyData.new("enemy_act_1_boss_1")
-	enemy_act_1_boss_1.enemy_health_max = 200
-	enemy_act_1_boss_1.enemy_health = 200
-	enemy_act_1_boss_1.enemy_type = EnemyData.ENEMY_TYPES.BOSS
-	enemy_act_1_boss_1.enemy_name = "Act 1 Boss"
-	enemy_act_1_boss_1.enemy_texture_path =  "external/sprites/enemies/enemy_red_large.png"
-	enemy_act_1_boss_1.enemy_attack_states = {
-		"initial":	# dummy state used for random attacks at start of combat
-		{
-		"attack_damage": 0,
-		"number_of_attacks": 0,
-		"block": 0,
-		"custom_actions": [],
-		"next_attack_weights": 
-			{
-			"1": 1
-			}
-		},
-		"1":
-		{
-		"attack_damage": 0,
-		"number_of_attacks": 0,
-		"block": 0,
-		"custom_actions": [
-			{
-			Scripts.ACTION_SUMMON_ENEMIES: {"number_of_spawns": 2, "spawn_slots": [1,2], "time_delay": 0.5, "random_enemy_object_ids": ["enemy_minion_1", "enemy_minion_2"], "target_override": BaseAction.TARGET_OVERRIDES.PARENT}
-			}
-		],
-		"next_attack_weights": 
-			{
-			"2": 1,
-			}
-		},
-		"2":
-		{
-		"attack_damage": 3,
-		"number_of_attacks": 2,
-		"block": 7,
-		"custom_actions": [],
-		"next_attack_weights": 
-			{
-			"2": 1,
-			}
-		}
-	}
-	enemy_act_1_boss_1.enemy_difficulty_to_enemy_modfiers = {
-	"3": {
-		"enemy_health": 25,
-		"enemy_health_max": 25,
-	}}
-	register_rod(enemy_act_1_boss_1)
-	
-	# example of minion enemy
-	var enemy_minion_1: EnemyData = EnemyData.new("enemy_minion_1")
-	enemy_minion_1.enemy_health_max = 4
-	enemy_minion_1.enemy_health = 4
-	enemy_minion_1.enemy_name = "Minion 1"
-	enemy_minion_1.enemy_texture_path = "external/sprites/enemies/enemy_purple_small.png"
-	enemy_minion_1.enemy_is_minion = true
-	enemy_minion_1.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 5,
-		"enemy_health_max": 5,
-	}}
-	register_rod(enemy_minion_1)
-	
-	# example of minion enemy
-	var enemy_minion_2: EnemyData = EnemyData.new("enemy_minion_2")
-	enemy_minion_2.enemy_health_max = 3
-	enemy_minion_2.enemy_health = 3
-	enemy_minion_2.enemy_name = "Minion 2"
-	enemy_minion_2.enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
-	enemy_minion_2.enemy_is_minion = true
-	enemy_minion_2.enemy_difficulty_to_enemy_modfiers = {
-	"1": {
-		"enemy_health": 3,
-		"enemy_health_max": 33,
-	}}
-	
-	register_rod(enemy_minion_2)
 
 func get_enemy_data(enemy_object_id: String) -> EnemyData:
 	return _id_to_enemy_data.get(enemy_object_id, null)
-
+	
 func get_enemy_data_from_prototype(enemy_object_id: String) -> EnemyData:
 	# generates a copy of a given EnemyData
 	var enemy_data: EnemyData = get_enemy_data(enemy_object_id)
 	return enemy_data.get_prototype(true)
+
 #endregion
+
 
 #region Player Data Prototypes
 
@@ -1949,1919 +1338,6 @@ func get_player_data_from_prototype(player_id: String) -> PlayerData:
 #endregion
 
 #region Cards
-	# Basic attack card
-	var attack_card: CardData = CardData.new("card_attack_basic")
-	attack_card.card_name = "Basic Attack"
-	attack_card.card_color_id = "color_white"
-	attack_card.card_description = "Attack for [damage] damage [number_of_attacks] times"
-	attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_card.card_rarity = CardData.CARD_RARITIES.BASIC
-	attack_card.card_keyword_object_ids = []
-	attack_card.card_values = {"damage": 25, "number_of_attacks": 1}
-	attack_card.card_upgrade_value_improvements = {"damage": 1, "number_of_attacks": 1}
-	attack_card.card_play_actions = [{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-	}]
-	
-	register_rod(attack_card)
-	
-	# Attack card with rng damage
-	var card_attack_rng: CardData = CardData.new("card_attack_rng")
-
-	card_attack_rng.card_name = "RNG Attack"
-	card_attack_rng.card_color_id = "color_blue"
-	card_attack_rng.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	card_attack_rng.card_description = "Attack for [damage] + [damage_random] damage"
-	card_attack_rng.card_type = CardData.CARD_TYPES.ATTACK
-	card_attack_rng.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_attack_rng.card_keyword_object_ids = []
-	card_attack_rng.card_values = {"damage": 10, "number_of_attacks": 1, "damage_random": 5}
-	card_attack_rng.card_upgrade_value_improvements = {"damage_random": 5}
-	card_attack_rng.card_play_actions = [{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-	}]
-	
-	register_rod(card_attack_rng)
-	
-	# Attack card that applies poison like effect
-	var corrosion_attack_card: CardData = CardData.new("card_attack_corrosion")
-	corrosion_attack_card.card_name = "Corrosion"
-	corrosion_attack_card.card_color_id = "color_green"
-	corrosion_attack_card.card_texture_path = "external/sprites/cards/green/card_green.png"
-	corrosion_attack_card.card_description = "Do [damage] damage and apply [status_charge_amount] corrosion"
-	corrosion_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	corrosion_attack_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	corrosion_attack_card.card_keyword_object_ids = ["keyword_corrosion"]
-	corrosion_attack_card.card_values = {"damage": 5, "number_of_attacks": 1, "status_charge_amount": 5, "status_effect_object_id": "status_effect_corrosion"}
-	corrosion_attack_card.card_upgrade_value_improvements = {"status_charge_amount": 3}
-	corrosion_attack_card.card_play_actions = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5}
-	},
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-	}
-	]
-	
-	register_rod(corrosion_attack_card)
-	
-	# Card that applies a bomb like effect
-	# Demonstrates statuses that can be applied multiple times
-	var card_bomb: CardData = CardData.new("card_bomb")
-	card_bomb.card_name = "Bomb"
-	card_bomb.card_color_id = "color_green"
-	card_bomb.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_bomb.card_description = "In [status_charge_amount] turns, do [status_secondary_charge_amount] damage to all enemies"
-	card_bomb.card_requires_target = false
-	card_bomb.card_type = CardData.CARD_TYPES.SKILL
-	card_bomb.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_bomb.card_keyword_object_ids = ["keyword_bomb"]
-	card_bomb.card_values = {"status_charge_amount": 3, "status_secondary_charge_amount": 30, "status_effect_object_id": "status_effect_bomb", "status_force_apply_new_effect": true}
-	card_bomb.card_upgrade_value_improvements = {"status_secondary_charge_amount": 20}
-	card_bomb.card_play_actions = [{Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.PARENT}}]
-	
-	register_rod(card_bomb)
-	
-	# Card that will duplicate the first <charge count> cards played each turn
-	var card_duplicate_plays: CardData = CardData.new("card_duplicate_plays")
-	card_duplicate_plays.card_name = "Duplicate Plays"
-	card_duplicate_plays.card_color_id = "color_green"
-	card_duplicate_plays.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_duplicate_plays.card_description = "Duplicate the first card played each turn"
-	card_duplicate_plays.card_requires_target = false
-	card_duplicate_plays.card_type = CardData.CARD_TYPES.POWER
-	card_duplicate_plays.card_rarity = CardData.CARD_RARITIES.RARE
-	card_duplicate_plays.card_keyword_object_ids = []
-	card_duplicate_plays.card_values = {"status_charge_amount": 1, "status_secondary_charge_amount": 0, "status_effect_object_id": "status_effect_duplicate_card_plays"}
-	card_duplicate_plays.card_upgrade_value_improvements = {"status_charge_amount": 3}
-	card_duplicate_plays.card_play_actions = [{Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.PARENT}}]
-	
-	register_rod(card_duplicate_plays)
-	
-	# Card that will duplicate the next <charge count> attack cards
-	var card_duplicate_attacks: CardData = CardData.new("card_duplicate_attacks")
-	card_duplicate_attacks.card_name = "Duplicate Atttacks"
-	card_duplicate_attacks.card_color_id = "color_red"
-	card_duplicate_attacks.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_duplicate_attacks.card_description = "Duplicate the next [status_charge_amount] attacks this turn"
-	card_duplicate_attacks.card_requires_target = false
-	card_duplicate_attacks.card_type = CardData.CARD_TYPES.SKILL
-	card_duplicate_attacks.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_duplicate_attacks.card_keyword_object_ids = []
-	card_duplicate_attacks.card_values = {"status_charge_amount": 1, "status_effect_object_id": "status_effect_duplicate_attacks"}
-	card_duplicate_attacks.card_upgrade_value_improvements = {"status_charge_amount": 1}
-	card_duplicate_attacks.card_play_actions = [{Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.PARENT}}]
-	
-	register_rod(card_duplicate_attacks)
-	
-	# Strengthens the wielder
-	var card_damage_increase: CardData = CardData.new("card_damage_increase")
-	card_damage_increase.card_name = "Damage Increase"
-	card_damage_increase.card_color_id = "color_purple"
-	card_damage_increase.card_description = "Increases attack damage by [status_charge_amount]"
-	card_damage_increase.card_type = CardData.CARD_TYPES.POWER
-	card_damage_increase.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_damage_increase.card_requires_target = false
-	card_damage_increase.card_energy_cost = 0
-	card_damage_increase.card_values = {"status_charge_amount": 5, "status_effect_object_id": "status_effect_damage_increase"}
-	card_damage_increase.card_upgrade_value_improvements = {"status_charge_amount": 3}
-	card_damage_increase.card_play_actions = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.PARENT}
-	}
-	]
-	
-	register_rod(card_damage_increase)
-	
-	# Multihit card that ignores strength increases
-	var ignore_damage_increase_attack_card: CardData = CardData.new("ignore_damage_increase_attack_card")
-	ignore_damage_increase_attack_card.card_name = "Flat Damage Attack"
-	ignore_damage_increase_attack_card.card_color_id = "color_red"
-	ignore_damage_increase_attack_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	ignore_damage_increase_attack_card.card_description = "Attack for [damage] damage [number_of_attacks] times"
-	ignore_damage_increase_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	ignore_damage_increase_attack_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	ignore_damage_increase_attack_card.card_keyword_object_ids = []
-	ignore_damage_increase_attack_card.card_values = {"damage": 1, "number_of_attacks": 10, "time_delay": 0.1, "ignored_interceptor_ids": ["interceptor_damage_increase"]}
-	ignore_damage_increase_attack_card.card_upgrade_value_improvements = {"number_of_attacks": 5}
-	ignore_damage_increase_attack_card.card_play_actions = [{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.1, "actions_on_lethal": []}
-	}]
-	
-	register_rod(ignore_damage_increase_attack_card)
-	
-	# Weaken all enemies
-	var card_weaken_enemies: CardData = CardData.new("card_weaken_enemies")
-	card_weaken_enemies.card_name = "Weaken Enemies"
-	card_weaken_enemies.card_color_id = "color_red"
-	card_weaken_enemies.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_weaken_enemies.card_description = "Apply [status_charge_amount] weaknesss"
-	card_weaken_enemies.card_type = CardData.CARD_TYPES.SKILL
-	card_weaken_enemies.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_weaken_enemies.card_requires_target = true
-	card_weaken_enemies.card_energy_cost = 1
-	card_weaken_enemies.card_values = {"status_charge_amount": 1, "status_effect_object_id": "status_effect_weaken"}
-	card_weaken_enemies.card_upgrade_value_improvements = {"status_charge_amount": 1}
-	card_weaken_enemies.card_play_actions = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS}
-	}
-	]
-	
-	register_rod(card_weaken_enemies)
-	
-	# Applies vulnerability to all enemies
-	var card_vulnerable_enemies: CardData = CardData.new("card_vulnerable_enemies")
-	card_vulnerable_enemies.card_name = "Vulnerable Enemies"
-	card_vulnerable_enemies.card_color_id = "color_red"
-	card_vulnerable_enemies.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_vulnerable_enemies.card_description = "Apply [status_charge_amount] vulnerable"
-	card_vulnerable_enemies.card_type = CardData.CARD_TYPES.SKILL
-	card_vulnerable_enemies.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_vulnerable_enemies.card_requires_target = true
-	card_vulnerable_enemies.card_energy_cost = 1
-	card_vulnerable_enemies.card_values = {"status_charge_amount": 1, "status_effect_object_id": "status_effect_vulnerable"}
-	card_vulnerable_enemies.card_upgrade_value_improvements = {"status_charge_amount": 1}
-	card_vulnerable_enemies.card_play_actions = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS}
-	}
-	]
-	
-	register_rod(card_vulnerable_enemies)
-	
-	# Applies a status that rejects resetting block at start of turn
-	var card_preserve_block: CardData = CardData.new("card_preserve_block")
-	card_preserve_block.card_name = "Preserve Block"
-	card_preserve_block.card_color_id = "color_green"
-	card_preserve_block.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_preserve_block.card_description = "Block will no longer reset"
-	card_preserve_block.card_type = CardData.CARD_TYPES.POWER
-	card_preserve_block.card_rarity = CardData.CARD_RARITIES.RARE
-	card_preserve_block.card_requires_target = false
-	card_preserve_block.card_energy_cost = 2
-	card_preserve_block.card_keyword_object_ids = ["keyword_block"]
-	card_preserve_block.card_values = {"status_charge_amount": 1, "status_effect_object_id": "status_effect_preserve_block"}
-	card_preserve_block.card_upgrade_value_improvements = {}
-	card_preserve_block.card_first_upgrade_property_changes = {"card_energy_cost": 1}
-	card_preserve_block.card_play_actions = [
-	{
-	Scripts.ACTION_APPLY_STATUS: {"time_delay": 0.5, "target_override": BaseAction.TARGET_OVERRIDES.PARENT}
-	}
-	]
-	
-	register_rod(card_preserve_block)
-	
-	# Attack card that applies block if in hand at end of turn
-	var attack_block_card: CardData = CardData.new("card_attack_block")
-	attack_block_card.card_name = "Attack and Block"
-	attack_block_card.card_color_id = "color_purple"
-	attack_block_card.card_description = "Retain. Attack for [damage] damage. Applies [block] block if in hand at end of turn."
-	attack_block_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_block_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	attack_block_card.card_is_retained = true
-	attack_block_card.card_keyword_object_ids = ["keyword_block"]
-	attack_block_card.card_values = {"damage": 7, "number_of_attacks": 1, "block": 7}
-	attack_block_card.card_upgrade_value_improvements = {"damage": 3, "block": 3}
-	attack_block_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-	}
-	]
-	attack_block_card.card_end_of_turn_actions = [
-	{
-	Scripts.ACTION_BLOCK: 
-		{
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-		"time_delay": 0.5
-		}
-	}
-	]
-	
-	register_rod(attack_block_card)
-	
-	# Basic block card
-	var block_card: CardData = CardData.new("card_block_basic")
-	block_card.card_name = "Basic Block"
-	block_card.card_color_id = "color_white"
-	block_card.card_description = "Add [block] block"
-	block_card.card_type = CardData.CARD_TYPES.SKILL
-	block_card.card_rarity = CardData.CARD_RARITIES.BASIC
-	block_card.card_requires_target = false
-	block_card.card_keyword_object_ids = ["keyword_block"]
-	block_card.card_values = {"block": 5}
-	block_card.card_upgrade_value_improvements = {"block": 3}
-	block_card.card_play_actions = [{
-	Scripts.ACTION_BLOCK: 
-		{
-			"block": 5,
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	}]
-	
-	register_rod(block_card)
-	
-	
-	# Basic draw card
-	var draw_card: CardData = CardData.new("card_draw")
-	draw_card.card_name = "Draw"
-	draw_card.card_color_id = "color_blue"
-	draw_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	draw_card.card_description = "Draw [draw_count] cards"
-	draw_card.card_type = CardData.CARD_TYPES.SKILL
-	draw_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	draw_card.card_requires_target = false
-	draw_card.card_values = {"draw_count": 3}
-	draw_card.card_upgrade_value_improvements = {"draw_count": 1}
-	draw_card.card_play_actions = [{
-	Scripts.ACTION_DRAW_GENERATOR: {"draw_count": 3},
-	}]
-	
-	register_rod(draw_card)
-	
-	# Reshuffle and draw
-	var card_reshuffle_draw: CardData = CardData.new("card_reshuffle_draw")
-	card_reshuffle_draw.card_name = "Reshuffle and Draw"
-	card_reshuffle_draw.card_color_id = "color_blue"
-	card_reshuffle_draw.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	card_reshuffle_draw.card_description = "Shuffle discard back into draw pile.\nDraw [draw_count] cards"
-	card_reshuffle_draw.card_type = CardData.CARD_TYPES.SKILL
-	card_reshuffle_draw.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_reshuffle_draw.card_energy_cost = 0
-	card_reshuffle_draw.card_requires_target = false
-	card_reshuffle_draw.card_values = {"draw_count": 1}
-	card_reshuffle_draw.card_upgrade_value_improvements = {"draw_count": 1}
-	card_reshuffle_draw.card_play_actions = [{
-	Scripts.ACTION_RESHUFFLE: {"shuffle_discard_into_draw": true},
-	Scripts.ACTION_DRAW_GENERATOR: {"draw_count": 3},
-	}]
-	
-	register_rod(card_reshuffle_draw)
-	
-	# Add a consumable
-	var card_add_consumable: CardData = CardData.new("card_add_consumable")
-	card_add_consumable.card_name = "Add Consumable"
-	card_add_consumable.card_color_id = "color_blue"
-	card_add_consumable.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	card_add_consumable.card_description = "Generate a random consumable"
-	card_add_consumable.card_type = CardData.CARD_TYPES.SKILL
-	card_add_consumable.card_rarity = CardData.CARD_RARITIES.RARE
-	card_add_consumable.card_requires_target = false
-	card_add_consumable.card_exhausts = true
-	card_add_consumable.card_values = {"random_consumable": true, "fill_all_slots": true}
-	card_add_consumable.card_first_upgrade_property_changes = {"card_energy_cost": 0}
-	card_add_consumable.card_play_actions = [{
-	Scripts.ACTION_ADD_CONSUMABLE: {},
-	}]
-	
-	register_rod(card_add_consumable)
-	
-	# Large 2 energy attack that exhausts if in hand at end of turn
-	# Grants money on kills
-	var big_attack_card: CardData = CardData.new("card_attack_big")
-	big_attack_card.card_name = "Big Attack"
-	big_attack_card.card_color_id = "color_orange"
-	big_attack_card.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	big_attack_card.card_description = "Attack for [damage] damage. Grants [money_amount] money on kill. Ethereal"
-	big_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	big_attack_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	big_attack_card.card_energy_cost = 2
-	big_attack_card.card_is_ethereal = true
-	big_attack_card.card_values = {"damage": 15, "number_of_attacks": 1, "money_amount": 25}
-	big_attack_card.card_upgrade_value_improvements = {"damage": 5, "money_amount": 5}
-	big_attack_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: 
-		{
-		
-		"time_delay": 0.0,
-		"actions_on_lethal": 
-			[
-				{
-				Scripts.ACTION_ADD_MONEY: {}
-				}
-			]
-		}
-	}
-	]
-	
-	register_rod(big_attack_card)
-	
-	# Attack that heals for unblocked damage
-	# demonstrates storing values into CardPlayRequest for use by other actions
-	var card_attack_heal_unblocked_damage: CardData = CardData.new("card_attack_heal_unblocked_damage")
-	card_attack_heal_unblocked_damage.card_name = "Healing Attack"
-	card_attack_heal_unblocked_damage.card_color_id = "color_blue"
-	card_attack_heal_unblocked_damage.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	card_attack_heal_unblocked_damage.card_description = "Attack all enemies for [damage] damage and heal for unblocked damage\nExhaust"
-	card_attack_heal_unblocked_damage.card_type = CardData.CARD_TYPES.ATTACK
-	card_attack_heal_unblocked_damage.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_attack_heal_unblocked_damage.card_requires_target = false
-	card_attack_heal_unblocked_damage.card_exhausts = true
-	card_attack_heal_unblocked_damage.card_values = {"damage": 4, "number_of_attacks": 1}
-	card_attack_heal_unblocked_damage.card_upgrade_value_improvements = {"damage": 3}
-	card_attack_heal_unblocked_damage.card_play_actions = [
-	{
-	Scripts.ACTION_ADD_HEALTH: 
-		{
-		# aliases unblocked damage into health value, capping it damage done to 0 hp
-		"custom_key_names":{"health_amount": "unblocked_damage_capped"}
-		}
-	},
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: 
-		{
-		"target_override": BaseAction.TARGET_OVERRIDES.ALL_ENEMIES,
-		"time_delay": 0.3,
-		}
-	}
-	]
-	
-	register_rod(card_attack_heal_unblocked_damage)
-	
-	# Attack that gets permanently stronger if it kills something
-	var improving_attack_card: CardData = CardData.new("card_improving_attack")
-	improving_attack_card.card_name = "Improving Attack"
-	improving_attack_card.card_color_id = "color_blue"
-	improving_attack_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	improving_attack_card.card_description = "Block for [block] and attack for [damage] damage. Improves damage and block by 2 on kill"
-	improving_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	improving_attack_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	improving_attack_card.card_energy_cost = 2
-	improving_attack_card.card_values = {"block": 5, "damage": 5, "number_of_attacks": 1}
-	improving_attack_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: 
-	{
-		"time_delay": 0.0,
-		"actions_on_lethal": 
-			[
-				{
-				Scripts.ACTION_IMPROVE_CARD_VALUES: 
-					{
-					"time_delay": 0.1,
-					"pick_played_card": true,
-					"improve_parent_card": true,
-					"card_value_improvements":
-						{
-						"block": 2,
-						"damage": 2,
-						}
-					}
-				}
-			]
-		}
-	}
-	
-	]
-	
-	register_rod(improving_attack_card)
-	
-	# Block that improves temporarily when retained
-	var improving_retain_block_card: CardData = CardData.new("improving_retain_block_card")
-	improving_retain_block_card.card_name = "Retain Block"
-	improving_retain_block_card.card_color_id = "color_purple"
-	improving_retain_block_card.card_description = "Retain. Block for [block]. Improves block by 3 on retain"
-	improving_retain_block_card.card_energy_cost = 1
-	improving_retain_block_card.card_type = CardData.CARD_TYPES.SKILL
-	improving_retain_block_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	improving_retain_block_card.card_requires_target = false
-	improving_retain_block_card.card_is_retained = true
-	attack_block_card.card_keyword_object_ids = ["keyword_block"]
-	improving_retain_block_card.card_values = {"block": 5}
-	improving_retain_block_card.card_play_actions = [
-		{
-		Scripts.ACTION_BLOCK: {
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-			}
-		}
-	]
-	improving_retain_block_card.card_retain_actions = [
-		{
-		Scripts.ACTION_IMPROVE_CARD_VALUES: {
-			"time_delay": 0.1,
-			"pick_played_card": true,
-			"improve_parent_card": false,
-			"card_value_improvements":
-				{
-				"block": 3
-				}
-			}
-		}
-	]
-	
-	register_rod(improving_retain_block_card)
-	
-	# Attack that attaches itself to random enemy at the start of combat
-	var self_attaching_attack_card: CardData = CardData.new("self_attaching_attack_card")
-	self_attaching_attack_card.card_name = "Self Attaching Attack"
-	self_attaching_attack_card.card_color_id = "color_blue"
-	self_attaching_attack_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	self_attaching_attack_card.card_description = "At the start of combat attaches itself to a random enemy\nAttack for [damage] damage"
-	self_attaching_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	self_attaching_attack_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	self_attaching_attack_card.card_energy_cost = 0
-	self_attaching_attack_card.card_values = {"damage": 20, "number_of_attacks": 1}
-	self_attaching_attack_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: 
-		{
-		"time_delay": 0.0,
-		}
-	}
-	]
-	self_attaching_attack_card.card_initial_combat_actions = [
-	{
-	Scripts.ACTION_ATTACH_CARDS_ONTO_ENEMY: 
-		{
-		"time_delay": 0.0,
-		"target_override": BaseAction.TARGET_OVERRIDES.RANDOM_ENEMY,
-		"pick_played_card": true
-		}
-	}
-	]
-	
-	register_rod(self_attaching_attack_card)
-	
-	# Attack that draws cards if played when 5 cards in hand
-	var attack_with_conditional_draw_card: CardData = CardData.new("attack_with_conditional_draw_card")
-	attack_with_conditional_draw_card.card_name = "Attack With Draw"
-	attack_with_conditional_draw_card.card_color_id = "color_red"
-	attack_with_conditional_draw_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	attack_with_conditional_draw_card.card_description = "Attack for [damage]. Draw 2 cards if played when 5 cards in hand, otherwise draw 1"
-	attack_with_conditional_draw_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_with_conditional_draw_card.card_rarity = CardData.CARD_RARITIES.RARE
-	attack_with_conditional_draw_card.card_energy_cost = 1
-	attack_with_conditional_draw_card.card_values = {"damage": 5, "number_of_attacks": 1}
-	attack_with_conditional_draw_card.card_upgrade_value_improvements = {"damage": 5}
-	attack_with_conditional_draw_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: {
-		"time_delay": 0.0,
-		"actions_on_lethal": []
-		}
-	},
-	{
-	Scripts.ACTION_VALIDATOR: {
-		"validator_data":
-		[
-			{
-			Scripts.VALIDATOR_CARD_TYPE_IN_HAND: 
-				{
-				"card_type_minimum": 4,
-				"card_type_maximum": 4,
-				"card_types": CardData.CARD_TYPES.values(),	# any card
-				"invert_validation": false,
-				}
-			}
-		],
-		"passed_action_data": 
-		[
-			{
-			Scripts.ACTION_DRAW_GENERATOR: {"draw_count": 2},
-			}
-		],
-		"failed_action_data": 
-		[
-			{
-			Scripts.ACTION_DRAW_GENERATOR: {"draw_count": 1},
-			}
-		],
-		"time_delay": 0.0,
-		}
-	}
-	]
-
-	register_rod(attack_with_conditional_draw_card)
-	
-	# Attack that blocks if targeted enemy is attacking
-	var attack_with_conditional_block_card: CardData = CardData.new("attack_with_conditional_block_card")
-	attack_with_conditional_block_card.card_name = "Block on Attack"
-	attack_with_conditional_block_card.card_color_id = "color_red"
-	attack_with_conditional_block_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	attack_with_conditional_block_card.card_description = "Attack for [damage]. If the targeted enemy is attacking, block for [block]"
-	attack_with_conditional_block_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_with_conditional_block_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	attack_with_conditional_block_card.card_energy_cost = 1
-	attack_with_conditional_block_card.card_values = {"damage": 10, "block": 5, "number_of_attacks": 1}
-	attack_with_conditional_block_card.card_upgrade_value_improvements = {"damage": 3, "block": 3}
-	attack_with_conditional_block_card.card_glow_validators = [
-		{Scripts.VALIDATOR_ENEMY_ATTACKING: {}}
-	]
-	attack_with_conditional_block_card.card_play_actions = [
-	{
-	Scripts.ACTION_ATTACK_GENERATOR: {
-		"time_delay": 0.0,
-		"actions_on_lethal": []
-		}
-	},
-	{
-	Scripts.ACTION_VALIDATOR: {
-		"validator_data":
-		[
-			{Scripts.VALIDATOR_CARD_PLAY_ENEMY_ATTACKING: {}}
-		],
-		"passed_action_data": 
-		[
-			{
-			Scripts.ACTION_BLOCK: {"target_override": BaseAction.TARGET_OVERRIDES.PARENT},
-			}
-		],
-		"time_delay": 0.0,
-		}
-	}
-	]
-
-	register_rod(attack_with_conditional_block_card)
-	
-	# Variable cost attack
-	# Capped at 5 energy
-	var variable_cost_attack_card: CardData = CardData.new("variable_cost_attack_card")
-	variable_cost_attack_card.card_name = "Variable Attack"
-	variable_cost_attack_card.card_color_id = "color_white"
-	variable_cost_attack_card.card_description = "Do [damage] damage for X energy"
-	variable_cost_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	variable_cost_attack_card.card_rarity = CardData.CARD_RARITIES.RARE
-	variable_cost_attack_card.card_energy_cost = 0
-	variable_cost_attack_card.card_energy_cost_is_variable = true
-	variable_cost_attack_card.card_energy_cost_variable_upper_bound = 5
-	variable_cost_attack_card.card_values = {"damage": 1, "number_of_attacks": 1}
-	variable_cost_attack_card.card_upgrade_value_improvements = {"damage": 1, "multiplier_offset": 1}
-	variable_cost_attack_card.card_first_upgrade_property_changes = {"card_description": "Do [damage] damage for X + 1 energy"}	# updates description
-	variable_cost_attack_card.card_play_actions = [
-	{
-	Scripts.ACTION_VARIABLE_COST_MODIFIER: {
-		"action_data":
-		[
-			{
-			Scripts.ACTION_ATTACK_GENERATOR: {
-				"time_delay": 0.0,
-				"merge_attacks": true,
-				"actions_on_lethal": []
-				}
-			}
-		],
-		"multiplier_offset": 0,
-		"multiplied_values": [
-			"number_of_attacks"
-		],
-		"time_delay": 0.0,
-		}
-	}
-	]
-
-	register_rod(variable_cost_attack_card)
-	
-	# Attack based on number of cards played in combat
-	var cards_played_attack_card: CardData = CardData.new("cards_played_attack_card")
-	cards_played_attack_card.card_name = "Cards Played Attack"
-	cards_played_attack_card.card_color_id = "color_red"
-	cards_played_attack_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	cards_played_attack_card.card_description = "Do [damage] damage, increased by 2 for each card played this combat"
-	cards_played_attack_card.card_type = CardData.CARD_TYPES.ATTACK
-	cards_played_attack_card.card_rarity = CardData.CARD_RARITIES.RARE
-	cards_played_attack_card.card_energy_cost = 2
-	cards_played_attack_card.card_values = {"damage": 1, "number_of_attacks": 1}
-	cards_played_attack_card.card_upgrade_value_improvements = {"damage": 1}
-	cards_played_attack_card.card_first_upgrade_property_changes = {"card_energy_cost": 1}
-	cards_played_attack_card.card_play_actions = [
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {
-			"time_delay": 0.0,
-			"merge_attacks": true,
-			"actions_on_lethal": []
-			}
-		}
-	]
-	cards_played_attack_card.card_listeners = [{Scripts.LISTENER_CARD_VALUE_MODIFIER: {
-		"stat_enum": CombatStatsData.STATS.CARDS_PLAYED,
-		"is_turn_stat": false,
-		"multiplied_values": ["damage"],
-		"multiplied_values_bases": {"damage": 0},
-		"multiplied_values_per_stat": {"damage": 2},
-	}}]
-	
-	register_rod(cards_played_attack_card)
-	
-	# Example of card using start of combat actions
-	var initial_block_card: CardData = CardData.new("card_block_initial")
-	initial_block_card.card_name = "Block"
-	initial_block_card.card_color_id = "color_white"
-	initial_block_card.card_description = "Add [block] block. At the start of combat, apply [block] block"
-	initial_block_card.card_type = CardData.CARD_TYPES.SKILL
-	initial_block_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	initial_block_card.card_requires_target = false
-	initial_block_card.card_keyword_object_ids = ["keyword_block"]
-	initial_block_card.card_values = {"block": 5}
-	initial_block_card.card_upgrade_value_improvements = {"block": 3}
-	initial_block_card.card_play_actions = [{
-	Scripts.ACTION_BLOCK: 
-		{
-			"block": 5,
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	}]
-	initial_block_card.card_initial_combat_actions = [{
-	Scripts.ACTION_BLOCK: 
-		{
-			"block": 5,
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	}]
-	
-	register_rod(initial_block_card)
-	
-	
-	# Block using 2 custom values
-	var custom_block_card: CardData = CardData.new("custom_block_card")
-	custom_block_card.card_name = "Custom Block"
-	custom_block_card.card_color_id = "color_white"
-	custom_block_card.card_description = "Block twice. Add [custom_block_1] block. Add [custom_block_2] block."
-	custom_block_card.card_type = CardData.CARD_TYPES.SKILL
-	custom_block_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	custom_block_card.card_requires_target = false
-	custom_block_card.card_keyword_object_ids = ["keyword_block"]
-	custom_block_card.card_values = {"custom_block_1": 3, "custom_block_2": 4}
-	custom_block_card.card_upgrade_value_improvements = {"custom_block_1": 5, "custom_block_2": 5}
-	custom_block_card.card_play_actions = [
-	{
-	Scripts.ACTION_BLOCK: 
-		{
-		"custom_key_names": {"block": "custom_block_1"},
-		"time_delay": 0.5,
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	},
-	{
-	Scripts.ACTION_BLOCK: 
-		{
-		"custom_key_names": {"block": "custom_block_2"},
-		"time_delay": 0.5,
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	},
-	]
-	
-	register_rod(custom_block_card)
-	
-	# Block that ends turn
-	# Adjust the immediacy value to affect when the turn is ended
-	# Blocks before and after an end turn requesst to demonstrate turn ending differences
-	var end_turn_card: CardData = CardData.new("end_turn_card")
-	end_turn_card.card_name = "End Turn"
-	end_turn_card.card_color_id = "color_white"
-	end_turn_card.card_description = "Add [block] block. End turn. Block for [block]"
-	end_turn_card.card_type = CardData.CARD_TYPES.SKILL
-	end_turn_card.card_rarity = CardData.CARD_RARITIES.RARE
-	end_turn_card.card_requires_target = false
-	end_turn_card.card_keyword_object_ids = ["keyword_block"]
-	end_turn_card.card_values = {"block": 5, "end_turn_immediacy_level": CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.IMMEDIATE}
-	end_turn_card.card_upgrade_value_improvements = {"block": 5}
-	end_turn_card.card_play_actions = [
-	{Scripts.ACTION_BLOCK: {"target_override": BaseAction.TARGET_OVERRIDES.PARENT}},
-	{Scripts.ACTION_END_TURN: {"time_delay": 0.05}},
-	{Scripts.ACTION_BLOCK: {"target_override": BaseAction.TARGET_OVERRIDES.PARENT}},
-	]
-	
-	register_rod(end_turn_card)
-	
-	# Block that exhausts on use
-	# Drawn first
-	var big_block_card: CardData = CardData.new("card_block_big")
-	big_block_card.card_name = "Exhaust Block"
-	big_block_card.card_color_id = "color_orange"
-	big_block_card.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	big_block_card.card_description = "Top Deck. Add [block] block and exhaust"
-	big_block_card.card_type = CardData.CARD_TYPES.SKILL
-	big_block_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	big_block_card.card_requires_target = false
-	big_block_card.card_exhausts = true
-	big_block_card.card_first_shuffle_priority = 1	# card will be top of deck on combat start
-	big_block_card.card_keyword_object_ids = ["keyword_block"]
-	big_block_card.card_values = {"block": 15}
-	big_block_card.card_upgrade_value_improvements = {"block": 5}
-	big_block_card.card_play_actions = [{
-	Scripts.ACTION_BLOCK: {
-		"time_delay": 0.5,
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	}]
-	
-	register_rod(big_block_card)
-	
-	# Block that improves each time in combat
-	var improving_block_card: CardData = CardData.new("card_improving_block")
-	improving_block_card.card_name = "Improving Block"
-	improving_block_card.card_color_id = "color_green"
-	improving_block_card.card_texture_path = "external/sprites/cards/green/card_green.png"
-	improving_block_card.card_description = "Top Deck. Add [block] block. Improve amount blocked by 1 this combat"
-	improving_block_card.card_type = CardData.CARD_TYPES.SKILL
-	improving_block_card.card_rarity = CardData.CARD_RARITIES.RARE
-	improving_block_card.card_requires_target = false
-	improving_block_card.card_first_shuffle_priority = 1	# card will be top of deck on combat start
-	improving_block_card.card_keyword_object_ids = ["keyword_block"]
-	improving_block_card.card_values = {"block": 5}
-	improving_block_card.card_play_actions = [
-	{
-	Scripts.ACTION_BLOCK: {
-		"time_delay": 0.5,
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-		}
-	},
-	{
-	Scripts.ACTION_IMPROVE_CARD_VALUES: {
-		"time_delay": 0.1,
-		"pick_played_card": true,
-		"improve_parent_card": false,
-		"card_value_improvements":
-			{
-			"block": 1
-			}
-		}
-	},
-	]
-	
-	register_rod(improving_block_card)
-	
-	# Attack card that improves all cards of the same id when played
-	var card_law: CardData = CardData.new("card_law")
-	card_law.card_name = "Law"
-	card_law.card_color_id = "color_red"
-	card_law.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_law.card_description = "Attack for [damage] damage. Improve all Law cards by 3 this combat."
-	card_law.card_type = CardData.CARD_TYPES.ATTACK
-	card_law.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_law.card_requires_target = true
-	card_law.card_energy_cost = 0
-	card_law.card_keyword_object_ids = []
-	card_law.card_values = {"damage": 5, "number_of_attacks": 1}
-	card_law.card_upgrade_value_improvements = {"damage": 3, "time_delay": 0.0,}
-	card_law.card_play_actions = [
-	# improve self
-	{
-	Scripts.ACTION_IMPROVE_CARD_VALUES: {
-		"pick_played_card": true,
-		"improve_parent_card": false,
-		"card_value_improvements":
-			{
-			"damage": 3
-			}
-		}
-	},
-	# improve all other Laws (self not included because card in limbo)
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 999,
-		"min_card_amount": 999,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.COMBAT_DECK,
-		"card_pick_text": "",
-		# limit to only other Law cards
-		"validator_data": [
-			{Scripts.VALIDATOR_CARD_ID: {"card_object_ids": [card_law.object_id]}}
-		],
-		"action_data": [
-				{
-				Scripts.ACTION_IMPROVE_CARD_VALUES: {
-					"pick_played_card": false,
-					"improve_parent_card": false,
-					"card_value_improvements":
-						{
-						"damage": 3,
-						}
-				}},
-			]
-		}
-	},
-	# attack. Happens before improvements
-	{Scripts.ACTION_ATTACK_GENERATOR: {}}
-	]
-	
-	register_rod(card_law)
-	
-	# Discard up to 3 cards and block for each
-	# example of cardset modifiers
-	var discard_card: CardData = CardData.new("card_discard_block")
-	discard_card.card_name = "Discard Block"
-	discard_card.card_color_id = "color_red"
-	discard_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	discard_card.card_description = "Discard up to [max_card_amount] cards and add [block] block for each"
-	discard_card.card_type = CardData.CARD_TYPES.SKILL
-	discard_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	discard_card.card_requires_target = false
-	discard_card.card_keyword_object_ids = ["keyword_block"]
-	discard_card.card_values = {"block": 5,  "max_card_amount": 3}
-	discard_card.card_upgrade_value_improvements = {"block": 3, "max_card_amount": 1}
-	discard_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 0,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"card_pick_text": "Choose up to {0} card(s) to discard. {1} cards selected",
-		"action_data": [
-			{Scripts.ACTION_VARIABLE_CARDSET_MODIFIER: {
-				"multiplied_values": ["block"],
-				"action_data": [{Scripts.ACTION_BLOCK: {
-					"time_delay": 0.5,
-					"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-					}}]
-			}},
-			{Scripts.ACTION_DISCARD_CARDS: {}},
-			]
-		}
-	},
-	]
-	
-	register_rod(discard_card)
-	
-	# Discard up to 3 attack cards and damage all enemies for each one
-	# exmaple of validators in card picking, and variable cardsets
-	var card_banish_attack: CardData = CardData.new("card_banish_attack")
-	card_banish_attack.card_name = "Banish Attack"
-	card_banish_attack.card_color_id = "color_red"
-	card_banish_attack.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_banish_attack.card_description = "Banish up to [max_card_amount] attack cards and do [damage] damage to all enemies for each"
-	card_banish_attack.card_type = CardData.CARD_TYPES.ATTACK
-	card_banish_attack.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_banish_attack.card_requires_target = false
-	card_banish_attack.card_keyword_object_ids = ["keyword_banish"]
-	card_banish_attack.card_values = {"damage": 8,  "max_card_amount": 3}
-	card_banish_attack.card_upgrade_value_improvements = {"damage": 2, "max_card_amount": 1}
-	card_banish_attack.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 0,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"card_pick_text": "Choose up to {0} card(s) to banish. {1} cards selected",
-		# only attack cards allowed
-		"validator_data": [
-			{Scripts.VALIDATOR_CARD_TYPE: {"card_types": [CardData.CARD_TYPES.ATTACK]}}
-		],
-		# banishes the cards and updates attack generator based on number of cards
-		"action_data": [
-			{Scripts.ACTION_VARIABLE_CARDSET_MODIFIER: {
-				"multiplied_values": ["number_of_attacks"],
-				"action_data": [{Scripts.ACTION_ATTACK_GENERATOR: {
-					"number_of_attacks": 1,
-					"time_delay": 0.5,
-					"target_override": BaseAction.TARGET_OVERRIDES.ALL_ENEMIES
-					}}]
-			}},
-			{Scripts.ACTION_BANISH_CARDS: {}},
-			]
-		}
-	},
-	]
-	
-	register_rod(card_banish_attack)
-	
-	# Discard up to 2 cards and emit a custom signal that's bound to a custom stat
-	# using custom signals with variable outputs
-	var card_special_discard: CardData = CardData.new("card_special_discard")
-	card_special_discard.card_name = "Special Discard"
-	card_special_discard.card_color_id = "color_orange"
-	card_special_discard.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	card_special_discard.card_description = "Discard up to [max_card_amount] cards and emit a custom signal for each"
-	card_special_discard.card_type = CardData.CARD_TYPES.SKILL
-	card_special_discard.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_special_discard.card_requires_target = false
-	card_special_discard.card_keyword_object_ids = ["keyword_discard"]
-	card_special_discard.card_values = {"max_card_amount": 3}
-	card_special_discard.card_upgrade_value_improvements = {"max_card_amount": 4}
-	card_special_discard.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 0,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"card_pick_text": "Choose up to {0} card(s) to discard. {1} cards selected",
-		"validator_data": [],
-		# discard the cards and emit a custom signal of value the number of cards
-		"action_data": [
-			{Scripts.ACTION_VARIABLE_CARDSET_MODIFIER: {
-				"multiplied_values": ["custom_signal_value"],
-				"action_data": [{Scripts.ACTION_EMIT_CUSTOM_SIGNAL: {
-					"custom_signal_object_id": "custom_signal_special_discard",
-					"custom_signal_value": 1,
-					"time_delay": 0.0,
-					}}]
-			}},
-			{Scripts.ACTION_DISCARD_CARDS: {}},
-			]
-		}
-	},
-	]
-	
-	register_rod(card_special_discard)
-	
-	# Pick up to 2 cards from draw pile and add to hand
-	var pick_from_discard_card: CardData = CardData.new("card_pick_from_discard")
-	pick_from_discard_card.card_name = "Pick From Discard"
-	pick_from_discard_card.card_color_id = "color_blue"
-	pick_from_discard_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	pick_from_discard_card.card_description = "Pick 2 cards from discard pile and add them to hand"
-	pick_from_discard_card.card_type = CardData.CARD_TYPES.SKILL
-	pick_from_discard_card.card_rarity = CardData.CARD_RARITIES.RARE
-	pick_from_discard_card.card_requires_target = false
-	pick_from_discard_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 0,
-		"max_card_amount": 2,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DISCARD,
-		"action_data": [{Scripts.ACTION_ADD_CARDS_TO_HAND: {}}]
-		}
-	},
-	]
-	
-	register_rod(pick_from_discard_card)
-	
-	# Pick 2 card from discard pile and randomly add to draw pile
-	var add_to_draw_from_discard_card: CardData = CardData.new("add_to_draw_from_discard_card")
-	add_to_draw_from_discard_card.card_name = "Pick From Discard"
-	add_to_draw_from_discard_card.card_color_id = "color_blue"
-	add_to_draw_from_discard_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	add_to_draw_from_discard_card.card_description = "Pick 2 cards from discard pile and randomly insert them into draw pile"
-	add_to_draw_from_discard_card.card_type = CardData.CARD_TYPES.SKILL
-	add_to_draw_from_discard_card.card_rarity = CardData.CARD_RARITIES.RARE
-	add_to_draw_from_discard_card.card_requires_target = false
-	add_to_draw_from_discard_card.card_values = {"card_destination": CardPlayRequest.CARD_PLAY_DESTINATIONS.DRAW_INSERT}
-	add_to_draw_from_discard_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 1,
-		"max_card_amount": 2,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_text": "Choose {0} card(s) to add to draw. {1} cards selected",
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DISCARD,
-		"action_data": [{Scripts.ACTION_ADD_CARDS_TO_DRAW: {}}]
-		}
-	},
-	]
-	
-	register_rod(add_to_draw_from_discard_card)
-	
-	# Sets all cards in hand to be zero cost until end of turn
-	var set_hand_energy_card: CardData = CardData.new("set_hand_energy_card")
-	set_hand_energy_card.card_name = "Set Hand Energy"
-	set_hand_energy_card.card_color_id = "color_red"
-	set_hand_energy_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	set_hand_energy_card.card_description = "All cards in hand cost 0 until end of turn"
-	set_hand_energy_card.card_type = CardData.CARD_TYPES.SKILL
-	set_hand_energy_card.card_rarity = CardData.CARD_RARITIES.RARE
-	set_hand_energy_card.card_requires_target = false
-	set_hand_energy_card.card_values = {"card_energy_cost": -1, "card_energy_cost_until_played": -1, "card_energy_cost_until_turn": 0}
-	set_hand_energy_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 10,
-		"max_card_amount": 10,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"action_data": [{Scripts.ACTION_CHANGE_CARD_ENERGIES: {}}]
-		}
-	},
-	]
-	
-	register_rod(set_hand_energy_card)
-	
-	# transforms all other cards in hand during combat
-	var transform_hand_card: CardData = CardData.new("transform_hand_card")
-	transform_hand_card.card_name = "Transform Hand"
-	transform_hand_card.card_color_id = "color_red"
-	transform_hand_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	transform_hand_card.card_description = "Transforms the cards in hand"
-	transform_hand_card.card_type = CardData.CARD_TYPES.SKILL
-	transform_hand_card.card_rarity = CardData.CARD_RARITIES.RARE
-	transform_hand_card.card_requires_target = false
-	transform_hand_card.card_values = {
-		"transform_parent_card": false,
-		"keep_rarity": false,
-		"keep_color": false,
-		"keep_type": false,
-		}
-	transform_hand_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 10,
-		"max_card_amount": 10,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"action_data": [{Scripts.ACTION_TRANSFORM_CARDS: {}}]
-		}
-	},
-	]
-	
-	register_rod(transform_hand_card)
-	
-	# Card that transforms into a B variant when right clicked
-	var card_right_click_transform_mode_a: CardData = CardData.new("card_right_click_transform_mode_a")
-	card_right_click_transform_mode_a.card_name = "Mode A"
-	card_right_click_transform_mode_a.card_color_id = "color_red"
-	card_right_click_transform_mode_a.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_right_click_transform_mode_a.card_description = "Attack for [damage] damage\nRight click to transform into B variant"
-	card_right_click_transform_mode_a.card_type = CardData.CARD_TYPES.ATTACK
-	card_right_click_transform_mode_a.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_right_click_transform_mode_a.card_color_id = "color_red"
-	card_right_click_transform_mode_a.card_requires_target = true
-	card_right_click_transform_mode_a.card_values = {
-		"damage": 7,
-		"number_of_attacks": 1,
-		"transform_parent_card": false,
-		"keep_upgrade_level": true,
-		"pick_played_card": true,
-		"transform_into_card_object_id": "card_right_click_transform_mode_b",
-		}
-	card_right_click_transform_mode_a.card_upgrade_value_improvements = {"damage": 4}
-	card_right_click_transform_mode_a.card_play_actions = [{Scripts.ACTION_ATTACK_GENERATOR: {}}]
-	card_right_click_transform_mode_a.card_right_click_actions = [{Scripts.ACTION_TRANSFORM_CARDS: {}}]
-	
-	register_rod(card_right_click_transform_mode_a)
-	
-	# Card that transforms into a A variant when right clicked
-	# this card cannot appear in card packs and thus not draftable
-	var card_right_click_transform_mode_b: CardData = CardData.new("card_right_click_transform_mode_b")
-	card_right_click_transform_mode_b.card_name = "Mode B"
-	card_right_click_transform_mode_b.card_color_id = "color_red"
-	card_right_click_transform_mode_b.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_right_click_transform_mode_b.card_description = "Block [block]\nRight click to transform into A variant"
-	card_right_click_transform_mode_b.card_type = CardData.CARD_TYPES.SKILL
-	card_right_click_transform_mode_b.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_right_click_transform_mode_b.card_appears_in_card_packs = false
-	card_right_click_transform_mode_b.card_color_id = "color_red"
-	card_right_click_transform_mode_b.card_requires_target = false
-	card_right_click_transform_mode_b.card_values = {
-		"block": 5,
-		"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-		"transform_parent_card": false,
-		"keep_upgrade_level": true,
-		"pick_played_card": true,
-		"transform_into_card_object_id": "card_right_click_transform_mode_a",
-		}
-	card_right_click_transform_mode_b.card_upgrade_value_improvements = {"block": 3}
-	card_right_click_transform_mode_b.card_play_actions = [{Scripts.ACTION_BLOCK: {}}]
-	card_right_click_transform_mode_b.card_right_click_actions = [{Scripts.ACTION_TRANSFORM_CARDS: {}}]
-	
-	register_rod(card_right_click_transform_mode_b)
-	
-	# draw cards and randomize cost of cards in hand
-	var randomize_hand_card: CardData = CardData.new("randomize_hand_card")
-	randomize_hand_card.card_name = "Randomize Card Cost"
-	randomize_hand_card.card_color_id = "color_blue"
-	randomize_hand_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	randomize_hand_card.card_description = "Draw [draw_count] cards. Randomize the cost of cards in hand this turn"
-	randomize_hand_card.card_energy_cost = 0
-	randomize_hand_card.card_type = CardData.CARD_TYPES.SKILL
-	randomize_hand_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	randomize_hand_card.card_requires_target = false
-	randomize_hand_card.card_values = {
-		"draw_count": 2,
-		"randomize_card_energy_cost_until_turn": true,
-		}
-	randomize_hand_card.card_upgrade_value_improvements = {"draw_count": 1}
-	randomize_hand_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"min_card_amount": 10,
-		"max_card_amount": 10,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"action_data": [{Scripts.ACTION_RANDOMIZE_CARD_ENERGIES: {}}]
-		}
-	},
-	{
-	Scripts.ACTION_DRAW_GENERATOR: {},
-	},
-	]
-	
-	register_rod(randomize_hand_card)
-	
-	# Creates cards and adds them to hand
-	var card_generate_shoves: CardData = CardData.new("card_generate_shoves")
-	card_generate_shoves.card_name = "Shove Dance"
-	card_generate_shoves.card_color_id = "color_green"
-	card_generate_shoves.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_generate_shoves.card_description = "Create [number_of_cards] legally distinct Shoves and add them to hand"
-	card_generate_shoves.card_type = CardData.CARD_TYPES.SKILL
-	card_generate_shoves.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_generate_shoves.card_requires_target = false
-	card_generate_shoves.card_keyword_object_ids = []
-	card_generate_shoves.card_values = {"created_card_object_id": "card_shove",  "number_of_cards": 3}
-	card_generate_shoves.card_upgrade_value_improvements = {"number_of_cards": 1}
-	card_generate_shoves.card_play_actions = [
-	{
-	Scripts.ACTION_CREATE_CARDS: {
-		"action_data": [{Scripts.ACTION_ADD_CARDS_TO_HAND: {}}]
-		}
-	},
-	]
-	
-	register_rod(card_generate_shoves)
-	
-	# Generated card
-	var card_shove: CardData = CardData.new("card_shove")
-	card_shove.card_name = "Shove"
-	card_shove.card_color_id = "color_white"
-	card_shove.card_description = "Attack for [damage] damage. Exhaust"
-	card_shove.card_type = CardData.CARD_TYPES.ATTACK
-	card_shove.card_rarity = CardData.CARD_RARITIES.GENERATED
-	card_shove.card_energy_cost = 0
-	card_shove.card_exhausts = true
-	card_shove.card_values = {"damage": 4, "number_of_attacks": 1}
-	card_shove.card_upgrade_value_improvements = {"damage": 3}
-	card_shove.card_play_actions = [{
-	Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-	}]
-	
-	register_rod(card_shove)
-	
-	# Energy on discard card
-	var card_energy_on_discard: CardData = CardData.new("card_energy_on_discard")
-	card_energy_on_discard.card_name = "Energy Card"
-	card_energy_on_discard.card_color_id = "color_purple"
-	card_energy_on_discard.card_description = "Unplayable. Grant [energy_amount] energy on discard"
-	card_energy_on_discard.card_is_playable = false
-	card_energy_on_discard.card_type = CardData.CARD_TYPES.SKILL
-	card_energy_on_discard.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_energy_on_discard.card_requires_target = false
-	card_energy_on_discard.card_values = {"energy_amount": 2}
-	card_energy_on_discard.card_upgrade_value_improvements = {"energy_amount": 1}
-	card_energy_on_discard.card_discard_actions = [
-	{
-	Scripts.ACTION_ADD_ENERGY: {}
-	},
-	]
-	
-	register_rod(card_energy_on_discard)
-
-	# Discard hand and draw 2 card
-	var discard_hand_card: CardData = CardData.new("card_discard_hand")
-	discard_hand_card.card_name = "Discard Hand Card"
-	discard_hand_card.card_color_id = "color_blue"
-	discard_hand_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	discard_hand_card.card_description = "Discard hand. Draw [draw_count] cards."
-	discard_hand_card.card_type = CardData.CARD_TYPES.SKILL
-	discard_hand_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	discard_hand_card.card_requires_target = false
-	discard_hand_card.card_values = {"draw_count": 2}
-	discard_hand_card.card_upgrade_value_improvements = {"draw_count": 1}
-	discard_hand_card.card_first_upgrade_property_changes = {"card_energy_cost": 0}
-	discard_hand_card.card_play_actions = [
-	{
-	Scripts.ACTION_DRAW_GENERATOR: {},
-	},
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 10,
-		"min_card_amount": 10,
-		"min_cards_are_required_for_action": false,
-		"random_selection": false,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-		"card_pick_text": "",
-		"action_data": [{Scripts.ACTION_DISCARD_CARDS: {}}]
-		}
-	},
-	]
-
-	register_rod(discard_hand_card)
-	
-	# Attack card that forces the target to cycle their intent
-	var card_cycle_enemy_intent: CardData = CardData.new("card_cycle_enemy_intent")
-	card_cycle_enemy_intent.card_name = "Cycle Intent"
-	card_cycle_enemy_intent.card_color_id = "color_green"
-	card_cycle_enemy_intent.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_cycle_enemy_intent.card_description = "Do [damage] damage and force enemy to cycle its intent."
-	card_cycle_enemy_intent.card_type = CardData.CARD_TYPES.ATTACK
-	card_cycle_enemy_intent.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_cycle_enemy_intent.card_keyword_object_ids = []
-	card_cycle_enemy_intent.card_values = {"damage": 5, "number_of_attacks": 1}
-	card_cycle_enemy_intent.card_upgrade_value_improvements = {"damage": 3}
-	card_cycle_enemy_intent.card_play_actions = [
-		{
-		Scripts.ACTION_CYCLE_ENEMY_INTENT: {"time_delay": 0.0}
-		},
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-		}
-	]
-	
-	register_rod(card_cycle_enemy_intent)
-	
-	# Block if no attacks in hand
-	var block_without_attacks_card: CardData = CardData.new("card_block_without_attacks")
-	block_without_attacks_card.card_name = "Block Without Attacks"
-	block_without_attacks_card.card_color_id = "color_green"
-	block_without_attacks_card.card_texture_path = "external/sprites/cards/green/card_green.png"
-	block_without_attacks_card.card_description = "Generate [block] Block. Cannot be played with attacks in hand."
-	block_without_attacks_card.card_type = CardData.CARD_TYPES.SKILL
-	block_without_attacks_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	block_without_attacks_card.card_requires_target = false
-	block_without_attacks_card.card_keyword_object_ids = ["keyword_block"]
-	block_without_attacks_card.card_values = {"block": 15}
-	block_without_attacks_card.card_upgrade_value_improvements = {"block": 5}
-	block_without_attacks_card.card_play_actions = [
-		{
-		Scripts.ACTION_BLOCK: 
-			{
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-			}
-		}
-	]
-	block_without_attacks_card.card_play_validators = [
-		{
-		Scripts.VALIDATOR_CARD_TYPE_IN_HAND: 
-			{
-			"card_type_minimum": 0,
-			"card_type_maximum": 0,
-			"card_types": [
-				CardData.CARD_TYPES.ATTACK
-			],
-			"invert_validation": false,
-			}
-		}
-	]
-
-	register_rod(block_without_attacks_card)
-	
-	# Attack that costs less per each card discarded
-	var attack_lower_cost_on_discard_card: CardData = CardData.new("attack_lower_cost_on_discard_card")
-	attack_lower_cost_on_discard_card.card_name = "Lowering Energy Attack"
-	attack_lower_cost_on_discard_card.card_color_id = "color_red"
-	attack_lower_cost_on_discard_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	attack_lower_cost_on_discard_card.card_energy_cost = 7
-	attack_lower_cost_on_discard_card.card_description = "Attack for [damage] damage. Cost lowered for each card discarded this turn."
-	attack_lower_cost_on_discard_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_lower_cost_on_discard_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	attack_lower_cost_on_discard_card.card_requires_target = true
-	attack_lower_cost_on_discard_card.card_values = {"damage": 30, "number_of_attacks": 1}
-	attack_lower_cost_on_discard_card.card_upgrade_value_improvements = {"damage": 10}
-	attack_lower_cost_on_discard_card.card_play_actions = [
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-		}
-	]
-	attack_lower_cost_on_discard_card.card_listeners = [
-		{
-		Scripts.LISTENER_CARD_COST_MODIFIER:
-			{
-			"modifiy_card_energy_cost_until_combat": false,
-			"modifiy_card_energy_cost_until_played": false,
-			"modifiy_card_energy_cost_until_turn": true,
-			"stat_enum": CombatStatsData.STATS.CARDS_DISCARDED,
-			"is_turn_stat": true,
-			"energy_per_stat": -2
-			}
-		}
-	]
-
-	register_rod(attack_lower_cost_on_discard_card)
-	
-	# Attack that costs more per each time damage taken
-	var attack_increase_cost_on_damage_taken_card: CardData = CardData.new("attack_increase_cost_on_damage_taken_card")
-	attack_increase_cost_on_damage_taken_card.card_name = "Increasing Energy Attack"
-	attack_increase_cost_on_damage_taken_card.card_color_id = "color_purple"
-	attack_increase_cost_on_damage_taken_card.card_energy_cost = 0
-	attack_increase_cost_on_damage_taken_card.card_description = "Attack for [damage] damage. Cost increased by each time damage taken this combat."
-	attack_increase_cost_on_damage_taken_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_increase_cost_on_damage_taken_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	attack_increase_cost_on_damage_taken_card.card_requires_target = true
-	attack_increase_cost_on_damage_taken_card.card_values = {"damage": 10, "number_of_attacks": 1}
-	attack_increase_cost_on_damage_taken_card.card_upgrade_value_improvements = {"damage": 10}
-	attack_increase_cost_on_damage_taken_card.card_play_actions = [
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-		}
-	]
-	attack_increase_cost_on_damage_taken_card.card_listeners = [
-		{
-		Scripts.LISTENER_CARD_COST_MODIFIER:
-			{
-			"modifiy_card_energy_cost_until_combat": true,
-			"modifiy_card_energy_cost_until_played": false,
-			"modifiy_card_energy_cost_until_turn": false,
-			"stat_enum": CombatStatsData.STATS.PLAYER_DAMAGED_COUNT,
-			"is_turn_stat": false,
-			"energy_per_stat": 1
-			}
-		}
-	]
-
-	register_rod(attack_increase_cost_on_damage_taken_card)
-	
-	# Block if a card exhausted this turn
-	var block_if_exhaust_card: CardData = CardData.new("block_if_exhaust_card")
-	block_if_exhaust_card.card_name = "Block If Exhaust"
-	block_if_exhaust_card.card_color_id = "color_orange"
-	block_if_exhaust_card.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	block_if_exhaust_card.card_description = "Generate [block] Block. Cannot be played unless a card was exhausted this turn."
-	block_if_exhaust_card.card_type = CardData.CARD_TYPES.SKILL
-	block_if_exhaust_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	block_if_exhaust_card.card_requires_target = false
-	block_if_exhaust_card.card_energy_cost = 0
-	block_if_exhaust_card.card_keyword_object_ids = ["keyword_block", "keyword_exhaust"]
-	block_if_exhaust_card.card_values = {"block": 8}
-	block_if_exhaust_card.card_upgrade_value_improvements = {"block": 4}
-	block_if_exhaust_card.card_play_actions = [
-		{
-		Scripts.ACTION_BLOCK: 
-			{
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-			}
-		}
-	]
-	block_if_exhaust_card.card_play_validators = [
-		{
-		Scripts.VALIDATOR_COMBAT_STATS: 
-			{
-			"stat_enum": CombatStatsData.STATS.CARDS_EXHAUSTED,
-			"is_total_stat": false,
-			"operator": ">=",
-			"comparison_value": 1,
-			}
-		}
-	]
-	
-	register_rod(block_if_exhaust_card)
-	
-	# Position based card
-	var attack_in_center_card: CardData = CardData.new("card_attack_in_center")
-	attack_in_center_card.card_name = "Attack in Center"
-	attack_in_center_card.card_color_id = "color_green"
-	attack_in_center_card.card_texture_path = "external/sprites/cards/green/card_green.png"
-	attack_in_center_card.card_description = "Attack for [damage] damage. Can only be played in center of hand."
-	attack_in_center_card.card_type = CardData.CARD_TYPES.ATTACK
-	attack_in_center_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	attack_in_center_card.card_requires_target = true
-	attack_in_center_card.card_values = {"damage": 5, "number_of_attacks": 1}
-	attack_in_center_card.card_upgrade_value_improvements = {"damage": 5}
-	attack_in_center_card.card_play_actions = [
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0, "actions_on_lethal": []}
-		}
-	]
-	attack_in_center_card.card_play_validators = [
-		{
-		Scripts.VALIDATOR_CARD_POSITION_IN_HAND:
-			{
-			"position_in_hand": "center",
-			"invert_validation": false,
-			}
-		}
-	]
-
-	register_rod(attack_in_center_card)
-	
-	# Han adjacency based card
-	# Requires others next to it in order to work
-	var card_requires_adjacency: CardData = CardData.new("card_requires_adjacency")
-	card_requires_adjacency.card_name = "Attack with Adjacency"
-	card_requires_adjacency.card_color_id = "color_red"
-	card_requires_adjacency.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_requires_adjacency.card_description = "Attack for [damage] damage. Can only be played if next to at least 1 attack card."
-	card_requires_adjacency.card_type = CardData.CARD_TYPES.ATTACK
-	card_requires_adjacency.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_requires_adjacency.card_requires_target = true
-	card_requires_adjacency.card_values = {"damage": 10, "number_of_attacks": 1}
-	card_requires_adjacency.card_upgrade_value_improvements = {"damage": 5}
-	card_requires_adjacency.card_play_actions = [
-		{
-		Scripts.ACTION_ATTACK_GENERATOR: {"time_delay": 0.0}
-		}
-	]
-	card_requires_adjacency.card_play_validators = [
-		{
-		Scripts.VALIDATOR_CARD_TYPE_ADJACENT_IN_HAND:
-			{
-			"card_types": [CardData.CARD_TYPES.ATTACK],
-			"requires_surrounded": false,
-			"invert_validation": false,
-			}
-		}
-	]
-
-	register_rod(card_requires_adjacency)
-	
-	# Block and play a card from discard pile
-	var play_from_discard_card: CardData = CardData.new("card_play_from_discard")
-	play_from_discard_card.card_name = "Play From Discard"
-	play_from_discard_card.card_color_id = "color_blue"
-	play_from_discard_card.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	play_from_discard_card.card_description = "Generate [block] Block. Play a card from discard pile."
-	play_from_discard_card.card_type = CardData.CARD_TYPES.SKILL
-	play_from_discard_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	play_from_discard_card.card_requires_target = false
-	play_from_discard_card.card_keyword_object_ids = ["keyword_block"]
-	play_from_discard_card.card_values = {"block": 3}
-	play_from_discard_card.card_upgrade_value_improvements = {"block": 2}
-	play_from_discard_card.card_play_actions = [
-		{
-		Scripts.ACTION_BLOCK: 
-			{
-			"time_delay": 0.5,
-			"target_override": BaseAction.TARGET_OVERRIDES.PARENT
-			}
-		},
-		{
-		Scripts.ACTION_PICK_CARDS: {
-			"max_card_amount": 1,
-			"min_card_amount": 1,
-			"min_cards_are_required_for_action": true,
-			"random_selection": false,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DISCARD,
-			"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
-			"action_data": [{Scripts.ACTION_PLAY_CARDS: {}}]
-			}
-		},
-	]
-
-	register_rod(play_from_discard_card)
-	
-	# Discard up to the top 3 attacks from draw pile
-	var card_discard_attacks_from_draw: CardData = CardData.new("card_discard_attacks_from_draw")
-	card_discard_attacks_from_draw.card_name = "Discard Attacks From Draw"
-	card_discard_attacks_from_draw.card_color_id = "color_blue"
-	card_discard_attacks_from_draw.card_texture_path = "external/sprites/cards/blue/card_blue.png"
-	card_discard_attacks_from_draw.card_description = "Discard up to the top [pickable_cards_max_amount] attack cards from your draw pile."
-	card_discard_attacks_from_draw.card_type = CardData.CARD_TYPES.SKILL
-	card_discard_attacks_from_draw.card_rarity = CardData.CARD_RARITIES.COMMON
-	card_discard_attacks_from_draw.card_first_shuffle_priority = 1
-	card_discard_attacks_from_draw.card_requires_target = false
-	card_discard_attacks_from_draw.card_keyword_object_ids = ["keyword_block"]
-	card_discard_attacks_from_draw.card_values = {"pickable_cards_max_amount": 3}
-	card_discard_attacks_from_draw.card_upgrade_value_improvements = {"pickable_cards_max_amount": 1}
-	card_discard_attacks_from_draw.card_play_actions = [
-		{
-		Scripts.ACTION_PICK_CARDS: {
-			"max_card_amount": 999,
-			"min_card_amount": 0,
-			"min_cards_are_required_for_action": true,
-			"random_selection": false,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DRAW,
-			"card_pick_text": "Choose {3} attacks to discard. {1} cards selected",
-			"action_data": [{Scripts.ACTION_DISCARD_CARDS: {}}],
-			# only attack cards allowed
-			"validator_data": [
-			{Scripts.VALIDATOR_CARD_TYPE: {"card_types": [CardData.CARD_TYPES.ATTACK]}},
-			],
-			}
-		},
-	]
-
-	register_rod(card_discard_attacks_from_draw)
-	
-	# Play 2 random cards from hand
-	var play_random_from_hand_card: CardData = CardData.new("card_play_random_from_hand")
-	play_random_from_hand_card.card_name = "Play Random Hand"
-	play_random_from_hand_card.card_color_id = "color_red"
-	play_random_from_hand_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	play_random_from_hand_card.card_description = "Play 2 cards randomly from your hand."
-	play_random_from_hand_card.card_type = CardData.CARD_TYPES.SKILL
-	play_random_from_hand_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	play_random_from_hand_card.card_requires_target = false
-	play_random_from_hand_card.card_play_actions = [
-		{
-		Scripts.ACTION_PICK_CARDS: {
-			"max_card_amount": 2,
-			"min_card_amount": 2,
-			"min_cards_are_required_for_action": false,
-			"random_selection": true,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-			"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
-			"action_data": [{Scripts.ACTION_PLAY_CARDS: {}}]
-			}
-		},
-	]
-
-	register_rod(play_random_from_hand_card)
-	
-	# Select cards to retain
-	var retain_hand_card: CardData = CardData.new("retain_hand_card")
-	retain_hand_card.card_name = "Retain Cards"
-	retain_hand_card.card_color_id = "color_orange"
-	retain_hand_card.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	retain_hand_card.card_description = "Select [min_card_amount] cards to retain end of turn."
-	retain_hand_card.card_type = CardData.CARD_TYPES.SKILL
-	retain_hand_card.card_rarity = CardData.CARD_RARITIES.COMMON
-	retain_hand_card.card_requires_target = false
-	retain_hand_card.card_keyword_object_ids = ["keyword_retain"]
-	retain_hand_card.card_values = {"min_card_amount": 2, "max_card_amount": 2,}
-	retain_hand_card.card_upgrade_value_improvements = {"min_card_amount": 1, "max_card_amount": 1,}
-	retain_hand_card.card_play_actions = [
-		{
-		Scripts.ACTION_PICK_CARDS: {
-			"min_cards_are_required_for_action": false,
-			"random_selection": false,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
-			"card_pick_text": "Choose {0} card(s) to retain. {1} cards selected",
-			"action_data": [{Scripts.ACTION_RETAIN_CARDS: {}}]
-			}
-		},
-	]
-
-	register_rod(retain_hand_card)
-	
-	# Select cards to upgrade permanently
-	var card_upgrade_card: CardData = CardData.new("card_upgrade_card")
-	card_upgrade_card.card_name = "Upgrade Cards"
-	card_upgrade_card.card_color_id = "color_green"
-	card_upgrade_card.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_upgrade_card.card_description = "Select a card to upgrade permanently."
-	card_upgrade_card.card_type = CardData.CARD_TYPES.SKILL
-	card_upgrade_card.card_rarity = CardData.CARD_RARITIES.RARE
-	card_upgrade_card.card_requires_target = false
-	card_upgrade_card.card_values = {"upgrade_parent_card": false}
-	card_upgrade_card.card_play_actions = [
-		{
-		Scripts.ACTION_PICK_UPGRADE_CARDS: {
-			"max_card_amount": 1,
-			"min_card_amount": 1,
-			"min_cards_are_required_for_action": true,
-			"random_selection": false,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DECK,
-			"card_pick_text": "Choose a card to upgrade."
-			}
-		},
-	]
-
-	register_rod(card_upgrade_card)
-	
-	# Upgrade all cards in combat deck card
-	var upgrade_entire_deck_card: CardData = CardData.new("upgrade_entire_deck_card")
-	upgrade_entire_deck_card.card_name = "Upgrade Combat Deck"
-	upgrade_entire_deck_card.card_color_id = "color_purple"
-	upgrade_entire_deck_card.card_description = "Upgrades all cards in deck for the rest of combat. Exhaust."
-	upgrade_entire_deck_card.card_type = CardData.CARD_TYPES.SKILL
-	upgrade_entire_deck_card.card_rarity = CardData.CARD_RARITIES.RARE
-	upgrade_entire_deck_card.card_requires_target = false
-	upgrade_entire_deck_card.card_exhausts = true
-	upgrade_entire_deck_card.card_energy_cost = 3
-	upgrade_entire_deck_card.card_values = {"upgrade_parent_card": false}
-	upgrade_entire_deck_card.card_play_actions = [
-		{
-		Scripts.ACTION_PICK_UPGRADE_CARDS: {
-			"max_card_amount": 999,
-			"min_card_amount": 999,
-			"min_cards_are_required_for_action": false,
-			"random_selection": false,
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.COMBAT_DECK,
-			"card_pick_text": "Choose {0} card(s) to upgrade. {1} cards selected"
-			}
-		},
-	]
-
-	register_rod(upgrade_entire_deck_card)
-	
-	# Pick one of 3 random attacks and add to hand
-	var card_draft_random_attack: CardData = CardData.new("card_draft_random_attack")
-	card_draft_random_attack.card_name = "Draft Attack Card"
-	card_draft_random_attack.card_color_id = "color_green"
-	card_draft_random_attack.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_draft_random_attack.card_description = "Select one of 3 attack cards and add it to hand.\nIt costs 0 for the rest of combat"
-	card_draft_random_attack.card_type = CardData.CARD_TYPES.SKILL
-	card_draft_random_attack.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_draft_random_attack.card_requires_target = false
-	card_draft_random_attack.card_exhausts = true
-	card_draft_random_attack.card_values = {}
-	card_draft_random_attack.card_upgrade_value_improvements = {}
-	card_draft_random_attack.card_first_upgrade_property_changes = {"card_energy_cost": 0}
-	card_draft_random_attack.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 1,
-		"min_card_amount": 1,
-		"draft_max_card_amount": 3,
-		"min_cards_are_required_for_action": true,
-		"draft_from_card_pool": true,
-		"random_selection": false,
-		"quick_pick": true,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DRAFT,
-		"card_pick_text": "Select An Attack Card",
-		"action_data": [
-			{Scripts.ACTION_ADD_CARDS_TO_HAND: {}},
-			{Scripts.ACTION_CHANGE_CARD_ENERGIES: {"card_energy_cost_until_combat": 0}}
-			],
-		# only non-generated attack cards allowed
-		"validator_data": [
-			{Scripts.VALIDATOR_CARD_TYPE: {"card_types": [CardData.CARD_TYPES.ATTACK]}},
-			{Scripts.VALIDATOR_CARD_RARITY: {"card_rarities_exclude": [CardData.CARD_RARITIES.GENERATED]}},
-		],
-		}
-	},
-	]
-
-	register_rod(card_draft_random_attack)
-	
-	# Pick a red card and add it to hand
-	var card_draft_red_card: CardData = CardData.new("card_draft_red_card")
-	card_draft_red_card.card_name = "Draft Red Card"
-	card_draft_red_card.card_color_id = "color_red"
-	card_draft_red_card.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_draft_red_card.card_description = "Select one of 5 red cards and add it to hand.\nIt costs 0 for the rest of combat"
-	card_draft_red_card.card_type = CardData.CARD_TYPES.SKILL
-	card_draft_red_card.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_draft_red_card.card_requires_target = false
-	card_draft_red_card.card_exhausts = true
-	card_draft_red_card.card_values = {}
-	card_draft_red_card.card_upgrade_value_improvements = {}
-	card_draft_red_card.card_first_upgrade_property_changes = {"card_energy_cost": 0}
-	card_draft_red_card.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 1,
-		"min_card_amount": 1,
-		"draft_max_card_amount": 5,
-		"min_cards_are_required_for_action": true,
-		"draft_from_card_pool": true,
-		"random_selection": false,
-		"quick_pick": true,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DRAFT,
-		"card_pick_text": "Select A Red Card",
-		"action_data": [
-			{Scripts.ACTION_ADD_CARDS_TO_HAND: {}},
-			{Scripts.ACTION_CHANGE_CARD_ENERGIES: {"card_energy_cost_until_combat": 0}}
-			],
-		# get red cards
-		"draft_card_pack_id": "card_pack_red"
-		}
-	},
-	]
-
-	register_rod(card_draft_red_card)
-	
-	# Adds a random card from the player's available card pool
-	var card_draft_random_player_pool: CardData = CardData.new("card_draft_random_player_pool")
-	card_draft_random_player_pool.card_name = "Draft Random Card"
-	card_draft_random_player_pool.card_color_id = "color_white"
-	card_draft_random_player_pool.card_texture_path = "external/sprites/cards/green/card_green.png"
-	card_draft_random_player_pool.card_description = "Add a random card from player's card pool to your hand. It costs 0"
-	card_draft_random_player_pool.card_type = CardData.CARD_TYPES.SKILL
-	card_draft_random_player_pool.card_rarity = CardData.CARD_RARITIES.RARE
-	card_draft_random_player_pool.card_requires_target = false
-	card_draft_random_player_pool.card_exhausts = true
-	card_draft_random_player_pool.card_values = {"draw_count": 2}
-	card_draft_random_player_pool.card_upgrade_value_improvements = {}
-	card_draft_random_player_pool.card_first_upgrade_property_changes = {"card_energy_cost": 0}
-	card_draft_random_player_pool.card_play_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 1,
-		"min_card_amount": 1,
-		"draft_max_card_amount": 1,
-		"min_cards_are_required_for_action": true,
-		"draft_from_card_pool": true,
-		"random_selection": true,
-		"quick_pick": true,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DRAFT,
-		"card_pick_text": "Select A Card",
-		"action_data": [
-			{Scripts.ACTION_ADD_CARDS_TO_HAND: {}},
-			{Scripts.ACTION_CHANGE_CARD_ENERGIES: {"card_energy_cost_until_combat": 0}}
-			],
-		# non weighted draft from player draft pool
-		"draft_use_player_draft": true,
-		"draft_is_weighted": false,
-		"draft_use_pity_system": false,
-		}
-	},
-	]
-
-	register_rod(card_draft_random_player_pool)
-	
-	# Energy on play card
-	# demonstrates [energy_icon] keyword
-	var card_grant_energy: CardData = CardData.new("card_grant_energy")
-	card_grant_energy.card_name = "Energy Card"
-	card_grant_energy.card_color_id = "color_red"
-	card_grant_energy.card_texture_path = "external/sprites/cards/red/card_red.png"
-	card_grant_energy.card_description = "Gives [energy_icon][energy_icon] when played"
-	card_grant_energy.card_is_playable = true
-	card_grant_energy.card_energy_cost = 0
-	card_grant_energy.card_type = CardData.CARD_TYPES.SKILL
-	card_grant_energy.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_grant_energy.card_requires_target = false
-	card_grant_energy.card_values = {"energy_amount": 2}
-	card_grant_energy.card_upgrade_value_improvements = {"energy_amount": 1}
-	card_grant_energy.card_first_upgrade_property_changes = {"card_description": "Gives [energy_icon][energy_icon][energy_icon] when played"}
-	card_grant_energy.card_play_actions = [
-	{
-	Scripts.ACTION_ADD_ENERGY: {}
-	}
-	]
-	
-	register_rod(card_grant_energy)
-	
-	# Energy on draw card
-	var card_energy_on_draw: CardData = CardData.new("card_energy_on_draw")
-	card_energy_on_draw.card_name = "Energy Draw Card"
-	card_energy_on_draw.card_color_id = "color_orange"
-	card_energy_on_draw.card_texture_path = "external/sprites/cards/orange/card_orange.png"
-	card_energy_on_draw.card_description = "Gives [energy_icon][energy_icon] when drawn"
-	card_energy_on_draw.card_is_playable = false
-	card_energy_on_draw.card_type = CardData.CARD_TYPES.SKILL
-	card_energy_on_draw.card_rarity = CardData.CARD_RARITIES.UNCOMMON
-	card_energy_on_draw.card_requires_target = false
-	card_energy_on_draw.card_values = {"energy_amount": 2}
-	card_energy_on_draw.card_upgrade_value_improvements = {"energy_amount": 1}
-	card_energy_on_draw.card_first_upgrade_property_changes = {"card_description": "Unplayable\nGives [energy_icon][energy_icon][energy_icon] when drawn"}
-	card_energy_on_draw.card_draw_actions = [
-	{
-	Scripts.ACTION_ADD_ENERGY: {}
-	}
-	]
-	
-	register_rod(card_energy_on_draw)
-	
-	# Health
-	var add_health_card: CardData = CardData.new("add_health_card")
-	add_health_card.card_name = "Add Health"
-	add_health_card.card_color_id = "color_white"
-	add_health_card.card_description = "Gives [health_amount] health and [health_max_amount] max health"
-	add_health_card.card_type = CardData.CARD_TYPES.SKILL
-	add_health_card.card_rarity = CardData.CARD_RARITIES.RARE
-	add_health_card.card_requires_target = false
-	add_health_card.card_exhausts = true
-	add_health_card.card_values = {"health_amount": 3, "health_max_amount": 3}
-	add_health_card.card_upgrade_value_improvements = {"health_amount": 1, "health_max_amount": 1}
-	add_health_card.card_play_actions = [
-	{
-	Scripts.ACTION_ADD_HEALTH: {}
-	}
-	]
-	
-	register_rod(add_health_card)
-	
-	# Restart Combat Card
-	# Mainly there for technical demonstration
-	var card_restart_combat: CardData = CardData.new("card_restart_combat")
-	card_restart_combat.card_name = "Restart Combat"
-	card_restart_combat.card_color_id = "color_white"
-	card_restart_combat.card_description = "Restarts Combat"
-	card_restart_combat.card_type = CardData.CARD_TYPES.SKILL
-	card_restart_combat.card_rarity = CardData.CARD_RARITIES.RARE
-	card_restart_combat.card_requires_target = false
-	card_restart_combat.card_exhausts = true
-	card_restart_combat.card_appears_in_card_packs = false # debug cards aren't draftable
-	card_restart_combat.card_values = {}
-	card_restart_combat.card_upgrade_value_improvements = {}
-	card_restart_combat.card_play_actions = [
-	{
-	Scripts.ACTION_START_COMBAT: {}
-	}
-	]
-	
-	register_rod(card_restart_combat)
-	
-	# Card that logs to console
-	var card_debug_log: CardData = CardData.new("card_debug_log")
-	card_debug_log.card_name = "Log to Console"
-	card_debug_log.card_color_id = "color_white"
-	card_debug_log.card_description = "Logs [log_message] to console"
-	card_debug_log.card_type = CardData.CARD_TYPES.SKILL
-	card_debug_log.card_rarity = CardData.CARD_RARITIES.RARE
-	card_debug_log.card_requires_target = false
-	card_debug_log.card_appears_in_card_packs = false # debug cards aren't draftable
-	card_debug_log.card_keyword_object_ids = []
-	card_debug_log.card_values = {"log_message": "Hello World", "log_message_color_html": Color.SEA_GREEN.to_html(true)}
-	card_debug_log.card_play_actions = [{
-	Scripts.ACTION_DEBUG_LOG: {}
-	}]
-	
-	register_rod(card_debug_log)
-	# Adds copies of cards to the player's deck to populate it
-	player_data.player_deck.append(get_card_data_from_prototype("card_attack_basic"))
-	player_data.player_deck.append(get_card_data_from_prototype("card_attack_basic"))
-	player_data.player_deck.append(get_card_data_from_prototype("card_attack_basic"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_attack_corrosion"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("card_damage_increase"))
-	player_data.player_deck.append(get_card_data_from_prototype("card_damage_increase"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("card_preserve_block"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("custom_block_card"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("end_turn_card"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("variable_cost_attack_card"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_attack_block"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_block_basic"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_draw"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_add_consumable"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_attack_big"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("improving_retain_block_card"))
-	#player_data.player_deck.append(get_card_data_from_prototype("improving_retain_block_card"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_attack_with_conditional_draw"))
-	#player_data.player_deck.append(get_card_data_from_prototype("block_if_exhaust_card"))
-	player_data.player_deck.append(get_card_data_from_prototype("card_block_big"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_improving_block"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_improving_attack"))
-	# player_data.player_deck.append(get_card_data_from_prototype("card_improving_attack"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("card_discard_block"))
-	#
-	# player_data.player_deck.append(get_card_data_from_prototype("card_play_from_discard"))
-	#
-	# player_data.player_deck.append(get_card_data_from_prototype("card_play_random_from_hand"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("retain_hand_card"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_upgrade_card"))
-	#player_data.player_deck.append(get_card_data_from_prototype("card_upgrade_card"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("upgrade_entire_deck_card"))
-	#
-	#player_data.player_deck.append(get_card_data_from_prototype("card_block_without_attacks"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("attack_lower_cost_on_discard_card"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("attack_increase_cost_on_damage_taken_card"))
-	# player_data.player_deck.append(get_card_data_from_prototype("attack_increase_cost_on_damage_taken_card"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_attack_in_center"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_pick_from_discard"))
-	#player_data.player_deck.append(get_card_data_from_prototype("card_pick_from_discard"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("set_hand_energy_card"))
-	#player_data.player_deck.append(get_card_data_from_prototype("set_hand_energy_card"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("transform_hand_card"))
-	
-	player_data.player_deck.append(get_card_data_from_prototype("randomize_hand_card"))
-	#
-	#player_data.player_deck.append(get_card_data_from_prototype("card_energy_on_discard"))
-	
-	# player_data.player_deck.append(get_card_data_from_prototype("card_discard_hand"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("card_energy_on_draw"))
-	
-	#player_data.player_deck.append(get_card_data_from_prototype("add_health_card"))
 
 ## Gets the data of a read only card data template.
 ## Use get_card_data_from_prototype() to make an editable copy
@@ -4006,12 +1482,15 @@ func get_cached_artifact_filter(artifact_filter_cache_id: String) -> ArtifactFil
 ## Returns if all given validators pass. This is used all across framework.
 func validate(validators: Array[Dictionary], card_data: CardData = null, action: BaseAction = null) -> bool:
 	for validator_data: Dictionary in validators:
-		for validator_script_path: String in validator_data:
-			var validator_script_asset = load(validator_script_path)
+		for validator_token: String in validator_data:
+			var validator_script_asset: Script = Scripts.resolve_script(validator_token)
+			if validator_script_asset == null:
+				push_error("Global.validate: Failed to resolve validator script token/path: %s" % validator_token)
+				return false
 			var validator: BaseValidator = validator_script_asset.new()
 			
 			var validator_values: Dictionary[String, Variant] = {}
-			validator_values.assign(validator_data[validator_script_path]) # assign to force typed dict
+			validator_values.assign(validator_data[validator_token]) # assign to force typed dict
 			
 			if not validator.validate(card_data, action, validator_values):
 				return false
@@ -4037,6 +1516,15 @@ func get_loaded_artifacts_in_segments(required_segments: Array[String], content_
 
 func get_loaded_enemies_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[EnemyData]:
 	return load_content_database(content_root).get_enemies_in_segments(required_segments)
+
+func get_loaded_keywords_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[KeywordData]:
+	return load_content_database(content_root).get_keywords_in_segments(required_segments)
+
+func get_loaded_consumables_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[ConsumableData]:
+	return load_content_database(content_root).get_consumables_in_segments(required_segments)
+
+func get_loaded_status_effects_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[StatusEffectData]:
+	return load_content_database(content_root).get_status_effects_in_segments(required_segments)
 
 func get_loaded_character_cards(character_name: String, tier: String, content_root: String = "res://content") -> Array[CardData]:
 	return load_content_database(content_root).get_character_cards(character_name, tier)

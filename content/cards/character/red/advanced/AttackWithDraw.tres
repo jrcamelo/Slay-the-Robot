@@ -14,25 +14,25 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [],
 "time_delay": 0.0
 }
 }, {
-"res://scripts/actions/meta_actions/ActionValidator.gd": {
+"ACTION_VALIDATOR": {
 "failed_action_data": [{
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"ACTION_DRAW_GENERATOR": {
 "draw_count": 1
 }
 }],
 "passed_action_data": [{
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"ACTION_DRAW_GENERATOR": {
 "draw_count": 2
 }
 }],
 "time_delay": 0.0,
 "validator_data": [{
-"res://scripts/validators/hand/ValidatorCardTypeInHand.gd": {
+"VALIDATOR_CARD_TYPE_IN_HAND": {
 "card_type_maximum": 4,
 "card_type_minimum": 4,
 "card_types": [0, 1, 2, 3, 4],

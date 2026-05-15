@@ -15,11 +15,11 @@ card_values = {
 "status_effect_object_id": "status_effect_corrosion"
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"ACTION_APPLY_STATUS": {
 "time_delay": 0.5
 }
 }, {
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [],
 "time_delay": 0.0
 }

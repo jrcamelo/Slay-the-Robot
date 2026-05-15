@@ -14,7 +14,7 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"ACTION_IMPROVE_CARD_VALUES": {
 "card_value_improvements": {
 "damage": 3
 },
@@ -22,9 +22,9 @@ card_play_actions = Array[Dictionary]([{
 "pick_played_card": true
 }
 }, {
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"ACTION_IMPROVE_CARD_VALUES": {
 "card_value_improvements": {
 "damage": 3
 },
@@ -39,13 +39,13 @@ card_play_actions = Array[Dictionary]([{
 "min_cards_are_required_for_action": false,
 "random_selection": false,
 "validator_data": [{
-"res://scripts/validators/card/ValidatorCardID.gd": {
+"VALIDATOR_CARD_ID": {
 "card_object_ids": ["card_law"]
 }
 }]
 }
 }, {
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {}
+"ACTION_ATTACK_GENERATOR": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "damage": 3,

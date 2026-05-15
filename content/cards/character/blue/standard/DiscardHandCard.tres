@@ -15,11 +15,11 @@ card_values = {
 "draw_count": 2
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {}
+"ACTION_DRAW_GENERATOR": {}
 }, {
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {}
+"ACTION_DISCARD_CARDS": {}
 }],
 "card_pick_text": "",
 "card_pick_type": 0,

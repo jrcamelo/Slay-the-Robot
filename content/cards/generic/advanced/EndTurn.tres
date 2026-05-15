@@ -16,15 +16,15 @@ card_values = {
 "end_turn_immediacy_level": 2
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1
 }
 }, {
-"res://scripts/actions/ActionEndTurn.gd": {
+"ACTION_END_TURN": {
 "time_delay": 0.05
 }
 }, {
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1
 }
 }])

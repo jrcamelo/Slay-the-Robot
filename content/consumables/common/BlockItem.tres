@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" format=3 uid="uid://ckwf7okfn0owy"]
+
+[ext_resource type="Script" uid="uid://bietwbq2ita0c" path="res://data/readonly/ConsumableData.gd" id="1_q7rif"]
+
+[resource]
+script = ExtResource("1_q7rif")
+consumable_name = "Block Item"
+consumable_description = "Adds 10 block"
+consumable_actions = Array[Dictionary]([{
+"ACTION_BLOCK": {
+"block": 10,
+"target_override": 2
+}
+}])
+object_id = "consumable_block"

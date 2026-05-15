@@ -14,13 +14,13 @@ card_values = {
 "block": 5
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1,
 "time_delay": 0.5
 }
 }])
 card_retain_actions = Array[Dictionary]([{
-"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"ACTION_IMPROVE_CARD_VALUES": {
 "card_value_improvements": {
 "block": 3
 },

@@ -14,7 +14,7 @@ card_values = {
 "upgrade_parent_card": false
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionPickUpgradeCards.gd": {
+"ACTION_PICK_UPGRADE_CARDS": {
 "card_pick_text": "Choose a card to upgrade.",
 "card_pick_type": 1,
 "max_card_amount": 1,

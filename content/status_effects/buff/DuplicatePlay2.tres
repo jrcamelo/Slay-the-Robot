@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_sxdnr"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_6krvh"]
+
+[resource]
+script = ExtResource("1_sxdnr")
+status_effect_name = "Duplicate Play"
+status_effect_decay_rate = -999
+status_effect_interceptor_ids = Array[String](["interceptor_duplicate_attacks"])
+object_id = "status_effect_duplicate_attacks"

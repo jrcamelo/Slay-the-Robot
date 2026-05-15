@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_6u12b"]
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_mvwmi"]
 
 [resource]
 script = ExtResource("1_6u12b")
@@ -10,12 +11,15 @@ artifact_texture_path = "external/sprites/artifacts/artifact_orange.png"
 artifact_counter_max = 3
 artifact_color_id = "color_orange"
 artifact_add_actions = Array[Dictionary]([{
-"res://scripts/actions/player_actions/ActionUpdateRestActions.gd": {
+"ACTION_UPDATE_REST_ACTIONS": {
 "add_rest_action_object_ids": ["rest_action_increase_attack_on_rest"]
 }
 }])
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 artifact_first_turn_actions = Array[Dictionary]([{
-"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"ACTION_APPLY_STATUS": {
 "custom_key_names": {
 "status_charge_amount": "artifact_counter"
 },

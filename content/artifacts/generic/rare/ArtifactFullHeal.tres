@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_7b4bi"]
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_io68e"]
 
 [resource]
 script = ExtResource("1_7b4bi")
@@ -8,8 +9,11 @@ artifact_name = "Artifact Full Heal"
 artifact_description = "Fully heals player when obtained"
 artifact_rarity = 3
 artifact_add_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionHealPercent.gd": {
+"ACTION_HEAL_PERCENT": {
 "percentage_heal_amount": 1.0
 }
+}])
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
 }])
 object_id = "artifact_full_heal"

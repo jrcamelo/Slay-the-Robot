@@ -17,9 +17,9 @@ card_values = {
 "randomize_card_energy_cost_until_turn": true
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionRandomizeCardEnergies.gd": {}
+"ACTION_RANDOMIZE_CARD_ENERGIES": {}
 }],
 "card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
 "card_pick_type": 0,
@@ -29,7 +29,7 @@ card_play_actions = Array[Dictionary]([{
 "random_selection": false
 }
 }, {
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {}
+"ACTION_DRAW_GENERATOR": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "draw_count": 1

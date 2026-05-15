@@ -12,13 +12,13 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [],
 "time_delay": 0.0
 }
 }])
 card_play_validators = Array[Dictionary]([{
-"res://scripts/validators/hand/ValidatorCardPositionInHand.gd": {
+"VALIDATOR_CARD_POSITION_IN_HAND": {
 "invert_validation": false,
 "position_in_hand": "center"
 }

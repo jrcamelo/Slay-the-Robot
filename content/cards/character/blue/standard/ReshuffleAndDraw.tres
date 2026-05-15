@@ -16,11 +16,11 @@ card_values = {
 "draw_count": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionReshuffle.gd": {
-"shuffle_discard_into_draw": true
-},
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"ACTION_DRAW_GENERATOR": {
 "draw_count": 3
+},
+"ACTION_RESHUFFLE": {
+"shuffle_discard_into_draw": true
 }
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({

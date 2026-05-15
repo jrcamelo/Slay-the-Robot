@@ -14,11 +14,11 @@ card_rarity = 2
 card_exhausts = true
 card_requires_target = false
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {}
+"ACTION_ADD_CARDS_TO_HAND": {}
 }, {
-"res://scripts/actions/cardset_actions/ActionChangeCardEnergies.gd": {
+"ACTION_CHANGE_CARD_ENERGIES": {
 "card_energy_cost_until_combat": 0
 }
 }],

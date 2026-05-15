@@ -18,10 +18,10 @@ card_values = {
 "transform_parent_card": false
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {}
+"ACTION_ATTACK_GENERATOR": {}
 }])
 card_right_click_actions = Array[Dictionary]([{
-"res://scripts/actions/cardset_actions/ActionTransformCards.gd": {}
+"ACTION_TRANSFORM_CARDS": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "damage": 4

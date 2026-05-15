@@ -16,9 +16,9 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [{
-"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"ACTION_IMPROVE_CARD_VALUES": {
 "card_value_improvements": {
 "block": 2,
 "damage": 2

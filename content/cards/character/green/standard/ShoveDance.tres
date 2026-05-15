@@ -14,9 +14,9 @@ card_values = {
 "number_of_cards": 3
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionCreateCards.gd": {
+"ACTION_CREATE_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {}
+"ACTION_ADD_CARDS_TO_HAND": {}
 }]
 }
 }])

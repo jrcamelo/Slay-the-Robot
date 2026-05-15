@@ -16,9 +16,9 @@ card_values = {
 "min_card_amount": 2
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionRetainCards.gd": {}
+"ACTION_RETAIN_CARDS": {}
 }],
 "card_pick_text": "Choose {0} card(s) to retain. {1} cards selected",
 "card_pick_type": 0,

@@ -14,25 +14,25 @@ card_values = {
 "number_of_attacks": 1
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"ACTION_ATTACK_GENERATOR": {
 "actions_on_lethal": [],
 "time_delay": 0.0
 }
 }, {
-"res://scripts/actions/meta_actions/ActionValidator.gd": {
+"ACTION_VALIDATOR": {
 "passed_action_data": [{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1
 }
 }],
 "time_delay": 0.0,
 "validator_data": [{
-"res://scripts/validators/card_plays/ValidatorCardPlayEnemyAttacking.gd": {}
+"VALIDATOR_CARD_PLAY_ENEMY_ATTACKING": {}
 }]
 }
 }])
 card_glow_validators = Array[Dictionary]([{
-"res://scripts/validators/ValidatorEnemyAttacking.gd": {}
+"VALIDATOR_ENEMY_ATTACKING": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "block": 3,

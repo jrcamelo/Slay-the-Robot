@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="KeywordData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/KeywordData.gd" id="1_68kq2"]
+
+[resource]
+script = ExtResource("1_68kq2")
+keyword_text_bb_code = "[color=orange]Exhaust[/color]
+Used once per combat"
+object_id = "keyword_exhaust"

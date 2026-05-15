@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_7r6bo"]
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_oaj3e"]
 
 [resource]
@@ -9,6 +10,9 @@ artifact_description = "Right click to shuffle discard into draw pile."
 artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
 artifact_color_id = "color_green"
 artifact_right_click_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionReshuffle.gd": {}
+"ACTION_RESHUFFLE": {}
+}])
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
 }])
 object_id = "artifact_right_click_shuffle_deck"

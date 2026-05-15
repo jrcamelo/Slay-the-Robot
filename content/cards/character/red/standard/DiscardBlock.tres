@@ -16,11 +16,11 @@ card_values = {
 "max_card_amount": 3
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/meta_actions/ActionVariableCardsetModifier.gd": {
+"ACTION_VARIABLE_CARDSET_MODIFIER": {
 "action_data": [{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1,
 "time_delay": 0.5
 }
@@ -28,7 +28,7 @@ card_play_actions = Array[Dictionary]([{
 "multiplied_values": ["block"]
 }
 }, {
-"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {}
+"ACTION_DISCARD_CARDS": {}
 }],
 "card_pick_text": "Choose up to {0} card(s) to discard. {1} cards selected",
 "card_pick_type": 0,

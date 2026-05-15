@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_jngdp"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_375vp"]
+
+[resource]
+script = ExtResource("1_jngdp")
+status_effect_name = "Preserve Block"
+status_effect_stacks = false
+status_effect_interceptor_ids = Array[String](["interceptor_preserve_block"])
+object_id = "status_effect_preserve_block"

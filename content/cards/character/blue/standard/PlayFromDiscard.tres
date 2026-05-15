@@ -15,14 +15,14 @@ card_values = {
 "block": 3
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "target_override": 1,
 "time_delay": 0.5
 }
 }, {
-"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"ACTION_PICK_CARDS": {
 "action_data": [{
-"res://scripts/actions/cardset_actions/ActionPlayCards.gd": {}
+"ACTION_PLAY_CARDS": {}
 }],
 "card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
 "card_pick_type": 4,

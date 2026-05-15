@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_1s3bs"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_sigen"]
+
+[resource]
+script = ExtResource("1_1s3bs")
+status_effect_name = "Duplicate Play"
+status_effect_interceptor_ids = Array[String](["interceptor_duplicate_card_plays"])
+object_id = "status_effect_duplicate_card_plays"

@@ -14,7 +14,7 @@ enemy_attack_states = Dictionary[String, Dictionary]({
 "attack_damage": 0,
 "block": 0,
 "custom_actions": [{
-"res://scripts/actions/ActionSummonEnemies.gd": {
+"ACTION_SUMMON_ENEMIES": {
 "number_of_spawns": 2,
 "random_enemy_object_ids": ["enemy_minion_1", "enemy_minion_2"],
 "spawn_slots": [1, 2],

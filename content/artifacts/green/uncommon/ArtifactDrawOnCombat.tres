@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_6u5sr"]
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_xsob2"]
 
 [resource]
 script = ExtResource("1_6u5sr")
@@ -9,8 +10,11 @@ artifact_description = "Draws 2 extra cards on the first turn"
 artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
 artifact_color_id = "color_green"
 artifact_rarity = 2
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 artifact_first_turn_actions = Array[Dictionary]([{
-"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"ACTION_DRAW_GENERATOR": {
 "draw_count": 2
 }
 }])

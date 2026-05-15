@@ -1,13 +1,17 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_ryic0"]
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_ybp5p"]
 
 [resource]
 script = ExtResource("1_ryic0")
 artifact_name = "Artifact Heal On Combat End"
 artifact_description = "Grants 5 health when combat is over"
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 artifact_end_of_combat_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionAddHealth.gd": {
+"ACTION_ADD_HEALTH": {
 "health_amount": 5
 }
 }])

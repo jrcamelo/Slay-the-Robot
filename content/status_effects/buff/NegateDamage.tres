@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_nq3vc"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_euamt"]
+
+[resource]
+script = ExtResource("1_nq3vc")
+status_effect_name = "Negate Damage"
+status_effect_interceptor_ids = Array[String](["interceptor_negate_damage"])
+object_id = "status_effect_negate_damage"

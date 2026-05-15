@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_f6pq6"]
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_rbhav"]
 
 [resource]
@@ -7,4 +8,7 @@ script = ExtResource("1_rbhav")
 artifact_name = "Artifact White Shop"
 artifact_description = "Test White Shop Artifact."
 artifact_rarity = 5
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 object_id = "artifact_shop_white"

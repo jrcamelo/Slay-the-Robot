@@ -15,7 +15,7 @@ card_values = {
 "custom_block_2": 4
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "custom_key_names": {
 "block": "custom_block_1"
 },
@@ -23,7 +23,7 @@ card_play_actions = Array[Dictionary]([{
 "time_delay": 0.5
 }
 }, {
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "custom_key_names": {
 "block": "custom_block_2"
 },

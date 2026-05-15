@@ -14,14 +14,14 @@ card_values = {
 "block": 5
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "block": 5,
 "target_override": 1,
 "time_delay": 0.5
 }
 }])
 card_initial_combat_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionBlock.gd": {
+"ACTION_BLOCK": {
 "block": 5,
 "target_override": 1,
 "time_delay": 0.5

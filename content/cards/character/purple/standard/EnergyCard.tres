@@ -14,7 +14,7 @@ card_values = {
 "energy_amount": 2
 }
 card_discard_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionAddEnergy.gd": {}
+"ACTION_ADD_ENERGY": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "energy_amount": 1

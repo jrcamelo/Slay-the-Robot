@@ -16,7 +16,7 @@ card_values = {
 "health_max_amount": 3
 }
 card_play_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionAddHealth.gd": {}
+"ACTION_ADD_HEALTH": {}
 }])
 card_upgrade_value_improvements = Dictionary[String, int]({
 "health_amount": 1,

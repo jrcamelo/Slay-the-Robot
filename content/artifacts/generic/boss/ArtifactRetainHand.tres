@@ -1,11 +1,14 @@
 [gd_resource type="Resource" script_class="ArtifactData" format=3]
 
+[ext_resource type="Script" path="res://scripts/artifacts/BaseArtifact.gd" id="1_6eunh"]
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_7dric"]
 
 [resource]
 script = ExtResource("1_7dric")
 artifact_name = "Artifact Retain Hand"
 artifact_description = "Cards will be retained end of turn"
-artifact_script_path = "res://scripts/artifacts/ArtifactRetainHand.gd"
 artifact_rarity = 4
+artifact_right_click_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_TURN": {}
+}])
 object_id = "artifact_retain_hand"

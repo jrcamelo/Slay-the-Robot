@@ -16,7 +16,7 @@ card_values = {
 "energy_amount": 2
 }
 card_draw_actions = Array[Dictionary]([{
-"res://scripts/actions/ActionAddEnergy.gd": {}
+"ACTION_ADD_ENERGY": {}
 }])
 card_first_upgrade_property_changes = Dictionary[String, Variant]({
 "card_description": "Unplayable
