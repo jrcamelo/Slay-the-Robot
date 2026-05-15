@@ -3,20 +3,23 @@
 extends Node
 
 ## General use factory method for creating actions.
-## Creates and initializes actions from a script path and values.
-## Action data is [{"script_path": {values}}].
+## Creates and initializes actions from a script token/path and values.
+## Action data is [{"ACTION_TOKEN": {values}}] with legacy raw path support.
 ## NOTE: Not automatically added to the stack and performed; do so with ActionHandler.add_actions()
 func create_actions(_parent_combatant: BaseCombatant, _card_play_request: CardPlayRequest, _targets: Array[BaseCombatant], actions_data: Array[Dictionary], _parent_action: BaseAction) -> Array[BaseAction]:
 	
 	var actions: Array[BaseAction] = []
 	
 	for action_data in actions_data:
-		for action_path in action_data:
-			var action_asset = load(action_path)
+		for action_token in action_data:
+			var action_asset: Script = Scripts.resolve_script(action_token)
+			if action_asset == null:
+				push_error("ActionGenerator: Failed to resolve action script token/path: %s" % action_token)
+				continue
 			var action: BaseAction = action_asset.new()
 			
 			var action_values: Dictionary[String, Variant] = {}
-			action_values.assign(action_data[action_path]) # # assign to force typed dict
+			action_values.assign(action_data[action_token]) # assign to force typed dict
 			
 			action.init(_parent_combatant, _card_play_request, _targets, action_values, _parent_action)
 			actions.append(action)
@@ -50,7 +53,7 @@ func generate_start_of_turn_draw_actions(number_of_cards: int = PlayerData.PLAYE
 func generate_act(act_id: String, act_number: int = 1) -> void:
 	var act_data: ActData = Global.get_act_data(act_id)
 	var action_data: Array[Dictionary] = [{
-		act_data.act_action_script_path: {
+		Scripts.normalize_script_reference(act_data.act_action_script_path): {
 			"act_id": act_id,
 			"act_number": act_number,
 			}

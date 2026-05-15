@@ -7,11 +7,17 @@ var cards_by_id: Dictionary[String, CardData] = {}
 var artifacts_by_id: Dictionary[String, ArtifactData] = {}
 var enemies_by_id: Dictionary[String, EnemyData] = {}
 var characters_by_id: Dictionary[String, CharacterData] = {}
+var keywords_by_id: Dictionary[String, KeywordData] = {}
+var consumables_by_id: Dictionary[String, ConsumableData] = {}
+var status_effects_by_id: Dictionary[String, StatusEffectData] = {}
 
 var _card_entries: Array[Dictionary] = []
 var _artifact_entries: Array[Dictionary] = []
 var _enemy_entries: Array[Dictionary] = []
 var _character_entries: Array[Dictionary] = []
+var _keyword_entries: Array[Dictionary] = []
+var _consumable_entries: Array[Dictionary] = []
+var _status_effect_entries: Array[Dictionary] = []
 
 func load_from_directory(root_path: String = "res://content") -> void:
 	content_root = root_path
@@ -19,10 +25,16 @@ func load_from_directory(root_path: String = "res://content") -> void:
 	artifacts_by_id.clear()
 	enemies_by_id.clear()
 	characters_by_id.clear()
+	keywords_by_id.clear()
+	consumables_by_id.clear()
+	status_effects_by_id.clear()
 	_card_entries.clear()
 	_artifact_entries.clear()
 	_enemy_entries.clear()
 	_character_entries.clear()
+	_keyword_entries.clear()
+	_consumable_entries.clear()
+	_status_effect_entries.clear()
 
 	_load_directory_recursive(content_root)
 
@@ -50,6 +62,24 @@ func get_characters_in_segments(required_segments: Array[String]) -> Array[Chara
 		results.append(entry["resource"])
 	return results
 
+func get_keywords_in_segments(required_segments: Array[String]) -> Array[KeywordData]:
+	var results: Array[KeywordData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_keyword_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_consumables_in_segments(required_segments: Array[String]) -> Array[ConsumableData]:
+	var results: Array[ConsumableData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_consumable_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_status_effects_in_segments(required_segments: Array[String]) -> Array[StatusEffectData]:
+	var results: Array[StatusEffectData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_status_effect_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
 func get_character_cards(character_name: String, tier: String) -> Array[CardData]:
 	return get_cards_in_segments(["character", character_name.to_lower(), tier.to_lower()])
 
@@ -62,6 +92,9 @@ func compare_against_global() -> Dictionary:
 		"artifacts": _compare_serializable_table(Global._id_to_artifact_data, artifacts_by_id, []),
 		"enemies": _compare_serializable_table(Global._id_to_enemy_data, enemies_by_id, []),
 		"characters": _compare_characters(),
+		"keywords": _compare_serializable_table(Global._id_to_keyword_data, keywords_by_id, []),
+		"consumables": _compare_serializable_table(Global._id_to_consumable_data, consumables_by_id, []),
+		"status_effects": _compare_serializable_table(Global._id_to_status_data, status_effects_by_id, []),
 	}
 
 func _load_directory_recursive(directory_path: String) -> void:
@@ -118,6 +151,18 @@ func _register_resource(resource: Resource, resource_path: String) -> void:
 		var character_data: CharacterData = resource
 		characters_by_id[character_data.object_id] = character_data
 		_character_entries.append(entry)
+	elif resource is KeywordData:
+		var keyword_data: KeywordData = resource
+		keywords_by_id[keyword_data.object_id] = keyword_data
+		_keyword_entries.append(entry)
+	elif resource is ConsumableData:
+		var consumable_data: ConsumableData = resource
+		consumables_by_id[consumable_data.object_id] = consumable_data
+		_consumable_entries.append(entry)
+	elif resource is StatusEffectData:
+		var status_effect_data: StatusEffectData = resource
+		status_effects_by_id[status_effect_data.object_id] = status_effect_data
+		_status_effect_entries.append(entry)
 
 func _get_entries_matching_segments(entries: Array[Dictionary], required_segments: Array[String]) -> Array[Dictionary]:
 	var normalized_segments: Array[String] = []
@@ -155,6 +200,8 @@ func _compare_serializable_table(global_table: Dictionary, loaded_table: Diction
 			missing_in_global.append(object_id)
 
 	return {
+		"global_count": len(global_table),
+		"loaded_count": len(loaded_table),
 		"missing_in_loaded": missing_in_loaded,
 		"missing_in_global": missing_in_global,
 		"mismatched": mismatched,
@@ -201,8 +248,8 @@ func _resource_signature(resource: Resource, ignored_fields: Array[String]) -> S
 		var properties: Dictionary = serializable_data.get_serializable_properties(true)
 		for ignored_field: String in ignored_fields:
 			properties.erase(ignored_field)
-		return JSON.stringify(properties)
-	return JSON.stringify(resource)
+		return JSON.stringify(Scripts.normalize_variant_script_references(properties))
+	return JSON.stringify(Scripts.normalize_variant_script_references(resource))
 
 func _string_arrays_equal(left: Array[String], right: Array[String]) -> bool:
 	if len(left) != len(right):

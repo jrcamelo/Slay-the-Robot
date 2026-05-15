@@ -165,3 +165,71 @@ const INTERCEPTOR_NEGATE_DEBUFF: String = "res://scripts/action_interceptors/Int
 const INTERCEPTOR_DUPLICATE_CARD_PLAYS: String = "res://scripts/action_interceptors/InterceptorDuplicateCardPlays.gd"
 const INTERCEPTOR_DUPLICATE_ATTACKS: String = "res://scripts/action_interceptors/InterceptorDuplicateAttacks.gd"
 #endregion
+
+var _token_to_script_path: Dictionary[String, String] = {}
+var _script_path_to_token: Dictionary[String, String] = {}
+
+func _ready() -> void:
+	_rebuild_script_registry()
+
+func resolve_script_path(token_or_path: String) -> String:
+	if token_or_path == "":
+		return ""
+	if token_or_path.begins_with("res://"):
+		return token_or_path
+	_ensure_script_registry()
+	return _token_to_script_path.get(token_or_path, "")
+
+func resolve_script(token_or_path: String) -> Script:
+	var script_path: String = resolve_script_path(token_or_path)
+	if script_path == "":
+		return null
+	return load(script_path)
+
+func get_token_for_path(script_path: String) -> String:
+	if script_path == "":
+		return ""
+	_ensure_script_registry()
+	return _script_path_to_token.get(script_path, "")
+
+func normalize_script_reference(token_or_path: String) -> String:
+	if token_or_path == "":
+		return ""
+	var normalized_token: String = get_token_for_path(token_or_path)
+	if normalized_token != "":
+		return normalized_token
+	return token_or_path
+
+func normalize_variant_script_references(value: Variant) -> Variant:
+	if value is String:
+		return normalize_script_reference(value)
+	if value is Array:
+		var normalized_array: Array = []
+		for item: Variant in value:
+			normalized_array.append(normalize_variant_script_references(item))
+		return normalized_array
+	if value is Dictionary:
+		var normalized_dictionary: Dictionary = {}
+		for key: Variant in value.keys():
+			var normalized_key: Variant = key
+			if key is String:
+				var normalized_string_key: String = get_token_for_path(key)
+				if normalized_string_key != "":
+					normalized_key = normalized_string_key
+			normalized_dictionary[normalized_key] = normalize_variant_script_references(value[key])
+		return normalized_dictionary
+	return value
+
+func _ensure_script_registry() -> void:
+	if len(_token_to_script_path) == 0:
+		_rebuild_script_registry()
+
+func _rebuild_script_registry() -> void:
+	_token_to_script_path.clear()
+	_script_path_to_token.clear()
+	var constant_map: Dictionary = get_script().get_script_constant_map()
+	for token_name: String in constant_map.keys():
+		var constant_value: Variant = constant_map[token_name]
+		if constant_value is String and constant_value.begins_with("res://scripts/"):
+			_token_to_script_path[token_name] = constant_value
+			_script_path_to_token[constant_value] = token_name

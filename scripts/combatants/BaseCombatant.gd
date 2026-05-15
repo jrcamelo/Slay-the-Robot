@@ -269,7 +269,7 @@ func _create_status_effect(status_effect_object_id: String) -> StatusEffect:
 	if (not status_exists) or status_effect_data.status_effect_allows_multiples:
 		# create the status
 		var status_effect: StatusEffect = Scenes.STATUS_EFFECT.instantiate()
-		var status_effect_script_asset: Resource = load(status_effect_data.status_effect_script_path)
+		var status_effect_script_asset: Script = status_effect_data.status_effect_script
 		var status_effect_script: BaseStatusEffect = status_effect_script_asset.new()
 		
 		# set bindings for ui elements

@@ -42,13 +42,16 @@ func filter_card_validators(card_validators: Array) -> CardFilter:
 		return self
 	# general filter that applies arbitrary validators
 	for validator_data: Dictionary in card_validators:
-		for validator_script_path: String in validator_data:
+		for validator_token: String in validator_data:
 			# generate validator
-			var validator_script_asset = load(validator_script_path)
+			var validator_script_asset: Script = Scripts.resolve_script(validator_token)
+			if validator_script_asset == null:
+				push_error("CardFilter: Failed to resolve validator script token/path: %s" % validator_token)
+				continue
 			var validator: BaseValidator = validator_script_asset.new()
 			
 			var validator_values: Dictionary[String, Variant] = {}
-			validator_values.assign(validator_data[validator_script_path])
+			validator_values.assign(validator_data[validator_token])
 
 			# iterate over each card in the validator amd filter it
 			var validator_result: Array[CardData] = []

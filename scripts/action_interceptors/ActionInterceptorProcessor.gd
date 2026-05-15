@@ -120,7 +120,7 @@ func _get_action_interceptors_modifying_pair(action: BaseAction, parent_combatan
 	# create interceptors from data
 	for action_interceptor_data in interceptor_data_list:
 		# create interceptor
-		var action_interceptor_asset = load(action_interceptor_data.action_interceptor_script_path)
+		var action_interceptor_asset: Script = action_interceptor_data.action_interceptor_script
 		var action_interceptor: BaseActionInterceptor = action_interceptor_asset.new()
 		returned_action_interceptors.append(action_interceptor)
 	

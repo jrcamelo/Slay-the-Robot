@@ -4,7 +4,7 @@ class_name ArtifactData
 @export var artifact_name: String = ""
 @export var artifact_description: String = ""
 @export var artifact_texture_path: String = "external/sprites/artifacts/artifact_white.png"
-@export var artifact_script_path: String = "res://scripts/artifacts/BaseArtifact.gd"
+@export var artifact_script: Script = preload("res://scripts/artifacts/BaseArtifact.gd")
 @export var artifact_counter: int = 0 # do not adjust directly
 @export var artifact_counter_max: int = 1
 @export var artifact_counter_reset_on_turn_start: int = -1 # the value to reset the counter to on the start of player's turn. Negative for no reset

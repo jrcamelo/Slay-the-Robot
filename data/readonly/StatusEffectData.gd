@@ -4,7 +4,7 @@ class_name StatusEffectData
 
 #region General
 @export var status_effect_name: String = ""	# how this status appears in tooltips
-@export var status_effect_script_path: String = "res://scripts/status_effects/BaseStatusEffect.gd"	# script of the BaseStatusEffect determining behavior of the status
+@export var status_effect_script: Script = preload("res://scripts/status_effects/BaseStatusEffect.gd")	# script of the BaseStatusEffect determining behavior of the status
 @export var status_effect_stacks: bool = true	# whether or not the status effect can have multiple charges
 @export var status_effect_can_be_negative: bool = false	# determines whether to remove the status when negative charges happen
 @export var status_effect_allows_multiples: bool = false	# whether or not the status effect can be applied multiple times uniquely. If false only 1 can exist

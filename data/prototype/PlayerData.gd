@@ -665,7 +665,7 @@ func add_artifact(artifact_id: String, artifact_owner_party_index: int = -1, art
 			player_artifact_uid_to_artifact_data[artifact_data.object_uid] = artifact_data
 		
 			# use a temp artifact script to perform any logic if the artifact has effect when added
-			var artifact_script_asset: Resource = load(artifact_data.artifact_script_path)
+			var artifact_script_asset: Script = artifact_data.artifact_script
 			var artifact_script: BaseArtifact = artifact_script_asset.new(artifact_data)
 			artifact_script.add_artifact()
 			Signals.player_artifacts_changed.emit()
@@ -680,7 +680,7 @@ func remove_artifact(artifact_id: String, remove_multiples: bool = true) -> void
 	var artifacts: Array[ArtifactData] = get_player_artifacts_with_artifact_id(artifact_id)
 	for artifact_data: ArtifactData in artifacts:
 		# use a temp artifact script to perform any logic if the artifact has effect when removed
-		var artifact_script_asset: Resource = load(artifact_data.artifact_script_path)
+		var artifact_script_asset: Script = artifact_data.artifact_script
 		var artifact_script: BaseArtifact = artifact_script_asset.new(artifact_data)
 		artifact_script.remove_artifact()
 		

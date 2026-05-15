@@ -32,6 +32,9 @@ static func export_all_content(content_root: String = CONTENT_ROOT) -> Dictionar
 		"artifacts": {},
 		"enemies": {},
 		"characters": {},
+		"keywords": {},
+		"consumables": {},
+		"status_effects": {},
 		"decks": {},
 		"artifact_lists": {},
 	}
@@ -70,6 +73,21 @@ static func export_all_content(content_root: String = CONTENT_ROOT) -> Dictionar
 		var character_export_path: String = character_folder_path.path_join("Character.tres")
 		var saved_character_path: String = _save_resource(character_export, character_export_path)
 		export_manifest["characters"][character_data.object_id] = saved_character_path
+
+	for keyword_data: KeywordData in Global._id_to_keyword_data.values():
+		var keyword_export_path: String = _build_keyword_path(keyword_data, content_root)
+		var saved_keyword_path: String = _save_unique_resource_copy(keyword_data, keyword_export_path)
+		export_manifest["keywords"][keyword_data.object_id] = saved_keyword_path
+
+	for consumable_data: ConsumableData in Global._id_to_consumable_data.values():
+		var consumable_export_path: String = _build_consumable_path(consumable_data, content_root)
+		var saved_consumable_path: String = _save_unique_resource_copy(consumable_data, consumable_export_path)
+		export_manifest["consumables"][consumable_data.object_id] = saved_consumable_path
+
+	for status_effect_data: StatusEffectData in Global._id_to_status_data.values():
+		var status_effect_export_path: String = _build_status_effect_path(status_effect_data, content_root)
+		var saved_status_effect_path: String = _save_unique_resource_copy(status_effect_data, status_effect_export_path)
+		export_manifest["status_effects"][status_effect_data.object_id] = saved_status_effect_path
 
 	return export_manifest
 
@@ -138,6 +156,36 @@ static func _build_character_folder_path(character_data: CharacterData, content_
 		color_name = _extract_character_folder_name(character_data)
 	return content_root.path_join("characters").path_join(color_name)
 
+static func _build_keyword_path(keyword_data: KeywordData, content_root: String) -> String:
+	var file_name: String = _resource_file_name(keyword_data.object_id.trim_prefix("keyword_"), keyword_data.object_id)
+	return content_root.path_join("keywords").path_join("%s.tres" % file_name)
+
+static func _build_consumable_path(consumable_data: ConsumableData, content_root: String) -> String:
+	var rarity_folder := "common"
+	match consumable_data.consumable_rarity:
+		ConsumableData.CONSUMABLE_RARITIES.COMMON:
+			rarity_folder = "common"
+		ConsumableData.CONSUMABLE_RARITIES.UNCOMMON:
+			rarity_folder = "uncommon"
+		ConsumableData.CONSUMABLE_RARITIES.RARE:
+			rarity_folder = "rare"
+		ConsumableData.CONSUMABLE_RARITIES.LEGENDARY:
+			rarity_folder = "legendary"
+	var file_name: String = _resource_file_name(consumable_data.consumable_name, consumable_data.object_id)
+	return content_root.path_join("consumables").path_join(rarity_folder).path_join("%s.tres" % file_name)
+
+static func _build_status_effect_path(status_effect_data: StatusEffectData, content_root: String) -> String:
+	var type_folder := "neutral"
+	match status_effect_data.status_effect_type:
+		StatusEffectData.STATUS_EFFECT_TYPES.BUFF:
+			type_folder = "buff"
+		StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF:
+			type_folder = "debuff"
+		StatusEffectData.STATUS_EFFECT_TYPES.NEUTRAL:
+			type_folder = "neutral"
+	var file_name: String = _resource_file_name(status_effect_data.status_effect_name, status_effect_data.object_id)
+	return content_root.path_join("status_effects").path_join(type_folder).path_join("%s.tres" % file_name)
+
 static func _extract_enemy_act_folder(enemy_data: EnemyData) -> String:
 	var object_id: String = enemy_data.object_id.to_lower()
 	var search_index: int = object_id.find("act_")
@@ -202,6 +250,7 @@ static func _save_unique_resource_copy(resource: Resource, desired_path: String)
 	return _save_resource(resource_copy, file_path)
 
 static func _save_resource(resource: Resource, resource_path: String) -> String:
+	_normalize_resource_script_references(resource)
 	_ensure_res_directory(resource_path.get_base_dir())
 	var save_result: Error = ResourceSaver.save(resource, resource_path)
 	if save_result != OK:
@@ -211,3 +260,28 @@ static func _save_resource(resource: Resource, resource_path: String) -> String:
 static func _ensure_res_directory(res_directory_path: String) -> void:
 	var absolute_path: String = ProjectSettings.globalize_path(res_directory_path)
 	DirAccess.make_dir_recursive_absolute(absolute_path)
+
+static func _normalize_resource_script_references(resource: Resource) -> void:
+	if resource == null:
+		return
+	for property_data: Dictionary in resource.get_property_list():
+		var property_name: String = property_data.get("name", "")
+		var usage: int = property_data.get("usage", 0)
+		if property_name == "" or property_name == "script":
+			continue
+		if (usage & PROPERTY_USAGE_STORAGE) != PROPERTY_USAGE_STORAGE:
+			continue
+		var property_value: Variant = resource.get(property_name)
+		var normalized_value: Variant = Scripts.normalize_variant_script_references(property_value)
+		if property_value is Array and normalized_value is Array:
+			var typed_array: Array = property_value.duplicate()
+			typed_array.clear()
+			typed_array.assign(normalized_value)
+			resource.set(property_name, typed_array)
+		elif property_value is Dictionary and normalized_value is Dictionary:
+			var typed_dictionary: Dictionary = property_value.duplicate()
+			typed_dictionary.clear()
+			typed_dictionary.assign(normalized_value)
+			resource.set(property_name, typed_dictionary)
+		else:
+			resource.set(property_name, normalized_value)

@@ -186,9 +186,12 @@ func get_card_description(selected_target: BaseCombatant = null) -> String:
 func _generate_card_listeners(listener_data: Array[Dictionary]) -> Array[BaseCardListener]:
 	var generated_card_listeners: Array[BaseCardListener] = []
 	for card_listener_data in listener_data:
-		for card_listener_path in card_listener_data:
-			var listener_asset = load(card_listener_path)
-			var listener_values: Dictionary = card_listener_data[card_listener_path]
+		for card_listener_token in card_listener_data:
+			var listener_asset: Script = Scripts.resolve_script(card_listener_token)
+			if listener_asset == null:
+				push_error("Card: Failed to resolve card listener script token/path: %s" % card_listener_token)
+				continue
+			var listener_values: Dictionary = card_listener_data[card_listener_token]
 			var card_listener: BaseCardListener = listener_asset.new(self, listener_values)
 			generated_card_listeners.append(card_listener)
 	

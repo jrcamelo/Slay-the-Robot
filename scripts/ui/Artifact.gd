@@ -14,7 +14,7 @@ func _ready():
 
 func init(_artifact_data: ArtifactData):
 	artifact_data = _artifact_data
-	var artifact_script_asset: Resource = load(artifact_data.artifact_script_path)
+	var artifact_script_asset: Script = artifact_data.artifact_script
 	artifact_script = artifact_script_asset.new(artifact_data)
 	texture_normal = FileLoader.load_texture(artifact_data.artifact_texture_path)
 	update_artifact_counter()
