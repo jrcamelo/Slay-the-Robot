@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_x7l60"]
+
+[resource]
+script = ExtResource("1_x7l60")
+artifact_name = "Artifact Draw on Kill"
+artifact_description = "Draws a card when an enemy is killed"
+artifact_script_path = "res://scripts/artifacts/ArtifactDrawOnKill.gd"
+artifact_rarity = 2
+object_id = "artifact_draw_on_kill"

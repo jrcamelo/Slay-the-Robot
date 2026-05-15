@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Resource" path="res://content/characters/green/StartingArtifacts.tres" id="1_ef07o"]
+[ext_resource type="Resource" path="res://content/characters/green/Deck.tres" id="2_3nigi"]
+[ext_resource type="Script" path="res://data/readonly/CharacterData.gd" id="3_cubte"]
+
+[resource]
+script = ExtResource("3_cubte")
+character_name = "Green Guy"
+character_description = "Puts pineapple on their pizza"
+character_color_id = "color_green"
+character_texture_path = "external/sprites/characters/character_green/character_green.png"
+character_icon_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+character_text_energy_texture_path = "external/sprites/characters/character_green/character_green_text_energy.png"
+character_player_id = "player_green"
+character_starting_artifact_ids = Array[String](["artifact_draw_on_combat_start"])
+character_starting_artifact_resource = ExtResource("1_ef07o")
+character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_green"])
+character_starting_card_object_ids = Array[String](["card_attack_basic", "card_attack_basic", "card_attack_basic", "custom_block_card", "attack_lower_cost_on_discard_card", "card_preserve_block", "card_duplicate_plays", "card_draft_random_attack"])
+character_starting_deck_resource = ExtResource("2_3nigi")
+character_starting_health = 75
+character_starting_card_draft_card_pack_ids = Array[String](["card_pack_green"])
+object_id = "character_green"

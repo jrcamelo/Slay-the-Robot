@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_f2qii"]
+
+[resource]
+script = ExtResource("1_f2qii")
+card_name = "Retain Cards"
+card_description = "Select [min_card_amount] cards to retain end of turn."
+card_texture_path = "external/sprites/cards/orange/card_orange.png"
+card_keyword_object_ids = Array[String](["keyword_retain"])
+card_color_id = "color_orange"
+card_type = 1
+card_requires_target = false
+card_values = {
+"max_card_amount": 2,
+"min_card_amount": 2
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionRetainCards.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to retain. {1} cards selected",
+"card_pick_type": 0,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"max_card_amount": 1,
+"min_card_amount": 1
+})
+object_id = "retain_hand_card"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_xgrc5"]
+
+[resource]
+script = ExtResource("1_xgrc5")
+artifact_name = "Artifact Green Boss"
+artifact_description = "Test Green Boss Artifact."
+artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
+artifact_color_id = "color_green"
+artifact_rarity = 4
+object_id = "artifact_boss_green"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_ec87s"]
+
+[resource]
+script = ExtResource("1_ec87s")
+artifact_name = "Artifact See Draw Pile"
+artifact_description = "See the top cards in your draw pile"
+artifact_texture_path = "external/sprites/artifacts/artifact_blue.png"
+artifact_color_id = "color_blue"
+artifact_first_turn_actions = Array[Dictionary]([{
+"res://scripts/actions/custom_ui_actions/ActionCustomUI.gd": {
+"custom_ui_object_id": "custom_ui_see_top_of_draw_pile",
+"enable_custom_ui": true,
+"target_override": 2
+}
+}])
+object_id = "artifact_see_top_of_draw_pile"

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_hybok"]
+
+[resource]
+script = ExtResource("1_hybok")
+card_name = "Block"
+card_description = "Add [block] block. At the start of combat, apply [block] block"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_white"
+card_type = 1
+card_requires_target = false
+card_values = {
+"block": 5
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"block": 5,
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_initial_combat_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"block": 5,
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 3
+})
+object_id = "card_block_initial"

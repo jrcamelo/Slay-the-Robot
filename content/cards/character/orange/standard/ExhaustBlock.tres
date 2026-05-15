@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_unc0s"]
+
+[resource]
+script = ExtResource("1_unc0s")
+card_name = "Exhaust Block"
+card_description = "Top Deck. Add [block] block and exhaust"
+card_texture_path = "external/sprites/cards/orange/card_orange.png"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_orange"
+card_first_shuffle_priority = 1
+card_type = 1
+card_exhausts = true
+card_requires_target = false
+card_values = {
+"block": 15
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 5
+})
+object_id = "card_block_big"

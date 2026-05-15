@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_rmtvt"]
+
+[resource]
+script = ExtResource("1_rmtvt")
+card_name = "Mode A"
+card_description = "Attack for [damage] damage
+Right click to transform into B variant"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"damage": 7,
+"keep_upgrade_level": true,
+"number_of_attacks": 1,
+"pick_played_card": true,
+"transform_into_card_object_id": "card_right_click_transform_mode_b",
+"transform_parent_card": false
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {}
+}])
+card_right_click_actions = Array[Dictionary]([{
+"res://scripts/actions/cardset_actions/ActionTransformCards.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 4
+})
+object_id = "card_right_click_transform_mode_a"

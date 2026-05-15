@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_kl022"]
+
+[resource]
+script = ExtResource("1_kl022")
+enemy_name = "Act 1 Miniboss"
+enemy_texture_path = "external/sprites/enemies/enemy_green_medium.png"
+enemy_health = 100
+enemy_health_max = 100
+enemy_type = 1
+enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
+"2": {
+"enemy_health": 120,
+"enemy_health_max": 120
+}
+})
+object_id = "enemy_act_1_miniboss_1"

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_kmqlr"]
+
+[resource]
+script = ExtResource("1_kmqlr")
+card_name = "Retain Block"
+card_description = "Retain. Block for [block]. Improves block by 3 on retain"
+card_color_id = "color_purple"
+card_type = 1
+card_is_retained = true
+card_requires_target = false
+card_values = {
+"block": 5
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_retain_actions = Array[Dictionary]([{
+"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"card_value_improvements": {
+"block": 3
+},
+"improve_parent_card": false,
+"pick_played_card": true,
+"time_delay": 0.1
+}
+}])
+object_id = "improving_retain_block_card"

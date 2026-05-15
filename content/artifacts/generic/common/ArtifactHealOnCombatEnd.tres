@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_ryic0"]
+
+[resource]
+script = ExtResource("1_ryic0")
+artifact_name = "Artifact Heal On Combat End"
+artifact_description = "Grants 5 health when combat is over"
+artifact_end_of_combat_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionAddHealth.gd": {
+"health_amount": 5
+}
+}])
+object_id = "artifact_heal_on_combat_ended"

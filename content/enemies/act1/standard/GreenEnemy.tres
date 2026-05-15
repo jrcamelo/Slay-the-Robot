@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_t5hua"]
+
+[resource]
+script = ExtResource("1_t5hua")
+enemy_name = "Green Enemy"
+enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
+enemy_health = 25
+enemy_health_max = 25
+enemy_actions_on_death = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"status_charge_amount": 5,
+"status_effect_object_id": "status_effect_corrosion",
+"target_override": 3,
+"time_delay": 0.5
+}
+}])
+enemy_initial_status_effects = Dictionary[String, int]({
+"status_effect_negate_debuff": 1
+})
+enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
+"1": {
+"enemy_health": 30,
+"enemy_health_max": 30
+}
+})
+object_id = "enemy_3"

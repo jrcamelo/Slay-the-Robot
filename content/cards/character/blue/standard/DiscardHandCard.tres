@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_4raf8"]
+
+[resource]
+script = ExtResource("1_4raf8")
+card_name = "Discard Hand Card"
+card_description = "Discard hand. Draw [draw_count] cards."
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_type = 1
+card_rarity = 2
+card_requires_target = false
+card_values = {
+"draw_count": 2
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {}
+}, {
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {}
+}],
+"card_pick_text": "",
+"card_pick_type": 0,
+"max_card_amount": 10,
+"min_card_amount": 10,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_energy_cost": 0
+})
+card_upgrade_value_improvements = Dictionary[String, int]({
+"draw_count": 1
+})
+object_id = "card_discard_hand"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_6u5sr"]
+
+[resource]
+script = ExtResource("1_6u5sr")
+artifact_name = "Artifact Draw on Combat"
+artifact_description = "Draws 2 extra cards on the first turn"
+artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
+artifact_color_id = "color_green"
+artifact_rarity = 2
+artifact_first_turn_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"draw_count": 2
+}
+}])
+object_id = "artifact_draw_on_combat_start"

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_6u12b"]
+
+[resource]
+script = ExtResource("1_6u12b")
+artifact_name = "Artifact Increase Attack on Rest"
+artifact_description = "Allows a permanent attack boost at rest sites"
+artifact_texture_path = "external/sprites/artifacts/artifact_orange.png"
+artifact_counter_max = 3
+artifact_color_id = "color_orange"
+artifact_add_actions = Array[Dictionary]([{
+"res://scripts/actions/player_actions/ActionUpdateRestActions.gd": {
+"add_rest_action_object_ids": ["rest_action_increase_attack_on_rest"]
+}
+}])
+artifact_first_turn_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"custom_key_names": {
+"status_charge_amount": "artifact_counter"
+},
+"status_effect_object_id": "status_effect_damage_increase",
+"target_override": 2
+}
+}])
+object_id = "artifact_increase_attack_on_rest"

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_plrg2"]
+
+[resource]
+script = ExtResource("1_plrg2")
+card_name = "Corrosion"
+card_description = "Do [damage] damage and apply [status_charge_amount] corrosion"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_keyword_object_ids = Array[String](["keyword_corrosion"])
+card_values = {
+"damage": 5,
+"number_of_attacks": 1,
+"status_charge_amount": 5,
+"status_effect_object_id": "status_effect_corrosion"
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"time_delay": 0.5
+}
+}, {
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"status_charge_amount": 3
+})
+object_id = "card_attack_corrosion"

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_yjymn"]
+
+[resource]
+script = ExtResource("1_yjymn")
+card_name = "Damage Increase"
+card_description = "Increases attack damage by [status_charge_amount]"
+card_color_id = "color_purple"
+card_energy_cost = 0
+card_type = 2
+card_requires_target = false
+card_values = {
+"status_charge_amount": 5,
+"status_effect_object_id": "status_effect_damage_increase"
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"status_charge_amount": 3
+})
+object_id = "card_damage_increase"

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_rdlhk"]
+
+[resource]
+script = ExtResource("1_rdlhk")
+card_name = "Attack with Adjacency"
+card_description = "Attack for [damage] damage. Can only be played if next to at least 1 attack card."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"damage": 10,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"time_delay": 0.0
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"res://scripts/validators/hand/ValidatorCardTypeAdjacentInHand.gd": {
+"card_types": [0],
+"invert_validation": false,
+"requires_surrounded": false
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5
+})
+object_id = "card_requires_adjacency"

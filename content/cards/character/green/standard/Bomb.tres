@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_bhu2w"]
+
+[resource]
+script = ExtResource("1_bhu2w")
+card_name = "Bomb"
+card_description = "In [status_charge_amount] turns, do [status_secondary_charge_amount] damage to all enemies"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_keyword_object_ids = Array[String](["keyword_bomb"])
+card_type = 1
+card_requires_target = false
+card_values = {
+"status_charge_amount": 3,
+"status_effect_object_id": "status_effect_bomb",
+"status_force_apply_new_effect": true,
+"status_secondary_charge_amount": 30
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"status_secondary_charge_amount": 20
+})
+object_id = "card_bomb"

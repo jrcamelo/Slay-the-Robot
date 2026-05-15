@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_g67y1"]
+
+[resource]
+script = ExtResource("1_g67y1")
+card_name = "Restart Combat"
+card_description = "Restarts Combat"
+card_color_id = "color_white"
+card_type = 1
+card_rarity = 3
+card_appears_in_card_packs = false
+card_exhausts = true
+card_requires_target = false
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/world_interaction_actions/ActionStartCombat.gd": {}
+}])
+object_id = "card_restart_combat"

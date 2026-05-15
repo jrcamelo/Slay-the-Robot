@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_hpvj1"]
+
+[resource]
+script = ExtResource("1_hpvj1")
+artifact_name = "Artifact Make Attack Card Innate"
+artifact_description = "Select an attack card to make appear at the top of your deck."
+artifact_add_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionChangeCardProperties.gd": {
+"card_properties": {
+"card_first_shuffle_priority": 1,
+"card_unremovable_from_deck": true,
+"card_untransformable_from_deck": true
+},
+"change_parent_card": false
+}
+}],
+"card_pick_text": "Choose a card to make top deck",
+"card_pick_type": 1,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"quick_pick": true,
+"random_selection": false,
+"validator_data": [{
+"res://scripts/validators/card/ValidatorCardType.gd": {
+"card_types": [0]
+}
+}, {
+"res://scripts/validators/card/ValidatorCardRarity.gd": {
+"card_rarities_exclude": [4]
+}
+}, {
+"res://scripts/validators/card/ValidatorCardProperties.gd": {
+"card_property_name": "card_unremovable_from_deck",
+"comparison_value": false,
+"operator": "=="
+}
+}]
+}
+}])
+object_id = "artifact_top_deck_attack_card"

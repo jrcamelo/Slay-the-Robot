@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ygxgt"]
+
+[resource]
+script = ExtResource("1_ygxgt")
+card_name = "Big Attack"
+card_description = "Attack for [damage] damage. Grants [money_amount] money on kill. Ethereal"
+card_texture_path = "external/sprites/cards/orange/card_orange.png"
+card_color_id = "color_orange"
+card_energy_cost = 2
+card_rarity = 2
+card_is_ethereal = true
+card_values = {
+"damage": 15,
+"money_amount": 25,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [{
+"res://scripts/actions/player_actions/ActionAddMoney.gd": {}
+}],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5,
+"money_amount": 5
+})
+object_id = "card_attack_big"

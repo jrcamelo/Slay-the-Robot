@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_2afpc"]
+
+[resource]
+script = ExtResource("1_2afpc")
+enemy_name = "Minion 2"
+enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
+enemy_health = 3
+enemy_health_max = 3
+enemy_is_minion = true
+enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
+"1": {
+"enemy_health": 3,
+"enemy_health_max": 33
+}
+})
+object_id = "enemy_minion_2"

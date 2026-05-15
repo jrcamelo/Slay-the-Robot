@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_u3y5e"]
+
+[resource]
+script = ExtResource("1_u3y5e")
+card_name = "Duplicate Plays"
+card_description = "Duplicate the first card played each turn"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_type = 2
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_duplicate_card_plays",
+"status_secondary_charge_amount": 0
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"status_charge_amount": 3
+})
+object_id = "card_duplicate_plays"

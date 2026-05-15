@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ymabl"]
+
+[resource]
+script = ExtResource("1_ymabl")
+card_name = "Attack in Center"
+card_description = "Attack for [damage] damage. Can only be played in center of hand."
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_values = {
+"damage": 5,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"res://scripts/validators/hand/ValidatorCardPositionInHand.gd": {
+"invert_validation": false,
+"position_in_hand": "center"
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5
+})
+object_id = "card_attack_in_center"

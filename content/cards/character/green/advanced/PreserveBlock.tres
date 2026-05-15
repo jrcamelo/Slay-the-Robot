@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_vqt8x"]
+
+[resource]
+script = ExtResource("1_vqt8x")
+card_name = "Preserve Block"
+card_description = "Block will no longer reset"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_energy_cost = 2
+card_type = 2
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_preserve_block"
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/status_actions/ActionApplyStatus.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_energy_cost": 1
+})
+object_id = "card_preserve_block"

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_lbqku"]
+
+[resource]
+script = ExtResource("1_lbqku")
+card_name = "Flat Damage Attack"
+card_description = "Attack for [damage] damage [number_of_attacks] times"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"damage": 1,
+"ignored_interceptor_ids": ["interceptor_damage_increase"],
+"number_of_attacks": 10,
+"time_delay": 0.1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.1
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"number_of_attacks": 5
+})
+object_id = "ignore_damage_increase_attack_card"

@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_msrvs"]
+
+[resource]
+script = ExtResource("1_msrvs")
+card_name = "Discard Block"
+card_description = "Discard up to [max_card_amount] cards and add [block] block for each"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_red"
+card_type = 1
+card_requires_target = false
+card_values = {
+"block": 5,
+"max_card_amount": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/meta_actions/ActionVariableCardsetModifier.gd": {
+"action_data": [{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}],
+"multiplied_values": ["block"]
+}
+}, {
+"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {}
+}],
+"card_pick_text": "Choose up to {0} card(s) to discard. {1} cards selected",
+"card_pick_type": 0,
+"min_card_amount": 0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 3,
+"max_card_amount": 1
+})
+object_id = "card_discard_block"

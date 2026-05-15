@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_v3xva"]
+
+[resource]
+script = ExtResource("1_v3xva")
+card_name = "Randomize Card Cost"
+card_description = "Draw [draw_count] cards. Randomize the cost of cards in hand this turn"
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_energy_cost = 0
+card_type = 1
+card_rarity = 2
+card_requires_target = false
+card_values = {
+"draw_count": 2,
+"randomize_card_energy_cost_until_turn": true
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionRandomizeCardEnergies.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 10,
+"min_card_amount": 10,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}, {
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"draw_count": 1
+})
+object_id = "randomize_hand_card"

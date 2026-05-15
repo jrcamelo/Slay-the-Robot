@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_70x36"]
+
+[resource]
+script = ExtResource("1_70x36")
+card_name = "Pick From Discard"
+card_description = "Pick 2 cards from discard pile and randomly insert them into draw pile"
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"card_destination": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionAddCardsToDraw.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to add to draw. {1} cards selected",
+"card_pick_type": 4,
+"max_card_amount": 2,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+object_id = "add_to_draw_from_discard_card"

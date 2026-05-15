@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_oyxns"]
+
+[resource]
+script = ExtResource("1_oyxns")
+card_name = "Log to Console"
+card_description = "Logs [log_message] to console"
+card_color_id = "color_white"
+card_type = 1
+card_rarity = 3
+card_appears_in_card_packs = false
+card_requires_target = false
+card_values = {
+"log_message": "Hello World",
+"log_message_color_html": "2e8b57ff"
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/debug_actions/ActionDebugLog.gd": {}
+}])
+object_id = "card_debug_log"

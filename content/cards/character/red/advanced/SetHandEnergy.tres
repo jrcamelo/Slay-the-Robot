@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_hloy8"]
+
+[resource]
+script = ExtResource("1_hloy8")
+card_name = "Set Hand Energy"
+card_description = "All cards in hand cost 0 until end of turn"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"card_energy_cost": -1,
+"card_energy_cost_until_played": -1,
+"card_energy_cost_until_turn": 0
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionChangeCardEnergies.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 10,
+"min_card_amount": 10,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+object_id = "set_hand_energy_card"

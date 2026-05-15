@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ArtifactListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_m5i41"]
+[ext_resource type="Resource" path="res://content/artifacts/blue/common/ArtifactSeeDrawPile.tres" id="2_l8bxd"]
+[ext_resource type="Script" path="res://data/content/ArtifactListResource.gd" id="3_1xf8u"]
+
+[resource]
+script = ExtResource("3_1xf8u")
+artifacts = Array[ExtResource("1_m5i41")]([ExtResource("2_l8bxd")])

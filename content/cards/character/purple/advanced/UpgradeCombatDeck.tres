@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_1dmef"]
+
+[resource]
+script = ExtResource("1_1dmef")
+card_name = "Upgrade Combat Deck"
+card_description = "Upgrades all cards in deck for the rest of combat. Exhaust."
+card_color_id = "color_purple"
+card_energy_cost = 3
+card_type = 1
+card_rarity = 3
+card_exhausts = true
+card_requires_target = false
+card_values = {
+"upgrade_parent_card": false
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickUpgradeCards.gd": {
+"card_pick_text": "Choose {0} card(s) to upgrade. {1} cards selected",
+"card_pick_type": 2,
+"max_card_amount": 999,
+"min_card_amount": 999,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+object_id = "upgrade_entire_deck_card"

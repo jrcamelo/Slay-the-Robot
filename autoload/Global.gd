@@ -96,6 +96,9 @@ var _id_to_card_filter_cache: Dictionary[String, CardFilter] = {}
 ## See: Global._generate_artifact_pack_cache()
 var _id_to_artifact_filter_cache: Dictionary[String, ArtifactFilter] = {}
 
+var content_database: ContentDB = null
+const CORE_CONTENT_TYPES_USE_RESOURCES: bool = true
+
 ## Takes SCHEMA and generates fast lookup tables used for mapping data types
 ## in the framework. This automates and centralizes a lot of extremely tedious
 ## schema maintenance and enables useful behavior like register_rod() for test data generation,
@@ -152,7 +155,6 @@ func _ready():
 	FileLoader.load_user_settings()
 	
 	### Test data generators
-	add_test_artifacts()
 	add_test_rest_actions()
 	add_test_status_effects()
 	add_test_consumables()
@@ -162,14 +164,13 @@ func _ready():
 	add_test_action_interceptors()
 	add_test_colors()
 	add_test_keywords()
-	add_test_characters()
 	add_test_player_data()
 	add_test_run_modifiers()
 	add_test_run_start_options()
 	add_test_custom_ui()
 	add_test_custom_signals()
-	add_test_enemies()
-	add_test_cards()
+	
+	_load_core_content_from_resources()
 	add_test_card_packs()
 	add_test_artifact_packs()
 	
@@ -186,8 +187,29 @@ func _ready():
 	# generate cached filters from ArtifactPackData
 	Global._generate_artifact_pack_cache()
 	
+	print(Global.compare_loaded_content_with_global())
+	
 	### Exporting Data
 	# FileLoader.export_test_data() # uncomment to output all unexported test data to file
+
+func _load_core_content_from_resources(content_root: String = "res://content") -> void:
+	var loaded_content_database: ContentDB = load_content_database(content_root, true)
+	_clear_core_content_tables()
+	_register_core_content_table(loaded_content_database.artifacts_by_id)
+	_register_core_content_table(loaded_content_database.characters_by_id)
+	_register_core_content_table(loaded_content_database.enemies_by_id)
+	_register_core_content_table(loaded_content_database.cards_by_id)
+
+func _clear_core_content_tables() -> void:
+	_id_to_artifact_data.clear()
+	_id_to_character_data.clear()
+	_id_to_enemy_data.clear()
+	_id_to_card_data.clear()
+
+func _register_core_content_table(content_table: Dictionary) -> void:
+	for content_id: String in content_table.keys():
+		var serializable_data: SerializableData = content_table[content_id]
+		register_rod(serializable_data, true)
 
 
 #region Run
@@ -432,280 +454,6 @@ func is_player_turn() -> bool:
 #endregion
 
 #region Artifacts
-func add_test_artifacts() -> void:
-	var artifact_add_money: ArtifactData = ArtifactData.new("artifact_add_money")
-	artifact_add_money.artifact_name = "Artifact Add Money"
-	artifact_add_money.artifact_description = "Adds money when obtained"
-	artifact_add_money.artifact_add_actions = [{Scripts.ACTION_ADD_MONEY: {"money_amount": 200}}]
-	
-	register_rod(artifact_add_money)
-	
-	var artifact_heal_on_combat_ended: ArtifactData = ArtifactData.new("artifact_heal_on_combat_ended")
-	artifact_heal_on_combat_ended.artifact_name = "Artifact Heal On Combat End"
-	artifact_heal_on_combat_ended.artifact_description = "Grants 5 health when combat is over"
-	artifact_heal_on_combat_ended.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_heal_on_combat_ended.artifact_end_of_combat_actions = [{
-			Scripts.ACTION_ADD_HEALTH: {"health_amount": 5}
-			}]
-	
-	register_rod(artifact_heal_on_combat_ended)
-	
-	var artifact_full_heal: ArtifactData = ArtifactData.new("artifact_full_heal")
-	artifact_full_heal.artifact_name = "Artifact Full Heal"
-	artifact_full_heal.artifact_description = "Fully heals player when obtained"
-	artifact_full_heal.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.RARE
-	artifact_full_heal.artifact_add_actions = [{
-			Scripts.ACTION_HEAL_PERCENT: {"percentage_heal_amount": 1.0}
-			}]
-	
-	register_rod(artifact_full_heal)
-	
-	var artifact_draw_on_kill: ArtifactData = ArtifactData.new("artifact_draw_on_kill")
-	artifact_draw_on_kill.artifact_name = "Artifact Draw on Kill"
-	artifact_draw_on_kill.artifact_description = "Draws a card when an enemy is killed"
-	artifact_draw_on_kill.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.UNCOMMON
-	artifact_draw_on_kill.artifact_script_path = "res://scripts/artifacts/ArtifactDrawOnKill.gd"
-	register_rod(artifact_draw_on_kill)
-	
-	
-	var artifact_draw_on_combat_start: ArtifactData = ArtifactData.new("artifact_draw_on_combat_start")
-	artifact_draw_on_combat_start.artifact_name = "Artifact Draw on Combat"
-	artifact_draw_on_combat_start.artifact_description = "Draws 2 extra cards on the first turn"
-	artifact_draw_on_combat_start.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.UNCOMMON
-	artifact_draw_on_combat_start.artifact_color_id = "color_green"
-	artifact_draw_on_combat_start.artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
-	artifact_draw_on_combat_start.artifact_first_turn_actions = [{Scripts.ACTION_DRAW_GENERATOR: {"draw_count": 2}}]
-	
-	register_rod(artifact_draw_on_combat_start)
-	
-	
-	var artifact_easy_mode: ArtifactData = ArtifactData.new("artifact_easy_mode")
-	artifact_easy_mode.artifact_name = "Artifact Easy Mode"
-	artifact_easy_mode.artifact_description = "Sets enemy HP to 1"
-	artifact_easy_mode.artifact_counter = 999
-	artifact_easy_mode.artifact_counter_max = 999
-	artifact_easy_mode.artifact_counter_reset_on_combat_end = -1
-	artifact_easy_mode.artifact_counter_reset_on_turn_start = -1
-	artifact_easy_mode.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.EVENT
-	artifact_easy_mode.artifact_script_path = "res://scripts/artifacts/ArtifactEasyMode.gd"
-	
-	register_rod(artifact_easy_mode)
-	
-	var artifact_block_on_attacks: ArtifactData = ArtifactData.new("artifact_block_on_attacks")
-	artifact_block_on_attacks.artifact_name = "Artifact Block on Attacks"
-	artifact_block_on_attacks.artifact_description = "Grants 5 block every 3 attacks"
-	artifact_block_on_attacks.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_block_on_attacks.artifact_color_id = "color_red"
-	artifact_block_on_attacks.artifact_texture_path = "external/sprites/artifacts/artifact_red.png"
-	artifact_block_on_attacks.artifact_script_path = "res://scripts/artifacts/ArtifactBlockOnAttacks.gd"
-	artifact_block_on_attacks.artifact_counter_max = 3
-	artifact_block_on_attacks.artifact_counter_wraparound = true
-	artifact_block_on_attacks.artifact_counter_reset_on_turn_start = 0
-	artifact_block_on_attacks.artifact_counter_reset_on_combat_end = 0
-	artifact_block_on_attacks.artifact_max_counter_actions = [{
-			Scripts.ACTION_BLOCK: {"block": 5, "target_override": BaseAction.TARGET_OVERRIDES.PLAYER}
-			}]
-	
-	register_rod(artifact_block_on_attacks)
-	
-	var artifact_retain_hand: ArtifactData = ArtifactData.new("artifact_retain_hand")
-	artifact_retain_hand.artifact_name = "Artifact Retain Hand"
-	artifact_retain_hand.artifact_description = "Cards will be retained end of turn"
-	artifact_retain_hand.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_retain_hand.artifact_script_path = "res://scripts/artifacts/ArtifactRetainHand.gd"
-	
-	register_rod(artifact_retain_hand)
-	
-	# Enables a rest action when obtained, which grants a damage increase at the start of combat
-	var artifact_increase_attack_on_rest: ArtifactData = ArtifactData.new("artifact_increase_attack_on_rest")
-	artifact_increase_attack_on_rest.artifact_name = "Artifact Increase Attack on Rest"
-	artifact_increase_attack_on_rest.artifact_description = "Allows a permanent attack boost at rest sites"
-	artifact_increase_attack_on_rest.artifact_counter = 0
-	artifact_increase_attack_on_rest.artifact_counter_max = 3
-	artifact_increase_attack_on_rest.artifact_color_id = "color_orange"
-	artifact_increase_attack_on_rest.artifact_texture_path = "external/sprites/artifacts/artifact_orange.png"
-	artifact_increase_attack_on_rest.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_increase_attack_on_rest.artifact_add_actions = [{
-		Scripts.ACTION_UPDATE_REST_ACTIONS: {"add_rest_action_object_ids": ["rest_action_increase_attack_on_rest"]}
-	}]
-	artifact_increase_attack_on_rest.artifact_first_turn_actions = [{
-			Scripts.ACTION_APPLY_STATUS: {
-				"target_override": BaseAction.TARGET_OVERRIDES.PLAYER,
-				"status_effect_object_id": "status_effect_damage_increase",
-				"custom_key_names": {
-					# convert artifact counter passed in from BaseArtifact, into the status charges
-					"status_charge_amount": "artifact_counter"
-				}}
-			}]
-	
-	register_rod(artifact_increase_attack_on_rest)
-	
-	var artifact_see_top_of_draw_pile: ArtifactData = ArtifactData.new("artifact_see_top_of_draw_pile")
-	artifact_see_top_of_draw_pile.artifact_name = "Artifact See Draw Pile"
-	artifact_see_top_of_draw_pile.artifact_description = "See the top cards in your draw pile"
-	artifact_see_top_of_draw_pile.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_see_top_of_draw_pile.artifact_color_id = "color_blue"
-	artifact_see_top_of_draw_pile.artifact_texture_path = "external/sprites/artifacts/artifact_blue.png"
-	artifact_see_top_of_draw_pile.artifact_first_turn_actions = [{
-		Scripts.ACTION_CUSTOM_UI: {"enable_custom_ui": true, "custom_ui_object_id": "custom_ui_see_top_of_draw_pile", "target_override": BaseAction.TARGET_OVERRIDES.PLAYER}
-		}]
-	
-	register_rod(artifact_see_top_of_draw_pile)
-	
-	# Makes an attack card top deck when obtained
-	var artifact_top_deck_attack_card: ArtifactData = ArtifactData.new("artifact_top_deck_attack_card")
-	artifact_top_deck_attack_card.artifact_name = "Artifact Make Attack Card Innate"
-	artifact_top_deck_attack_card.artifact_description = "Select an attack card to make appear at the top of your deck."
-	artifact_top_deck_attack_card.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_top_deck_attack_card.artifact_add_actions = [
-	{
-	Scripts.ACTION_PICK_CARDS: {
-		"max_card_amount": 1,
-		"min_card_amount": 1,
-		"min_cards_are_required_for_action": true,
-		"random_selection": false,
-		"quick_pick": true,
-		"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DECK,
-		"card_pick_text": "Choose a card to make top deck",
-		"action_data": [
-			# convert the card to top deck
-			{Scripts.ACTION_CHANGE_CARD_PROPERTIES: 
-				{
-				"change_parent_card": false,
-				"card_properties": {"card_unremovable_from_deck": true, "card_untransformable_from_deck": true, "card_first_shuffle_priority": 1, }
-				}
-				},
-			],
-		# only non-generated removable attack cards allowed
-		"validator_data": [
-			{Scripts.VALIDATOR_CARD_TYPE: {"card_types": [CardData.CARD_TYPES.ATTACK]}},
-			{Scripts.VALIDATOR_CARD_RARITY: {"card_rarities_exclude": [CardData.CARD_RARITIES.GENERATED]}},
-			{Scripts.VALIDATOR_CARD_PROPERTIES: {"card_property_name": "card_unremovable_from_deck", "operator": "==", "comparison_value": false}},
-		],
-		}
-	},
-	]
-	
-	register_rod(artifact_top_deck_attack_card)
-	
-	
-	var artifact_right_click_shuffle_deck: ArtifactData = ArtifactData.new("artifact_right_click_shuffle_deck")
-	artifact_right_click_shuffle_deck.artifact_name = "Artifact Reshuffle"
-	artifact_right_click_shuffle_deck.artifact_description = "Right click to shuffle discard into draw pile."
-	artifact_right_click_shuffle_deck.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.COMMON
-	artifact_right_click_shuffle_deck.artifact_color_id = "color_green"
-	artifact_right_click_shuffle_deck.artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
-	artifact_right_click_shuffle_deck.artifact_script_path = "res://scripts/artifacts/BaseArtifact.gd"
-	artifact_right_click_shuffle_deck.artifact_right_click_actions = [
-		{Scripts.ACTION_RESHUFFLE:{}}
-	]
-	
-	register_rod(artifact_right_click_shuffle_deck)
-	
-	### Filler Artifacts
-	var artifact_boss_red: ArtifactData = ArtifactData.new("artifact_boss_red")
-	artifact_boss_red.artifact_name = "Artifact Red Boss"
-	artifact_boss_red.artifact_description = "Test Red Boss Artifact."
-	artifact_boss_red.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_boss_red.artifact_color_id = "color_red"
-	artifact_boss_red.artifact_texture_path = "external/sprites/artifacts/artifact_red.png"
-	
-	register_rod(artifact_boss_red)
-	
-	var artifact_shop_red: ArtifactData = ArtifactData.new("artifact_shop_red")
-	artifact_shop_red.artifact_name = "Artifact Red Shop"
-	artifact_shop_red.artifact_description = "Test Red Shop Artifact."
-	artifact_shop_red.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.SHOP
-	artifact_shop_red.artifact_color_id = "color_red"
-	artifact_shop_red.artifact_texture_path = "external/sprites/artifacts/artifact_red.png"
-	
-	register_rod(artifact_shop_red)
-	
-	var artifact_boss_blue: ArtifactData = ArtifactData.new("artifact_boss_blue")
-	artifact_boss_blue.artifact_name = "Artifact Blue Boss"
-	artifact_boss_blue.artifact_description = "Test Blue Boss Artifact."
-	artifact_boss_blue.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_boss_blue.artifact_color_id = "color_blue"
-	artifact_boss_blue.artifact_texture_path = "external/sprites/artifacts/artifact_blue.png"
-	
-	register_rod(artifact_boss_blue)
-	
-	var artifact_shop_blue: ArtifactData = ArtifactData.new("artifact_shop_blue")
-	artifact_shop_blue.artifact_name = "Artifact Blue Shop"
-	artifact_shop_blue.artifact_description = "Test Blue Shop Artifact."
-	artifact_shop_blue.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.SHOP
-	artifact_shop_blue.artifact_color_id = "color_blue"
-	artifact_shop_blue.artifact_texture_path = "external/sprites/artifacts/artifact_blue.png"
-	
-	register_rod(artifact_shop_blue)
-	
-	var artifact_boss_green: ArtifactData = ArtifactData.new("artifact_boss_green")
-	artifact_boss_green.artifact_name = "Artifact Green Boss"
-	artifact_boss_green.artifact_description = "Test Green Boss Artifact."
-	artifact_boss_green.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_boss_green.artifact_color_id = "color_green"
-	artifact_boss_green.artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
-	
-	register_rod(artifact_boss_green)
-	
-	var artifact_shop_green: ArtifactData = ArtifactData.new("artifact_shop_green")
-	artifact_shop_green.artifact_name = "Artifact Green Shop"
-	artifact_shop_green.artifact_description = "Test Green Shop Artifact."
-	artifact_shop_green.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.SHOP
-	artifact_shop_green.artifact_color_id = "color_green"
-	artifact_shop_green.artifact_texture_path = "external/sprites/artifacts/artifact_green.png"
-	
-	register_rod(artifact_shop_green)
-	
-	var artifact_boss_orange: ArtifactData = ArtifactData.new("artifact_boss_orange")
-	artifact_boss_orange.artifact_name = "Artifact Orange Boss"
-	artifact_boss_orange.artifact_description = "Test Orange Boss Artifact."
-	artifact_boss_orange.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_boss_orange.artifact_color_id = "color_orange"
-	artifact_boss_orange.artifact_texture_path = "external/sprites/artifacts/artifact_orange.png"
-	
-	register_rod(artifact_boss_orange)
-	
-	var artifact_shop_orange: ArtifactData = ArtifactData.new("artifact_shop_orange")
-	artifact_shop_orange.artifact_name = "Artifact Orange Shop"
-	artifact_shop_orange.artifact_description = "Test Orange Shop Artifact."
-	artifact_shop_orange.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.SHOP
-	artifact_shop_orange.artifact_color_id = "color_orange"
-	artifact_shop_orange.artifact_texture_path = "external/sprites/artifacts/artifact_orange.png"
-	
-	register_rod(artifact_shop_orange)
-	
-	var artifact_boss_white: ArtifactData = ArtifactData.new("artifact_boss_white")
-	artifact_boss_white.artifact_name = "Artifact White Boss"
-	artifact_boss_white.artifact_description = "Test White Boss Artifact."
-	artifact_boss_white.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.BOSS
-	artifact_boss_white.artifact_color_id = "color_white"
-	artifact_boss_white.artifact_texture_path = "external/sprites/artifacts/artifact_white.png"
-	
-	register_rod(artifact_boss_white)
-	
-	var artifact_shop_white: ArtifactData = ArtifactData.new("artifact_shop_white")
-	artifact_shop_white.artifact_name = "Artifact White Shop"
-	artifact_shop_white.artifact_description = "Test White Shop Artifact."
-	artifact_shop_white.artifact_rarity = ArtifactData.ARTIFACT_RARITIES.SHOP
-	artifact_shop_white.artifact_color_id = "color_white"
-	artifact_shop_white.artifact_texture_path = "external/sprites/artifacts/artifact_white.png"
-	
-	register_rod(artifact_shop_white)
-	
-	
-	
-
-func add_test_artifacts_to_player() -> void:
-	player_data.add_artifact("artifact_draw_on_kill")
-	player_data.add_artifact("artifact_draw_on_combat_start")
-	player_data.add_artifact("artifact_block_on_attacks")
-	player_data.add_artifact("artifact_retain_hand")
-	player_data.add_artifact("artifact_increase_attack_on_rest")
-	player_data.add_artifact("artifact_add_money")
-	player_data.add_artifact("artifact_top_deck_attack_card")
-	player_data.add_artifact("artifact_right_click_shuffle_deck")
-	
 
 func get_artifact_data(artifact_id: String) -> ArtifactData:
 	return _id_to_artifact_data.get(artifact_id, null)
@@ -1512,7 +1260,6 @@ func get_player_character_data() -> CharacterData:
 	var character_data: CharacterData = get_character_data(player_data.player_character_object_id)
 	return character_data
 
-func add_test_characters() -> void:
 	# red character
 	var character_red: CharacterData = CharacterData.new("character_red")
 	character_red.character_player_id = "player_red"
@@ -1941,7 +1688,6 @@ func get_shop_at_player_location() -> ShopData:
 #endregion
 
 #region Enemies
-func add_test_enemies() -> void:
 	var enemy_1: EnemyData = EnemyData.new("enemy_1")
 	enemy_1.enemy_name = "Red Enemy"
 	enemy_1.enemy_health_max = 20
@@ -2203,8 +1949,6 @@ func get_player_data_from_prototype(player_id: String) -> PlayerData:
 #endregion
 
 #region Cards
-
-func add_test_cards() -> void:
 	# Basic attack card
 	var attack_card: CardData = CardData.new("card_attack_basic")
 	attack_card.card_name = "Basic Attack"
@@ -4039,8 +3783,6 @@ func add_test_cards() -> void:
 	}]
 	
 	register_rod(card_debug_log)
-	
-func add_test_cards_to_player_deck() -> void:
 	# Adds copies of cards to the player's deck to populate it
 	player_data.player_deck.append(get_card_data_from_prototype("card_attack_basic"))
 	player_data.player_deck.append(get_card_data_from_prototype("card_attack_basic"))
@@ -4275,5 +4017,34 @@ func validate(validators: Array[Dictionary], card_data: CardData = null, action:
 				return false
 	
 	return true
+
+func load_content_database(content_root: String = "res://content", force_reload: bool = false) -> ContentDB:
+	if content_database != null and not force_reload:
+		return content_database
+	content_database = ContentDB.new()
+	content_database.load_from_directory(content_root)
+	return content_database
+
+func compare_loaded_content_with_global(content_root: String = "res://content", force_reload: bool = false) -> Dictionary:
+	var loaded_content_database: ContentDB = load_content_database(content_root, force_reload)
+	return loaded_content_database.compare_against_global()
+
+func get_loaded_cards_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[CardData]:
+	return load_content_database(content_root).get_cards_in_segments(required_segments)
+
+func get_loaded_artifacts_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[ArtifactData]:
+	return load_content_database(content_root).get_artifacts_in_segments(required_segments)
+
+func get_loaded_enemies_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[EnemyData]:
+	return load_content_database(content_root).get_enemies_in_segments(required_segments)
+
+func get_loaded_character_cards(character_name: String, tier: String, content_root: String = "res://content") -> Array[CardData]:
+	return load_content_database(content_root).get_character_cards(character_name, tier)
+
+func get_loaded_act_enemies(act_name: String, encounter_tier: String, content_root: String = "res://content") -> Array[EnemyData]:
+	return load_content_database(content_root).get_act_enemies(act_name, encounter_tier)
+
+func export_content_to_resources(content_root: String = "res://content") -> Dictionary:
+	return ContentExporter.export_all_content(content_root)
 
 #endregion

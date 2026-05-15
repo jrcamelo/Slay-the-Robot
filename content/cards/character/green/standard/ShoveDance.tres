@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_0wxfa"]
+
+[resource]
+script = ExtResource("1_0wxfa")
+card_name = "Shove Dance"
+card_description = "Create [number_of_cards] legally distinct Shoves and add them to hand"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_type = 1
+card_requires_target = false
+card_values = {
+"created_card_object_id": "card_shove",
+"number_of_cards": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionCreateCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {}
+}]
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"number_of_cards": 1
+})
+object_id = "card_generate_shoves"

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ak6ik"]
+
+[resource]
+script = ExtResource("1_ak6ik")
+card_name = "Custom Block"
+card_description = "Block twice. Add [custom_block_1] block. Add [custom_block_2] block."
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_white"
+card_type = 1
+card_requires_target = false
+card_values = {
+"custom_block_1": 3,
+"custom_block_2": 4
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"custom_key_names": {
+"block": "custom_block_1"
+},
+"target_override": 1,
+"time_delay": 0.5
+}
+}, {
+"res://scripts/actions/ActionBlock.gd": {
+"custom_key_names": {
+"block": "custom_block_2"
+},
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"custom_block_1": 5,
+"custom_block_2": 5
+})
+object_id = "custom_block_card"

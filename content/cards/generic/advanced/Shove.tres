@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_otibv"]
+
+[resource]
+script = ExtResource("1_otibv")
+card_name = "Shove"
+card_description = "Attack for [damage] damage. Exhaust"
+card_color_id = "color_white"
+card_energy_cost = 0
+card_rarity = 4
+card_exhausts = true
+card_values = {
+"damage": 4,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 3
+})
+object_id = "card_shove"

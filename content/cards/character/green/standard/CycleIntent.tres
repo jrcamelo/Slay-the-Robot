@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_5yslk"]
+
+[resource]
+script = ExtResource("1_5yslk")
+card_name = "Cycle Intent"
+card_description = "Do [damage] damage and force enemy to cycle its intent."
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_rarity = 2
+card_values = {
+"damage": 5,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/enemy_actions/ActionCycleEnemyIntent.gd": {
+"time_delay": 0.0
+}
+}, {
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 3
+})
+object_id = "card_cycle_enemy_intent"

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_tpwbq"]
+
+[resource]
+script = ExtResource("1_tpwbq")
+card_name = "Attack and Block"
+card_description = "Retain. Attack for [damage] damage. Applies [block] block if in hand at end of turn."
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_purple"
+card_rarity = 2
+card_is_retained = true
+card_values = {
+"block": 7,
+"damage": 7,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_end_of_turn_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 3,
+"damage": 3
+})
+object_id = "card_attack_block"

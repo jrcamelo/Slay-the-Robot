@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_xuut7"]
+
+[resource]
+script = ExtResource("1_xuut7")
+artifact_name = "Artifact Easy Mode"
+artifact_description = "Sets enemy HP to 1"
+artifact_script_path = "res://scripts/artifacts/ArtifactEasyMode.gd"
+artifact_counter = 999
+artifact_counter_max = 999
+artifact_rarity = 6
+object_id = "artifact_easy_mode"

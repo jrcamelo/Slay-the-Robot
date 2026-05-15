@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_a0rve"]
+
+[resource]
+script = ExtResource("1_a0rve")
+card_name = "Improving Attack"
+card_description = "Block for [block] and attack for [damage] damage. Improves damage and block by 2 on kill"
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_energy_cost = 2
+card_rarity = 2
+card_values = {
+"block": 5,
+"damage": 5,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [{
+"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"card_value_improvements": {
+"block": 2,
+"damage": 2
+},
+"improve_parent_card": true,
+"pick_played_card": true,
+"time_delay": 0.1
+}
+}],
+"time_delay": 0.0
+}
+}])
+object_id = "card_improving_attack"

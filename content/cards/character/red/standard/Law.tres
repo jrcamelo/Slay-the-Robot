@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_5cuob"]
+
+[resource]
+script = ExtResource("1_5cuob")
+card_name = "Law"
+card_description = "Attack for [damage] damage. Improve all Law cards by 3 this combat."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 0
+card_values = {
+"damage": 5,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"card_value_improvements": {
+"damage": 3
+},
+"improve_parent_card": false,
+"pick_played_card": true
+}
+}, {
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionImproveCardValues.gd": {
+"card_value_improvements": {
+"damage": 3
+},
+"improve_parent_card": false,
+"pick_played_card": false
+}
+}],
+"card_pick_text": "",
+"card_pick_type": 2,
+"max_card_amount": 999,
+"min_card_amount": 999,
+"min_cards_are_required_for_action": false,
+"random_selection": false,
+"validator_data": [{
+"res://scripts/validators/card/ValidatorCardID.gd": {
+"card_object_ids": ["card_law"]
+}
+}]
+}
+}, {
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 3,
+"time_delay": 0
+})
+object_id = "card_law"

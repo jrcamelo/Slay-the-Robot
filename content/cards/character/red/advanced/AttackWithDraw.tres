@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_sk86o"]
+
+[resource]
+script = ExtResource("1_sk86o")
+card_name = "Attack With Draw"
+card_description = "Attack for [damage]. Draw 2 cards if played when 5 cards in hand, otherwise draw 1"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_rarity = 3
+card_values = {
+"damage": 5,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}, {
+"res://scripts/actions/meta_actions/ActionValidator.gd": {
+"failed_action_data": [{
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"draw_count": 1
+}
+}],
+"passed_action_data": [{
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"draw_count": 2
+}
+}],
+"time_delay": 0.0,
+"validator_data": [{
+"res://scripts/validators/hand/ValidatorCardTypeInHand.gd": {
+"card_type_maximum": 4,
+"card_type_minimum": 4,
+"card_types": [0, 1, 2, 3, 4],
+"invert_validation": false
+}
+}]
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5
+})
+object_id = "attack_with_conditional_draw_card"

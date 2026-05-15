@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_dqcah"]
+
+[resource]
+script = ExtResource("1_dqcah")
+card_name = "Energy Card"
+card_description = "Unplayable. Grant [energy_amount] energy on discard"
+card_color_id = "color_purple"
+card_type = 1
+card_is_playable = false
+card_requires_target = false
+card_values = {
+"energy_amount": 2
+}
+card_discard_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionAddEnergy.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"energy_amount": 1
+})
+object_id = "card_energy_on_discard"

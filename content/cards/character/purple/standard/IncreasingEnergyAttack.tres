@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_0k3l6"]
+
+[resource]
+script = ExtResource("1_0k3l6")
+card_name = "Increasing Energy Attack"
+card_description = "Attack for [damage] damage. Cost increased by each time damage taken this combat."
+card_color_id = "color_purple"
+card_energy_cost = 0
+card_rarity = 2
+card_values = {
+"damage": 10,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_listeners = Array[Dictionary]([{
+"res://scripts/card_listeners/ListenerCardCostModifier.gd": {
+"energy_per_stat": 1,
+"is_turn_stat": false,
+"modifiy_card_energy_cost_until_combat": true,
+"modifiy_card_energy_cost_until_played": false,
+"modifiy_card_energy_cost_until_turn": false,
+"stat_enum": 9
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 10
+})
+object_id = "attack_increase_cost_on_damage_taken_card"

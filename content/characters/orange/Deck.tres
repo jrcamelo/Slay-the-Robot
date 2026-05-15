@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ciu6i"]
+[ext_resource type="Resource" path="res://content/cards/generic/standard/BasicAttack.tres" id="2_mcf1j"]
+[ext_resource type="Resource" path="res://content/cards/generic/advanced/RestartCombat.tres" id="3_oemak"]
+[ext_resource type="Resource" path="res://content/cards/generic/standard/BasicBlock.tres" id="4_o485e"]
+[ext_resource type="Resource" path="res://content/cards/character/orange/standard/RetainCards.tres" id="5_viji5"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/PlayFromDiscard.tres" id="6_iqhv7"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/Draw.tres" id="7_44n7g"]
+[ext_resource type="Resource" path="res://content/cards/character/orange/standard/EnergyDrawCard.tres" id="8_acxu5"]
+[ext_resource type="Resource" path="res://content/cards/character/green/advanced/ImprovingBlock.tres" id="9_2f4rj"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/ImprovingAttack.tres" id="10_beoxj"]
+[ext_resource type="Resource" path="res://content/cards/character/red/standard/PlayRandomHand.tres" id="11_p55yw"]
+[ext_resource type="Resource" path="res://content/cards/character/green/standard/Bomb.tres" id="12_lvay8"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/advanced/PickFromDiscard2.tres" id="13_usioe"]
+[ext_resource type="Resource" path="res://content/cards/character/red/standard/BanishAttack.tres" id="14_7g4e5"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="15_7lyf0"]
+
+[resource]
+script = ExtResource("15_7lyf0")
+cards = Array[ExtResource("1_ciu6i")]([ExtResource("2_mcf1j"), ExtResource("2_mcf1j"), ExtResource("2_mcf1j"), ExtResource("3_oemak"), ExtResource("4_o485e"), ExtResource("4_o485e"), ExtResource("4_o485e"), ExtResource("5_viji5"), ExtResource("6_iqhv7"), ExtResource("7_44n7g"), ExtResource("8_acxu5"), ExtResource("9_2f4rj"), ExtResource("10_beoxj"), ExtResource("11_p55yw"), ExtResource("12_lvay8"), ExtResource("13_usioe"), ExtResource("13_usioe"), ExtResource("14_7g4e5")])

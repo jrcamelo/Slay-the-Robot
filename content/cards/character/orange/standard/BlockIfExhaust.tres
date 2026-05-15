@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_pv0k8"]
+
+[resource]
+script = ExtResource("1_pv0k8")
+card_name = "Block If Exhaust"
+card_description = "Generate [block] Block. Cannot be played unless a card was exhausted this turn."
+card_texture_path = "external/sprites/cards/orange/card_orange.png"
+card_keyword_object_ids = Array[String](["keyword_block", "keyword_exhaust"])
+card_color_id = "color_orange"
+card_energy_cost = 0
+card_type = 1
+card_rarity = 2
+card_requires_target = false
+card_values = {
+"block": 8
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"res://scripts/validators/ValidatorCombatStats.gd": {
+"comparison_value": 1,
+"is_total_stat": false,
+"operator": ">=",
+"stat_enum": 14
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 4
+})
+object_id = "block_if_exhaust_card"

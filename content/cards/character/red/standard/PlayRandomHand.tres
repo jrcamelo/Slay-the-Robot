@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_vru54"]
+
+[resource]
+script = ExtResource("1_vru54")
+card_name = "Play Random Hand"
+card_description = "Play 2 cards randomly from your hand."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_type = 1
+card_rarity = 2
+card_requires_target = false
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionPlayCards.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 2,
+"min_card_amount": 2,
+"min_cards_are_required_for_action": false,
+"random_selection": true
+}
+}])
+object_id = "card_play_random_from_hand"

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ij0p0"]
+
+[resource]
+script = ExtResource("1_ij0p0")
+card_name = "Draw"
+card_description = "Draw [draw_count] cards"
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_type = 1
+card_requires_target = false
+card_values = {
+"draw_count": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionDrawGenerator.gd": {
+"draw_count": 3
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"draw_count": 1
+})
+object_id = "card_draw"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ArtifactData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_6pt0s"]
+
+[resource]
+script = ExtResource("1_6pt0s")
+artifact_name = "Artifact White Boss"
+artifact_description = "Test White Boss Artifact."
+artifact_rarity = 4
+object_id = "artifact_boss_white"

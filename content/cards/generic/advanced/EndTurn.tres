@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_4j884"]
+
+[resource]
+script = ExtResource("1_4j884")
+card_name = "End Turn"
+card_description = "Add [block] block. End turn. Block for [block]"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_white"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"block": 5,
+"end_turn_immediacy_level": 2
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1
+}
+}, {
+"res://scripts/actions/ActionEndTurn.gd": {
+"time_delay": 0.05
+}
+}, {
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 5
+})
+object_id = "end_turn_card"

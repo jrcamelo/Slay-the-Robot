@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_laiv8"]
+
+[resource]
+script = ExtResource("1_laiv8")
+card_name = "Variable Attack"
+card_description = "Do [damage] damage for X energy"
+card_color_id = "color_white"
+card_energy_cost = 0
+card_energy_cost_is_variable = true
+card_energy_cost_variable_upper_bound = 5
+card_rarity = 3
+card_values = {
+"damage": 1,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionVariableCostModifier.gd": {
+"action_data": [{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"merge_attacks": true,
+"time_delay": 0.0
+}
+}],
+"multiplied_values": ["number_of_attacks"],
+"multiplier_offset": 0,
+"time_delay": 0.0
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_description": "Do [damage] damage for X + 1 energy"
+})
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 1,
+"multiplier_offset": 1
+})
+object_id = "variable_cost_attack_card"

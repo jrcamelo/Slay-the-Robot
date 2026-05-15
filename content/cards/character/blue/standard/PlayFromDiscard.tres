@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_spowo"]
+
+[resource]
+script = ExtResource("1_spowo")
+card_name = "Play From Discard"
+card_description = "Generate [block] Block. Play a card from discard pile."
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_blue"
+card_type = 1
+card_requires_target = false
+card_values = {
+"block": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1,
+"time_delay": 0.5
+}
+}, {
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionPlayCards.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to play. {1} cards selected",
+"card_pick_type": 4,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"random_selection": false
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 2
+})
+object_id = "card_play_from_discard"

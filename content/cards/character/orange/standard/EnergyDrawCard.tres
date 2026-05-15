@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_5nfak"]
+
+[resource]
+script = ExtResource("1_5nfak")
+card_name = "Energy Draw Card"
+card_description = "Gives [energy_icon][energy_icon] when drawn"
+card_texture_path = "external/sprites/cards/orange/card_orange.png"
+card_color_id = "color_orange"
+card_type = 1
+card_rarity = 2
+card_is_playable = false
+card_requires_target = false
+card_values = {
+"energy_amount": 2
+}
+card_draw_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionAddEnergy.gd": {}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_description": "Unplayable
+Gives [energy_icon][energy_icon][energy_icon] when drawn"
+})
+card_upgrade_value_improvements = Dictionary[String, int]({
+"energy_amount": 1
+})
+object_id = "card_energy_on_draw"

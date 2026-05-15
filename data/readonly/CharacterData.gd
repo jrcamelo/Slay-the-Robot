@@ -18,10 +18,12 @@ class_name CharacterData
 # data used for initializing runs
 @export var character_player_id: String = ""	# the corresponding player data prototype id to use
 @export var character_starting_artifact_ids: Array[String] = []	# added to player on run start
+@export var character_starting_artifact_resource: ArtifactListResource = null
 ## Determines what kinds of artifacts are available to the player at start of run. Should generally be
 ## [color_white, character_color_id]
 @export var character_starting_artifact_pack_ids: Array[String] = []
 @export var character_starting_card_object_ids: Array[String] = [] # cards added to player on run start
+@export var character_starting_deck_resource: DeckListResource = null
 @export var character_starting_money: int = 999	# money added to player on start
 @export var character_starting_health: int = 50
 @export var character_starting_card_draft_card_pack_ids: Array[String] = [] # the cards this character can draft. Usually the same as the character color.

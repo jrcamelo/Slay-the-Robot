@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_5wnv8"]
+
+[resource]
+script = ExtResource("1_5wnv8")
+card_name = "Add Health"
+card_description = "Gives [health_amount] health and [health_max_amount] max health"
+card_color_id = "color_white"
+card_type = 1
+card_rarity = 3
+card_exhausts = true
+card_requires_target = false
+card_values = {
+"health_amount": 3,
+"health_max_amount": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionAddHealth.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"health_amount": 1,
+"health_max_amount": 1
+})
+object_id = "add_health_card"

@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_nigab"]
+
+[resource]
+script = ExtResource("1_nigab")
+card_name = "Draft Red Card"
+card_description = "Select one of 5 red cards and add it to hand.
+It costs 0 for the rest of combat"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_type = 1
+card_rarity = 2
+card_exhausts = true
+card_requires_target = false
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {}
+}, {
+"res://scripts/actions/cardset_actions/ActionChangeCardEnergies.gd": {
+"card_energy_cost_until_combat": 0
+}
+}],
+"card_pick_text": "Select A Red Card",
+"card_pick_type": 8,
+"draft_card_pack_id": "card_pack_red",
+"draft_from_card_pool": true,
+"draft_max_card_amount": 5,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"quick_pick": true,
+"random_selection": false
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_energy_cost": 0
+})
+object_id = "card_draft_red_card"

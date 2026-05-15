@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_apjny"]
+
+[resource]
+script = ExtResource("1_apjny")
+card_name = "Energy Card"
+card_description = "Gives [energy_icon][energy_icon] when played"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 0
+card_type = 1
+card_rarity = 2
+card_requires_target = false
+card_values = {
+"energy_amount": 2
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionAddEnergy.gd": {}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_description": "Gives [energy_icon][energy_icon][energy_icon] when played"
+})
+card_upgrade_value_improvements = Dictionary[String, int]({
+"energy_amount": 1
+})
+object_id = "card_grant_energy"

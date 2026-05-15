@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_glhwr"]
+
+[resource]
+script = ExtResource("1_glhwr")
+enemy_name = "Act 1 Boss"
+enemy_texture_path = "external/sprites/enemies/enemy_red_large.png"
+enemy_health = 200
+enemy_health_max = 200
+enemy_type = 2
+enemy_attack_states = Dictionary[String, Dictionary]({
+"1": {
+"attack_damage": 0,
+"block": 0,
+"custom_actions": [{
+"res://scripts/actions/ActionSummonEnemies.gd": {
+"number_of_spawns": 2,
+"random_enemy_object_ids": ["enemy_minion_1", "enemy_minion_2"],
+"spawn_slots": [1, 2],
+"target_override": 1,
+"time_delay": 0.5
+}
+}],
+"next_attack_weights": {
+"2": 1
+},
+"number_of_attacks": 0
+},
+"2": {
+"attack_damage": 3,
+"block": 7,
+"custom_actions": [],
+"next_attack_weights": {
+"2": 1
+},
+"number_of_attacks": 2
+},
+"initial": {
+"attack_damage": 0,
+"block": 0,
+"custom_actions": [],
+"next_attack_weights": {
+"1": 1
+},
+"number_of_attacks": 0
+}
+})
+enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
+"3": {
+"enemy_health": 25,
+"enemy_health_max": 25
+}
+})
+object_id = "enemy_act_1_boss_1"

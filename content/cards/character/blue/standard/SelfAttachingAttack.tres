@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_g7vt1"]
+
+[resource]
+script = ExtResource("1_g7vt1")
+card_name = "Self Attaching Attack"
+card_description = "At the start of combat attaches itself to a random enemy
+Attack for [damage] damage"
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_color_id = "color_blue"
+card_energy_cost = 0
+card_rarity = 2
+card_values = {
+"damage": 20,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"time_delay": 0.0
+}
+}])
+card_initial_combat_actions = Array[Dictionary]([{
+"res://scripts/actions/cardset_actions/ActionAttachCardsOntoEnemy.gd": {
+"pick_played_card": true,
+"target_override": 7,
+"time_delay": 0.0
+}
+}])
+object_id = "self_attaching_attack_card"

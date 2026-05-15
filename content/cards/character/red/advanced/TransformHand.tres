@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_unk1r"]
+
+[resource]
+script = ExtResource("1_unk1r")
+card_name = "Transform Hand"
+card_description = "Transforms the cards in hand"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"keep_color": false,
+"keep_rarity": false,
+"keep_type": false,
+"transform_parent_card": false
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionTransformCards.gd": {}
+}],
+"card_pick_text": "Choose {0} card(s) to add to hand. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 10,
+"min_card_amount": 10,
+"min_cards_are_required_for_action": false,
+"random_selection": false
+}
+}])
+object_id = "transform_hand_card"

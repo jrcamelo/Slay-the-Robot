@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_uqm08"]
+
+[resource]
+script = ExtResource("1_uqm08")
+card_name = "Draft Random Card"
+card_description = "Add a random card from player's card pool to your hand. It costs 0"
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_color_id = "color_white"
+card_type = 1
+card_rarity = 3
+card_exhausts = true
+card_requires_target = false
+card_values = {
+"draw_count": 2
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionAddCardsToHand.gd": {}
+}, {
+"res://scripts/actions/cardset_actions/ActionChangeCardEnergies.gd": {
+"card_energy_cost_until_combat": 0
+}
+}],
+"card_pick_text": "Select A Card",
+"card_pick_type": 8,
+"draft_from_card_pool": true,
+"draft_is_weighted": false,
+"draft_max_card_amount": 1,
+"draft_use_pity_system": false,
+"draft_use_player_draft": true,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"quick_pick": true,
+"random_selection": true
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_energy_cost": 0
+})
+object_id = "card_draft_random_player_pool"

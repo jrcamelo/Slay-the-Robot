@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_oyb0h"]
+
+[resource]
+script = ExtResource("1_oyb0h")
+card_name = "Block on Attack"
+card_description = "Attack for [damage]. If the targeted enemy is attacking, block for [block]"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"block": 5,
+"damage": 10,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}, {
+"res://scripts/actions/meta_actions/ActionValidator.gd": {
+"passed_action_data": [{
+"res://scripts/actions/ActionBlock.gd": {
+"target_override": 1
+}
+}],
+"time_delay": 0.0,
+"validator_data": [{
+"res://scripts/validators/card_plays/ValidatorCardPlayEnemyAttacking.gd": {}
+}]
+}
+}])
+card_glow_validators = Array[Dictionary]([{
+"res://scripts/validators/ValidatorEnemyAttacking.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 3,
+"damage": 3
+})
+object_id = "attack_with_conditional_block_card"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_8xt3s"]
+
+[resource]
+script = ExtResource("1_8xt3s")
+enemy_name = "Blue Enemy"
+enemy_health = 5
+enemy_health_max = 5
+enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
+"1": {
+"enemy_health": 8,
+"enemy_health_max": 8
+}
+})
+object_id = "enemy_2"

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_277m6"]
+
+[resource]
+script = ExtResource("1_277m6")
+card_name = "Discard Attacks From Draw"
+card_description = "Discard up to the top [pickable_cards_max_amount] attack cards from your draw pile."
+card_texture_path = "external/sprites/cards/blue/card_blue.png"
+card_keyword_object_ids = Array[String](["keyword_block"])
+card_color_id = "color_blue"
+card_first_shuffle_priority = 1
+card_type = 1
+card_requires_target = false
+card_values = {
+"pickable_cards_max_amount": 3
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickCards.gd": {
+"action_data": [{
+"res://scripts/actions/cardset_actions/ActionDiscardCards.gd": {}
+}],
+"card_pick_text": "Choose {3} attacks to discard. {1} cards selected",
+"card_pick_type": 3,
+"max_card_amount": 999,
+"min_card_amount": 0,
+"min_cards_are_required_for_action": true,
+"random_selection": false,
+"validator_data": [{
+"res://scripts/validators/card/ValidatorCardType.gd": {
+"card_types": [0]
+}
+}]
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"pickable_cards_max_amount": 1
+})
+object_id = "card_discard_attacks_from_draw"

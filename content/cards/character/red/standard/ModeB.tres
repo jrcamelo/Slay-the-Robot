@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_q56x0"]
+
+[resource]
+script = ExtResource("1_q56x0")
+card_name = "Mode B"
+card_description = "Block [block]
+Right click to transform into A variant"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_type = 1
+card_appears_in_card_packs = false
+card_requires_target = false
+card_values = {
+"block": 5,
+"keep_upgrade_level": true,
+"pick_played_card": true,
+"target_override": 1,
+"transform_into_card_object_id": "card_right_click_transform_mode_a",
+"transform_parent_card": false
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/ActionBlock.gd": {}
+}])
+card_right_click_actions = Array[Dictionary]([{
+"res://scripts/actions/cardset_actions/ActionTransformCards.gd": {}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"block": 3
+})
+object_id = "card_right_click_transform_mode_b"

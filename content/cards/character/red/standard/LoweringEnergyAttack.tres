@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_s05kr"]
+
+[resource]
+script = ExtResource("1_s05kr")
+card_name = "Lowering Energy Attack"
+card_description = "Attack for [damage] damage. Cost lowered for each card discarded this turn."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 7
+card_values = {
+"damage": 30,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_listeners = Array[Dictionary]([{
+"res://scripts/card_listeners/ListenerCardCostModifier.gd": {
+"energy_per_stat": -2,
+"is_turn_stat": true,
+"modifiy_card_energy_cost_until_combat": false,
+"modifiy_card_energy_cost_until_played": false,
+"modifiy_card_energy_cost_until_turn": true,
+"stat_enum": 13
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 10
+})
+object_id = "attack_lower_cost_on_discard_card"

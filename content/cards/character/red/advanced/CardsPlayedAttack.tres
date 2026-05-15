@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_yhjod"]
+
+[resource]
+script = ExtResource("1_yhjod")
+card_name = "Cards Played Attack"
+card_description = "Do [damage] damage, increased by 2 for each card played this combat"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 2
+card_rarity = 3
+card_values = {
+"damage": 1,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"merge_attacks": true,
+"time_delay": 0.0
+}
+}])
+card_listeners = Array[Dictionary]([{
+"res://scripts/card_listeners/ListenerCardValueModifier.gd": {
+"is_turn_stat": false,
+"multiplied_values": ["damage"],
+"multiplied_values_bases": {
+"damage": 0
+},
+"multiplied_values_per_stat": {
+"damage": 2
+},
+"stat_enum": 11
+}
+}])
+card_first_upgrade_property_changes = Dictionary[String, Variant]({
+"card_energy_cost": 1
+})
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 1
+})
+object_id = "cards_played_attack_card"

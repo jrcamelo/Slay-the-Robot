@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_n352t"]
+
+[resource]
+script = ExtResource("1_n352t")
+card_name = "Upgrade Cards"
+card_description = "Select a card to upgrade permanently."
+card_texture_path = "external/sprites/cards/green/card_green.png"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"upgrade_parent_card": false
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/pick_card_actions/ActionPickUpgradeCards.gd": {
+"card_pick_text": "Choose a card to upgrade.",
+"card_pick_type": 1,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"random_selection": false
+}
+}])
+object_id = "card_upgrade_card"

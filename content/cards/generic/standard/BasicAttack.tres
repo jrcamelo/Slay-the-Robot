@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_42ik6"]
+
+[resource]
+script = ExtResource("1_42ik6")
+card_name = "Basic Attack"
+card_description = "Attack for [damage] damage [number_of_attacks] times"
+card_color_id = "color_white"
+card_rarity = 0
+card_values = {
+"damage": 25,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"res://scripts/actions/meta_actions/ActionAttackGenerator.gd": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 1,
+"number_of_attacks": 1
+})
+object_id = "card_attack_basic"
