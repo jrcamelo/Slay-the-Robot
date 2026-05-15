@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/ActData.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+act_name = "Act 3"
+act_easy_combat_event_pool_object_id = "event_pool_act_1_easy"
+act_hard_combat_event_pool_object_id = "event_pool_act_1_easy"
+act_non_combat_event_pool_object_id = "event_pool_act_1_dialogue"
+act_miniboss_event_pool_object_id = "event_pool_act_1_miniboss"
+act_boss_event_pool_object_id = "event_pool_act_1_boss"
+act_next_act_ids = Array[String](["act_1"])
+object_id = "act_3"

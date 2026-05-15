@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/DialogueData.gd" id="1_1"]
+[ext_resource type="Script" path="res://data/readonly/embedded/DialogueOptionData.gd" id="2_1"]
+[ext_resource type="Script" path="res://data/readonly/embedded/DialogueStateData.gd" id="3_1"]
+
+[sub_resource type="Resource" id="Resource_8yyqn"]
+script = ExtResource("2_1")
+dialogue_option_bbcode = "[color=red]Lose 10 HP[/color] and [color=green]Gain 100 Money[/color]"
+dialogue_option_failed_validator_bbcode = "[color=grey][Locked]: Insufficient Health[/color]"
+dialogue_option_actions = Array[Dictionary]([{
+"ACTION_ADD_HEALTH": {
+"health_amount": -10
+}
+}, {
+"ACTION_ADD_MONEY": {
+"money_amount": 100
+}
+}])
+dialogue_option_validators = Array[Dictionary]([{
+"VALIDATOR_PLAYER_HEALTH": {
+"health_amount": 11
+}
+}])
+object_id = "dialogue_pick_something_option_1"
+
+[sub_resource type="Resource" id="Resource_headl"]
+script = ExtResource("2_1")
+dialogue_option_bbcode = "[color=red]Lose 50 Money[/color] and [color=green]Gain Random Rare Card[/color]"
+dialogue_option_failed_validator_bbcode = "[color=grey][Locked]: Insufficient Money[/color]"
+dialogue_option_actions = Array[Dictionary]([{
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_DECK": {}
+}],
+"card_pick_type": 7,
+"draft_from_card_pool": true,
+"draft_is_weighted": false,
+"draft_max_card_amount": 1,
+"draft_use_pity_system": false,
+"draft_use_player_draft": false,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"pick_draft_cards": false,
+"random_selection": true,
+"rng_name": "rng_events",
+"validator_data": [{
+"VALIDATOR_CARD_RARITY": {
+"card_rarities": [3]
+}
+}, {
+"VALIDATOR_CARD_DRAFTABLE": {}
+}]
+}
+}, {
+"ACTION_ADD_MONEY": {
+"money_amount": -50
+}
+}])
+dialogue_option_validators = Array[Dictionary]([{
+"VALIDATOR_MONEY": {
+"money_amount": 50
+}
+}])
+object_id = "dialogue_pick_something_option_2"
+
+[sub_resource type="Resource" id="Resource_ctrf4"]
+script = ExtResource("3_1")
+dialogue_state_prompt_bbcode = "Test Event. Select an option..."
+dialogue_state_dialogue_texture_path = "external/sprites/events/event_pick_something.png"
+dialogue_state_dialogue_option_object_ids = Array[String](["dialogue_pick_something_option_1", "dialogue_pick_something_option_2"])
+object_id = "dialogue_state_pick_something_initial"
+
+[resource]
+script = ExtResource("1_1")
+dialogue_initial_dialogue_state_object_id = "dialogue_state_pick_something_initial"
+dialogue_state_id_to_dialogue_states = Dictionary[String, ExtResource("3_1")]({
+"dialogue_state_pick_something_initial": SubResource("Resource_ctrf4")
+})
+dialogue_option_id_to_dialogue_options = Dictionary[String, ExtResource("2_1")]({
+"dialogue_pick_something_option_1": SubResource("Resource_8yyqn"),
+"dialogue_pick_something_option_2": SubResource("Resource_headl")
+})
+object_id = "dialogue_pick_something"

@@ -53,7 +53,7 @@ func generate_start_of_turn_draw_actions(number_of_cards: int = PlayerData.PLAYE
 func generate_act(act_id: String, act_number: int = 1) -> void:
 	var act_data: ActData = Global.get_act_data(act_id)
 	var action_data: Array[Dictionary] = [{
-		Scripts.normalize_script_reference(act_data.act_action_script_path): {
+		Scripts.normalize_script_reference(act_data.act_action_script_keyword): {
 			"act_id": act_id,
 			"act_number": act_number,
 			}

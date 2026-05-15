@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/EventData.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+event_dialogue_object_id = "dialogue_pick_something"
+object_id = "event_pick_something"

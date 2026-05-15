@@ -156,9 +156,6 @@ func _ready():
 	
 	### Test data generators
 	add_test_rest_actions()
-	add_test_events()
-	add_test_dialogue()
-	add_test_acts()
 	add_test_action_interceptors()
 	add_test_colors()
 	add_test_player_data()
@@ -168,7 +165,6 @@ func _ready():
 	add_test_custom_signals()
 	
 	_load_core_content_from_resources()
-	add_test_card_packs()
 	add_test_artifact_packs()
 	
 	### Modding and external file loads
@@ -196,6 +192,11 @@ func _ready():
 func _load_core_content_from_resources(content_root: String = "res://content") -> void:
 	var loaded_content_database: ContentDB = load_content_database(content_root, true)
 	_clear_core_content_tables()
+	_register_core_content_table(loaded_content_database.acts_by_id)
+	_register_core_content_table(loaded_content_database.events_by_id)
+	_register_core_content_table(loaded_content_database.event_pools_by_id)
+	_register_core_content_table(loaded_content_database.dialogues_by_id)
+	_register_core_content_table(loaded_content_database.card_packs_by_id)
 	_register_core_content_table(loaded_content_database.artifacts_by_id)
 	_register_core_content_table(loaded_content_database.characters_by_id)
 	_register_core_content_table(loaded_content_database.enemies_by_id)
@@ -205,6 +206,11 @@ func _load_core_content_from_resources(content_root: String = "res://content") -
 	_register_core_content_table(loaded_content_database.status_effects_by_id)
 
 func _clear_core_content_tables() -> void:
+	_id_to_act_data.clear()
+	_id_to_event_data.clear()
+	_id_to_event_pool_data.clear()
+	_id_to_dialogue_data.clear()
+	_id_to_card_pack_data.clear()
 	_id_to_artifact_data.clear()
 	_id_to_character_data.clear()
 	_id_to_enemy_data.clear()
@@ -598,160 +604,13 @@ func get_status_effect_data(status_effect_object_id: String) -> StatusEffectData
 #endregion
 
 #region Acts
-func add_test_acts() -> void:
-	var act_1: ActData = ActData.new("act_1")
-	act_1.act_name = "Act 1"
-	act_1.act_next_act_ids = ["act_2"]
-	act_1.act_easy_combat_event_pool_object_id = "event_pool_act_1_easy"
-	act_1.act_hard_combat_event_pool_object_id = "event_pool_act_1_hard"
-	act_1.act_miniboss_event_pool_object_id = "event_pool_act_1_miniboss"
-	act_1.act_non_combat_event_pool_object_id = "event_pool_act_1_dialogue"
-	act_1.act_boss_event_pool_object_id = "event_pool_act_1_boss"
-	
-	register_rod(act_1)
-	
-	var act_2: ActData = ActData.new("act_2")
-	act_2.act_name = "Act 2"
-	act_2.act_next_act_ids = ["act_3"]
-	act_2.act_easy_combat_event_pool_object_id = "event_pool_act_1_easy"
-	act_2.act_hard_combat_event_pool_object_id = "event_pool_act_1_easy"
-	act_2.act_miniboss_event_pool_object_id = "event_pool_act_1_miniboss"
-	act_2.act_non_combat_event_pool_object_id = "event_pool_act_1_dialogue"
-	act_2.act_boss_event_pool_object_id = "event_pool_act_1_boss"
-	register_rod(act_2)
-	
-	var act_3: ActData = ActData.new("act_3")
-	act_3.act_name = "Act 3"
-	act_3.act_next_act_ids = ["act_1"] # only works in endless
-	act_3.act_easy_combat_event_pool_object_id = "event_pool_act_1_easy"
-	act_3.act_hard_combat_event_pool_object_id = "event_pool_act_1_easy"
-	act_3.act_miniboss_event_pool_object_id = "event_pool_act_1_miniboss"
-	act_3.act_non_combat_event_pool_object_id = "event_pool_act_1_dialogue"
-	act_3.act_boss_event_pool_object_id = "event_pool_act_1_boss"
-	register_rod(act_3)
-	
-	
+
 func get_act_data(act_id: String) -> ActData:
 	return _id_to_act_data[act_id]
 
 #endregion
 	
 #region Events and Event Pools
-func add_test_events() -> void:
-	## Act 1 Combat
-	var event_act_1_easy_combat_1: EventData = EventData.new("event_act_1_easy_combat_1")
-	event_act_1_easy_combat_1.event_weighted_enemy_object_ids = [
-		{"enemy_1": 1, "enemy_2": 1, "enemy_3": 1},
-		{"enemy_1": 1, "enemy_2": 1, "enemy_3": 1},
-		{"enemy_1": 1, "enemy_2": 1, "enemy_3": 1},
-		]
-	
-	register_rod(event_act_1_easy_combat_1)
-	
-	var event_act_1_easy_combat_2: EventData = EventData.new("event_act_1_easy_combat_2")
-	event_act_1_easy_combat_2.event_weighted_enemy_object_ids = [
-		{"enemy_3": 1}
-		]
-	
-	register_rod(event_act_1_easy_combat_2)
-	
-	var event_act_1_easy_combat_3: EventData = EventData.new("event_act_1_easy_combat_3")
-	event_act_1_easy_combat_3.event_weighted_enemy_object_ids = [
-		{"enemy_1": 1},
-		{"enemy_2": 1},
-		]
-	
-	register_rod(event_act_1_easy_combat_3)
-	
-	var event_act_1_easy_combat_4: EventData = EventData.new("event_act_1_easy_combat_4")
-	event_act_1_easy_combat_4.event_weighted_enemy_object_ids = [
-		{"enemy_4": 1},
-		]
-	
-	register_rod(event_act_1_easy_combat_4)
-	
-	var event_act_1_miniboss_1: EventData = EventData.new("event_act_1_miniboss_1")
-	event_act_1_miniboss_1.event_weighted_enemy_object_ids = [
-		{"enemy_act_1_miniboss_1": 1},
-		]
-	
-	register_rod(event_act_1_miniboss_1)
-	
-	var event_act_1_miniboss_2: EventData = EventData.new("event_act_1_miniboss_2")
-	event_act_1_miniboss_2.event_weighted_enemy_object_ids = [
-		{"enemy_act_1_miniboss_2": 1},
-		{"enemy_act_1_miniboss_2": 1},
-		]
-	
-	register_rod(event_act_1_miniboss_2)
-	
-	var event_act_1_miniboss_3: EventData = EventData.new("event_act_1_miniboss_3")
-	event_act_1_miniboss_3.event_weighted_enemy_object_ids = [
-		{"enemy_act_1_miniboss_1": 1},
-		]
-	
-	register_rod(event_act_1_miniboss_3)
-	
-	var event_act_1_boss_1: EventData = EventData.new("event_act_1_boss_1")
-	event_act_1_boss_1.event_weighted_enemy_object_ids = [
-		{"enemy_act_1_boss_1": 1},
-		]
-	event_act_1_boss_1.event_enemy_placement_is_automatic = false
-	event_act_1_boss_1.event_enemy_placement_positions = [[0,0], [180,0], [360,0]]
-	
-	register_rod(event_act_1_boss_1)
-	
-	## Act 1 Dialogue Events
-	
-	var event_pick_something: EventData = EventData.new("event_pick_something")
-	event_pick_something.event_dialogue_object_id = "dialogue_pick_something"
-	
-	register_rod(event_pick_something)
-	
-	
-	### Event Pools
-	# act 1 easy pool
-	var event_pool_act_1_easy: EventPoolData = EventPoolData.new("event_pool_act_1_easy")
-	event_pool_act_1_easy.event_pool_event_object_ids += [
-		"event_act_1_easy_combat_1",
-		"event_act_1_easy_combat_2",
-		"event_act_1_easy_combat_3",
-		"event_act_1_easy_combat_4",
-		]
-	
-	register_rod(event_pool_act_1_easy)
-	
-	# act 1 hard pool
-	var event_pool_act_1_hard: EventPoolData = EventPoolData.new("event_pool_act_1_hard")
-	event_pool_act_1_hard.event_pool_event_object_ids += [
-		"event_act_1_easy_combat_1",
-		"event_act_1_easy_combat_2",
-		"event_act_1_easy_combat_3",
-		"event_act_1_easy_combat_4",
-		]
-	
-	register_rod(event_pool_act_1_hard)
-	
-	# act 1 dialogue event pool
-	var event_pool_act_1_dialogue: EventPoolData = EventPoolData.new("event_pool_act_1_dialogue")
-	event_pool_act_1_dialogue.event_pool_event_object_ids += [
-		"event_pick_something",
-		]
-	
-	register_rod(event_pool_act_1_dialogue)
-	
-	# act 1 miniboss pool
-	var event_pool_act_1_miniboss: EventPoolData = EventPoolData.new("event_pool_act_1_miniboss")
-	event_pool_act_1_miniboss.event_pool_event_object_ids += ["event_act_1_miniboss_1", "event_act_1_miniboss_2"]
-	
-	register_rod(event_pool_act_1_miniboss)
-	
-	# act 1 boss pool
-	var event_pool_act_1_boss: EventPoolData = EventPoolData.new("event_pool_act_1_boss")
-	event_pool_act_1_boss.event_pool_event_object_ids += ["event_act_1_boss_1"]
-	
-	register_rod(event_pool_act_1_boss)
-	
 
 func get_event_data(event_object_id: String) -> EventData:
 	return _id_to_event_data.get(event_object_id, null)
@@ -769,74 +628,6 @@ func get_event_pool_data(event_pool_object_id: String) -> EventPoolData:
 #endregion
 
 #region Dialogue
-
-## Adds test DialogueData, and their embedded DialogueStateData and DialogueOptionData payloads
-func add_test_dialogue() -> void:
-	### Dialogue Event 1
-	# Dialogue 1
-	var dialogue_pick_something: DialogueData = DialogueData.new("dialogue_pick_something")
-	register_rod(dialogue_pick_something)
-	
-	# Option 1
-	var dialogue_pick_something_option_1: DialogueOptionData = DialogueOptionData.new("dialogue_pick_something_option_1")
-	dialogue_pick_something_option_1.dialogue_option_bbcode = "[color=red]Lose 10 HP[/color] and [color=green]Gain 100 Money[/color]"
-	dialogue_pick_something_option_1.dialogue_option_failed_validator_bbcode = "[color=grey][Locked]: Insufficient Health[/color]"
-	dialogue_pick_something_option_1.dialogue_option_actions = [
-		{Scripts.ACTION_ADD_HEALTH: {"health_amount": -10}},
-		{Scripts.ACTION_ADD_MONEY: {"money_amount": 100}},
-		]
-	dialogue_pick_something_option_1.dialogue_option_validators = [
-		{Scripts.VALIDATOR_PLAYER_HEALTH: {"health_amount": 11}},
-	]
-	dialogue_pick_something_option_1.dialogue_option_next_dialogue_state_id = "" # empty ends dialogue
-	
-	dialogue_pick_something._assign_option(dialogue_pick_something_option_1)
-	
-	# Option 2
-	var dialogue_pick_something_option_2: DialogueOptionData = DialogueOptionData.new("dialogue_pick_something_option_2")
-	dialogue_pick_something_option_2.dialogue_option_bbcode = "[color=red]Lose 50 Money[/color] and [color=green]Gain Random Rare Card[/color]"
-	dialogue_pick_something_option_2.dialogue_option_failed_validator_bbcode = "[color=grey][Locked]: Insufficient Money[/color]"
-	dialogue_pick_something_option_2.dialogue_option_actions = [
-		{
-		Scripts.ACTION_PICK_CARDS: {
-			"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.DRAFT,
-			"pick_draft_cards": false,
-			"draft_from_card_pool": true,
-			"action_data": [{Scripts.ACTION_ADD_CARDS_TO_DECK: {}}],
-			"validator_data": [
-				{Scripts.VALIDATOR_CARD_RARITY: {"card_rarities": [CardData.CARD_RARITIES.RARE]}},
-				{Scripts.VALIDATOR_CARD_DRAFTABLE: {}},
-			],
-			"rng_name": "rng_events",
-			"draft_use_player_draft": false, # this should always be false if using a validator based draft
-			"draft_is_weighted": false,
-			"draft_use_pity_system": false,
-			"random_selection": true, # auto pick it
-			"draft_max_card_amount": 1, # auto pick it
-			"min_card_amount": 1,
-			"max_card_amount": 1,
-			}
-		},
-		{Scripts.ACTION_ADD_MONEY: {"money_amount": -50}},
-	]
-	dialogue_pick_something_option_2.dialogue_option_validators = [
-		{Scripts.VALIDATOR_MONEY: {"money_amount": 50}},
-	]
-	dialogue_pick_something_option_2.dialogue_option_next_dialogue_state_id = "" # empty ends dialogue
-	
-	dialogue_pick_something._assign_option(dialogue_pick_something_option_2)
-	
-	# State 1
-	var dialogue_state_pick_something_initial: DialogueStateData = DialogueStateData.new("dialogue_state_pick_something_initial")
-	dialogue_state_pick_something_initial.dialogue_state_prompt_bbcode = "Test Event. Select an option..."
-	dialogue_state_pick_something_initial.dialogue_state_dialogue_texture_path = "external/sprites/events/event_pick_something.png"
-	dialogue_state_pick_something_initial.dialogue_state_dialogue_option_object_ids = [
-		dialogue_pick_something_option_1.object_id,
-		dialogue_pick_something_option_2.object_id,
-	]
-	
-	dialogue_pick_something._assign_state(dialogue_state_pick_something_initial)
-	dialogue_pick_something._assign_initial_state(dialogue_state_pick_something_initial)
 
 func get_dialogue_data(dialogue_object_id: String) -> DialogueData:
 	return _id_to_dialogue_data.get(dialogue_object_id, null)
@@ -1370,39 +1161,6 @@ func get_card_data_from_prototypes(card_object_ids: Array[String]) -> Array[Card
 func get_card_pack_data(card_pack_object_id: String) -> CardPackData:
 	return _id_to_card_pack_data.get(card_pack_object_id, null)
 
-func add_test_card_packs() -> void:
-	# all cards in game, with no filtering
-	var card_pack_all: CardPackData = CardPackData.new("card_pack_all")
-	card_pack_all.exclude_non_standard_rarities = false
-	card_pack_all.exclude_non_standard_types = false
-	register_rod(card_pack_all)
-	
-	# all draftable cards, ignoring non-standard types and rarities
-	var card_pack_prismatic: CardPackData = CardPackData.new("card_pack_prismatic")
-	register_rod(card_pack_prismatic)
-	
-	var card_pack_red: CardPackData = CardPackData.new("card_pack_red")
-	card_pack_red.card_pack_color_id = "color_red"
-	register_rod(card_pack_red)
-	
-	var card_pack_blue: CardPackData = CardPackData.new("card_pack_blue")
-	card_pack_blue.card_pack_color_id = "color_blue"
-	register_rod(card_pack_blue)
-	
-	var card_pack_green: CardPackData = CardPackData.new("card_pack_green")
-	card_pack_green.card_pack_color_id = "color_green"
-	register_rod(card_pack_green)
-	
-	var card_pack_orange: CardPackData = CardPackData.new("card_pack_orange")
-	card_pack_orange.card_pack_color_id = "color_orange"
-	register_rod(card_pack_orange)
-	
-	var card_pack_white: CardPackData = CardPackData.new("card_pack_white")
-	card_pack_white.card_pack_color_id = "color_white"
-	register_rod(card_pack_white)
-	
-
-
 #endregion
 #region Artifact Packs
 
@@ -1510,6 +1268,21 @@ func compare_loaded_content_with_global(content_root: String = "res://content", 
 
 func get_loaded_cards_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[CardData]:
 	return load_content_database(content_root).get_cards_in_segments(required_segments)
+
+func get_loaded_acts_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[ActData]:
+	return load_content_database(content_root).get_acts_in_segments(required_segments)
+
+func get_loaded_events_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[EventData]:
+	return load_content_database(content_root).get_events_in_segments(required_segments)
+
+func get_loaded_event_pools_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[EventPoolData]:
+	return load_content_database(content_root).get_event_pools_in_segments(required_segments)
+
+func get_loaded_dialogues_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[DialogueData]:
+	return load_content_database(content_root).get_dialogues_in_segments(required_segments)
+
+func get_loaded_card_packs_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[CardPackData]:
+	return load_content_database(content_root).get_card_packs_in_segments(required_segments)
 
 func get_loaded_artifacts_in_segments(required_segments: Array[String], content_root: String = "res://content") -> Array[ArtifactData]:
 	return load_content_database(content_root).get_artifacts_in_segments(required_segments)

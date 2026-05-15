@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EventPoolData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/EventPoolData.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+event_pool_event_object_ids = Array[String](["event_act_1_miniboss_1", "event_act_1_miniboss_2"])
+object_id = "event_pool_act_1_miniboss"

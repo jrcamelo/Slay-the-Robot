@@ -3,6 +3,11 @@ class_name ContentDB
 
 var content_root: String = "res://content"
 
+var acts_by_id: Dictionary[String, ActData] = {}
+var events_by_id: Dictionary[String, EventData] = {}
+var event_pools_by_id: Dictionary[String, EventPoolData] = {}
+var dialogues_by_id: Dictionary[String, DialogueData] = {}
+var card_packs_by_id: Dictionary[String, CardPackData] = {}
 var cards_by_id: Dictionary[String, CardData] = {}
 var artifacts_by_id: Dictionary[String, ArtifactData] = {}
 var enemies_by_id: Dictionary[String, EnemyData] = {}
@@ -11,6 +16,11 @@ var keywords_by_id: Dictionary[String, KeywordData] = {}
 var consumables_by_id: Dictionary[String, ConsumableData] = {}
 var status_effects_by_id: Dictionary[String, StatusEffectData] = {}
 
+var _act_entries: Array[Dictionary] = []
+var _event_entries: Array[Dictionary] = []
+var _event_pool_entries: Array[Dictionary] = []
+var _dialogue_entries: Array[Dictionary] = []
+var _card_pack_entries: Array[Dictionary] = []
 var _card_entries: Array[Dictionary] = []
 var _artifact_entries: Array[Dictionary] = []
 var _enemy_entries: Array[Dictionary] = []
@@ -21,6 +31,11 @@ var _status_effect_entries: Array[Dictionary] = []
 
 func load_from_directory(root_path: String = "res://content") -> void:
 	content_root = root_path
+	acts_by_id.clear()
+	events_by_id.clear()
+	event_pools_by_id.clear()
+	dialogues_by_id.clear()
+	card_packs_by_id.clear()
 	cards_by_id.clear()
 	artifacts_by_id.clear()
 	enemies_by_id.clear()
@@ -28,6 +43,11 @@ func load_from_directory(root_path: String = "res://content") -> void:
 	keywords_by_id.clear()
 	consumables_by_id.clear()
 	status_effects_by_id.clear()
+	_act_entries.clear()
+	_event_entries.clear()
+	_event_pool_entries.clear()
+	_dialogue_entries.clear()
+	_card_pack_entries.clear()
 	_card_entries.clear()
 	_artifact_entries.clear()
 	_enemy_entries.clear()
@@ -41,6 +61,36 @@ func load_from_directory(root_path: String = "res://content") -> void:
 func get_cards_in_segments(required_segments: Array[String]) -> Array[CardData]:
 	var results: Array[CardData] = []
 	for entry: Dictionary in _get_entries_matching_segments(_card_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_acts_in_segments(required_segments: Array[String]) -> Array[ActData]:
+	var results: Array[ActData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_act_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_events_in_segments(required_segments: Array[String]) -> Array[EventData]:
+	var results: Array[EventData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_event_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_event_pools_in_segments(required_segments: Array[String]) -> Array[EventPoolData]:
+	var results: Array[EventPoolData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_event_pool_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_dialogues_in_segments(required_segments: Array[String]) -> Array[DialogueData]:
+	var results: Array[DialogueData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_dialogue_entries, required_segments):
+		results.append(entry["resource"])
+	return results
+
+func get_card_packs_in_segments(required_segments: Array[String]) -> Array[CardPackData]:
+	var results: Array[CardPackData] = []
+	for entry: Dictionary in _get_entries_matching_segments(_card_pack_entries, required_segments):
 		results.append(entry["resource"])
 	return results
 
@@ -88,6 +138,11 @@ func get_act_enemies(act_name: String, encounter_tier: String) -> Array[EnemyDat
 
 func compare_against_global() -> Dictionary:
 	return {
+		"acts": _compare_serializable_table(Global._id_to_act_data, acts_by_id, []),
+		"events": _compare_serializable_table(Global._id_to_event_data, events_by_id, []),
+		"event_pools": _compare_serializable_table(Global._id_to_event_pool_data, event_pools_by_id, []),
+		"dialogue": _compare_serializable_table(Global._id_to_dialogue_data, dialogues_by_id, []),
+		"card_packs": _compare_serializable_table(Global._id_to_card_pack_data, card_packs_by_id, []),
 		"cards": _compare_serializable_table(Global._id_to_card_data, cards_by_id, []),
 		"artifacts": _compare_serializable_table(Global._id_to_artifact_data, artifacts_by_id, []),
 		"enemies": _compare_serializable_table(Global._id_to_enemy_data, enemies_by_id, []),
@@ -139,6 +194,26 @@ func _register_resource(resource: Resource, resource_path: String) -> void:
 		var card_data: CardData = resource
 		cards_by_id[card_data.object_id] = card_data
 		_card_entries.append(entry)
+	elif resource is ActData:
+		var act_data: ActData = resource
+		acts_by_id[act_data.object_id] = act_data
+		_act_entries.append(entry)
+	elif resource is EventData:
+		var event_data: EventData = resource
+		events_by_id[event_data.object_id] = event_data
+		_event_entries.append(entry)
+	elif resource is EventPoolData:
+		var event_pool_data: EventPoolData = resource
+		event_pools_by_id[event_pool_data.object_id] = event_pool_data
+		_event_pool_entries.append(entry)
+	elif resource is DialogueData:
+		var dialogue_data: DialogueData = resource
+		dialogues_by_id[dialogue_data.object_id] = dialogue_data
+		_dialogue_entries.append(entry)
+	elif resource is CardPackData:
+		var card_pack_data: CardPackData = resource
+		card_packs_by_id[card_pack_data.object_id] = card_pack_data
+		_card_pack_entries.append(entry)
 	elif resource is ArtifactData:
 		var artifact_data: ArtifactData = resource
 		artifacts_by_id[artifact_data.object_id] = artifact_data

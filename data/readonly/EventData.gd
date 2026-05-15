@@ -9,10 +9,10 @@ class_name EventData
 ## past a difficulty level, requiring a certain amount of health/money, etc.
 @export var event_pool_validator_data: Array[Dictionary] = [
 	#{
-		#"validator_script_file_path_1": {"validator_key_1": "value"}
+		#"VALIDATOR_KEYWORD_1": {"validator_key_1": "value"}
 	#},
 	#{
-		#"validator_script_file_path_2": {"validator_key_1": "value"}
+		#"VALIDATOR_KEYWORD_2": {"validator_key_1": "value"}
 	#}	
 ]
 

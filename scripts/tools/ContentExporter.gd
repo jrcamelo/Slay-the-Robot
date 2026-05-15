@@ -28,6 +28,11 @@ static func export_all_content(content_root: String = CONTENT_ROOT) -> Dictionar
 		return {}
 
 	var export_manifest: Dictionary = {
+		"acts": {},
+		"events": {},
+		"event_pools": {},
+		"dialogue": {},
+		"card_packs": {},
 		"cards": {},
 		"artifacts": {},
 		"enemies": {},
@@ -43,6 +48,31 @@ static func export_all_content(content_root: String = CONTENT_ROOT) -> Dictionar
 		var card_export_path: String = _build_card_path(card_data, content_root)
 		var saved_card_path: String = _save_unique_resource_copy(card_data, card_export_path)
 		export_manifest["cards"][card_data.object_id] = saved_card_path
+
+	for act_data: ActData in Global._id_to_act_data.values():
+		var act_export_path: String = _build_act_path(act_data, content_root)
+		var saved_act_path: String = _save_unique_resource_copy(act_data, act_export_path)
+		export_manifest["acts"][act_data.object_id] = saved_act_path
+
+	for event_data: EventData in Global._id_to_event_data.values():
+		var event_export_path: String = _build_event_path(event_data, content_root)
+		var saved_event_path: String = _save_unique_resource_copy(event_data, event_export_path)
+		export_manifest["events"][event_data.object_id] = saved_event_path
+
+	for event_pool_data: EventPoolData in Global._id_to_event_pool_data.values():
+		var event_pool_export_path: String = _build_event_pool_path(event_pool_data, content_root)
+		var saved_event_pool_path: String = _save_unique_resource_copy(event_pool_data, event_pool_export_path)
+		export_manifest["event_pools"][event_pool_data.object_id] = saved_event_pool_path
+
+	for dialogue_data: DialogueData in Global._id_to_dialogue_data.values():
+		var dialogue_export_path: String = _build_dialogue_path(dialogue_data, content_root)
+		var saved_dialogue_path: String = _save_unique_resource_copy(dialogue_data, dialogue_export_path)
+		export_manifest["dialogue"][dialogue_data.object_id] = saved_dialogue_path
+
+	for card_pack_data: CardPackData in Global._id_to_card_pack_data.values():
+		var card_pack_export_path: String = _build_card_pack_path(card_pack_data, content_root)
+		var saved_card_pack_path: String = _save_unique_resource_copy(card_pack_data, card_pack_export_path)
+		export_manifest["card_packs"][card_pack_data.object_id] = saved_card_pack_path
 
 	for artifact_data: ArtifactData in Global._id_to_artifact_data.values():
 		var artifact_export_path: String = _build_artifact_path(artifact_data, content_root)
@@ -127,6 +157,66 @@ static func _build_card_path(card_data: CardData, content_root: String) -> Strin
 	var rarity_folder: String = CARD_RARITY_TO_FOLDER.get(card_data.card_rarity, "standard")
 	var file_name: String = _resource_file_name(card_data.card_name, card_data.object_id)
 	return content_root.path_join("cards").path_join(owner_folder).path_join(rarity_folder).path_join("%s.tres" % file_name)
+
+static func _build_act_path(act_data: ActData, content_root: String) -> String:
+	var file_name: String = _resource_file_name(act_data.act_name, act_data.object_id)
+	return content_root.path_join("acts").path_join("%s.tres" % file_name)
+
+static func _build_event_path(event_data: EventData, content_root: String) -> String:
+	var object_id: String = event_data.object_id.to_lower()
+	var path_segments: Array[String] = ["events"]
+	if object_id.begins_with("event_act_"):
+		var id_segments: PackedStringArray = object_id.split("_")
+		if len(id_segments) >= 4:
+			path_segments.append("%s%s" % [id_segments[1], id_segments[2]])
+		if object_id.contains("_miniboss_"):
+			path_segments.append("miniboss")
+		elif object_id.contains("_boss_"):
+			path_segments.append("boss")
+		elif object_id.contains("_easy_"):
+			path_segments.append("easy")
+		elif object_id.contains("_hard_"):
+			path_segments.append("hard")
+		else:
+			path_segments.append("combat")
+	else:
+		path_segments.append("dialogue")
+	var file_name: String = _resource_file_name(event_data.object_id.trim_prefix("event_"), event_data.object_id)
+	var export_path: String = content_root
+	for segment: String in path_segments:
+		export_path = export_path.path_join(segment)
+	return export_path.path_join("%s.tres" % file_name)
+
+static func _build_event_pool_path(event_pool_data: EventPoolData, content_root: String) -> String:
+	var object_id: String = event_pool_data.object_id.to_lower()
+	var path_segments: Array[String] = ["event_pools"]
+	if object_id.begins_with("event_pool_act_"):
+		var id_segments: PackedStringArray = object_id.split("_")
+		if len(id_segments) >= 5:
+			path_segments.append("%s%s" % [id_segments[2], id_segments[3]])
+		if object_id.contains("_easy"):
+			path_segments.append("easy")
+		elif object_id.contains("_hard"):
+			path_segments.append("hard")
+		elif object_id.contains("_dialogue"):
+			path_segments.append("dialogue")
+		elif object_id.contains("_miniboss"):
+			path_segments.append("miniboss")
+		elif object_id.contains("_boss"):
+			path_segments.append("boss")
+	var file_name: String = _resource_file_name(event_pool_data.object_id.trim_prefix("event_pool_"), event_pool_data.object_id)
+	var export_path: String = content_root
+	for segment: String in path_segments:
+		export_path = export_path.path_join(segment)
+	return export_path.path_join("%s.tres" % file_name)
+
+static func _build_dialogue_path(dialogue_data: DialogueData, content_root: String) -> String:
+	var file_name: String = _resource_file_name(dialogue_data.object_id.trim_prefix("dialogue_"), dialogue_data.object_id)
+	return content_root.path_join("dialogue").path_join("%s.tres" % file_name)
+
+static func _build_card_pack_path(card_pack_data: CardPackData, content_root: String) -> String:
+	var file_name: String = _resource_file_name(card_pack_data.object_id.trim_prefix("card_pack_"), card_pack_data.object_id)
+	return content_root.path_join("card_packs").path_join("%s.tres" % file_name)
 
 static func _build_artifact_path(artifact_data: ArtifactData, content_root: String) -> String:
 	var owner_folder: String = "generic"
@@ -272,7 +362,7 @@ static func _normalize_resource_script_references(resource: Resource) -> void:
 		if (usage & PROPERTY_USAGE_STORAGE) != PROPERTY_USAGE_STORAGE:
 			continue
 		var property_value: Variant = resource.get(property_name)
-		var normalized_value: Variant = Scripts.normalize_variant_script_references(property_value)
+		var normalized_value: Variant = _normalize_variant_script_references(property_value)
 		if property_value is Array and normalized_value is Array:
 			var typed_array: Array = property_value.duplicate()
 			typed_array.clear()
@@ -285,3 +375,24 @@ static func _normalize_resource_script_references(resource: Resource) -> void:
 			resource.set(property_name, typed_dictionary)
 		else:
 			resource.set(property_name, normalized_value)
+
+static func _normalize_variant_script_references(value: Variant) -> Variant:
+	if value is SerializableData:
+		_normalize_resource_script_references(value)
+		return value
+	if value is Array:
+		var normalized_array: Array = []
+		for item: Variant in value:
+			normalized_array.append(_normalize_variant_script_references(item))
+		return Scripts.normalize_variant_script_references(normalized_array)
+	if value is Dictionary:
+		var normalized_dictionary: Dictionary = {}
+		for key: Variant in value.keys():
+			var normalized_key: Variant = key
+			if key is String:
+				var normalized_script_key: String = Scripts.get_token_for_path(key)
+				if normalized_script_key != "":
+					normalized_key = normalized_script_key
+			normalized_dictionary[normalized_key] = _normalize_variant_script_references(value[key])
+		return normalized_dictionary
+	return Scripts.normalize_variant_script_references(value)

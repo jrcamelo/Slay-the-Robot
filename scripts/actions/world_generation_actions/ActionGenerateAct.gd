@@ -1,7 +1,7 @@
 ## Generates the world map for an act. This is called at the start of a run and end of an act.
 ## See: ActionGenerator.generate_act() and generate_next_act()
 ## Changing this script and its params should be sufficient for most use cases,
-## however you can supply different scripts to an ActData.act_action_script_path if you need multiple
+## however you can supply different scripts to an ActData.act_action_script_keyword if you need multiple
 ## generation algorithms.
 extends BaseAction
 

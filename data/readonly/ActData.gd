@@ -4,9 +4,9 @@ class_name ActData
 
 ## How the act should appear in text.
 @export var act_name: String = "Act 1"
-## The path to the script used to generate this act. You can change this to enable
-## custom act generation
-@export var act_action_script_path: String = Scripts.ACTION_GENERATE_ACT
+## The script keyword used to generate this act. You can change this to enable
+## custom act generation.
+@export var act_action_script_keyword: String = "ACTION_GENERATE_ACT"
 
 ## The event pool for this act's easy combats. Used for generation of locations in this act.
 @export var act_easy_combat_event_pool_object_id: String = ""
