@@ -173,6 +173,7 @@ func _ready():
 	FileLoader.load_read_only_data() # loads all mods and base game exteral data
 	
 	### Generated from loaded data
+	_apply_card_kind_rules()
 	# custom signals generated from CustomSignalData
 	Signals.register_all_custom_signals()
 	# generate cached filters from CardPackData
@@ -223,6 +224,10 @@ func _register_core_content_table(content_table: Dictionary) -> void:
 	for content_id: String in content_table.keys():
 		var serializable_data: SerializableData = content_table[content_id]
 		register_rod(serializable_data, true)
+
+func _apply_card_kind_rules() -> void:
+	for card_data: CardData in _id_to_card_data.values():
+		card_data.synchronize_card_kind_rules()
 		
 
 #region Run

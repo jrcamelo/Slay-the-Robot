@@ -17,6 +17,7 @@ const ENERGY_ICON_KEYWORD: String = "[energy_icon]"	# tells description to displ
 
 @onready var card_texture = %CardTexture
 @onready var card_name: RichLabelAutoSizer = %CardName
+@onready var card_kind: RichLabelAutoSizer = %CardKind
 @onready var card_type: Label = %CardType
 @onready var card_description: RichLabelAutoSizer = %CardDescription
 @onready var card_energy_cost: Label = %EnergyCost
@@ -82,6 +83,7 @@ func update_card_display(selected_enemy: Enemy = null) -> void:
 	
 	# updates the card's display
 	card_name.set_bbcode("[center]" + card_data.get_card_name() + "[/center]")
+	card_kind.set_bbcode("[center]" + card_data.get_card_kind_display_name() + "[/center]")
 	card_description.set_bbcode(get_card_description(selected_enemy))
 	card_type.text = CardData.CARD_RARITIES.keys()[card_data.card_rarity] + " " + CardData.CARD_TYPES.keys()[card_data.card_type]
 	
@@ -107,7 +109,7 @@ func toggle_card_glow() -> void:
 func can_play_card() -> bool:
 	if not card_data.card_is_playable:
 		return false
-	if Global.player_data.player_energy < card_data.get_card_energy_cost():
+	if Global.player_data.player_energy + card_data.get_card_energy_cost() > Global.player_data.player_energy_max:
 		return false
 	
 	if not _validate_card():

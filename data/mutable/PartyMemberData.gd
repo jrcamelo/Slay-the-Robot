@@ -6,6 +6,7 @@ class_name PartyMemberData
 @export var party_member_party_index: int = -1
 @export var party_member_character_object_id: String = ""
 @export var party_member_name: String = ""
+@export var party_member_is_removed: bool = false
 
 @export var party_member_health: int = 50
 @export var party_member_health_max: int = 50
@@ -25,6 +26,9 @@ var party_member_reward_card_rarity_cache: Dictionary[int, Array] = {}
 
 func is_alive() -> bool:
 	return party_member_health > 0
+
+func is_active() -> bool:
+	return not party_member_is_removed
 
 func add_health(health_amount: int, health_amount_max: int = 0) -> void:
 	set_health(party_member_health + health_amount, party_member_health_max + health_amount_max)

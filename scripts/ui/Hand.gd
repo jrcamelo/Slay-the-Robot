@@ -367,7 +367,7 @@ func add_card_to_play_queue(card_play_request: CardPlayRequest, require_energy: 
 	var card_data: CardData = card_play_request.card_data
 	# insufficient energy, don't add to queue
 	if require_energy:
-		if card_data.get_card_energy_cost() > Global.player_data.player_energy:
+		if card_data.get_card_energy_cost() > Global.player_data.get_remaining_energy_capacity():
 			return
 	
 	card_play_queue.append(card_play_request)
@@ -378,7 +378,7 @@ func add_card_to_play_queue(card_play_request: CardPlayRequest, require_energy: 
 		
 		# variable cost cards consume all energy
 		if card_data.card_energy_cost_is_variable:
-			energy_cost = Global.player_data.player_energy
+			energy_cost = Global.player_data.get_remaining_energy_capacity()
 			# variable cost cards can have an upper bound to energy input
 			if card_data.card_energy_cost_variable_upper_bound >= 0:
 				energy_cost = min(energy_cost, card_data.card_energy_cost_variable_upper_bound)
@@ -388,7 +388,7 @@ func add_card_to_play_queue(card_play_request: CardPlayRequest, require_energy: 
 		card_play_queue_reserved_energy_total += energy_cost
 		
 		# energy cost
-		Global.player_data.player_energy -= energy_cost
+		Global.player_data.player_energy += energy_cost
 		combat.update_combat_display()
 	else:
 		# card doesn't require energy, reserve -1 energy in energy queue
@@ -396,7 +396,7 @@ func add_card_to_play_queue(card_play_request: CardPlayRequest, require_energy: 
 		
 		if card_data.card_energy_cost_is_variable:
 			if card_play_request.is_duplicate_play:
-				card_play_request.input_energy = Global.player_data.player_energy
+				card_play_request.input_energy = Global.player_data.get_remaining_energy_capacity()
 		else:
 			card_play_request.input_energy = 0
 	
@@ -472,7 +472,8 @@ func refund_card_queue():
 	# clears out the card queue, refunding all the energy in it
 	#print("refunding at " + str(Global.player_data.player_energy))
 	for card_play_request in card_play_queue:
-		Global.player_data.player_energy += card_play_request.refundable_energy
+		var refundable_energy: int = max(card_play_request.refundable_energy, 0)
+		Global.player_data.player_energy = max(Global.player_data.player_energy - refundable_energy, 0)
 		#print(str(card_play_request.refundable_energy) + " refunded")
 	#print("total " + str(Global.player_data.player_energy))
 	clear_card_queue()
@@ -920,9 +921,6 @@ func _on_card_turn_energy_changed(card_data: CardData):
 			cards_with_modified_turn_energy.append(card_data)
 
 func _on_player_killed(_player: Player):
-	if Global.player_data.are_all_party_members_dead():
-		discard_hand(false)
-		return
 	var dead_party_member_index: int = _player.get_party_member_index()
 	if current_selected_card != null and current_selected_card.card_data.card_owner_party_index == dead_party_member_index:
 		current_selected_card = null
@@ -935,7 +933,7 @@ func _on_player_killed(_player: Player):
 			card_play_queue_reserved_energy_total -= max(queued_card_play_request.refundable_energy, 0)
 			card_play_queue.erase(queued_card_play_request)
 	if refunded_energy > 0:
-		Global.player_data.player_energy += refunded_energy
+		Global.player_data.player_energy = max(Global.player_data.player_energy - refunded_energy, 0)
 	
 	var dead_owner_cards: Array[CardData] = []
 	for pile_card: CardData in Global.player_data.player_hand:
@@ -947,9 +945,13 @@ func _on_player_killed(_player: Player):
 	for pile_card: CardData in Global.player_data.player_discard:
 		if pile_card.card_owner_party_index == dead_party_member_index:
 			dead_owner_cards.append(pile_card)
+	for pile_card: CardData in Global.player_data.player_exhaust:
+		if pile_card.card_owner_party_index == dead_party_member_index:
+			dead_owner_cards.append(pile_card)
 	if len(dead_owner_cards) > 0:
-		exhaust_cards(dead_owner_cards)
+		banish_cards(dead_owner_cards, false)
 	update_hand_card_display()
+	combat.update_combat_display()
 
 ### Helpers
 

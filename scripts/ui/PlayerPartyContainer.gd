@@ -7,6 +7,7 @@ var base_player: Player = null
 
 func _ready():
 	Signals.run_ended.connect(_on_run_ended)
+	Signals.party_member_removed.connect(_on_party_member_removed)
 
 func register_base_player(player: Player) -> void:
 	if player == null:
@@ -74,3 +75,11 @@ func _clear_extra_players() -> void:
 
 func _on_run_ended():
 	clear_party_members(true)
+
+func _on_party_member_removed(party_member_index: int) -> void:
+	for child: Node in automatic_party_container.get_children():
+		if child is Player and child.get_party_member_index() == party_member_index:
+			if child == base_player:
+				base_player = null
+			child.queue_free()
+			break

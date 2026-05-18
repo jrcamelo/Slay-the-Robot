@@ -214,13 +214,11 @@ func _on_combat_started(event_id: String):
 	enemy_container.populate_enemies(current_event)
 	start_turn_animation()
 	
-	Global.player_data.player_energy = Global.player_data.player_energy_max
+	Global.player_data.player_energy = 0
 	set_combat_display_visibility(true)
 	update_combat_display()
 	
 func _on_combat_ended():
-	if not Global.player_data.are_all_party_members_dead():
-		Global.player_data.revive_dead_party_members_after_combat(1)
 	set_combat_display_visibility(false)
 	
 
@@ -466,7 +464,7 @@ func end_turn():
 func start_turn():
 	# called from animation player
 	_reset_turn_end_queue()
-	Global.player_data.player_energy = Global.player_data.player_energy_max
+	Global.player_data.player_energy = max(Global.player_data.player_energy - PlayerData.PLAYER_TURN_ENERGY_DECAY, 0)
 	update_combat_display()
 	Signals.player_turn_started.emit()
 

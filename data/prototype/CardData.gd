@@ -10,6 +10,13 @@ var parent_card: CardData = null	# the parent card in the player's true deck tha
 @export var card_texture_path: String = ""
 @export var card_keyword_object_ids: Array[String] = [] # keywords (mechanics with tooltips) displayed when this card is hovered over
 @export var card_color_id: String = "color_green"
+@export var card_kind: String = CARD_KIND_VERSE : set = set_card_kind
+
+const CARD_KIND_INTRO: String = "INTRO"
+const CARD_KIND_VERSE: String = "VERSE"
+const CARD_KIND_JAZZ: String = "JAZZ"
+const CARD_KIND_OUTRO: String = "OUTRO"
+const CARD_KINDS: Array[String] = [CARD_KIND_INTRO, CARD_KIND_VERSE, CARD_KIND_JAZZ, CARD_KIND_OUTRO]
 
 ### Card Energy
 # card energies
@@ -142,11 +149,12 @@ func get_card_energy_cost(shadow_energy_cost: bool = true, variable_cost_is_zero
 		if variable_cost_is_zero:
 			return 0
 		else:
+			var remaining_energy_capacity: int = Global.player_data.get_remaining_energy_capacity()
 			if card_energy_cost_variable_upper_bound < 0:
 				# variable cost cards with no upper bound
-				return Global.player_data.player_energy
+				return remaining_energy_capacity
 			else:
-				return max(min(Global.player_data.player_energy, card_energy_cost_variable_upper_bound), 0)
+				return max(min(remaining_energy_capacity, card_energy_cost_variable_upper_bound), 0)
 	# shadowing
 	if shadow_energy_cost:
 		if card_energy_cost_until_played > -1:
@@ -161,6 +169,12 @@ func set_card_energy_cost(energy_cost: int) -> void:
 	var cost: int = max(0, energy_cost)
 	if card_energy_cost != cost:
 		card_energy_cost = cost
+		Signals.card_properties_changed.emit(self)
+
+func set_card_kind(value: String) -> void:
+	var normalized_kind: String = value.strip_edges().to_upper()
+	if card_kind != normalized_kind:
+		card_kind = normalized_kind
 		Signals.card_properties_changed.emit(self)
 
 func set_card_energy_cost_until_played(energy_cost: int) -> void:
@@ -184,6 +198,55 @@ func get_card_description() -> String:
 		modified_card_description = modified_card_description.replace("["+key+"]", str(card_values[key]))
 	
 	return modified_card_description
+
+func get_card_kind_display_name() -> String:
+	return get_effective_card_kind()
+
+func is_card_kind(kind_name: String) -> bool:
+	return get_effective_card_kind() == kind_name.strip_edges().to_upper()
+
+func get_effective_card_kind() -> String:
+	var normalized_kind: String = card_kind.strip_edges().to_upper()
+	if normalized_kind == "":
+		return CARD_KIND_VERSE
+	return normalized_kind
+
+func synchronize_card_kind_rules() -> void:
+	var filtered_validators: Array[Dictionary] = []
+	for validator_data: Dictionary in card_play_validators:
+		var keep_validator: bool = true
+		for validator_token_or_path: String in validator_data.keys():
+			var validator_values: Dictionary = validator_data[validator_token_or_path]
+			if validator_values.get("kind_rule", false) and Scripts.normalize_script_reference(validator_token_or_path) == Scripts.normalize_script_reference(Scripts.VALIDATOR_CARD_PLAY_INTRO):
+				keep_validator = false
+		if keep_validator:
+			filtered_validators.append(validator_data)
+	card_play_validators = filtered_validators
+	
+	var filtered_actions: Array[Dictionary] = []
+	for action_data: Dictionary in card_play_actions:
+		var keep_action: bool = true
+		for action_token_or_path: String in action_data.keys():
+			var action_values: Dictionary = action_data[action_token_or_path]
+			if action_values.get("kind_rule", false) and Scripts.normalize_script_reference(action_token_or_path) == Scripts.normalize_script_reference(Scripts.ACTION_END_TURN):
+				keep_action = false
+		if keep_action:
+			filtered_actions.append(action_data)
+	card_play_actions = filtered_actions
+	
+	if is_card_kind(CARD_KIND_INTRO):
+		card_play_validators.append({
+			Scripts.VALIDATOR_CARD_PLAY_INTRO: {
+				"kind_rule": true
+			}
+		})
+	if is_card_kind(CARD_KIND_OUTRO):
+		card_play_actions.append({
+			Scripts.ACTION_END_TURN: {
+				"kind_rule": true,
+				"time_delay": 0.05
+			}
+		})
 
 func set_card_properties(card_properties: Dictionary[String, Variant]) -> void:
 	for property_name: String in card_properties:

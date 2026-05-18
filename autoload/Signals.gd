@@ -83,6 +83,7 @@ signal run_ended # player has ended a run (does not necessarily mean victory/def
 signal run_victory # player has won a run
 signal player_killed(player: Player)
 signal player_death_animation_finished(player: Player)
+signal party_member_removed(party_member_index: int)
 
 # rewards
 signal reward_grant_requested(reward_group: int, money_amount: int, card_drafts: Array[Array], artifact_ids: Array[String], custom_action_data: Array[Array])

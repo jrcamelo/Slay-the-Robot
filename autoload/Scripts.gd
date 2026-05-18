@@ -119,6 +119,7 @@ const VALIDATOR_CARD_UPGRADEABLE: String = "res://scripts/validators/card/Valida
 const VALIDATOR_CARD_PLAY_ENEMY_ATTACKING: String = "res://scripts/validators/card_plays/ValidatorCardPlayEnemyAttacking.gd"
 const VALIDATOR_CARD_PLAY_ENERGY_INPUT: String = "res://scripts/validators/card_plays/ValidatorCardPlayEnergyInput.gd"
 const VALIDATOR_CARD_PLAY_IS_DUPLICATED: String = "res://scripts/validators/card_plays/ValidatorCardPlayIsDuplicated.gd"
+const VALIDATOR_CARD_PLAY_INTRO: String = "res://scripts/validators/card_plays/ValidatorCardPlayIntro.gd"
 
 # deck/pile validators
 const VALIDATOR_DECK_HAS_REMOVEABLE_CARD: String = "res://scripts/validators/deck/ValidatorDeckHasRemovableCard.gd"
