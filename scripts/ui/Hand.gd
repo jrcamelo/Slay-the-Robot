@@ -3,6 +3,8 @@ extends Control
 
 ## Controls the movement speed (time) of cards, making them tween faster or slower around the hand
 const CARD_TWEEN_TIME: float = 0.2
+const NON_RETAINED_END_TURN_HAND_LIMIT: int = 5
+const ACTION_DISCARD_EXCESS_END_TURN_CARDS: Script = preload("res://scripts/actions/pick_card_actions/ActionDiscardExcessEndTurnCards.gd")
 
 ### General Nodes
 @onready var combat = $%Combat
@@ -854,8 +856,8 @@ func perform_end_of_turn_hand_actions() -> void:
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
-	# retain/discard cards
-	var discarded_cards: Array[CardData] = []
+	# process retained cards and determine which non-retained cards remain subject to hand limit
+	var non_retained_cards: Array[CardData] = []
 	for card_data in get_player_hand():
 		# check if card flagged for retain
 		var card_is_retained: bool = card_data.card_is_retained or cards_retained_this_turn.has(card_data)
@@ -871,12 +873,34 @@ func perform_end_of_turn_hand_actions() -> void:
 		
 			Signals.card_retained.emit(card_data)
 		else:
-			discarded_cards.append(card_data)
+			non_retained_cards.append(card_data)
 	
 	cards_retained_this_turn.clear()
 	
-	if len(discarded_cards) > 0:
-		discard_cards(discarded_cards, false)
+	# allow the player to keep up to the non-retained hand limit.
+	# retained cards never count against that cap.
+	var excess_non_retained_cards: int = len(non_retained_cards) - NON_RETAINED_END_TURN_HAND_LIMIT
+	if excess_non_retained_cards > 0:
+		var discard_excess_action: ActionDiscardExcessEndTurnCards = ACTION_DISCARD_EXCESS_END_TURN_CARDS.new()
+		discard_excess_action.init(
+			_get_default_player_combatant(),
+			null,
+			[],
+			{
+				"card_pick_type": ActionBasePickCards.CARD_PICK_TYPES.HAND,
+				"pick_draft_cards": true,
+				"draft_cards": non_retained_cards,
+				"min_card_amount": excess_non_retained_cards,
+				"max_card_amount": excess_non_retained_cards,
+				"min_cards_are_required_for_action": true,
+				"quick_pick": true,
+				"card_pick_text": "Discard {0} card(s) to end your turn. {1} selected",
+			},
+			null
+		)
+		ActionHandler.add_action(discard_excess_action)
+		if ActionHandler.actions_being_performed:
+			await ActionHandler.actions_ended
 		
 		# wait for tween/card actions to finish
 		await Global.get_tree().create_timer(CARD_TWEEN_TIME).timeout
