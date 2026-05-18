@@ -15,6 +15,7 @@ const ACTION_START_COMBAT: String = "res://scripts/actions/world_interaction_act
 
 const ACTION_RESET_BLOCK: String = "res://scripts/actions/ActionResetBlock.gd"
 const ACTION_BLOCK: String = "res://scripts/actions/ActionBlock.gd"
+const ACTION_BARRIER: String = "res://scripts/actions/ActionBarrier.gd"
 const ACTION_DIRECT_DAMAGE: String = "res://scripts/actions/ActionDirectDamage.gd"
 const ACTION_ADD_ENERGY: String = "res://scripts/actions/ActionAddEnergy.gd"
 const ACTION_APPLY_STATUS: String = "res://scripts/actions/status_actions/ActionApplyStatus.gd"

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="CardData" format=3]
 
-[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_vk76l"]
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_lqyfa"]
 
 [resource]
-script = ExtResource("1_vk76l")
+script = ExtResource("1_lqyfa")
 card_name = "Basic Barrier"
 card_description = "Gain [block] Barrier"
 card_keyword_object_ids = Array[String](["keyword_barrier"])
@@ -11,10 +11,10 @@ card_color_id = "color_white"
 card_type = 1
 card_rarity = 0
 card_requires_target = false
-card_description_preview_overrides = Array[Array]([["block", "ACTION_BARRIER"]])
 card_values = {
 "block": 5
 }
+card_description_preview_overrides = Array[Array]([["block", "ACTION_BARRIER"]])
 card_play_actions = Array[Dictionary]([{
 "ACTION_BARRIER": {
 "block": 5,

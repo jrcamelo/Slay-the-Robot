@@ -92,6 +92,7 @@ signal reward_clear_requested(reward_group: int) # -1 for clear all rewards
 # player stats
 signal player_money_changed
 signal player_health_changed
+signal player_barrier_changed
 signal player_artifacts_changed
 signal combat_stat_changed(stat_enum: int)	# can be used to hook into certain stats
 #endregion

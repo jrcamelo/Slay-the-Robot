@@ -6,7 +6,7 @@
 [ext_resource type="Resource" path="res://content/cards/character/red/standard/BlockOnAttack.tres" id="4_hwdow"]
 [ext_resource type="Resource" path="res://content/cards/character/purple/standard/DamageIncrease.tres" id="5_l41mg"]
 [ext_resource type="Resource" path="res://content/cards/character/red/standard/FlatDamageAttack.tres" id="6_vj55m"]
-[ext_resource type="Resource" path="res://content/cards/generic/standard/BasicBlock.tres" id="7_urqx1"]
+[ext_resource type="Resource" path="res://content/cards/generic/standard/BasicBarrier.tres" id="7_jd4a4"]
 [ext_resource type="Resource" path="res://content/cards/character/red/standard/WeakenEnemies.tres" id="8_lb6ny"]
 [ext_resource type="Resource" path="res://content/cards/character/red/standard/VulnerableEnemies.tres" id="9_ss5p4"]
 [ext_resource type="Resource" path="res://content/cards/character/red/standard/EnergyCard.tres" id="10_f7oo2"]
@@ -14,4 +14,4 @@
 
 [resource]
 script = ExtResource("11_l2y1k")
-cards = Array[ExtResource("1_jd4a4")]([ExtResource("2_21exn"), ExtResource("2_21exn"), ExtResource("2_21exn"), ExtResource("3_xtwcg"), ExtResource("4_hwdow"), ExtResource("5_l41mg"), ExtResource("6_vj55m"), ExtResource("7_urqx1"), ExtResource("7_urqx1"), ExtResource("7_urqx1"), ExtResource("7_urqx1"), ExtResource("7_urqx1"), ExtResource("7_urqx1"), ExtResource("8_lb6ny"), ExtResource("9_ss5p4"), ExtResource("10_f7oo2")])
+cards = Array[ExtResource("1_jd4a4")]([ExtResource("2_21exn"), ExtResource("2_21exn"), ExtResource("2_21exn"), ExtResource("3_xtwcg"), ExtResource("4_hwdow"), ExtResource("5_l41mg"), ExtResource("6_vj55m"), ExtResource("7_jd4a4"), ExtResource("7_jd4a4"), ExtResource("7_jd4a4"), ExtResource("7_jd4a4"), ExtResource("7_jd4a4"), ExtResource("7_jd4a4"), ExtResource("8_lb6ny"), ExtResource("9_ss5p4"), ExtResource("10_f7oo2")])

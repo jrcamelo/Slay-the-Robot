@@ -16,6 +16,7 @@ var player_energy: int = 0 # current filled energy. Not saved.
 const PLAYER_TURN_ENERGY_DECAY: int = 3
 
 var player_block: int = 0 # in combat block. Not saved.
+var player_barrier: int = 0 # shared party-wide block. Not saved.
 
 ## A json friendly dictionary containing values that can be embedded onto the player
 ## for extensibility, custom UI, and general mod support purposes.
@@ -223,6 +224,24 @@ func add_money(amount: int) -> void:
 
 func get_remaining_energy_capacity() -> int:
 	return max(player_energy_max - player_energy, 0)
+
+func set_barrier(barrier_amount: int) -> void:
+	player_barrier = max(0, barrier_amount)
+	Signals.player_barrier_changed.emit()
+
+func add_barrier(barrier_amount: int) -> void:
+	if barrier_amount == 0:
+		return
+	set_barrier(player_barrier + barrier_amount)
+
+func consume_barrier(damage_amount: int) -> int:
+	var blocked_amount: int = min(max(damage_amount, 0), player_barrier)
+	if blocked_amount > 0:
+		set_barrier(player_barrier - blocked_amount)
+	return blocked_amount
+
+func reset_barrier() -> void:
+	set_barrier(0)
 
 ## Gets an rng track for the run. If it does not exist create one.
 func get_player_rng(rng_name: String) -> RandomNumberGenerator:

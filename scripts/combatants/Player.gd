@@ -4,6 +4,8 @@ class_name Player
 
 @onready var incoming_damage: Control = $Visible/IncomingDamage
 @onready var incoming_damage_amount_text: Label = $Visible/IncomingDamage/IncomingDamageAmount
+@onready var barrier: Sprite2D = $Visible/Barrier
+@onready var barrier_amount: Label = $Visible/Barrier/BarrierAmount
 
 const INTENT_UPDATES_LAZILY: bool = true	# batches intent updates
 var _intent_is_updating: bool = false
@@ -15,6 +17,7 @@ func _ready():
 	Signals.enemy_intent_changed.connect(_on_enemy_intent_changed)
 	Signals.enemy_death_animation_finished.connect(_on_enemy_death_animation_finished)
 	Signals.player_health_changed.connect(_on_player_health_changed)
+	Signals.player_barrier_changed.connect(_on_player_barrier_changed)
 	Signals.artifact_proc.connect(_on_artifact_proc)
 	Signals.run_started.connect(_on_run_started)
 	Signals.run_ended.connect(_on_run_ended)
@@ -29,21 +32,30 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 	var bypassed_damage: int = _damage # raw unblocked damage
 	var bypassed_damage_capped: int = 0 # damage done that does not factor in overkill damage
 	var overkill_damage: int = 0 # damage done past 0
+	var blocked_by_barrier: int = 0
+	if not bypass_block:
+		blocked_by_barrier = Global.player_data.consume_barrier(_damage)
+		if blocked_by_barrier > 0:
+			Signals.combatant_blocked.emit(self, blocked_by_barrier)
+			create_block_text()
+	var remaining_damage: int = _damage - blocked_by_barrier
 	var current_block: int = get_block()
 	var current_health: int = _get_health()
 
-	if current_block > 0 and not bypass_block:
-		if current_block > _damage:
+	if current_block > 0 and not bypass_block and remaining_damage > 0:
+		if current_block > remaining_damage:
 			# damage less than block
-			set_block(current_block - _damage)
+			set_block(current_block - remaining_damage)
 			bypassed_damage = 0
 			create_block_text()
-			Signals.combatant_blocked.emit(self, _damage)
+			Signals.combatant_blocked.emit(self, remaining_damage)
 		else:
 			# damage exceeds block
-			bypassed_damage = _damage - current_block
+			bypassed_damage = remaining_damage - current_block
 			set_block(0)
 			Signals.combatant_block_broken.emit(self)
+	elif not bypass_block:
+		bypassed_damage = remaining_damage
 	
 	if bypassed_damage <= 0:
 		return [0,0,0]
@@ -98,6 +110,7 @@ func update_health_bar(as_damage: bool = false) -> void:
 
 func update_player_display(_player_data: PlayerData):
 	update_health_bar(false)
+	_update_barrier_display()
 
 func update_incoming_damage_amount(recalculate_enemy_intent: bool = true) -> void:
 	# updates the damage preview above the player's head
@@ -160,6 +173,10 @@ func create_artifact_fade(artifact_id: String) -> void:
 	fade_container.add_child(artifact_fade)
 	artifact_fade.init(artifact_id)
 
+func _update_barrier_display() -> void:
+	barrier.visible = Global.player_data.player_barrier > 0
+	barrier_amount.text = str(Global.player_data.player_barrier)
+
 ### Run Modifiers
 
 func register_run_modifier_interceptors() -> void:
@@ -191,6 +208,7 @@ func _on_run_started():
 	update_health_bar(false)
 	
 	update_incoming_damage_amount(true)
+	_update_barrier_display()
 	# run modifiers
 	register_run_modifier_interceptors()
 	
@@ -205,16 +223,19 @@ func _on_run_ended():
 	unregister_all_custom_ui()
 	_death_reported = false
 	visible = true
+	_update_barrier_display()
 
 func _on_combat_started(_event_id: String):
 	clear_all_status_effects()
 	_death_reported = false
+	_update_barrier_display()
 	
 func _on_combat_ended():
 	clear_all_status_effects()
 	reset_block()
 	update_incoming_damage_amount()
 	_death_reported = false
+	_update_barrier_display()
 
 func _on_enemy_intent_changed():
 	update_incoming_damage_amount(true)
@@ -235,6 +256,9 @@ func _on_player_health_changed():
 
 func _on_artifact_proc(artifact_data: ArtifactData):
 	create_artifact_fade(artifact_data.object_id)
+
+func _on_player_barrier_changed():
+	_update_barrier_display()
 
 func _on_death_animtation_finished():
 	# called from animation player

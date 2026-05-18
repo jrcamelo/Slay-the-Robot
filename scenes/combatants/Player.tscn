@@ -157,6 +157,23 @@ text = "999"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Barrier" type="Sprite2D" parent="Visible" unique_id=130001001]
+visible = false
+self_modulate = Color(0.101961, 0.498039, 0.858824, 1)
+position = Vector2(160, 40)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_snepv")
+
+[node name="BarrierAmount" type="Label" parent="Visible/Barrier" unique_id=130001002]
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 42
+text = "999"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="StatusContainer" type="GridContainer" parent="Visible" unique_id=1178820925]
 layout_mode = 0
 offset_left = -16.0

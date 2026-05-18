@@ -215,10 +215,12 @@ func _on_combat_started(event_id: String):
 	start_turn_animation()
 	
 	Global.player_data.player_energy = 0
+	Global.player_data.reset_barrier()
 	set_combat_display_visibility(true)
 	update_combat_display()
 	
 func _on_combat_ended():
+	Global.player_data.reset_barrier()
 	set_combat_display_visibility(false)
 	
 
@@ -268,16 +270,6 @@ func perform_enemy_turn():
 						"time_delay": 0.0,
 						}
 					}
-			)
-			
-			# add reset block action
-			enemy_actions_data.append(
-			{
-			Scripts.ACTION_RESET_BLOCK:  {
-				"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-				"time_delay": 0.0
-				}
-			}
 			)
 			
 			# perform them and wait
@@ -362,8 +354,8 @@ func _on_player_turn_started():
 	# perform pre draw actions
 	for player_combatant: Player in Global.get_players():
 		player_combatant.update_incoming_damage_amount(true)
+	Global.player_data.reset_barrier()
 	for player_combatant: Player in Global.get_living_players():
-		player_combatant.generate_reset_block_action()
 		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
