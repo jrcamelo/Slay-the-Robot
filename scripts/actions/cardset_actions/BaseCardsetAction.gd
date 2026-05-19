@@ -3,6 +3,19 @@
 extends BaseAction
 class_name BaseCardsetAction
 
+func get_editor_script_type() -> String:
+	return "cardset_action"
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameter_definitions: Array[Dictionary] = super()
+	parameter_definitions.append(
+		_editor_param("pick_played_card", "Pick Played Card", "bool", false, "Uses the currently played card as the cardset source.")
+	)
+	parameter_definitions.append(
+		_editor_param("picked_cards", "Picked Cards", "card_array", [], "Explicit cards to operate on when no parent pick action provides them.")
+	)
+	return parameter_definitions
+
 ### Override
 
 func perform_action() -> void:

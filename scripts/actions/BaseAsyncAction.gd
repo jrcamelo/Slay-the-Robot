@@ -15,6 +15,9 @@ var async_awaiting: bool = false
 var _interceptor_processors_cached: bool = false
 var _cached_interceptor_processors: Array[ActionInterceptorProcessor] = []
 
+func get_editor_script_type() -> String:
+	return "async_action"
+
 ### Override
 
 ## Async actions should use perform_action() to define an await callback, and

@@ -36,6 +36,52 @@ const DECK_PICK_TYPES: Array = [
 	CARD_PICK_TYPES.PLAYED_LAST_TURN,
 	]
 
+func get_editor_script_type() -> String:
+	return "card_pick_action"
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameter_definitions: Array[Dictionary] = super()
+	parameter_definitions.append(
+		_editor_param(
+			"card_pick_type",
+			"Card Pick Type",
+			"enum",
+			CARD_PICK_TYPES.HAND,
+			"Controls both the source pile and the UI used for selection.",
+			{
+				"options": [
+					{"label": "Hand", "value": CARD_PICK_TYPES.HAND},
+					{"label": "Deck", "value": CARD_PICK_TYPES.DECK},
+					{"label": "Combat Deck", "value": CARD_PICK_TYPES.COMBAT_DECK},
+					{"label": "Draw", "value": CARD_PICK_TYPES.DRAW},
+					{"label": "Discard", "value": CARD_PICK_TYPES.DISCARD},
+					{"label": "Exhaust", "value": CARD_PICK_TYPES.EXHAUST},
+					{"label": "Played This Turn", "value": CARD_PICK_TYPES.PLAYED_THIS_TURN},
+					{"label": "Played Last Turn", "value": CARD_PICK_TYPES.PLAYED_LAST_TURN},
+					{"label": "Draft", "value": CARD_PICK_TYPES.DRAFT},
+				]
+			}
+		)
+	)
+	parameter_definitions.append(_editor_param("card_pick_text", "Card Pick Text", "string", "Choose {0} card(s). {1} cards selected", "UI prompt shown during selection."))
+	parameter_definitions.append(_editor_param("min_card_amount", "Minimum Cards", "int", 0, "Minimum number of cards that must be picked."))
+	parameter_definitions.append(_editor_param("max_card_amount", "Maximum Cards", "int", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX, "Maximum number of cards the player can pick."))
+	parameter_definitions.append(_editor_param("min_cards_are_required_for_action", "Require Minimum Cards", "bool", false, "If true and not enough cards are available, the action does nothing."))
+	parameter_definitions.append(_editor_param("pickable_cards_max_amount", "Pickable Cards Max", "int", -1, "Restricts the number of cards exposed after filtering."))
+	parameter_definitions.append(_editor_param("quick_pick", "Quick Pick", "bool", true, "Auto-confirms once the maximum allowed cards have been selected."))
+	parameter_definitions.append(_editor_param("random_selection", "Random Selection", "bool", false, "Selects cards automatically instead of prompting the user."))
+	parameter_definitions.append(_editor_param("rng_name", "RNG Name", "string", "rng_card_picking", "RNG track used for random card selection."))
+	parameter_definitions.append(_editor_param("validator_data", "Validator Data", "validator_array", [], "Validators used to narrow pickable cards."))
+	parameter_definitions.append(_editor_param("pick_draft_cards", "Pick Draft Cards", "bool", false, "Uses provided draft cards instead of reading from a pile."))
+	parameter_definitions.append(_editor_param("draft_cards", "Draft Cards", "card_array", [], "Explicit cards to present in draft mode."))
+	parameter_definitions.append(_editor_param("draft_from_card_pool", "Draft From Card Pool", "bool", false, "Generates draft choices from the broader card pool."))
+	parameter_definitions.append(_editor_param("draft_card_pack_id", "Draft Card Pack ID", "string", "", "Card pack to draft from, if any."))
+	parameter_definitions.append(_editor_param("draft_use_player_draft", "Use Player Draft Pool", "bool", false, "Uses the player's draft-eligible card pool."))
+	parameter_definitions.append(_editor_param("draft_is_weighted", "Weighted Draft", "bool", false, "Uses rarity weighting when drafting from the player's pool."))
+	parameter_definitions.append(_editor_param("draft_use_pity_system", "Use Pity System", "bool", false, "Applies the player's pity system for rare drafts."))
+	parameter_definitions.append(_editor_param("draft_max_card_amount", "Draft Max Cards", "int", 3, "Maximum number of generated draft cards."))
+	return parameter_definitions
+
 func _assign_generated_card_owners(cards: Array[CardData]) -> Array[CardData]:
 	if not Global.player_data.has_party_members():
 		return cards

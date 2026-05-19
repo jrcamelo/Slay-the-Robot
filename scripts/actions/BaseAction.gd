@@ -45,6 +45,82 @@ enum TARGET_OVERRIDES {
 	RANDOM_ENEMY	# a random existing enemy is chosen
 	}
 
+func get_editor_metadata() -> Dictionary:
+	return {
+		"kind": "action",
+		"script_type": get_editor_script_type(),
+		"display_name": _get_editor_display_name(),
+		"description": _get_editor_description(),
+		"contexts": _get_editor_contexts(),
+		"parameters": _get_editor_parameter_definitions(),
+	}
+
+func get_editor_script_type() -> String:
+	return "action"
+
+func _get_editor_display_name() -> String:
+	var script := get_script() as Script
+	if script == null:
+		return "Action"
+	var file_name: String = script.resource_path.get_file().trim_suffix(".gd")
+	file_name = file_name.trim_prefix("Action")
+	return file_name.to_snake_case().replace("_", " ").capitalize()
+
+func _get_editor_description() -> String:
+	return ""
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		"card_play_actions",
+		"card_trigger_actions",
+		"action_children",
+	]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	return [
+		_editor_param("time_delay", "Time Delay", "float", 0.0, "Delay before the next action executes."),
+		_editor_param("action_tags", "Action Tags", "string_array", [], "Optional tags used by interceptors and editor tooling."),
+		_editor_param("action_short_circuits", "Short Circuits", "bool", false, "Skips the action when combat is already over."),
+		_editor_param(
+			"target_override",
+			"Target Override",
+			"enum",
+			TARGET_OVERRIDES.SELECTED_TARGETS,
+			"Overrides how the action resolves its targets.",
+			{
+				"options": [
+					{"label": "Selected Targets", "value": TARGET_OVERRIDES.SELECTED_TARGETS},
+					{"label": "Parent", "value": TARGET_OVERRIDES.PARENT},
+					{"label": "Player", "value": TARGET_OVERRIDES.PLAYER},
+					{"label": "All Combatants", "value": TARGET_OVERRIDES.ALL_COMBATANTS},
+					{"label": "All Enemies", "value": TARGET_OVERRIDES.ALL_ENEMIES},
+					{"label": "Leftmost Enemy", "value": TARGET_OVERRIDES.LEFTMOST_ENEMY},
+					{"label": "Enemy ID", "value": TARGET_OVERRIDES.ENEMY_ID},
+					{"label": "Random Enemy", "value": TARGET_OVERRIDES.RANDOM_ENEMY},
+				]
+			}
+		),
+	]
+
+func _editor_param(
+	name: String,
+	label: String,
+	value_type: String,
+	default_value: Variant,
+	description: String = "",
+	extra: Dictionary = {}
+) -> Dictionary:
+	var parameter_data: Dictionary = {
+		"name": name,
+		"label": label,
+		"value_type": value_type,
+		"default_value": default_value,
+		"description": description,
+	}
+	for key: Variant in extra.keys():
+		parameter_data[key] = extra[key]
+	return parameter_data
+
 func init(_parent_combatant: BaseCombatant = null, _card_play_request: CardPlayRequest = null, _targets: Array[BaseCombatant] = [], _values: Dictionary[String, Variant] = {}, _parent_action: BaseAction = null):
 	# constructor method for the action
 	parent_combatant = _parent_combatant
