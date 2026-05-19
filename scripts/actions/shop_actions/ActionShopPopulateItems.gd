@@ -4,6 +4,16 @@
 ## See: ShopData.visit_shop() and ActionGenerator.generate_populate_shop_items() 
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Populates the current shop with cards, artifacts, consumables, and their prices."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_SHOP_ACTIONS,
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+	]
+
 func perform_action():
 	# check if shop at player location
 	var shop_data: ShopData = Global.get_shop_at_player_location()

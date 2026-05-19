@@ -1,6 +1,9 @@
 ## Swaps the player's starting artifact(s) for the next available boss artifact.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Replaces the player's starting artifacts with the next available boss artifact."
+
 func perform_action():
 	var player_character_data: CharacterData = Global.get_player_character_data()
 	for starting_artifact_id: String in player_character_data.character_starting_artifact_ids:

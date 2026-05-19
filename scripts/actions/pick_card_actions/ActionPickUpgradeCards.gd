@@ -5,6 +5,9 @@
 ## For more control you'll want to use validators and ActionUpgradeCards with ActionPickCards
 extends ActionBasePickCards
 
+func _get_editor_description() -> String:
+	return "Picks cards and upgrades them directly, optionally applying upgrades to permanent parent deck copies."
+
 func perform_async_action() -> void:
 	var upgrade_parent_card: bool = get_action_value("upgrade_parent_card", false) # This should be false if using CARD_PICK_TYPES.DECK
 	for card in picked_cards:

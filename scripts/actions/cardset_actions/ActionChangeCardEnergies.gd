@@ -1,6 +1,9 @@
 # Changes the energy cost values of given cards
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Overwrites one or more energy cost layers on the selected cards."
+
 func perform_action() -> void:
 	var card_energy_cost: int = get_action_value("card_energy_cost", -1)
 	var card_energy_cost_until_combat: int = get_action_value("card_energy_cost_until_combat", -1)

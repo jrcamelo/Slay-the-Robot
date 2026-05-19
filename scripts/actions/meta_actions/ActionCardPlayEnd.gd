@@ -5,5 +5,8 @@
 ## and add to the action stack, without actually ending the processing of actions.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Synthetic post-play action that signals the end of a card play."
+
 func perform_action() -> void:
 	Signals.card_played.emit(card_play_request)

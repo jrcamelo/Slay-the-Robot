@@ -3,6 +3,17 @@
 ## To intercept, extend InterceptorBaseNegateStatusDecay and provide a check for status_object_id.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Applies negative status charges to decay an existing status effect in an interceptable way."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	

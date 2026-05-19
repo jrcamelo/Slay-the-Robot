@@ -1,6 +1,9 @@
 # Shared party-wide block action.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adds shared barrier block to the party-wide barrier pool."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

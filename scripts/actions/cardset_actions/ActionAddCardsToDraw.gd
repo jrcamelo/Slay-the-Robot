@@ -1,6 +1,9 @@
 # Action to add cards to your draw pile
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Moves selected cards into the draw pile at the chosen destination."
+
 func perform_action() -> void:
 	
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])

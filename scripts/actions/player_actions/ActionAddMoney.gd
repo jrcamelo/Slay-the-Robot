@@ -1,5 +1,8 @@
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adds or removes money from the player's run state."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

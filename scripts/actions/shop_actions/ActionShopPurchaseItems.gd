@@ -1,6 +1,16 @@
 # allows purchasing things from a shop
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Attempts to purchase a card, artifact, or consumable from the current shop."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_SHOP_ACTIONS,
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+	]
+
 func perform_action():
 	# intercept the action
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])

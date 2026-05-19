@@ -2,6 +2,17 @@
 ## NOTE: This does not prevent a card being played. See: CardData.card_play_validators
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Runs validators at action time and generates either the passed or failed child actions."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
 func perform_action():
 	var action_data: Array[Dictionary] = []
 	if _validate():

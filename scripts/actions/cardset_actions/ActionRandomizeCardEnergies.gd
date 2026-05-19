@@ -1,6 +1,9 @@
 # Randomizes the energy cost values of given cards
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Randomizes one or more energy cost layers on the selected cards."
+
 func perform_action() -> void:
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

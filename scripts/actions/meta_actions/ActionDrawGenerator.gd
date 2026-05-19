@@ -4,6 +4,9 @@
 ## for use in interception logic.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Generates repeated draw actions from a single draw-count payload."
+
 func perform_action(): 
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

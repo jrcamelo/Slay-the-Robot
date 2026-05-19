@@ -5,6 +5,9 @@
 # If you want the value to be seen in the description, use a listener such as ListenerCardValueModifier
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Wraps child actions and scales selected values from a combat stat."
+
 func is_instant_action() -> bool:
 	return true
 

@@ -1,6 +1,17 @@
 # Registers/unregisters a custom ui element with a target
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Registers or unregisters a custom UI element on the resolved target."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	

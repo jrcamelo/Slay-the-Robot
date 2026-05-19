@@ -4,6 +4,9 @@
 ## modifying the "custom_signal_value" action value.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Emits a custom signal defined in content, optionally with a numeric payload."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

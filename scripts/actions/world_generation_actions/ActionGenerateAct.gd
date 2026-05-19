@@ -5,6 +5,15 @@
 ## generation algorithms.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Generates a run map for an act, including floor counts, node spacing, obfuscation, and non-combat rates."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_RUN_ACTIONS,
+	]
+
 func perform_action() -> void:
 	# generates all world locations from a seed and stores them in PlayerData
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])

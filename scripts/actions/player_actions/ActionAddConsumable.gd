@@ -1,6 +1,9 @@
 # attempts to grant a consumable to the player, if slots are available
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adds a consumable to the player, either directly or by random selection with whitelist and blacklist support."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

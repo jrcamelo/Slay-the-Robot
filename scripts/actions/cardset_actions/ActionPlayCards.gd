@@ -1,6 +1,9 @@
 # plays given cards
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Queues the selected cards to be played, usually against random or inherited targets."
+
 func perform_action() -> void:
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

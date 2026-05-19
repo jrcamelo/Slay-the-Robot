@@ -3,6 +3,16 @@
 # Note: one is automatically created at the start of combat by RewardOverlay and cycled back to prepopulate end of combat rewards
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Pushes money, card drafts, artifacts, and custom reward buttons into the reward overlay."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_REWARD_ACTIONS,
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

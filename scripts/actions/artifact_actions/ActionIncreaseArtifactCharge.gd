@@ -2,6 +2,9 @@
 ## instance of an artifact
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Increases or decreases charges on artifacts by id or on specific artifact instances."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:

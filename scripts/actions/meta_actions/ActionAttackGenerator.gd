@@ -2,6 +2,17 @@
 # Use this action instead of just invoking an AttackDamage action
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Builds one or more attack actions from a shared damage payload, including random variance and lethal children."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
 func is_instant_action() -> bool:
 	return true
 

@@ -2,6 +2,17 @@
 # affected by fewer interceptors compared to an AttackAction
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Deals direct damage immediately, with optional bypass-block behavior and lethal follow-up actions."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	

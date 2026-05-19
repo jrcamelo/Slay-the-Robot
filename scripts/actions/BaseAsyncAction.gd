@@ -18,6 +18,9 @@ var _cached_interceptor_processors: Array[ActionInterceptorProcessor] = []
 func get_editor_script_type() -> String:
 	return "async_action"
 
+func _get_editor_description() -> String:
+	return "Base class for actions that pause execution until UI input, animation, or another async signal completes."
+
 ### Override
 
 ## Async actions should use perform_action() to define an await callback, and

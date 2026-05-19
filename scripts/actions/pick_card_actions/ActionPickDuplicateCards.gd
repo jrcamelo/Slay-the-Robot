@@ -2,6 +2,9 @@
 # Should have children cardset actions to ensure the duplicated cards are placed somewhere
 extends ActionPickCards
 
+func _get_editor_description() -> String:
+	return "Picks cards, duplicates them into new instances, and exposes those duplicates to child cardset actions."
+
 func perform_async_action() -> void:
 	var generated_cards: Array[CardData]
 	for card in picked_cards:

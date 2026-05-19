@@ -2,6 +2,15 @@
 ## but can be invoked elsewhere.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Forces the player to visit a location by id, optionally autosaving first."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_RUN_ACTIONS,
+	]
+
 func perform_action() -> void:
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor: ActionInterceptorProcessor in action_interceptor_processors:

@@ -2,6 +2,9 @@
 ## Intercept hand_card_count_max to change hand size max allowed for this action.
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Draws a single card, usually generated through Draw Generator."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:

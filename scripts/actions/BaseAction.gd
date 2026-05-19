@@ -6,6 +6,15 @@
 extends RefCounted
 class_name BaseAction
 
+const EDITOR_CONTEXT_CARD_PLAY_ACTIONS := "card_play_actions"
+const EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS := "card_trigger_actions"
+const EDITOR_CONTEXT_ACTION_CHILDREN := "action_children"
+const EDITOR_CONTEXT_ENEMY_ACTIONS := "enemy_custom_actions"
+const EDITOR_CONTEXT_WORLD_ACTIONS := "world_actions"
+const EDITOR_CONTEXT_REWARD_ACTIONS := "reward_actions"
+const EDITOR_CONTEXT_SHOP_ACTIONS := "shop_actions"
+const EDITOR_CONTEXT_RUN_ACTIONS := "run_actions"
+
 ## The owner of the action. Can be null.
 var parent_combatant: BaseCombatant = null
 ## The card play that is responsible for the action. Can be null.
@@ -71,36 +80,52 @@ func _get_editor_description() -> String:
 
 func _get_editor_contexts() -> Array[String]:
 	return [
-		"card_play_actions",
-		"card_trigger_actions",
-		"action_children",
+		EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
+		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
 	]
 
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
-	return [
-		_editor_param("time_delay", "Time Delay", "float", 0.0, "Delay before the next action executes."),
-		_editor_param("action_tags", "Action Tags", "string_array", [], "Optional tags used by interceptors and editor tooling."),
-		_editor_param("action_short_circuits", "Short Circuits", "bool", false, "Skips the action when combat is already over."),
-		_editor_param(
-			"target_override",
-			"Target Override",
-			"enum",
-			TARGET_OVERRIDES.SELECTED_TARGETS,
-			"Overrides how the action resolves its targets.",
-			{
-				"options": [
-					{"label": "Selected Targets", "value": TARGET_OVERRIDES.SELECTED_TARGETS},
-					{"label": "Parent", "value": TARGET_OVERRIDES.PARENT},
-					{"label": "Player", "value": TARGET_OVERRIDES.PLAYER},
-					{"label": "All Combatants", "value": TARGET_OVERRIDES.ALL_COMBATANTS},
-					{"label": "All Enemies", "value": TARGET_OVERRIDES.ALL_ENEMIES},
-					{"label": "Leftmost Enemy", "value": TARGET_OVERRIDES.LEFTMOST_ENEMY},
-					{"label": "Enemy ID", "value": TARGET_OVERRIDES.ENEMY_ID},
-					{"label": "Random Enemy", "value": TARGET_OVERRIDES.RANDOM_ENEMY},
-				]
-			}
-		),
-	]
+	return []
+
+func _get_editor_common_parameter_definitions(parameter_names: Array[String]) -> Array[Dictionary]:
+	var parameter_definitions: Array[Dictionary] = []
+	for parameter_name: String in parameter_names:
+		var parameter_definition: Dictionary = _get_editor_common_parameter_definition(parameter_name)
+		if not parameter_definition.is_empty():
+			parameter_definitions.append(parameter_definition)
+	return parameter_definitions
+
+func _get_editor_common_parameter_definition(parameter_name: String) -> Dictionary:
+	match parameter_name:
+		"time_delay":
+			return _editor_param("time_delay", "Time Delay", "float", 0.0, "Delay before the next action executes.")
+		"action_tags":
+			return _editor_param("action_tags", "Action Tags", "string_array", [], "Optional tags used by interceptors and editor tooling.")
+		"action_short_circuits":
+			return _editor_param("action_short_circuits", "Short Circuits", "bool", false, "Skips the action when combat is already over.")
+		"target_override":
+			return _editor_param(
+				"target_override",
+				"Target Override",
+				"enum",
+				TARGET_OVERRIDES.SELECTED_TARGETS,
+				"Overrides how the action resolves its targets.",
+				{
+					"options": [
+						{"label": "Selected Targets", "value": TARGET_OVERRIDES.SELECTED_TARGETS},
+						{"label": "Parent", "value": TARGET_OVERRIDES.PARENT},
+						{"label": "Player", "value": TARGET_OVERRIDES.PLAYER},
+						{"label": "All Combatants", "value": TARGET_OVERRIDES.ALL_COMBATANTS},
+						{"label": "All Enemies", "value": TARGET_OVERRIDES.ALL_ENEMIES},
+						{"label": "Leftmost Enemy", "value": TARGET_OVERRIDES.LEFTMOST_ENEMY},
+						{"label": "Enemy ID", "value": TARGET_OVERRIDES.ENEMY_ID},
+						{"label": "Random Enemy", "value": TARGET_OVERRIDES.RANDOM_ENEMY},
+					]
+				}
+			)
+		_:
+			return {}
 
 func _editor_param(
 	name: String,

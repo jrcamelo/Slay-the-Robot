@@ -3,6 +3,9 @@
 # See ActionChangeCardProperties for setter version
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Improves entries in card_values for the selected cards, optionally on their parent deck copies."
+
 func perform_action():
 	var improve_parent_card: bool = get_action_value("improve_parent_card", true)
 	var picked_cards: Array[CardData] = _get_picked_cards()

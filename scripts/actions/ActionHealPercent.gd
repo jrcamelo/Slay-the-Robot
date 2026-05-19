@@ -1,6 +1,9 @@
 # Heals the player by a percentage
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Heals the relevant player or party member by a percentage of max health."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	var party_member_data: PartyMemberData = null

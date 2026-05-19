@@ -28,10 +28,13 @@ static func get_script_metadata(script: Script) -> Dictionary:
 	metadata["script_global_name"] = script.get_global_name()
 	metadata["script_class_name"] = instance.get_class()
 	if instance is BaseAction:
-		metadata["parameters"] = _merge_parameter_definitions(
-			metadata.get("parameters", []),
-			_infer_action_parameters(script.resource_path)
-		)
+		var source_text: String = _load_script_source(script.resource_path)
+		var inferred_parameters: Array[Dictionary] = _infer_action_parameters_from_source(script.resource_path, source_text)
+		var common_parameters: Array[Dictionary] = _infer_common_action_parameters(instance, source_text, inferred_parameters)
+		var merged_parameters: Array[Dictionary] = _merge_parameter_definitions(common_parameters, inferred_parameters)
+		merged_parameters = _merge_parameter_definitions(metadata.get("parameters", []), merged_parameters)
+		metadata["parameters"] = merged_parameters
+		metadata["used_parameter_names"] = _parameter_names_from_definitions(merged_parameters)
 	return metadata
 
 static func get_all_action_metadata() -> Array[Dictionary]:
@@ -80,6 +83,9 @@ static func _merge_parameter_definitions(primary_parameters: Array, inferred_par
 
 static func _infer_action_parameters(script_path: String) -> Array[Dictionary]:
 	var source_text: String = _load_script_source(script_path)
+	return _infer_action_parameters_from_source(script_path, source_text)
+
+static func _infer_action_parameters_from_source(script_path: String, source_text: String) -> Array[Dictionary]:
 	if source_text == "":
 		return []
 	var regex_patterns: Array[String] = [
@@ -113,6 +119,49 @@ static func _infer_action_parameters(script_path: String) -> Array[Dictionary]:
 	for parameter_name: String in parameter_names:
 		parameters.append(parameter_map[parameter_name])
 	return parameters
+
+static func _infer_common_action_parameters(action: BaseAction, source_text: String, inferred_parameters: Array[Dictionary]) -> Array[Dictionary]:
+	var parameter_names: Array[String] = ["time_delay"]
+	if _source_uses_interception(source_text):
+		parameter_names.append("action_tags")
+	if _source_uses_target_override(source_text) or _has_parameter_named(inferred_parameters, "target_override"):
+		parameter_names.append("target_override")
+	if _source_uses_action_short_circuits(source_text) or _has_parameter_named(inferred_parameters, "action_short_circuits"):
+		parameter_names.append("action_short_circuits")
+	return action._get_editor_common_parameter_definitions(parameter_names)
+
+static func _source_uses_interception(source_text: String) -> bool:
+	return source_text.contains("_intercept_action(")
+
+static func _source_uses_target_override(source_text: String) -> bool:
+	return (
+		source_text.contains("_intercept_action()")
+		or source_text.contains("get_adjusted_action_targets()")
+		or source_text.contains('get_action_value("target_override"')
+		or source_text.contains('get_shadowed_action_values("target_override"')
+	)
+
+static func _source_uses_action_short_circuits(source_text: String) -> bool:
+	return (
+		source_text.contains("func is_action_short_circuited")
+		or source_text.contains('get_action_value("action_short_circuits"')
+		or source_text.contains('get_shadowed_action_values("action_short_circuits"')
+	)
+
+static func _has_parameter_named(parameter_definitions: Array[Dictionary], parameter_name: String) -> bool:
+	for parameter_definition: Dictionary in parameter_definitions:
+		if str(parameter_definition.get("name", "")) == parameter_name:
+			return true
+	return false
+
+static func _parameter_names_from_definitions(parameter_definitions: Array[Dictionary]) -> Array[String]:
+	var parameter_names: Array[String] = []
+	for parameter_definition: Dictionary in parameter_definitions:
+		var parameter_name: String = str(parameter_definition.get("name", ""))
+		if parameter_name == "":
+			continue
+		parameter_names.append(parameter_name)
+	return parameter_names
 
 static func _load_script_source(script_path: String) -> String:
 	if script_path == "":

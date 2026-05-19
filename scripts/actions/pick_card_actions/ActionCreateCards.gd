@@ -3,6 +3,9 @@
 # Make sure to have child BaseCardSetAction(s) to actually do something such as add to hand
 extends ActionPickCards
 
+func _get_editor_description() -> String:
+	return "Generates fresh card instances instead of prompting the user, then passes them through the normal pick-card child action flow."
+
 func perform_action():
 	# overrides user card selection with generating cards
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])

@@ -6,6 +6,9 @@ class_name BaseCardsetAction
 func get_editor_script_type() -> String:
 	return "cardset_action"
 
+func _get_editor_description() -> String:
+	return "Base class for actions that operate on a selected set of cards."
+
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	var parameter_definitions: Array[Dictionary] = super()
 	parameter_definitions.append(

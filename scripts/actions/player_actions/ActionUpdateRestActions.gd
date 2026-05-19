@@ -1,6 +1,9 @@
 ## Enables/disables rest actions to player
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Enables or disables rest actions for the current run."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor: ActionInterceptorProcessor in action_interceptor_processors:

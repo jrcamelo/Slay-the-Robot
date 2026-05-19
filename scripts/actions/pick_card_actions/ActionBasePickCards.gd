@@ -39,6 +39,9 @@ const DECK_PICK_TYPES: Array = [
 func get_editor_script_type() -> String:
 	return "card_pick_action"
 
+func _get_editor_description() -> String:
+	return "Base async action for selecting cards from piles or draft sources before running follow-up logic."
+
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	var parameter_definitions: Array[Dictionary] = super()
 	parameter_definitions.append(

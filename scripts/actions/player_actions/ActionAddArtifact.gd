@@ -1,5 +1,8 @@
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adds an artifact to the player by artifact id."
+
 func perform_action():
 	var artifact_id: String = get_action_value("artifact_id", "")
 	var artifact_data: ArtifactData = Global.get_artifact_data_from_prototype(artifact_id)

@@ -3,6 +3,9 @@
 extends ActionBasePickCards
 class_name ActionPickCards
 
+func _get_editor_description() -> String:
+	return "Prompts for or auto-selects cards, then generates child cardset actions that operate on the picked cards."
+
 func perform_async_action() -> void:
 	_generate_child_actions()
 	action_async_finished.emit()

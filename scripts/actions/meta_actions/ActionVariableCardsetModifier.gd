@@ -3,6 +3,9 @@
 # see also ActionVariableCostModifiier
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Wraps child actions and scales selected values based on the size of an input card set."
+
 func is_instant_action() -> bool:
 	return true
 

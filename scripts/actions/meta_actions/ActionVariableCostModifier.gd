@@ -1,6 +1,9 @@
 # Wraps child actions, modifying their values based on the card's input energy, allowing for variable cost cards to work
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Wraps child actions and scales selected values using the current card play's committed energy."
+
 func is_instant_action() -> bool:
 	return true
 

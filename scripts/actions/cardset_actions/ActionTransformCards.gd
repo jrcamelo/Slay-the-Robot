@@ -2,6 +2,9 @@
 # This can target a list of cards, or their parent cards (making it permanent if in player's deck)
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Transforms selected cards into other cards, with optional preservation of color, rarity, type, and upgrades."
+
 func perform_action():
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	

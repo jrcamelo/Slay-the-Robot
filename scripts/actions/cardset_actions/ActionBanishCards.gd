@@ -1,6 +1,9 @@
 # Action to completely remove cards from play (hand, all piles), in effect removing the card from play
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Removes selected cards from all combat piles and banishes them from play."
+
 func perform_action() -> void:
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	Signals.card_banish_requested.emit(picked_cards, false)

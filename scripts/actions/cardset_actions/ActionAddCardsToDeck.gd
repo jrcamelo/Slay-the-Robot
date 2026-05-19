@@ -1,6 +1,9 @@
 # Action add given cards to your permanent deck
 extends BaseCardsetAction
 
+func _get_editor_description() -> String:
+	return "Adds the selected cards to the player's permanent deck."
+
 func perform_action() -> void:
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	for card_data in picked_cards:

@@ -1,5 +1,8 @@
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Reshuffles the player's draw/discard piles, optionally merging discard back into draw."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

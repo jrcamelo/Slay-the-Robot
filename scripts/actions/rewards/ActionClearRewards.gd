@@ -2,6 +2,16 @@
 # Can be specified to clear all rewards or a given reward group
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Clears all rewards or only a specific reward group from the reward overlay."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_REWARD_ACTIONS,
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:

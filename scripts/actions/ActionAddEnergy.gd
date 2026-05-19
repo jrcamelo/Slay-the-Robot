@@ -1,6 +1,9 @@
 # adds both permanent and combat energy to the player
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adds current-turn energy and optionally raises the maximum available energy."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	

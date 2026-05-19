@@ -1,6 +1,16 @@
 ## Provides interceptable generation for rewards in a chest
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Builds chest rewards, either from explicit payload values or from the normal reward generation systems."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_WORLD_ACTIONS,
+		EDITOR_CONTEXT_REWARD_ACTIONS,
+		EDITOR_CONTEXT_ACTION_CHILDREN,
+	]
+
 func perform_action() -> void:	
 	# generates all world locations from a seed and stores them in PlayerData
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])

@@ -2,6 +2,9 @@
 ## Forces a recompiling of PlayerData.player_reward_card_filter_cache
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Adjusts the party member's future card reward pools by adding or removing card packs and id filters."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	var party_member_data: PartyMemberData = null

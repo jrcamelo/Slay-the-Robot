@@ -1,6 +1,9 @@
 ## Interceptable action to use a consumable in a given slot
 extends BaseAction
 
+func _get_editor_description() -> String:
+	return "Consumes the item in a given slot and executes that consumable's action payload."
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
