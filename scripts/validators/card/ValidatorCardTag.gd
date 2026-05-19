@@ -3,6 +3,22 @@
 ## May also be used in a CardPackData to filter by tag.
 extends BaseValidator
 
+func _get_editor_display_name() -> String:
+	return "Card Tags"
+
+func _get_editor_description() -> String:
+	return "Filters cards by required and excluded tags."
+
+func _get_editor_contexts() -> Array[String]:
+	return [EDITOR_CONTEXT_ACTION_VALIDATORS, EDITOR_CONTEXT_CARD_FILTER, EDITOR_CONTEXT_CARD_PICK]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameters: Array[Dictionary] = super()
+	parameters.append(_editor_param("card_tags", "Required Tags", "string_array", [], "Tags the card must contain."))
+	parameters.append(_editor_param("require_all_tags", "Require All Tags", "bool", true, "If true, the card must contain every required tag."))
+	parameters.append(_editor_param("card_tags_exclude", "Excluded Tags", "string_array", [], "Tags that automatically fail validation."))
+	return parameters
+
 func _validation(card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	if card_data == null:
 		return false

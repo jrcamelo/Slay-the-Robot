@@ -1,6 +1,18 @@
 # Validator for checking if a card belongs to a certain rarity
 extends BaseValidator
 
+func _get_editor_description() -> String:
+	return "Filters cards by allowed and excluded rarities."
+
+func _get_editor_contexts() -> Array[String]:
+	return [EDITOR_CONTEXT_ACTION_VALIDATORS, EDITOR_CONTEXT_CARD_FILTER, EDITOR_CONTEXT_CARD_PICK]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameters: Array[Dictionary] = super()
+	parameters.append(_editor_param("card_rarities", "Allowed Rarities", "enum_array", [], "If not empty, the card must match one of these rarities."))
+	parameters.append(_editor_param("card_rarities_exclude", "Excluded Rarities", "enum_array", [], "Cards with these rarities always fail validation."))
+	return parameters
+
 func _validation(card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	if card_data == null:
 		return false

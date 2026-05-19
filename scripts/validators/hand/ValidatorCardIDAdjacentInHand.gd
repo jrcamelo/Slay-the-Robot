@@ -2,6 +2,21 @@
 ## Fails if card not in hand.
 extends BaseValidator
 
+func _get_editor_display_name() -> String:
+	return "Adjacent Card ID"
+
+func _get_editor_description() -> String:
+	return "Checks whether a card is adjacent to one or more specific card IDs in hand."
+
+func _get_editor_contexts() -> Array[String]:
+	return [EDITOR_CONTEXT_CARD_PLAY_VALIDATORS, EDITOR_CONTEXT_CARD_GLOW_VALIDATORS, EDITOR_CONTEXT_ACTION_VALIDATORS]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameters: Array[Dictionary] = super()
+	parameters.append(_editor_param("card_ids", "Adjacent Card IDs", "string_array", [], "Adjacent card IDs that satisfy the validator."))
+	parameters.append(_editor_param("requires_surrounded", "Requires Surrounded", "bool", false, "If true, both adjacent cards must match."))
+	return parameters
+
 func _validation(_card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	var card_ids: Array = _get_validator_value("card_ids", values, _action, [])
 	

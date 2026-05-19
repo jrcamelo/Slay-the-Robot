@@ -2,6 +2,24 @@
 # See: CombatStatsData for stat_enum values
 extends BaseValidator
 
+func _get_editor_description() -> String:
+	return "Compares a combat stat against a threshold."
+
+func _get_editor_contexts() -> Array[String]:
+	return [
+		EDITOR_CONTEXT_CARD_PLAY_VALIDATORS,
+		EDITOR_CONTEXT_CARD_GLOW_VALIDATORS,
+		EDITOR_CONTEXT_ACTION_VALIDATORS,
+	]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameters: Array[Dictionary] = super()
+	parameters.append(_editor_param("stat_enum", "Stat", "enum", CombatStatsData.STATS.ENEMIES_KILLED, "Combat stat to inspect."))
+	parameters.append(_editor_param("is_total_stat", "Use Total Stat", "bool", false, "Uses the whole-combat value instead of the current turn value."))
+	parameters.append(_editor_param("operator", "Operator", "enum", ">", "Comparison operator.", {"options": ["<", "<=", ">", ">=", "==", "!="]}))
+	parameters.append(_editor_param("comparison_value", "Comparison Value", "int", 0, "Value to compare against."))
+	return parameters
+
 func _validation(_card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	var combat_stats_data: CombatStatsData = Global.get_combat_stats()
 	

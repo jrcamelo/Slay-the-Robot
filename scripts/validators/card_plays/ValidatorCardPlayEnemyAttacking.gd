@@ -2,6 +2,15 @@
 # NOTE: See ValidatorEnemyAttacking
 extends BaseValidator
 
+func _get_editor_display_name() -> String:
+	return "Selected Enemy Attacking"
+
+func _get_editor_description() -> String:
+	return "Checks whether the selected target, or every resolved enemy target, is attacking."
+
+func _get_editor_contexts() -> Array[String]:
+	return [EDITOR_CONTEXT_ACTION_VALIDATORS]
+
 func _validation(_card_data: CardData, action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 
 	if action == null:

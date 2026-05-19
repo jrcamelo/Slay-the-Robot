@@ -5,6 +5,20 @@
 ## the draft_use_player_draft flag
 extends BaseValidator
 
+func _get_editor_display_name() -> String:
+	return "Card Draftable"
+
+func _get_editor_description() -> String:
+	return "Checks whether a card is currently draftable by the player or a specific party member."
+
+func _get_editor_contexts() -> Array[String]:
+	return [EDITOR_CONTEXT_ACTION_VALIDATORS, EDITOR_CONTEXT_CARD_FILTER, EDITOR_CONTEXT_CARD_PICK]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameters: Array[Dictionary] = super()
+	parameters.append(_editor_param("party_member_index", "Party Member Index", "int", -1, "Optional party member index to validate against."))
+	return parameters
+
 func _validation(card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	if card_data == null:
 		return false
