@@ -150,13 +150,7 @@ static func _export_character_artifact_list(character_data: CharacterData, chara
 	return _save_resource(artifact_list, artifact_list_path)
 
 static func _build_card_path(card_data: CardData, content_root: String) -> String:
-	var owner_folder: String = "generic"
-	var color_name: String = _color_id_to_folder_name(card_data.card_color_id)
-	if color_name != "white":
-		owner_folder = "character/%s" % color_name
-	var rarity_folder: String = CARD_RARITY_TO_FOLDER.get(card_data.card_rarity, "standard")
-	var file_name: String = _resource_file_name(card_data.card_name, card_data.object_id)
-	return content_root.path_join("cards").path_join(owner_folder).path_join(rarity_folder).path_join("%s.tres" % file_name)
+	return CardEditorPathUtils.build_managed_card_path(card_data, content_root)
 
 static func _build_act_path(act_data: ActData, content_root: String) -> String:
 	var file_name: String = _resource_file_name(act_data.act_name, act_data.object_id)
