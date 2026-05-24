@@ -32,6 +32,7 @@
 [ext_resource type="Script" uid="uid://ci6oby4hmnfg6" path="res://scripts/ui/DialogueOverlay.gd" id="25_tn5yy"]
 [ext_resource type="Script" uid="uid://b3nvcsku8u75w" path="res://addons/smooth_scroll_container/scroll_damper/expo_scroll_damper.gd" id="26_08sam"]
 [ext_resource type="Script" uid="uid://6xsavir53fvp" path="res://scripts/ui/PauseOverlay.gd" id="29_p8axl"]
+[ext_resource type="PackedScene" path="res://scenes/ui/menus/CardEditorScreen.tscn" id="30_cardeditor"]
 
 [sub_resource type="Resource" id="Resource_i7igs"]
 script = ExtResource("26_08sam")
@@ -254,6 +255,11 @@ text = "New Game"
 layout_mode = 2
 theme = ExtResource("2_bi5lp")
 text = "Codex"
+
+[node name="CardEditorButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Card Editor"
 
 [node name="SettingsButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=984842632]
 layout_mode = 2
@@ -616,6 +622,9 @@ text = "Artifacts"
 layout_mode = 2
 disabled = true
 text = "Consumables"
+
+[node name="CardEditorScreen" parent="TitleScreen" instance=ExtResource("30_cardeditor")]
+unique_name_in_owner = true
 
 [node name="RunScreen" type="Control" parent="." unique_id=1832602911]
 visible = false
