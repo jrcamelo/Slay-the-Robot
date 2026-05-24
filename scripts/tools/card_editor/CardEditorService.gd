@@ -3,6 +3,7 @@ extends RefCounted
 class_name CardEditorService
 
 const DEFAULT_CONTENT_ROOT := CardEditorPathUtils.DEFAULT_CONTENT_ROOT
+const DEFAULT_TRIAGE_ROOT := CardEditorPathUtils.DEFAULT_TRIAGE_ROOT
 
 const CARD_ARRAY_PROPERTIES := {
 	"card_play_actions": BaseAction.EDITOR_CONTEXT_CARD_PLAY_ACTIONS,
@@ -27,13 +28,46 @@ const TARGETED_ACTION_TOKENS := {
 	Scripts.ACTION_PLAY_CARDS: true,
 }
 
+const SUPPORTED_SESSION_POLICIES := {
+	CardEditorSession.SAVE_POLICY_MANAGED_CONTENT: true,
+	CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE: true,
+	CardEditorSession.SAVE_POLICY_MANUAL: true,
+}
+
 var last_discovery_diagnostics: Array[Dictionary] = []
 
-func list_cards(content_root: String = DEFAULT_CONTENT_ROOT) -> Array[Dictionary]:
+func list_cards(
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	include_triage: bool = true,
+	include_content: bool = true
+) -> Array[Dictionary]:
+	var cards: Array[Dictionary] = list_library_cards(content_root, triage_root, include_triage, include_content)
+	var compact_cards: Array[Dictionary] = []
+	for entry: Dictionary in cards:
+		compact_cards.append({
+			"object_id": entry.get("object_id", ""),
+			"card_name": entry.get("card_name", ""),
+			"card_color_id": entry.get("card_color_id", ""),
+			"card_rarity": entry.get("card_rarity", CardData.CARD_RARITIES.COMMON),
+			"resource_path": entry.get("resource_path", ""),
+			"source_bucket": entry.get("source_bucket", ""),
+			"owner_bucket": entry.get("owner_bucket", ""),
+		})
+	return compact_cards
+
+func list_library_cards(
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	include_triage: bool = true,
+	include_content: bool = true
+) -> Array[Dictionary]:
 	last_discovery_diagnostics.clear()
 	var cards: Array[Dictionary] = []
-	var cards_root: String = content_root.path_join("cards")
-	_discover_cards_recursive(cards_root, cards)
+	if include_content:
+		_discover_cards_in_root(content_root, "content", content_root, triage_root, cards)
+	if include_triage:
+		_discover_cards_in_root(triage_root, "triage", content_root, triage_root, cards)
 	cards.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
 		var left_name: String = str(left.get("card_name", left.get("object_id", "")))
 		var right_name: String = str(right.get("card_name", right.get("object_id", "")))
@@ -43,47 +77,164 @@ func list_cards(content_root: String = DEFAULT_CONTENT_ROOT) -> Array[Dictionary
 	)
 	return cards
 
+func filter_library_cards(entries: Array[Dictionary], filters: Dictionary = {}, search_text: String = "") -> Array[Dictionary]:
+	var normalized_search: String = search_text.strip_edges().to_lower()
+	var filtered_cards: Array[Dictionary] = []
+	for entry: Dictionary in entries:
+		if not _library_entry_matches_filters(entry, filters, normalized_search):
+			continue
+		filtered_cards.append(entry)
+	return filtered_cards
+
+func get_library_facets(entries: Array[Dictionary]) -> Dictionary:
+	var facets: Dictionary = {
+		"source_bucket": {},
+		"owner_bucket": {},
+		"card_color_id": {},
+		"card_rarity": {},
+		"card_type": {},
+		"card_kind": {},
+	}
+	for entry: Dictionary in entries:
+		for facet_name: String in facets.keys():
+			var facet_value: Variant = entry.get(facet_name, null)
+			if facet_value == null:
+				continue
+			var facet_bucket: Dictionary = facets[facet_name]
+			facet_bucket[facet_value] = int(facet_bucket.get(facet_value, 0)) + 1
+			facets[facet_name] = facet_bucket
+	return facets
+
+func find_cards_by_object_id(
+	object_id: String,
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	include_triage: bool = true,
+	include_content: bool = true
+) -> Array[Dictionary]:
+	var matching_cards: Array[Dictionary] = []
+	if object_id.strip_edges() == "":
+		return matching_cards
+	for card_entry: Dictionary in list_library_cards(content_root, triage_root, include_triage, include_content):
+		if str(card_entry.get("object_id", "")) == object_id:
+			matching_cards.append(card_entry)
+	return matching_cards
+
 func get_discovery_diagnostics() -> Array[Dictionary]:
 	return last_discovery_diagnostics.duplicate(true)
 
-func create_blank_session(content_root: String = DEFAULT_CONTENT_ROOT) -> CardEditorSession:
-	var card_data: CardData = CardData.new()
-	var session := CardEditorSession.new(card_data, "", content_root)
-	session.recompute_managed_path()
+func create_blank_session(
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	save_policy: String = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+) -> CardEditorSession:
+	var card_data := CardData.new()
+	var session := CardEditorSession.new(card_data, "", content_root, triage_root, save_policy)
+	session.recompute_managed_paths()
 	session.refresh_diagnostics(self)
 	return session
 
-func load_session(resource_path: String, content_root: String = DEFAULT_CONTENT_ROOT) -> CardEditorSession:
+func create_blank_session_from_preset(
+	preset_id: String,
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	save_policy: String = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+) -> CardEditorSession:
+	var session: CardEditorSession = create_blank_session(content_root, triage_root, save_policy)
+	apply_preset_to_session(session, preset_id, false)
+	session.mark_dirty()
+	return session
+
+func load_session(
+	resource_path: String,
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	save_policy: String = ""
+) -> CardEditorSession:
 	var resource: Resource = load(resource_path)
 	if not (resource is CardData):
 		push_error("CardEditorService: Resource is not CardData: %s" % resource_path)
 		return null
+	var resolved_save_policy: String = save_policy
+	if resolved_save_policy == "":
+		if CardEditorPathUtils.path_is_within_root(resource_path, triage_root):
+			resolved_save_policy = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+		else:
+			resolved_save_policy = CardEditorSession.SAVE_POLICY_MANAGED_CONTENT
 	var session_card: CardData = (resource as CardData).duplicate(true)
-	var session := CardEditorSession.new(session_card, resource_path, content_root)
-	session.recompute_managed_path()
+	var session := CardEditorSession.new(session_card, resource_path, content_root, triage_root, resolved_save_policy)
+	session.recompute_managed_paths()
 	session.refresh_diagnostics(self)
 	return session
 
-func duplicate_session(source: Variant, content_root: String = DEFAULT_CONTENT_ROOT) -> CardEditorSession:
+func duplicate_session(
+	source: Variant,
+	content_root: String = DEFAULT_CONTENT_ROOT,
+	triage_root: String = DEFAULT_TRIAGE_ROOT,
+	save_policy: String = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+) -> CardEditorSession:
 	var source_session: CardEditorSession = null
 	if source is CardEditorSession:
 		source_session = source
 	elif source is String:
-		source_session = load_session(source, content_root)
+		source_session = load_session(source, content_root, triage_root)
 	if source_session == null or source_session.working_card_data == null:
 		return null
 	var duplicated_card: CardData = source_session.working_card_data.duplicate(true)
-	var session := CardEditorSession.new(duplicated_card, "", content_root)
-	session.recompute_managed_path()
+	var session := CardEditorSession.new(duplicated_card, "", content_root, triage_root, save_policy)
+	session.recompute_managed_paths()
 	session.mark_dirty()
 	session.refresh_diagnostics(self)
 	return session
+
+func set_session_save_policy(session: CardEditorSession, save_policy: String) -> bool:
+	if session == null:
+		return false
+	if not SUPPORTED_SESSION_POLICIES.has(save_policy):
+		return false
+	session.set_save_policy(save_policy)
+	session.refresh_diagnostics(self)
+	return true
 
 func save_session(session: CardEditorSession) -> Dictionary:
 	return _save_session_internal(session, "")
 
 func save_session_as(session: CardEditorSession, target_path: String) -> Dictionary:
 	return _save_session_internal(session, target_path)
+
+func save_session_to_triage(session: CardEditorSession) -> Dictionary:
+	if session == null:
+		return {"success": false, "path": "", "diagnostics": [_make_diagnostic("session_missing", "error", "No valid session was provided for saving.")]}
+	session.set_save_policy(CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE)
+	session.recompute_managed_paths()
+	return _save_session_internal(session, session.managed_triage_save_path)
+
+func promote_session_to_content(session: CardEditorSession) -> Dictionary:
+	if session == null:
+		return {"success": false, "path": "", "diagnostics": [_make_diagnostic("session_missing", "error", "No valid session was provided for promotion.")]}
+	session.set_save_policy(CardEditorSession.SAVE_POLICY_MANAGED_CONTENT)
+	session.recompute_managed_paths()
+	return _save_session_internal(session, session.managed_save_path)
+
+func apply_preset_to_session(session: CardEditorSession, preset_id: String, preserve_identity: bool = true) -> bool:
+	if session == null or session.working_card_data == null:
+		return false
+	var applied: bool = CardEditorPresets.apply_preset(session.working_card_data, preset_id, preserve_identity)
+	if applied:
+		_after_card_mutation(session, "")
+	return applied
+
+func list_presets() -> Array[Dictionary]:
+	return CardEditorPresets.list_presets()
+
+func get_card_field_sections() -> Array[Dictionary]:
+	return CardEditorSchema.get_card_field_sections()
+
+func get_card_field_definitions() -> Dictionary[String, Dictionary]:
+	return CardEditorSchema.get_card_field_definitions()
+
+func get_library_filter_definitions() -> Array[Dictionary]:
+	return CardEditorSchema.get_library_filter_definitions()
 
 func validate_session(session: CardEditorSession) -> Array[Dictionary]:
 	var diagnostics: Array[Dictionary] = []
@@ -96,12 +247,17 @@ func validate_session(session: CardEditorSession) -> Array[Dictionary]:
 		return diagnostics
 
 	card_data.synchronize_card_kind_rules()
-	session.recompute_managed_path()
+	session.recompute_managed_paths()
 
 	if card_data.object_id.strip_edges() == "":
 		diagnostics.append(_make_diagnostic("empty_object_id", "error", "Card object_id cannot be empty.", "object_id"))
+	elif not _is_object_id_well_formed(card_data.object_id):
+		diagnostics.append(_make_diagnostic("object_id_format", "warning", "Card object_id should be lowercase snake_case and typically start with card_.", "object_id"))
 	if card_data.card_name.strip_edges() == "":
 		diagnostics.append(_make_diagnostic("empty_card_name", "error", "Card name cannot be empty.", "card_name"))
+
+	if not SUPPORTED_SESSION_POLICIES.has(session.save_policy):
+		diagnostics.append(_make_diagnostic("invalid_save_policy", "error", "Unknown card editor save policy.", "save_policy", {"save_policy": session.save_policy}))
 
 	var active_save_path: String = session.get_active_save_path().strip_edges()
 	if active_save_path == "":
@@ -112,6 +268,7 @@ func validate_session(session: CardEditorSession) -> Array[Dictionary]:
 		var collision_diagnostic: Dictionary = _validate_save_collision(session, active_save_path)
 		if not collision_diagnostic.is_empty():
 			diagnostics.append(collision_diagnostic)
+		_validate_save_path_policy(session, active_save_path, diagnostics)
 
 	_validate_token_entries(card_data.card_play_actions, "card_play_actions", true, diagnostics)
 	_validate_token_entries(card_data.card_discard_actions, "card_discard_actions", true, diagnostics)
@@ -129,6 +286,16 @@ func validate_session(session: CardEditorSession) -> Array[Dictionary]:
 
 	if card_data.card_texture_path.strip_edges() != "" and not _texture_path_exists(card_data.card_texture_path):
 		diagnostics.append(_make_diagnostic("missing_texture", "warning", "Card texture path could not be resolved.", "card_texture_path", {"path": card_data.card_texture_path}))
+
+	_validate_string_array(card_data.card_keyword_object_ids, "card_keyword_object_ids", diagnostics, false)
+	_validate_string_array(card_data.card_tags, "card_tags", diagnostics, true)
+	_validate_dictionary_keys(card_data.card_values, "card_values", diagnostics)
+	_validate_dictionary_keys(card_data.card_first_upgrade_property_changes, "card_first_upgrade_property_changes", diagnostics)
+	_validate_dictionary_keys(card_data.card_upgrade_value_improvements, "card_upgrade_value_improvements", diagnostics)
+	_validate_description_placeholders(card_data, diagnostics)
+	_validate_card_upgrade_configuration(card_data, diagnostics)
+	_validate_card_cost_configuration(card_data, diagnostics)
+	_validate_library_object_id_collisions(session, diagnostics)
 
 	var target_usage: Dictionary = _analyze_target_requirement(card_data.card_play_actions)
 	if card_data.card_requires_target and not target_usage["needs_target"]:
@@ -304,7 +471,13 @@ func _save_session_internal(session: CardEditorSession, save_as_path: String) ->
 
 	if save_as_path.strip_edges() != "":
 		session.manual_save_override_path = save_as_path.strip_edges()
-	session.recompute_managed_path()
+		if save_as_path == session.managed_save_path:
+			session.save_policy = CardEditorSession.SAVE_POLICY_MANAGED_CONTENT
+		elif save_as_path == session.managed_triage_save_path:
+			session.save_policy = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+		else:
+			session.save_policy = CardEditorSession.SAVE_POLICY_MANUAL
+	session.recompute_managed_paths()
 	_normalize_card_resource(session.working_card_data)
 	var diagnostics: Array[Dictionary] = validate_session(session)
 	if _has_error_diagnostics(diagnostics):
@@ -328,6 +501,12 @@ func _save_session_internal(session: CardEditorSession, save_as_path: String) ->
 		}
 
 	session.original_resource_path = save_path
+	if save_path == session.managed_save_path:
+		session.save_policy = CardEditorSession.SAVE_POLICY_MANAGED_CONTENT
+	elif save_path == session.managed_triage_save_path:
+		session.save_policy = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
+	else:
+		session.save_policy = CardEditorSession.SAVE_POLICY_MANUAL
 	session.clear_dirty()
 	session.refresh_diagnostics(self)
 	return {
@@ -336,7 +515,27 @@ func _save_session_internal(session: CardEditorSession, save_as_path: String) ->
 		"diagnostics": session.diagnostics,
 	}
 
-func _discover_cards_recursive(directory_path: String, output_cards: Array[Dictionary]) -> void:
+func _discover_cards_in_root(
+	root_path: String,
+	source_bucket: String,
+	content_root: String,
+	triage_root: String,
+	output_cards: Array[Dictionary]
+) -> void:
+	var cards_root: String = root_path.path_join("cards")
+	var directory: DirAccess = DirAccess.open(cards_root)
+	if directory == null:
+		last_discovery_diagnostics.append(_make_diagnostic("directory_open_failed", "warning", "Could not open card directory.", "resource_path", {"path": cards_root}))
+		return
+	_discover_cards_recursive(cards_root, source_bucket, content_root, triage_root, output_cards)
+
+func _discover_cards_recursive(
+	directory_path: String,
+	source_bucket: String,
+	content_root: String,
+	triage_root: String,
+	output_cards: Array[Dictionary]
+) -> void:
 	var directory: DirAccess = DirAccess.open(directory_path)
 	if directory == null:
 		last_discovery_diagnostics.append(_make_diagnostic("directory_open_failed", "warning", "Could not open card directory.", "resource_path", {"path": directory_path}))
@@ -350,7 +549,7 @@ func _discover_cards_recursive(directory_path: String, output_cards: Array[Dicti
 			continue
 		var child_path: String = directory_path.path_join(entry_name)
 		if directory.current_is_dir():
-			_discover_cards_recursive(child_path, output_cards)
+			_discover_cards_recursive(child_path, source_bucket, content_root, triage_root, output_cards)
 			continue
 		if not entry_name.to_lower().ends_with(".tres") and not entry_name.to_lower().ends_with(".res"):
 			continue
@@ -360,15 +559,47 @@ func _discover_cards_recursive(directory_path: String, output_cards: Array[Dicti
 			continue
 		if not (loaded_resource is CardData):
 			continue
-		var card_data: CardData = loaded_resource
-		output_cards.append({
-			"object_id": card_data.object_id,
-			"card_name": card_data.card_name,
-			"card_color_id": card_data.card_color_id,
-			"card_rarity": card_data.card_rarity,
-			"resource_path": child_path,
-		})
+		output_cards.append(_make_card_library_entry(loaded_resource, child_path, source_bucket, content_root, triage_root))
 	directory.list_dir_end()
+
+func _make_card_library_entry(
+	card_data: CardData,
+	resource_path: String,
+	source_bucket: String,
+	content_root: String,
+	triage_root: String
+) -> Dictionary:
+	var path_metadata: Dictionary = CardEditorPathUtils.analyze_card_resource_path(resource_path, content_root, triage_root)
+	var search_blob_parts: Array[String] = [
+		card_data.object_id,
+		card_data.card_name,
+		card_data.card_description,
+		str(path_metadata.get("owner_bucket", "")),
+		str(path_metadata.get("relative_path", "")),
+	]
+	for keyword_id: String in card_data.card_keyword_object_ids:
+		search_blob_parts.append(keyword_id)
+	for card_tag: String in card_data.card_tags:
+		search_blob_parts.append(card_tag)
+	return {
+		"object_id": card_data.object_id,
+		"card_name": card_data.card_name,
+		"card_color_id": card_data.card_color_id,
+		"card_rarity": card_data.card_rarity,
+		"card_type": card_data.card_type,
+		"card_kind": card_data.get_effective_card_kind(),
+		"card_requires_target": card_data.card_requires_target,
+		"resource_path": resource_path,
+		"source_bucket": source_bucket,
+		"source_root": path_metadata.get("source_root", ""),
+		"relative_path": path_metadata.get("relative_path", ""),
+		"path_segments": path_metadata.get("path_segments", []),
+		"owner_bucket": path_metadata.get("owner_bucket", "unknown"),
+		"file_name": path_metadata.get("file_name", ""),
+		"keyword_ids": card_data.card_keyword_object_ids.duplicate(true),
+		"card_tags": card_data.card_tags.duplicate(true),
+		"search_blob": " ".join(search_blob_parts).to_lower(),
+	}
 
 func _validate_token_entries(entries: Array, property_name: String, is_action: bool, diagnostics: Array[Dictionary]) -> void:
 	for index: int in range(len(entries)):
@@ -387,6 +618,31 @@ func _validate_token_entries(entries: Array, property_name: String, is_action: b
 		var values: Variant = entry_dict[token_or_path]
 		if not (values is Dictionary):
 			diagnostics.append(_make_diagnostic("malformed_action_entry" if is_action else "malformed_validator_entry", "error", "Entry payload must be a Dictionary.", property_name, {"index": index, "token": token_or_path}))
+			continue
+		_validate_entry_payload(token_or_path, values, property_name, index, diagnostics)
+
+func _validate_entry_payload(token_or_path: String, values: Dictionary, property_name: String, index: int, diagnostics: Array[Dictionary]) -> void:
+	var metadata: Dictionary = ScriptEditorMetadataRegistry.get_resolved_script_metadata(token_or_path)
+	if metadata.is_empty():
+		return
+	var parameter_definitions: Array[Dictionary] = []
+	parameter_definitions.assign(metadata.get("parameters", []))
+	var parameters_by_name: Dictionary[String, Dictionary] = {}
+	for parameter_definition: Dictionary in parameter_definitions:
+		var parameter_name: String = str(parameter_definition.get("name", ""))
+		if parameter_name == "":
+			continue
+		parameters_by_name[parameter_name] = parameter_definition
+	for value_key: Variant in values.keys():
+		var parameter_name_str: String = str(value_key)
+		if not parameters_by_name.has(parameter_name_str):
+			diagnostics.append(_make_diagnostic("unknown_parameter", "warning", "Entry includes a parameter that the editor metadata does not recognize.", property_name, {"index": index, "token": token_or_path, "parameter": parameter_name_str}))
+			continue
+		var parameter_definition: Dictionary = parameters_by_name[parameter_name_str]
+		var value_type: String = str(parameter_definition.get("value_type", "variant"))
+		var value: Variant = values[value_key]
+		if not _value_matches_editor_type(value, value_type, parameter_definition):
+			diagnostics.append(_make_diagnostic("parameter_type_mismatch", "warning", "Entry parameter type does not match editor metadata.", property_name, {"index": index, "token": token_or_path, "parameter": parameter_name_str, "value_type": value_type}))
 
 func _validate_save_collision(session: CardEditorSession, save_path: String) -> Dictionary:
 	if not ResourceLoader.exists(save_path):
@@ -402,6 +658,79 @@ func _validate_save_collision(session: CardEditorSession, save_path: String) -> 
 	if existing_card.object_id != session.working_card_data.object_id:
 		return _make_diagnostic("path_collision", "error", "The target path already belongs to a different card.", "save_path", {"path": save_path, "existing_object_id": existing_card.object_id})
 	return {}
+
+func _validate_save_path_policy(session: CardEditorSession, save_path: String, diagnostics: Array[Dictionary]) -> void:
+	match session.save_policy:
+		CardEditorSession.SAVE_POLICY_MANAGED_CONTENT:
+			if save_path != session.managed_save_path:
+				diagnostics.append(_make_diagnostic("save_policy_path_mismatch", "warning", "Managed content save policy points at a custom path.", "save_path", {"path": save_path}))
+		CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE:
+			if save_path != session.managed_triage_save_path:
+				diagnostics.append(_make_diagnostic("save_policy_path_mismatch", "warning", "Managed triage save policy points at a custom path.", "save_path", {"path": save_path}))
+		CardEditorSession.SAVE_POLICY_MANUAL:
+			if not CardEditorPathUtils.path_is_within_root(save_path, session.content_root) and not CardEditorPathUtils.path_is_within_root(save_path, session.triage_root):
+				diagnostics.append(_make_diagnostic("manual_path_external", "warning", "Manual save path is outside the configured content and triage roots.", "save_path", {"path": save_path}))
+
+func _validate_library_object_id_collisions(session: CardEditorSession, diagnostics: Array[Dictionary]) -> void:
+	if session == null or session.working_card_data == null:
+		return
+	var duplicate_entries: Array[Dictionary] = find_cards_by_object_id(session.working_card_data.object_id, session.content_root, session.triage_root, true, true)
+	var duplicate_paths: Array[String] = []
+	for entry: Dictionary in duplicate_entries:
+		var entry_path: String = str(entry.get("resource_path", ""))
+		if entry_path == "":
+			continue
+		if entry_path == session.original_resource_path:
+			continue
+		if entry_path == session.get_active_save_path():
+			continue
+		duplicate_paths.append(entry_path)
+	if len(duplicate_paths) > 0:
+		diagnostics.append(_make_diagnostic("duplicate_object_id", "warning", "Another card with the same object_id already exists in the library roots.", "object_id", {"paths": duplicate_paths}))
+
+func _validate_description_placeholders(card_data: CardData, diagnostics: Array[Dictionary]) -> void:
+	var regex := RegEx.new()
+	if regex.compile("\\[([A-Za-z0-9_]+)\\]") != OK:
+		return
+	var missing_placeholders: Array[String] = []
+	for result: RegExMatch in regex.search_all(card_data.card_description):
+		var placeholder_name: String = result.get_string(1)
+		if placeholder_name == "energy_icon":
+			continue
+		if not card_data.card_values.has(placeholder_name):
+			if not missing_placeholders.has(placeholder_name):
+				missing_placeholders.append(placeholder_name)
+	if len(missing_placeholders) > 0:
+		diagnostics.append(_make_diagnostic("missing_description_values", "warning", "Card description references values that are missing from card_values.", "card_description", {"missing_placeholders": missing_placeholders}))
+
+func _validate_string_array(values: Array[String], property_name: String, diagnostics: Array[Dictionary], allow_empty_strings: bool) -> void:
+	var seen_values: Dictionary[String, bool] = {}
+	for index: int in range(len(values)):
+		var string_value: String = values[index]
+		if string_value.strip_edges() == "" and not allow_empty_strings:
+			diagnostics.append(_make_diagnostic("empty_string_array_value", "warning", "Array contains an empty string.", property_name, {"index": index}))
+		if seen_values.has(string_value):
+			diagnostics.append(_make_diagnostic("duplicate_string_array_value", "warning", "Array contains duplicate values.", property_name, {"index": index, "value": string_value}))
+		seen_values[string_value] = true
+
+func _validate_dictionary_keys(values: Dictionary, property_name: String, diagnostics: Array[Dictionary]) -> void:
+	for key: Variant in values.keys():
+		if str(key).strip_edges() == "":
+			diagnostics.append(_make_diagnostic("empty_dictionary_key", "warning", "Dictionary contains an empty key.", property_name))
+
+func _validate_card_upgrade_configuration(card_data: CardData, diagnostics: Array[Dictionary]) -> void:
+	if card_data.card_upgrade_amount_max < 0:
+		diagnostics.append(_make_diagnostic("negative_upgrade_max", "error", "Max upgrades cannot be negative.", "card_upgrade_amount_max"))
+	if card_data.card_upgrade_amount < 0:
+		diagnostics.append(_make_diagnostic("negative_upgrade_amount", "error", "Upgrade amount cannot be negative.", "card_upgrade_amount"))
+	if card_data.card_upgrade_amount > card_data.card_upgrade_amount_max:
+		diagnostics.append(_make_diagnostic("upgrade_amount_exceeds_max", "warning", "Current upgrade amount exceeds max upgrades.", "card_upgrade_amount"))
+
+func _validate_card_cost_configuration(card_data: CardData, diagnostics: Array[Dictionary]) -> void:
+	if card_data.card_energy_cost < 0:
+		diagnostics.append(_make_diagnostic("negative_energy_cost", "error", "Card energy cost cannot be negative.", "card_energy_cost"))
+	if not card_data.card_energy_cost_is_variable and card_data.card_energy_cost_variable_upper_bound >= 0:
+		diagnostics.append(_make_diagnostic("unused_variable_cost_cap", "warning", "Variable cost upper bound is set, but variable cost is disabled.", "card_energy_cost_variable_upper_bound"))
 
 func _analyze_target_requirement(action_entries: Array[Dictionary]) -> Dictionary:
 	var needs_target: bool = false
@@ -458,7 +787,7 @@ func _after_card_mutation(session: CardEditorSession, property_name: String) -> 
 		return
 	if property_name == "card_kind":
 		session.working_card_data.synchronize_card_kind_rules()
-	session.recompute_managed_path()
+	session.recompute_managed_paths()
 	session.mark_dirty()
 	session.refresh_diagnostics(self)
 
@@ -467,6 +796,61 @@ func _normalize_card_resource(card_data: CardData) -> void:
 		return
 	card_data.synchronize_card_kind_rules()
 	ContentExporter._normalize_resource_script_references(card_data)
+
+func _value_matches_editor_type(value: Variant, value_type: String, parameter_definition: Dictionary = {}) -> bool:
+	match value_type:
+		"variant":
+			return true
+		"bool":
+			return value is bool
+		"int":
+			return value is int and not (value is bool)
+		"float":
+			return value is float or (value is int and not (value is bool))
+		"string", "resource_path", "multiline_string":
+			return value is String
+		"string_array":
+			if not (value is Array):
+				return false
+			for item: Variant in value:
+				if not (item is String):
+					return false
+			return true
+		"array":
+			return value is Array
+		"dictionary":
+			return value is Dictionary
+		"enum":
+			var options: Array = parameter_definition.get("options", [])
+			if len(options) == 0:
+				return value is int or value is String
+			for option: Dictionary in options:
+				if option.get("value", null) == value:
+					return true
+			return false
+		_:
+			return true
+
+func _library_entry_matches_filters(entry: Dictionary, filters: Dictionary, normalized_search: String) -> bool:
+	for filter_name: String in filters.keys():
+		var expected_value: Variant = filters[filter_name]
+		if expected_value == null:
+			continue
+		if expected_value is String and str(expected_value).strip_edges() == "":
+			continue
+		if entry.get(filter_name, null) != expected_value:
+			return false
+	if normalized_search != "":
+		var search_blob: String = str(entry.get("search_blob", ""))
+		if not search_blob.contains(normalized_search):
+			return false
+	return true
+
+func _is_object_id_well_formed(object_id: String) -> bool:
+	var regex := RegEx.new()
+	if regex.compile("^card_[a-z0-9_]+$") != OK:
+		return true
+	return regex.search(object_id) != null
 
 func _has_error_diagnostics(diagnostics: Array[Dictionary]) -> bool:
 	for diagnostic: Dictionary in diagnostics:
