@@ -374,19 +374,19 @@ func _validate_token_entries(entries: Array, property_name: String, is_action: b
 	for index: int in range(len(entries)):
 		var entry: Variant = entries[index]
 		if not (entry is Dictionary):
-			diagnostics.append(_make_diagnostic(is_action ? "malformed_action_entry" : "malformed_validator_entry", "error", "Entry must be a Dictionary.", property_name, {"index": index}))
+			diagnostics.append(_make_diagnostic("malformed_action_entry" if is_action else "malformed_validator_entry", "error", "Entry must be a Dictionary.", property_name, {"index": index}))
 			continue
 		var entry_dict: Dictionary = entry
 		if len(entry_dict.keys()) != 1:
-			diagnostics.append(_make_diagnostic(is_action ? "malformed_action_entry" : "malformed_validator_entry", "error", "Entry must contain exactly one token key.", property_name, {"index": index}))
+			diagnostics.append(_make_diagnostic("malformed_action_entry" if is_action else "malformed_validator_entry", "error", "Entry must contain exactly one token key.", property_name, {"index": index}))
 			continue
 		var token_or_path: String = str(entry_dict.keys()[0])
 		var resolved_script: Script = Scripts.resolve_script(token_or_path)
 		if resolved_script == null:
-			diagnostics.append(_make_diagnostic(is_action ? "unresolved_action_token" : "unresolved_validator_token", "error", "Token could not be resolved.", property_name, {"index": index, "token": token_or_path}))
+			diagnostics.append(_make_diagnostic("unresolved_action_token" if is_action else "unresolved_validator_token", "error", "Token could not be resolved.", property_name, {"index": index, "token": token_or_path}))
 		var values: Variant = entry_dict[token_or_path]
 		if not (values is Dictionary):
-			diagnostics.append(_make_diagnostic(is_action ? "malformed_action_entry" : "malformed_validator_entry", "error", "Entry payload must be a Dictionary.", property_name, {"index": index, "token": token_or_path}))
+			diagnostics.append(_make_diagnostic("malformed_action_entry" if is_action else "malformed_validator_entry", "error", "Entry payload must be a Dictionary.", property_name, {"index": index, "token": token_or_path}))
 
 func _validate_save_collision(session: CardEditorSession, save_path: String) -> Dictionary:
 	if not ResourceLoader.exists(save_path):

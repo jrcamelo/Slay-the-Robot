@@ -17,7 +17,7 @@ func _get_editor_parameter_definitions() -> Array[Dictionary]:
 			{
 				"options": [
 					{"label": "Wait For All Card Plays", "value": CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.WAIT_FOR_ALL_CARD_PLAYS},
-					{"label": "After Current Card", "value": CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.AFTER_CURRENT_CARD},
+					{"label": "Wait For Actions", "value": CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.WAIT_FOR_ACTIONS},
 					{"label": "Immediate", "value": CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.IMMEDIATE},
 				]
 			}
