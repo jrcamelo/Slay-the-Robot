@@ -32,6 +32,51 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="ScreenSummary" type="VBoxContainer" parent="MainContainer/Header" unique_id=100100001]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ScreenTitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100002]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Card Workshop"
+
+[node name="ScreenSubtitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Draft new cards, tune behavior, and promote finished content."
+autowrap_mode = 2
+
+[node name="StatusBanner" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Open a card to inspect it, or start a new triage draft."
+autowrap_mode = 2
+
+[node name="StatsRow" type="HBoxContainer" parent="MainContainer/Header/ScreenSummary" unique_id=100100005]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LibraryCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100006]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Library: 0"
+
+[node name="FilterCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100007]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Visible: 0"
+
+[node name="SelectionCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100008]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Selection: none"
+
+[node name="DiagnosticsCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100009]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Diagnostics: none"
+
 [node name="BackButton" type="Button" parent="MainContainer/Header" unique_id=645530600]
 layout_mode = 2
 theme = ExtResource("2")
@@ -114,6 +159,10 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search cards"
+
+[node name="ClearFiltersButton" type="Button" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow" unique_id=100100010]
+layout_mode = 2
+text = "Clear"
 
 [node name="FilterGrid" type="GridContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=70704918]
 layout_mode = 2
@@ -280,6 +329,13 @@ text = "No session"
 [node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=968705889]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
+bbcode_enabled = true
+
+[node name="SaveStatusLabel" type="Label" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=100100011]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Open a card to inspect it, or start a new triage draft."
+autowrap_mode = 2
 
 [node name="QuickActions" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1356135667]
 layout_mode = 2

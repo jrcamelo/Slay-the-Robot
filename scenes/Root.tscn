@@ -32,6 +32,7 @@
 [ext_resource type="Script" uid="uid://ci6oby4hmnfg6" path="res://scripts/ui/DialogueOverlay.gd" id="25_tn5yy"]
 [ext_resource type="Script" uid="uid://b3nvcsku8u75w" path="res://addons/smooth_scroll_container/scroll_damper/expo_scroll_damper.gd" id="26_08sam"]
 [ext_resource type="Script" uid="uid://6xsavir53fvp" path="res://scripts/ui/PauseOverlay.gd" id="29_p8axl"]
+[ext_resource type="PackedScene" uid="uid://bk27jgr43dngi" path="res://scenes/ui/menus/CardEditorScreen.tscn" id="30_carded"]
 
 [sub_resource type="Resource" id="Resource_i7igs"]
 script = ExtResource("26_08sam")
@@ -554,6 +555,9 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("9_uxrgu")
 
+[node name="CardEditorScreen" parent="TitleScreen" instance=ExtResource("30_carded")]
+visible = false
+
 [node name="ScrollContainer" type="ScrollContainer" parent="TitleScreen/CodexMenu" unique_id=1492264713]
 layout_mode = 0
 offset_left = 152.0
@@ -598,7 +602,7 @@ offset_top = 88.0
 offset_right = 136.0
 offset_bottom = 584.0
 
-[node name="Button" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=731979169]
+[node name="CardsButton" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=731979169]
 layout_mode = 2
 text = "Cards"
 
@@ -616,6 +620,11 @@ text = "Artifacts"
 layout_mode = 2
 disabled = true
 text = "Consumables"
+
+[node name="CardEditorButton" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=100100012]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Card Editor"
 
 [node name="RunScreen" type="Control" parent="." unique_id=1832602911]
 visible = false

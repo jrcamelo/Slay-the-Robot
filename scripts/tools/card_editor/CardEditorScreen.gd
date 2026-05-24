@@ -25,8 +25,21 @@ const NOISY_PARAMETER_DEFAULTS := {
 	"action_short_circuits": false,
 	"invert_validation": false,
 }
+const STATUS_COLORS := {
+	"info": Color(0.82, 0.87, 0.95, 1.0),
+	"success": Color(0.7, 0.92, 0.76, 1.0),
+	"warning": Color(0.95, 0.84, 0.54, 1.0),
+	"error": Color(0.96, 0.63, 0.63, 1.0),
+}
 
 @onready var title_screen: Control = get_parent() as Control
+@onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
+@onready var screen_subtitle: Label = $MainContainer/Header/ScreenSummary/ScreenSubtitle
+@onready var status_banner: Label = $MainContainer/Header/ScreenSummary/StatusBanner
+@onready var library_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/LibraryCountLabel
+@onready var filter_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/FilterCountLabel
+@onready var selection_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/SelectionCountLabel
+@onready var diagnostics_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/DiagnosticsCountLabel
 @onready var body_split: HSplitContainer = $MainContainer/Header/Body
 @onready var editor_split: HSplitContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit
 @onready var back_button: Button = $MainContainer/Header/BackButton
@@ -37,6 +50,7 @@ const NOISY_PARAMETER_DEFAULTS := {
 @onready var save_triage_button: Button = $MainContainer/Header/ButtonRow/SaveTriageButton
 @onready var promote_button: Button = $MainContainer/Header/ButtonRow/PromoteButton
 @onready var library_search: LineEdit = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/SearchInput
+@onready var clear_filters_button: Button = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/ClearFiltersButton
 @onready var source_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/SourceFilter
 @onready var owner_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/OwnerFilter
 @onready var color_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/ColorFilter
@@ -53,6 +67,7 @@ const NOISY_PARAMETER_DEFAULTS := {
 @onready var preview_mount: Control = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/PreviewMount
 @onready var session_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/SessionLabel
 @onready var diagnostics_text: RichTextLabel = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/DiagnosticsText
+@onready var save_status_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SaveStatusLabel
 @onready var action_add_panel: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel
 @onready var validator_add_panel: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel
 @onready var action_group_option: OptionButton = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/ActionGroupOption
@@ -72,15 +87,23 @@ var collapsed_library_groups: Dictionary[String, bool] = {}
 var collapsed_behavior_groups: Dictionary[String, bool] = {}
 var expanded_entry_parameters: Dictionary[String, bool] = {}
 var collapsed_behavior_entries: Dictionary[String, bool] = {}
+var status_message: String = "Open a card to inspect it, or start a new triage draft."
+var status_severity: String = "info"
 
 func _ready() -> void:
 	visible = not _is_embedded_in_title_screen()
+	screen_title.text = "Card Workshop"
+	screen_subtitle.text = "Triage ideas, tune behaviors, and promote polished cards into the content library."
+	diagnostics_text.bbcode_enabled = true
+	diagnostics_text.fit_content = true
+	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
 	back_button.button_up.connect(_on_back_button_up)
 	new_button.button_up.connect(_on_new_button_up)
 	duplicate_button.button_up.connect(_on_duplicate_button_up)
 	apply_preset_button.button_up.connect(_on_apply_preset_button_up)
 	save_triage_button.button_up.connect(_on_save_triage_button_up)
 	promote_button.button_up.connect(_on_promote_button_up)
+	clear_filters_button.button_up.connect(_on_clear_filters_button_up)
 	library_search.text_changed.connect(_on_library_search_changed)
 	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter, target_filter]:
 		option_button.item_selected.connect(_on_filter_changed)
@@ -92,6 +115,7 @@ func _ready() -> void:
 	_populate_static_filters()
 	_populate_group_options()
 	_populate_preset_options()
+	_refresh_status_banner()
 	call_deferred("_apply_split_layout")
 	if _is_embedded_in_title_screen():
 		back_button.visible = true
@@ -104,10 +128,40 @@ func show_editor() -> void:
 	call_deferred("_apply_split_layout")
 	populate_editor()
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible or current_session == null:
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		var key_event: InputEventKey = event
+		if key_event.ctrl_pressed and key_event.keycode == KEY_S:
+			if key_event.shift_pressed:
+				_on_promote_button_up()
+			else:
+				_on_save_triage_button_up()
+			get_viewport().set_input_as_handled()
+			return
+		if key_event.ctrl_pressed and key_event.keycode == KEY_D:
+			_on_duplicate_button_up()
+			get_viewport().set_input_as_handled()
+			return
+		if key_event.ctrl_pressed and key_event.keycode == KEY_N:
+			_on_new_button_up()
+			get_viewport().set_input_as_handled()
+			return
+		if key_event.ctrl_pressed and key_event.keycode == KEY_F:
+			library_search.grab_focus()
+			library_search.select_all()
+			get_viewport().set_input_as_handled()
+			return
+		if key_event.keycode == KEY_ESCAPE and _is_embedded_in_title_screen():
+			_on_back_button_up()
+			get_viewport().set_input_as_handled()
+
 func populate_editor() -> void:
 	_refresh_library()
 	if current_session == null:
 		current_session = service.create_blank_session()
+		_set_status_message("Started a new triage session. Use a preset or open a library card to begin.", "info")
 	_refresh_editor_panels()
 	call_deferred("_apply_split_layout")
 
@@ -127,6 +181,7 @@ func _apply_library_filters() -> void:
 	_add_filter_value(filters, "card_requires_target", target_filter)
 	filtered_entries = service.filter_library_cards(library_entries, filters, library_search.text)
 	_render_library_sections()
+	_refresh_overview()
 
 func _update_library_selection() -> void:
 	pass
@@ -138,6 +193,7 @@ func _refresh_editor_panels() -> void:
 	_render_session_summary()
 	_populate_action_option_list()
 	_populate_validator_option_list()
+	_refresh_overview()
 	duplicate_button.disabled = current_session == null
 	save_triage_button.disabled = current_session == null
 	promote_button.disabled = current_session == null
@@ -147,6 +203,10 @@ func _render_inspector() -> void:
 		child.queue_free()
 	if current_session == null or current_session.working_card_data == null:
 		return
+	inspector_container.add_child(_build_section_intro(
+		"Card Details",
+		"Edit identity, costs, values, and upgrades here. Most fields update the preview and diagnostics as soon as focus leaves the control."
+	))
 	var field_definitions: Dictionary = service.get_card_field_definitions()
 	for section: Dictionary in service.get_card_field_sections():
 		var section_panel := PanelContainer.new()
@@ -167,6 +227,29 @@ func _render_inspector() -> void:
 			var field_definition: Dictionary = field_definitions.get(property_name, {})
 			section_vbox.add_child(_build_property_editor(property_name, field_definition))
 		inspector_container.add_child(section_panel)
+
+func _build_section_intro(title_text: String, description_text: String) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 12)
+	padding.add_theme_constant_override("margin_top", 12)
+	padding.add_theme_constant_override("margin_right", 12)
+	padding.add_theme_constant_override("margin_bottom", 12)
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	panel.add_child(padding)
+	padding.add_child(wrapper)
+	var title := Label.new()
+	title.text = title_text
+	title.add_theme_font_size_override("font_size", 20)
+	wrapper.add_child(title)
+	var description := Label.new()
+	description.text = description_text
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.modulate = Color(0.84, 0.84, 0.88, 0.95)
+	wrapper.add_child(description)
+	return panel
 
 func _build_property_editor(property_name: String, field_definition: Dictionary) -> Control:
 	var wrapper := VBoxContainer.new()
@@ -414,6 +497,10 @@ func _render_behavior() -> void:
 		child.queue_free()
 	if current_session == null or current_session.working_card_data == null:
 		return
+	behavior_container.add_child(_build_section_intro(
+		"Behavior Graph",
+		"Actions decide what the card does. Validators decide when it can glow or be played. Reorder entries to match the gameplay sequence."
+	))
 	var populated_groups: Array[Dictionary] = []
 	var empty_groups: Array[Dictionary] = []
 	for property_name: String in CardEditorSchema.get_action_property_names():
@@ -645,6 +732,11 @@ func _render_preview() -> void:
 		child.queue_free()
 	preview_card = null
 	if current_session == null or current_session.working_card_data == null:
+		var empty_label := Label.new()
+		empty_label.text = "Open a card from the library or create a new preset-based draft to see the live preview."
+		empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		preview_mount.add_child(empty_label)
 		return
 	preview_card = Scenes.CARD.instantiate()
 	preview_mount.add_child(preview_card)
@@ -658,19 +750,86 @@ func _render_session_summary() -> void:
 		diagnostics_text.text = ""
 		return
 	var summary: Dictionary = service.get_card_summary(current_session)
-	session_label.text = "Editing: %s\nSave: %s\nPolicy: %s\nDirty: %s" % [
-		summary.get("card_name", ""),
+	var policy_label: String = _format_save_policy(str(summary.get("save_policy", "")))
+	var dirty_label: String = "Unsaved changes" if bool(summary.get("dirty", false)) else "Saved"
+	session_label.text = "%s  |  %s\n%s" % [
+		"%s (%s)" % [summary.get("card_name", "Untitled Card"), summary.get("object_id", "no_id")],
+		policy_label,
 		summary.get("active_save_path", ""),
-		summary.get("save_policy", ""),
-		str(summary.get("dirty", false)),
 	]
+	session_label.tooltip_text = "State: %s" % dirty_label
 	var diagnostics_lines: Array[String] = []
-	for diagnostic: Dictionary in current_session.diagnostics:
-		var severity: String = str(diagnostic.get("severity", "info")).to_upper()
-		var field: String = str(diagnostic.get("field", ""))
-		var suffix: String = "" if field == "" else " (%s)" % field
-		diagnostics_lines.append("[%s]%s %s" % [severity, suffix, diagnostic.get("message", "")])
+	var counts: Dictionary = _get_diagnostic_counts()
+	if counts["errors"] == 0 and counts["warnings"] == 0:
+		diagnostics_lines.append("[color=#9fe2a9]Ready to save.[/color] The current card passes editor validation.")
+	else:
+		for diagnostic: Dictionary in current_session.diagnostics:
+			var severity: String = str(diagnostic.get("severity", "info"))
+			var severity_color: String = _status_color_hex(severity)
+			var field: String = str(diagnostic.get("field", ""))
+			var suffix: String = "" if field == "" else " [i](%s)[/i]" % field
+			diagnostics_lines.append("[color=%s][%s][/color]%s %s" % [
+				severity_color,
+				severity.to_upper(),
+				suffix,
+				str(diagnostic.get("message", "")).xml_escape(),
+			])
 	diagnostics_text.text = "\n".join(diagnostics_lines)
+
+func _refresh_overview() -> void:
+	library_count_label.text = "Library: %s" % len(library_entries)
+	filter_count_label.text = "Visible: %s" % len(filtered_entries)
+	if current_session == null or current_session.working_card_data == null:
+		selection_count_label.text = "Selection: none"
+	else:
+		var card_data: CardData = current_session.working_card_data
+		selection_count_label.text = "Selection: %s" % card_data.get_card_name()
+	var counts: Dictionary = _get_diagnostic_counts()
+	if current_session == null:
+		diagnostics_count_label.text = "Diagnostics: none"
+	elif counts["errors"] == 0 and counts["warnings"] == 0:
+		diagnostics_count_label.text = "Diagnostics: clean"
+	else:
+		diagnostics_count_label.text = "Diagnostics: %s error(s), %s warning(s)" % [counts["errors"], counts["warnings"]]
+	_refresh_status_banner()
+
+func _refresh_status_banner() -> void:
+	status_banner.text = status_message
+	status_banner.modulate = STATUS_COLORS.get(status_severity, STATUS_COLORS["info"])
+	save_status_label.text = status_message
+	save_status_label.modulate = STATUS_COLORS.get(status_severity, STATUS_COLORS["info"])
+
+func _set_status_message(message: String, severity: String = "info") -> void:
+	status_message = message
+	status_severity = severity
+	_refresh_status_banner()
+
+func _get_diagnostic_counts() -> Dictionary:
+	var counts := {"errors": 0, "warnings": 0}
+	if current_session == null:
+		return counts
+	for diagnostic: Dictionary in current_session.diagnostics:
+		var severity: String = str(diagnostic.get("severity", ""))
+		if severity == "error":
+			counts["errors"] += 1
+		elif severity == "warning":
+			counts["warnings"] += 1
+	return counts
+
+func _format_save_policy(save_policy: String) -> String:
+	match save_policy:
+		CardEditorSession.SAVE_POLICY_MANAGED_CONTENT:
+			return "Content save"
+		CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE:
+			return "Triage save"
+		CardEditorSession.SAVE_POLICY_MANUAL:
+			return "Manual save"
+		_:
+			return save_policy
+
+func _status_color_hex(severity: String) -> String:
+	var color: Color = STATUS_COLORS.get(severity, STATUS_COLORS["info"])
+	return "#" + color.to_html()
 
 func _apply_split_layout() -> void:
 	if not visible:
@@ -682,6 +841,8 @@ func _apply_split_layout() -> void:
 	var editor_width: float = editor_split.size.x
 	if editor_width > 480:
 		editor_split.split_offset = int(editor_width / 2.0)
+	if is_instance_valid(library_sections):
+		call_deferred("_render_library_sections")
 
 func _render_library_sections() -> void:
 	for child in library_sections.get_children():
@@ -731,7 +892,7 @@ func _build_library_group(group_name: String, entries: Array) -> Control:
 	if bool(collapsed_library_groups.get(group_name, false)):
 		return panel
 	var grid := GridContainer.new()
-	grid.columns = 2
+	grid.columns = _get_library_grid_columns()
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
@@ -744,7 +905,8 @@ func _build_library_card_tile(entry: Dictionary) -> Control:
 	var tile := PanelContainer.new()
 	tile.custom_minimum_size = Vector2(160, 260)
 	tile.mouse_filter = Control.MOUSE_FILTER_STOP
-	if current_session != null and str(entry.get("resource_path", "")) == current_session.original_resource_path:
+	var entry_path: String = str(entry.get("resource_path", ""))
+	if current_session != null and (entry_path == current_session.original_resource_path or entry_path == current_session.get_active_save_path()):
 		tile.modulate = Color(1.0, 0.96, 0.8, 1.0)
 	var tile_padding := MarginContainer.new()
 	tile_padding.add_theme_constant_override("margin_left", 8)
@@ -770,6 +932,7 @@ func _build_library_card_tile(entry: Dictionary) -> Control:
 		_render_preview_card(library_card, card_resource as CardData)
 	var title_label := Label.new()
 	title_label.text = str(entry.get("card_name", entry.get("object_id", "")))
+	title_label.tooltip_text = "%s\n%s" % [entry.get("object_id", ""), entry_path]
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	title_label.clip_text = true
@@ -779,6 +942,7 @@ func _build_library_card_tile(entry: Dictionary) -> Control:
 	meta_label.text = _format_library_meta(entry)
 	meta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	meta_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	meta_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
 	meta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tile_vbox.add_child(meta_label)
 	var click_overlay := Button.new()
@@ -797,6 +961,11 @@ func _build_library_card_tile(entry: Dictionary) -> Control:
 	tile.add_child(click_overlay)
 	return tile
 
+func _get_library_grid_columns() -> int:
+	if library_scroll.size.x >= 540:
+		return 2
+	return 1
+
 func _get_library_group_name(entry: Dictionary) -> String:
 	var owner_bucket: String = str(entry.get("owner_bucket", "Unsorted"))
 	var source_bucket: String = str(entry.get("source_bucket", ""))
@@ -808,6 +977,8 @@ func _get_library_group_name(entry: Dictionary) -> String:
 
 func _open_library_entry(entry: Dictionary) -> void:
 	current_session = service.load_session(str(entry.get("resource_path", "")))
+	if current_session != null and current_session.working_card_data != null:
+		_set_status_message("Loaded %s from the library." % current_session.working_card_data.get_card_name(), "info")
 	_refresh_editor_panels()
 
 func _should_show_parameter(parameter_data: Dictionary, values: Dictionary) -> bool:
@@ -888,6 +1059,8 @@ func _populate_static_filters() -> void:
 	_populate_option_button(target_filter, target_options)
 
 func _populate_dynamic_filters() -> void:
+	var selected_owner: Variant = _get_option_button_value(owner_filter)
+	var selected_color: Variant = _get_option_button_value(color_filter)
 	var owner_options: Array[Dictionary] = [{"label": "All Owners", "value": null}]
 	var color_options: Array[Dictionary] = [{"label": "All Colors", "value": null}]
 	var seen_owners: Dictionary = {}
@@ -901,8 +1074,8 @@ func _populate_dynamic_filters() -> void:
 		if color_id != "" and not seen_colors.has(color_id):
 			seen_colors[color_id] = true
 			color_options.append({"label": color_id, "value": color_id})
-	_populate_option_button(owner_filter, owner_options)
-	_populate_option_button(color_filter, color_options)
+	_populate_option_button(owner_filter, owner_options, selected_owner)
+	_populate_option_button(color_filter, color_options, selected_color)
 
 func _populate_group_options() -> void:
 	_populate_option_button(action_group_option, _property_group_options(CardEditorSchema.get_action_property_names()))
@@ -920,16 +1093,18 @@ func _populate_preset_options() -> void:
 func _populate_action_option_list() -> void:
 	var property_name: Variant = _get_option_button_value(action_group_option)
 	var options: Array[Dictionary] = []
+	var selected_action: Variant = _get_option_button_value(action_option)
 	if property_name != null:
 		options = service.get_action_options(service.get_entry_context(str(property_name)))
-	_populate_option_button(action_option, _metadata_options(options))
+	_populate_option_button(action_option, _metadata_options(options), selected_action)
 
 func _populate_validator_option_list() -> void:
 	var property_name: Variant = _get_option_button_value(validator_group_option)
 	var options: Array[Dictionary] = []
+	var selected_validator: Variant = _get_option_button_value(validator_option)
 	if property_name != null:
 		options = service.get_validator_options(service.get_entry_context(str(property_name)))
-	_populate_option_button(validator_option, _metadata_options(options))
+	_populate_option_button(validator_option, _metadata_options(options), selected_validator)
 
 func _property_group_options(property_names: Array[String]) -> Array[Dictionary]:
 	var options: Array[Dictionary] = []
@@ -1134,13 +1309,19 @@ func _prepend_option(options: Array[Dictionary], label: String, value: Variant) 
 		merged_options.append(option_data)
 	return merged_options
 
-func _populate_option_button(option_button: OptionButton, options: Array[Dictionary]) -> void:
+func _populate_option_button(option_button: OptionButton, options: Array[Dictionary], preferred_value: Variant = null) -> void:
+	var current_value: Variant = preferred_value if preferred_value != null else _get_option_button_value(option_button)
 	option_button.clear()
 	for option_data: Dictionary in options:
 		option_button.add_item(str(option_data.get("label", option_data.get("value", ""))))
 		option_button.set_item_metadata(option_button.get_item_count() - 1, option_data.get("value", null))
-	if option_button.get_item_count() > 0:
-		option_button.select(0)
+	if option_button.get_item_count() == 0:
+		return
+	for index: int in range(option_button.get_item_count()):
+		if option_button.get_item_metadata(index) == current_value:
+			option_button.select(index)
+			return
+	option_button.select(0)
 
 func _add_filter_value(filters: Dictionary, filter_name: String, option_button: OptionButton) -> void:
 	var value: Variant = _get_option_button_value(option_button)
@@ -1184,12 +1365,15 @@ func _is_embedded_in_title_screen() -> bool:
 
 func _on_new_button_up() -> void:
 	current_session = service.create_blank_session()
+	_set_status_message("Started a fresh triage card. Pick a preset or shape the card field by field.", "info")
 	_refresh_editor_panels()
 
 func _on_duplicate_button_up() -> void:
 	if current_session == null:
 		return
 	current_session = service.duplicate_session(current_session)
+	if current_session != null and current_session.working_card_data != null:
+		_set_status_message("Duplicated %s into a new triage draft." % current_session.working_card_data.get_card_name(), "success")
 	_refresh_editor_panels()
 
 func _on_apply_preset_button_up() -> void:
@@ -1199,19 +1383,22 @@ func _on_apply_preset_button_up() -> void:
 	if preset_id == null:
 		return
 	service.apply_preset_to_session(current_session, str(preset_id), true)
+	_set_status_message("Applied the %s preset. Review identity and values before saving." % preset_option.get_item_text(preset_option.get_selected()), "success")
 	_refresh_editor_panels()
 
 func _on_save_triage_button_up() -> void:
 	if current_session == null:
 		return
-	service.save_session_to_triage(current_session)
+	var result: Dictionary = service.save_session_to_triage(current_session)
+	_handle_save_result(result, "Saved to triage")
 	_refresh_library()
 	_refresh_editor_panels()
 
 func _on_promote_button_up() -> void:
 	if current_session == null:
 		return
-	service.promote_session_to_content(current_session)
+	var result: Dictionary = service.promote_session_to_content(current_session)
+	_handle_save_result(result, "Promoted to content")
 	_refresh_library()
 	_refresh_editor_panels()
 
@@ -1220,6 +1407,14 @@ func _on_library_search_changed(_new_text: String) -> void:
 
 func _on_filter_changed(_index: int) -> void:
 	_apply_library_filters()
+
+func _on_clear_filters_button_up() -> void:
+	library_search.text = ""
+	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter, target_filter]:
+		if option_button.get_item_count() > 0:
+			option_button.select(0)
+	_apply_library_filters()
+	_set_status_message("Cleared library filters. Showing the full card library again.", "info")
 
 func _on_library_item_selected(index: int) -> void:
 	if index < 0 or index >= len(filtered_entries):
@@ -1241,6 +1436,7 @@ func _on_add_action_button_up() -> void:
 	if property_name == null or token == null:
 		return
 	service.add_entry(current_session, str(property_name), str(token))
+	_set_status_message("Added a new %s entry." % PROPERTY_GROUP_LABELS.get(str(property_name), str(property_name)), "success")
 	_refresh_editor_panels()
 
 func _on_add_validator_button_up() -> void:
@@ -1251,4 +1447,17 @@ func _on_add_validator_button_up() -> void:
 	if property_name == null or token == null:
 		return
 	service.add_entry(current_session, str(property_name), str(token))
+	_set_status_message("Added a new %s entry." % PROPERTY_GROUP_LABELS.get(str(property_name), str(property_name)), "success")
 	_refresh_editor_panels()
+
+func _handle_save_result(result: Dictionary, success_prefix: String) -> void:
+	if bool(result.get("success", false)):
+		var saved_path: String = str(result.get("path", ""))
+		_set_status_message("%s at %s" % [success_prefix, saved_path], "success")
+		return
+	var diagnostics: Array = result.get("diagnostics", [])
+	var error_count: int = 0
+	for diagnostic: Dictionary in diagnostics:
+		if str(diagnostic.get("severity", "")) == "error":
+			error_count += 1
+	_set_status_message("Save blocked by %s error(s). Review the diagnostics list before trying again." % error_count, "error")
