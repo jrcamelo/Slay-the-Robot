@@ -233,6 +233,9 @@ func get_card_field_sections() -> Array[Dictionary]:
 func get_card_field_definitions() -> Dictionary[String, Dictionary]:
 	return CardEditorSchema.get_card_field_definitions()
 
+func get_card_value_definitions() -> Dictionary[String, Dictionary]:
+	return CardEditorSchema.get_card_value_definitions()
+
 func get_library_filter_definitions() -> Array[Dictionary]:
 	return CardEditorSchema.get_library_filter_definitions()
 

@@ -31,6 +31,102 @@ const STATUS_COLORS := {
 	"warning": Color(0.95, 0.84, 0.54, 1.0),
 	"error": Color(0.96, 0.63, 0.63, 1.0),
 }
+const ESSENTIAL_FIELD_GROUPS := [
+	{
+		"title": "Identity",
+		"description": "Start with the fields that actually define the card a player will recognize.",
+		"columns": 2,
+		"fields": ["card_name", "object_id", "card_type", "card_rarity", "card_color_id", "card_kind", "card_texture_path", "card_tags", "card_exhausts", "card_is_ethereal", "card_is_retained"],
+	},
+	{
+		"title": "Play Profile",
+		"description": "These are the knobs that usually matter first when prototyping.",
+		"columns": 2,
+		"fields": ["card_energy_cost", "card_requires_target", "card_is_playable", "card_appears_in_card_packs"],
+	},
+	{
+		"title": "Text And Values",
+		"description": "Keep the description and the values it references close together.",
+		"columns": 1,
+		"fields": ["card_description", "card_values", "card_keyword_object_ids"],
+	},
+]
+const ADVANCED_FIELD_GROUPS := [
+	{
+		"title": "Extra Costs And Flags",
+		"description": "Temporary energy overrides, hand behavior, and special combat setup.",
+		"columns": 2,
+		"fields": [
+			"card_energy_cost_until_played",
+			"card_energy_cost_until_turn",
+			"card_energy_cost_until_combat",
+			"card_energy_cost_is_variable",
+			"card_energy_cost_variable_upper_bound",
+			"card_first_shuffle_priority",
+		],
+	},
+	{
+		"title": "Upgrade Rules",
+		"description": "Only touch these once the base card already feels right.",
+		"columns": 1,
+		"fields": [
+			"card_upgrade_amount_max",
+			"card_upgrade_value_improvements",
+			"card_first_upgrade_property_changes",
+		],
+	},
+	{
+		"title": "Metadata And Edge Cases",
+		"description": "Low-frequency fields for organization, preview customization, and deck restrictions.",
+		"columns": 1,
+		"fields": [
+			"card_description_preview_overrides",
+			"card_unremovable_from_deck",
+			"card_untransformable_from_deck",
+		],
+	},
+]
+const PRIMARY_BEHAVIOR_GROUPS := [
+	"card_play_actions",
+	"card_play_validators",
+	"card_glow_validators",
+	"card_right_click_actions",
+]
+const SECONDARY_BEHAVIOR_GROUPS := [
+	"card_discard_actions",
+	"card_end_of_turn_actions",
+	"card_exhaust_actions",
+	"card_draw_actions",
+	"card_retain_actions",
+	"card_initial_combat_actions",
+	"card_add_to_deck_actions",
+	"card_remove_from_deck_actions",
+	"card_transform_in_deck_actions",
+]
+const BEHAVIOR_GROUP_DESCRIPTIONS := {
+	"card_play_actions": "What the card does when played.",
+	"card_play_validators": "Rules that block the card from being played.",
+	"card_glow_validators": "Rules that make the card light up without blocking play.",
+	"card_right_click_actions": "Optional utility behavior while the card is in hand.",
+	"card_discard_actions": "Triggered only by manual discard effects.",
+	"card_end_of_turn_actions": "Triggered while the card remains in hand at turn end.",
+	"card_exhaust_actions": "Triggered when the card is exhausted.",
+	"card_draw_actions": "Triggered when the card enters the hand by drawing.",
+	"card_retain_actions": "Triggered when the card is kept in hand.",
+	"card_initial_combat_actions": "Triggered once for each copy at combat start.",
+	"card_add_to_deck_actions": "Triggered when the permanent deck gains this card.",
+	"card_remove_from_deck_actions": "Triggered when the permanent deck loses this card.",
+	"card_transform_in_deck_actions": "Triggered before a permanent deck transform.",
+}
+const MAX_VISIBLE_DIAGNOSTICS := 5
+const DEFAULT_CARD_COLOR_IDS := [
+	"color_red",
+	"color_blue",
+	"color_green",
+	"color_orange",
+	"color_white",
+	"color_purple",
+]
 
 @onready var title_screen: Control = get_parent() as Control
 @onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
@@ -43,6 +139,7 @@ const STATUS_COLORS := {
 @onready var body_split: HSplitContainer = $MainContainer/Header/Body
 @onready var editor_split: HSplitContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit
 @onready var back_button: Button = $MainContainer/Header/BackButton
+@onready var button_row: HBoxContainer = $MainContainer/Header/ButtonRow
 @onready var new_button: Button = $MainContainer/Header/ButtonRow/NewButton
 @onready var duplicate_button: Button = $MainContainer/Header/ButtonRow/DuplicateButton
 @onready var preset_option: OptionButton = $MainContainer/Header/ButtonRow/PresetOption
@@ -84,16 +181,22 @@ var filtered_entries: Array[Dictionary] = []
 var preview_card: Card = null
 const PREVIEW_FALLBACK_CHARACTER_ID := "character_red"
 var collapsed_library_groups: Dictionary[String, bool] = {}
+var collapsed_property_groups: Dictionary[String, bool] = {
+	"Extra Costs And Flags": true,
+	"Upgrade Rules": true,
+	"Metadata And Edge Cases": true,
+}
 var collapsed_behavior_groups: Dictionary[String, bool] = {}
 var expanded_entry_parameters: Dictionary[String, bool] = {}
 var collapsed_behavior_entries: Dictionary[String, bool] = {}
+var show_secondary_behavior_groups: bool = false
 var status_message: String = "Open a card to inspect it, or start a new triage draft."
 var status_severity: String = "info"
 
 func _ready() -> void:
 	visible = not _is_embedded_in_title_screen()
 	screen_title.text = "Card Workshop"
-	screen_subtitle.text = "Triage ideas, tune behaviors, and promote polished cards into the content library."
+	screen_subtitle.text = "Build cards without fighting the editor."
 	diagnostics_text.bbcode_enabled = true
 	diagnostics_text.fit_content = true
 	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
@@ -105,13 +208,14 @@ func _ready() -> void:
 	promote_button.button_up.connect(_on_promote_button_up)
 	clear_filters_button.button_up.connect(_on_clear_filters_button_up)
 	library_search.text_changed.connect(_on_library_search_changed)
-	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter, target_filter]:
+	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter]:
 		option_button.item_selected.connect(_on_filter_changed)
 	action_group_option.item_selected.connect(_on_action_group_selected)
 	validator_group_option.item_selected.connect(_on_validator_group_selected)
 	add_action_button.button_up.connect(_on_add_action_button_up)
 	add_validator_button.button_up.connect(_on_add_validator_button_up)
 	resized.connect(_apply_split_layout)
+	_compact_header_layout()
 	_populate_static_filters()
 	_populate_group_options()
 	_populate_preset_options()
@@ -178,7 +282,6 @@ func _apply_library_filters() -> void:
 	_add_filter_value(filters, "card_type", type_filter)
 	_add_filter_value(filters, "card_rarity", rarity_filter)
 	_add_filter_value(filters, "card_kind", kind_filter)
-	_add_filter_value(filters, "card_requires_target", target_filter)
 	filtered_entries = service.filter_library_cards(library_entries, filters, library_search.text)
 	_render_library_sections()
 	_refresh_overview()
@@ -203,30 +306,160 @@ func _render_inspector() -> void:
 		child.queue_free()
 	if current_session == null or current_session.working_card_data == null:
 		return
-	inspector_container.add_child(_build_section_intro(
-		"Card Details",
-		"Edit identity, costs, values, and upgrades here. Most fields update the preview and diagnostics as soon as focus leaves the control."
-	))
+	inspector_container.add_child(_build_editor_hero())
+	for group_data: Dictionary in ESSENTIAL_FIELD_GROUPS:
+		inspector_container.add_child(_build_property_section(group_data))
+	for group_data: Dictionary in ADVANCED_FIELD_GROUPS:
+		inspector_container.add_child(_build_property_section(group_data))
+
+func _compact_header_layout() -> void:
+	screen_title.add_theme_font_size_override("font_size", 24)
+	screen_subtitle.visible = false
+	status_banner.visible = false
+	button_row.visible = false
+	if is_instance_valid(target_filter):
+		target_filter.visible = false
+		target_filter.queue_free()
+	var search_row: HBoxContainer = library_search.get_parent() as HBoxContainer
+	if search_row != null:
+		var library_actions := HBoxContainer.new()
+		library_actions.name = "LibraryActions"
+		library_actions.add_theme_constant_override("separation", 8)
+		search_row.get_parent().add_child(library_actions)
+		search_row.get_parent().move_child(library_actions, search_row.get_index() + 1)
+		for control: Control in [new_button, duplicate_button, preset_option, apply_preset_button]:
+			if control.get_parent() != null:
+				control.get_parent().remove_child(control)
+			library_actions.add_child(control)
+	var preview_vbox: VBoxContainer = preview_mount.get_parent() as VBoxContainer
+	if preview_vbox != null:
+		var render_actions := HBoxContainer.new()
+		render_actions.name = "RenderActions"
+		render_actions.add_theme_constant_override("separation", 8)
+		if save_triage_button.get_parent() != null:
+			save_triage_button.get_parent().remove_child(save_triage_button)
+		if promote_button.get_parent() != null:
+			promote_button.get_parent().remove_child(promote_button)
+		render_actions.add_child(save_triage_button)
+		render_actions.add_child(promote_button)
+		preview_vbox.add_child(render_actions)
+		preview_vbox.move_child(render_actions, preview_mount.get_index() + 1)
+
+func _build_editor_hero() -> Control:
+	var card_data: CardData = current_session.working_card_data
+	var counts: Dictionary = _get_diagnostic_counts()
+	var severity_text: String = "Ready"
+	if counts["errors"] > 0:
+		severity_text = "%s error(s)" % counts["errors"]
+	elif counts["warnings"] > 0:
+		severity_text = "%s warning(s)" % counts["warnings"]
+	var lines: Array[String] = [
+		"%s" % card_data.get_card_name(),
+		"%s | %s | %s" % [
+			_enum_label_from_value(CardData.CARD_TYPES, card_data.card_type).capitalize(),
+			_enum_label_from_value(CardData.CARD_RARITIES, card_data.card_rarity).capitalize(),
+			card_data.card_color_id,
+		],
+		"Cost %s | %s | %s" % [
+			"X" if card_data.card_energy_cost_is_variable else str(card_data.card_energy_cost),
+			"Needs clicked target" if card_data.card_requires_target else "No clicked target",
+			severity_text,
+		],
+	]
+	return _build_section_intro("Card Focus", "\n".join(lines))
+
+func _build_property_section(group_data: Dictionary) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 12)
+	padding.add_theme_constant_override("margin_top", 12)
+	padding.add_theme_constant_override("margin_right", 12)
+	padding.add_theme_constant_override("margin_bottom", 12)
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 8)
+	panel.add_child(padding)
+	padding.add_child(wrapper)
+	var title := Label.new()
+	title.text = str(group_data.get("title", "Section"))
+	title.add_theme_font_size_override("font_size", 18)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	header.add_child(title)
+	var collapse_button := Button.new()
+	var group_title: String = str(group_data.get("title", "Section"))
+	collapse_button.text = COLLAPSED_ARROW if bool(collapsed_property_groups.get(group_title, false)) else EXPANDED_ARROW
+	collapse_button.button_up.connect(func():
+		collapsed_property_groups[group_title] = not bool(collapsed_property_groups.get(group_title, false))
+		_render_inspector()
+	)
+	header.add_child(collapse_button)
+	wrapper.add_child(header)
+	var description_text: String = str(group_data.get("description", ""))
+	if description_text != "":
+		var description := Label.new()
+		description.text = description_text
+		description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		description.modulate = Color(0.8, 0.82, 0.86, 0.9)
+		wrapper.add_child(description)
+	if bool(collapsed_property_groups.get(group_title, false)):
+		return panel
+	var grid := GridContainer.new()
+	grid.columns = int(group_data.get("columns", 1))
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
 	var field_definitions: Dictionary = service.get_card_field_definitions()
-	for section: Dictionary in service.get_card_field_sections():
-		var section_panel := PanelContainer.new()
-		section_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var section_padding := MarginContainer.new()
-		section_padding.add_theme_constant_override("margin_left", 12)
-		section_padding.add_theme_constant_override("margin_top", 12)
-		section_padding.add_theme_constant_override("margin_right", 12)
-		section_padding.add_theme_constant_override("margin_bottom", 12)
-		var section_vbox := VBoxContainer.new()
-		section_vbox.add_theme_constant_override("separation", 8)
-		section_panel.add_child(section_padding)
-		section_padding.add_child(section_vbox)
-		var title_label := Label.new()
-		title_label.text = str(section.get("label", "Section"))
-		section_vbox.add_child(title_label)
-		for property_name: String in section.get("fields", []):
-			var field_definition: Dictionary = field_definitions.get(property_name, {})
-			section_vbox.add_child(_build_property_editor(property_name, field_definition))
-		inspector_container.add_child(section_panel)
+	for property_name: String in group_data.get("fields", []):
+		var field_definition: Dictionary = field_definitions.get(property_name, {})
+		grid.add_child(_build_property_card(property_name, field_definition))
+	wrapper.add_child(grid)
+	return panel
+
+func _build_property_card(property_name: String, field_definition: Dictionary) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var value_type: String = str(field_definition.get("value_type", "string"))
+	if value_type in ["multiline_string", "dictionary", "array"] or property_name == "card_keyword_object_ids":
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 10)
+	padding.add_theme_constant_override("margin_top", 10)
+	padding.add_theme_constant_override("margin_right", 10)
+	padding.add_theme_constant_override("margin_bottom", 10)
+	panel.add_child(padding)
+	padding.add_child(_build_property_editor(property_name, field_definition))
+	return panel
+
+func _build_simple_toggle_row(title_text: String, description_text: String, expanded: bool, on_toggle: Callable) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 12)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 12)
+	padding.add_theme_constant_override("margin_bottom", 8)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	panel.add_child(padding)
+	padding.add_child(row)
+	var text_box := VBoxContainer.new()
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := Label.new()
+	title.text = title_text
+	text_box.add_child(title)
+	var description := Label.new()
+	description.text = description_text
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.modulate = Color(0.8, 0.82, 0.86, 0.9)
+	text_box.add_child(description)
+	row.add_child(text_box)
+	var button := Button.new()
+	button.text = "Hide" if expanded else "Show"
+	button.button_up.connect(on_toggle)
+	row.add_child(button)
+	return panel
 
 func _build_section_intro(title_text: String, description_text: String) -> Control:
 	var panel := PanelContainer.new()
@@ -253,32 +486,40 @@ func _build_section_intro(title_text: String, description_text: String) -> Contr
 
 func _build_property_editor(property_name: String, field_definition: Dictionary) -> Control:
 	var wrapper := VBoxContainer.new()
+	wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	wrapper.add_theme_constant_override("separation", 6)
+	var description := _property_description(property_name, field_definition)
+	wrapper.tooltip_text = description
 	var label := Label.new()
-	label.text = str(field_definition.get("label", property_name))
+	label.text = _property_label(property_name, field_definition)
+	label.add_theme_font_size_override("font_size", 14)
+	label.tooltip_text = description
 	wrapper.add_child(label)
 	var value_type: String = str(field_definition.get("value_type", "string"))
 	var card_data: CardData = current_session.working_card_data
 	var property_value: Variant = card_data.get(property_name)
+	if property_name == "card_color_id":
+		wrapper.add_child(_build_card_color_editor(property_name, str(property_value), description))
+		return wrapper
 	if property_name == "card_keyword_object_ids":
 		var keyword_values: Array[String] = []
 		keyword_values.assign(property_value)
 		wrapper.add_child(_build_keyword_editor(property_name, keyword_values))
 		return wrapper
+	if property_name == "card_values":
+		var card_values: Dictionary = property_value
+		wrapper.add_child(_build_card_values_editor(property_name, card_values))
+		return wrapper
 	if value_type == "dictionary":
 		var dictionary_value: Dictionary = property_value
 		wrapper.add_child(_build_dictionary_editor(property_name, dictionary_value))
-		var description := str(field_definition.get("description", ""))
-		if description != "":
-			var dictionary_hint := Label.new()
-			dictionary_hint.text = description
-			dictionary_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			dictionary_hint.modulate = Color(0.8, 0.8, 0.8, 0.8)
-			wrapper.add_child(dictionary_hint)
 		return wrapper
 	match value_type:
 		"bool":
 			var checkbox := CheckBox.new()
 			checkbox.button_pressed = bool(property_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, bool(property_value))
 			checkbox.toggled.connect(func(pressed: bool): service.set_card_property(current_session, property_name, pressed); _refresh_editor_panels())
 			wrapper.add_child(checkbox)
 		"enum":
@@ -295,6 +536,7 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 				service.set_card_property(current_session, property_name, dropdown.get_item_metadata(index))
 				_refresh_editor_panels()
 			)
+			dropdown.tooltip_text = description
 			wrapper.add_child(dropdown)
 		"int":
 			var spin := SpinBox.new()
@@ -306,11 +548,14 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 				service.set_card_property(current_session, property_name, int(value))
 				_refresh_editor_panels()
 			)
+			spin.tooltip_text = description
 			wrapper.add_child(spin)
 		"multiline_string":
 			var text_edit := TextEdit.new()
 			text_edit.custom_minimum_size = Vector2(0, 96)
+			text_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			text_edit.text = str(property_value)
+			text_edit.tooltip_text = description
 			text_edit.focus_exited.connect(func():
 				service.set_card_property(current_session, property_name, text_edit.text)
 				_refresh_editor_panels()
@@ -318,8 +563,10 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			wrapper.add_child(text_edit)
 		"string_array":
 			var line_edit := LineEdit.new()
+			line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			line_edit.text = ",".join(property_value)
 			line_edit.placeholder_text = "comma,separated,values"
+			line_edit.tooltip_text = description
 			line_edit.text_submitted.connect(func(_text: String):
 				service.set_card_property(current_session, property_name, _parse_csv_strings(line_edit.text))
 				_refresh_editor_panels()
@@ -332,7 +579,9 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 		"array":
 			var text_edit := TextEdit.new()
 			text_edit.custom_minimum_size = Vector2(0, 96)
+			text_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			text_edit.text = JSON.stringify(property_value, "\t")
+			text_edit.tooltip_text = description
 			text_edit.focus_exited.connect(func():
 				var parsed_value: Variant = JSON.parse_string(text_edit.text)
 				if parsed_value != null:
@@ -342,7 +591,9 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			wrapper.add_child(text_edit)
 		_:
 			var line_edit := LineEdit.new()
+			line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			line_edit.text = str(property_value)
+			line_edit.tooltip_text = description
 			line_edit.text_submitted.connect(func(new_text: String):
 				service.set_card_property(current_session, property_name, new_text)
 				_refresh_editor_panels()
@@ -352,13 +603,6 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 				_refresh_editor_panels()
 			)
 			wrapper.add_child(line_edit)
-	var description := str(field_definition.get("description", ""))
-	if description != "":
-		var description_label := Label.new()
-		description_label.text = description
-		description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		description_label.modulate = Color(0.8, 0.8, 0.8, 0.8)
-		wrapper.add_child(description_label)
 	return wrapper
 
 func _build_keyword_editor(property_name: String, values: Array[String]) -> Control:
@@ -405,7 +649,260 @@ func _build_keyword_editor(property_name: String, values: Array[String]) -> Cont
 		wrapper.add_child(row)
 	return wrapper
 
-func _build_dictionary_editor(property_name: String, dictionary_value: Dictionary) -> Control:
+func _build_card_color_editor(property_name: String, current_color_id: String, description: String) -> Control:
+	var dropdown := OptionButton.new()
+	dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dropdown.tooltip_text = description
+	_populate_option_button(dropdown, _get_card_color_options(), current_color_id)
+	dropdown.item_selected.connect(func(_index: int):
+		var selected_color_id: Variant = _get_option_button_value(dropdown)
+		if selected_color_id == null:
+			return
+		service.set_card_property(current_session, property_name, str(selected_color_id))
+		_refresh_editor_panels()
+	)
+	return dropdown
+
+func _build_card_values_editor(property_name: String, dictionary_value: Dictionary) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 8)
+	var definitions: Dictionary[String, Dictionary] = service.get_card_value_definitions()
+	var suggestion_panel := PanelContainer.new()
+	var suggestion_padding := MarginContainer.new()
+	suggestion_padding.add_theme_constant_override("margin_left", 8)
+	suggestion_padding.add_theme_constant_override("margin_top", 8)
+	suggestion_padding.add_theme_constant_override("margin_right", 8)
+	suggestion_padding.add_theme_constant_override("margin_bottom", 8)
+	var suggestion_vbox := VBoxContainer.new()
+	suggestion_vbox.add_theme_constant_override("separation", 4)
+	suggestion_panel.add_child(suggestion_padding)
+	suggestion_padding.add_child(suggestion_vbox)
+	var suggestion_label := Label.new()
+	suggestion_label.text = "Suggested entries for this card"
+	suggestion_vbox.add_child(suggestion_label)
+	var description_keys: Array[String] = _collect_description_placeholders()
+	var action_keys: Array[String] = _collect_action_value_suggestions()
+	var description_text := Label.new()
+	description_text.text = "Description placeholders: %s" % (", ".join(description_keys) if not description_keys.is_empty() else "none detected")
+	description_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	suggestion_vbox.add_child(description_text)
+	var action_text := Label.new()
+	action_text.text = "Action value keys in use: %s" % (", ".join(action_keys) if not action_keys.is_empty() else "none detected")
+	action_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	suggestion_vbox.add_child(action_text)
+	wrapper.add_child(suggestion_panel)
+	var sorted_keys: Array[String] = []
+	for dictionary_key: Variant in dictionary_value.keys():
+		sorted_keys.append(str(dictionary_key))
+	sorted_keys.sort()
+	if sorted_keys.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No card values configured."
+		wrapper.add_child(empty_label)
+	for key_name: String in sorted_keys:
+		wrapper.add_child(_build_card_value_row(property_name, key_name, dictionary_value.get(key_name), definitions.get(key_name, {})))
+	wrapper.add_child(_build_card_value_add_panel(property_name, dictionary_value, definitions))
+	return wrapper
+
+func _build_card_value_row(property_name: String, key_name: String, current_value: Variant, definition: Dictionary) -> Control:
+	var panel := PanelContainer.new()
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 8)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 8)
+	padding.add_theme_constant_override("margin_bottom", 8)
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	panel.add_child(padding)
+	padding.add_child(row)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 6)
+	var title_box := VBoxContainer.new()
+	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_box.add_theme_constant_override("separation", 2)
+	var title_label := Label.new()
+	var display_label: String = str(definition.get("label", key_name))
+	title_label.text = display_label
+	title_label.add_theme_font_size_override("font_size", 14)
+	title_box.add_child(title_label)
+	var meta_label := Label.new()
+	var value_type: String = str(definition.get("value_type", _infer_variant_type(current_value)))
+	meta_label.text = "%s | %s" % [key_name, value_type]
+	meta_label.modulate = Color(0.76, 0.8, 0.88, 0.95)
+	title_box.add_child(meta_label)
+	var description: String = str(definition.get("description", ""))
+	if description != "":
+		var description_label := Label.new()
+		description_label.text = description
+		description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
+		title_box.add_child(description_label)
+	header.add_child(title_box)
+	if definition.is_empty():
+		var key_edit := LineEdit.new()
+		key_edit.custom_minimum_size = Vector2(180, 0)
+		key_edit.text = key_name
+		key_edit.focus_exited.connect(func():
+			var renamed_key: String = key_edit.text.strip_edges()
+			if renamed_key == "" or renamed_key == key_name:
+				key_edit.text = key_name
+				return
+			if service.rename_dictionary_key(current_session, property_name, key_name, renamed_key):
+				_refresh_editor_panels()
+			else:
+				key_edit.text = key_name
+		)
+		header.add_child(key_edit)
+		var type_option := OptionButton.new()
+		_populate_option_button(type_option, _variant_type_options())
+		_select_option_value(type_option, value_type)
+		type_option.item_selected.connect(func(_index: int):
+			var next_type: String = str(_get_option_button_value(type_option))
+			if service.set_dictionary_value(current_session, property_name, key_name, _coerce_variant_value(current_value, next_type)):
+				_refresh_editor_panels()
+		)
+		header.add_child(type_option)
+	var remove_button := Button.new()
+	remove_button.text = "Remove"
+	remove_button.button_up.connect(func():
+		if service.remove_dictionary_value(current_session, property_name, key_name):
+			_refresh_editor_panels()
+	)
+	header.add_child(remove_button)
+	row.add_child(header)
+	row.add_child(_build_card_value_value_editor(property_name, key_name, current_value, definition))
+	return panel
+
+func _build_card_value_value_editor(property_name: String, key_name: String, current_value: Variant, definition: Dictionary) -> Control:
+	var value_type: String = str(definition.get("value_type", _infer_variant_type(current_value)))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
+			checkbox.toggled.connect(func(pressed: bool):
+				if service.set_dictionary_value(current_session, property_name, key_name, pressed):
+					_refresh_editor_panels()
+			)
+			return checkbox
+		"int":
+			var int_spin := SpinBox.new()
+			int_spin.min_value = -9999
+			int_spin.max_value = 99999
+			int_spin.step = 1
+			int_spin.value = float(current_value if current_value != null else 0)
+			int_spin.value_changed.connect(func(value: float):
+				if service.set_dictionary_value(current_session, property_name, key_name, int(value)):
+					_refresh_editor_panels()
+			)
+			return int_spin
+		"float":
+			var float_spin := SpinBox.new()
+			float_spin.min_value = -9999
+			float_spin.max_value = 99999
+			float_spin.step = 0.1
+			float_spin.value = float(current_value if current_value != null else 0)
+			float_spin.value_changed.connect(func(value: float):
+				if service.set_dictionary_value(current_session, property_name, key_name, value):
+					_refresh_editor_panels()
+			)
+			return float_spin
+		"enum":
+			var dropdown := OptionButton.new()
+			var options: Array = definition.get("options", [])
+			for option_data: Variant in options:
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				if service.set_dictionary_value(current_session, property_name, key_name, dropdown.get_item_metadata(option_index)):
+					_refresh_editor_panels()
+			)
+			return dropdown
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				if service.set_dictionary_value(current_session, property_name, key_name, _coerce_string_parameter(new_text, value_type)):
+					_refresh_editor_panels()
+			)
+			line_edit.focus_exited.connect(func():
+				if service.set_dictionary_value(current_session, property_name, key_name, _coerce_string_parameter(line_edit.text, value_type)):
+					_refresh_editor_panels()
+			)
+			return line_edit
+
+func _build_card_value_add_panel(property_name: String, dictionary_value: Dictionary, definitions: Dictionary[String, Dictionary]) -> Control:
+	var panel := PanelContainer.new()
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 8)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 8)
+	padding.add_theme_constant_override("margin_bottom", 8)
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 8)
+	panel.add_child(padding)
+	padding.add_child(wrapper)
+	var known_title := Label.new()
+	known_title.text = "Add Known Value"
+	wrapper.add_child(known_title)
+	var known_row := HBoxContainer.new()
+	known_row.add_theme_constant_override("separation", 6)
+	var known_option := OptionButton.new()
+	known_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var known_options: Array[Dictionary] = _get_card_value_definition_options(dictionary_value, definitions)
+	_populate_option_button(known_option, known_options)
+	known_row.add_child(known_option)
+	var add_known_button := Button.new()
+	add_known_button.text = "Add"
+	add_known_button.disabled = known_option.get_item_count() == 0
+	add_known_button.button_up.connect(func():
+		var selected_key: Variant = _get_option_button_value(known_option)
+		if selected_key == null:
+			return
+		var key_name: String = str(selected_key)
+		var definition: Dictionary = definitions.get(key_name, {})
+		if service.set_dictionary_value(current_session, property_name, key_name, definition.get("default_value", null)):
+			_refresh_editor_panels()
+	)
+	known_row.add_child(add_known_button)
+	wrapper.add_child(known_row)
+	var custom_title := Label.new()
+	custom_title.text = "Add Custom Value"
+	wrapper.add_child(custom_title)
+	var custom_row := HBoxContainer.new()
+	custom_row.add_theme_constant_override("separation", 6)
+	var add_key_edit := LineEdit.new()
+	add_key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	add_key_edit.placeholder_text = "custom_key_name"
+	custom_row.add_child(add_key_edit)
+	var add_type_option := OptionButton.new()
+	_populate_option_button(add_type_option, _variant_type_options())
+	custom_row.add_child(add_type_option)
+	var add_custom_button := Button.new()
+	add_custom_button.text = "Add"
+	add_custom_button.button_up.connect(func():
+		var key_name: String = add_key_edit.text.strip_edges()
+		if key_name == "" or dictionary_value.has(key_name):
+			return
+		var type_name: String = str(_get_option_button_value(add_type_option))
+		if service.set_dictionary_value(current_session, property_name, key_name, _default_value_for_variant_type(type_name)):
+			_refresh_editor_panels()
+	)
+	custom_row.add_child(add_custom_button)
+	wrapper.add_child(custom_row)
+	return panel
+
+func _build_dictionary_editor(property_name: String, dictionary_value: Dictionary, use_suggestions: bool = false) -> Control:
 	var wrapper := VBoxContainer.new()
 	wrapper.add_theme_constant_override("separation", 6)
 	var sorted_keys: Array[String] = []
@@ -425,12 +922,23 @@ func _build_dictionary_editor(property_name: String, dictionary_value: Dictionar
 	var add_label := Label.new()
 	add_label.text = "Add Entry"
 	add_vbox.add_child(add_label)
+	var suggested_key_option: OptionButton = null
+	if use_suggestions:
+		suggested_key_option = OptionButton.new()
+		_populate_option_button(suggested_key_option, _get_card_value_key_options(dictionary_value))
+		add_vbox.add_child(suggested_key_option)
 	var add_key_edit := LineEdit.new()
 	add_key_edit.placeholder_text = "key_name"
 	add_vbox.add_child(add_key_edit)
 	var add_type_option := OptionButton.new()
 	_populate_option_button(add_type_option, _variant_type_options())
 	add_vbox.add_child(add_type_option)
+	if suggested_key_option != null:
+		suggested_key_option.item_selected.connect(func(_index: int):
+			var selected_key: Variant = _get_option_button_value(suggested_key_option)
+			if selected_key != null:
+				add_key_edit.text = str(selected_key)
+		)
 	var add_button := Button.new()
 	add_button.text = "Add"
 	add_button.button_up.connect(func():
@@ -498,32 +1006,26 @@ func _render_behavior() -> void:
 	if current_session == null or current_session.working_card_data == null:
 		return
 	behavior_container.add_child(_build_section_intro(
-		"Behavior Graph",
-		"Actions decide what the card does. Validators decide when it can glow or be played. Reorder entries to match the gameplay sequence."
+		"Behavior",
+		"Keep the main card flow visible. Secondary hooks stay tucked away until you need them."
 	))
-	var populated_groups: Array[Dictionary] = []
-	var empty_groups: Array[Dictionary] = []
-	for property_name: String in CardEditorSchema.get_action_property_names():
-		var entries: Array = current_session.working_card_data.get(property_name)
-		var group_data := {"property_name": property_name, "is_action": true, "count": len(entries)}
-		if entries.is_empty():
-			empty_groups.append(group_data)
-		else:
-			populated_groups.append(group_data)
-	for property_name: String in CardEditorSchema.get_validator_property_names():
-		var entries: Array = current_session.working_card_data.get(property_name)
-		var group_data := {"property_name": property_name, "is_action": false, "count": len(entries)}
-		if entries.is_empty():
-			empty_groups.append(group_data)
-		else:
-			populated_groups.append(group_data)
-	for group_data: Dictionary in populated_groups:
-		behavior_container.add_child(_build_entry_group(str(group_data["property_name"]), bool(group_data["is_action"])))
-	if not populated_groups.is_empty() and not empty_groups.is_empty():
-		var spacer := HSeparator.new()
-		behavior_container.add_child(spacer)
-	for group_data: Dictionary in empty_groups:
-		behavior_container.add_child(_build_entry_group(str(group_data["property_name"]), bool(group_data["is_action"])))
+	for property_name: String in PRIMARY_BEHAVIOR_GROUPS:
+		behavior_container.add_child(_build_entry_group(property_name, not property_name.contains("validators")))
+	var secondary_toggle := _build_simple_toggle_row(
+		"Triggered and deck hooks",
+		"Discard, draw, retain, and deck-change hooks are usually niche. Open them only when the card needs them.",
+		show_secondary_behavior_groups,
+		func():
+			show_secondary_behavior_groups = not show_secondary_behavior_groups
+			_render_behavior()
+	)
+	behavior_container.add_child(secondary_toggle)
+	if show_secondary_behavior_groups:
+		for property_name: String in SECONDARY_BEHAVIOR_GROUPS:
+			var entries: Array = current_session.working_card_data.get(property_name)
+			if entries.is_empty():
+				continue
+			behavior_container.add_child(_build_entry_group(property_name, true))
 
 func _build_entry_group(property_name: String, is_action: bool) -> Control:
 	var panel := PanelContainer.new()
@@ -541,6 +1043,7 @@ func _build_entry_group(property_name: String, is_action: bool) -> Control:
 	var title := Label.new()
 	var entries: Array = current_session.working_card_data.get(property_name)
 	title.text = "%s (%s)" % [PROPERTY_GROUP_LABELS.get(property_name, property_name), len(entries)]
+	title.add_theme_font_size_override("font_size", 16)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	var collapse_button := Button.new()
@@ -551,11 +1054,19 @@ func _build_entry_group(property_name: String, is_action: bool) -> Control:
 	)
 	header.add_child(collapse_button)
 	vbox.add_child(header)
+	if BEHAVIOR_GROUP_DESCRIPTIONS.has(property_name):
+		var description := Label.new()
+		description.text = str(BEHAVIOR_GROUP_DESCRIPTIONS[property_name])
+		description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		description.modulate = Color(0.8, 0.82, 0.86, 0.9)
+		vbox.add_child(description)
 	if bool(collapsed_behavior_groups.get(property_name, false)):
 		return panel
 	if entries.is_empty():
 		var no_entries := Label.new()
-		no_entries.text = "No entries configured."
+		no_entries.text = "No entries configured yet."
+		no_entries.modulate = Color(0.78, 0.8, 0.84, 0.9)
 		vbox.add_child(no_entries)
 		return panel
 	for index: int in range(len(entries)):
@@ -592,6 +1103,7 @@ func _build_entry_editor(property_name: String, index: int, entry: Dictionary, i
 	var title_label := Label.new()
 	title_label.text = "%s #%s" % [display_name, index + 1]
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.add_theme_font_size_override("font_size", 15)
 	toolbar.add_child(title_label)
 	var entry_key: String = _entry_visibility_key(property_name, index, token)
 	var collapse_button := Button.new()
@@ -624,11 +1136,24 @@ func _build_entry_editor(property_name: String, index: int, entry: Dictionary, i
 	toolbar.add_child(remove_button)
 	wrapper.add_child(toolbar)
 	if bool(collapsed_behavior_entries.get(entry_key, false)):
+		var collapsed_summary := Label.new()
+		collapsed_summary.text = _build_entry_summary(token, entry[token], is_action)
+		collapsed_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		collapsed_summary.modulate = Color(0.82, 0.82, 0.86, 0.95)
+		wrapper.add_child(collapsed_summary)
 		return entry_panel
+	var token_metadata: Dictionary = service.get_action_metadata(token) if is_action else service.get_validator_metadata(token)
+	var token_description: String = str(token_metadata.get("description", ""))
+	if token_description != "":
+		var description_label := Label.new()
+		description_label.text = token_description
+		description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
+		wrapper.add_child(description_label)
 	var token_row := HBoxContainer.new()
 	var token_label := Label.new()
-	token_label.text = "Script"
-	token_label.custom_minimum_size = Vector2(64, 0)
+	token_label.text = "Effect"
+	token_label.custom_minimum_size = Vector2(52, 0)
 	token_row.add_child(token_label)
 	token_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	token_row.add_child(token_option)
@@ -637,26 +1162,65 @@ func _build_entry_editor(property_name: String, index: int, entry: Dictionary, i
 		var metadata: Dictionary = token_option.get_item_metadata(selected_index)
 		var next_token: String = str(metadata.get("resolved_token", metadata.get("token_or_path", "")))
 		service.replace_entry(current_session, property_name, index, next_token)
-		_refresh_editor_panels()
+		_refresh_after_behavior_structure_change()
 	)
-	var token_metadata: Dictionary = service.get_action_metadata(token) if is_action else service.get_validator_metadata(token)
 	var parameters: Array[Dictionary] = []
 	parameters.assign(token_metadata.get("parameters", []))
 	var values: Dictionary = entry[token]
+	var visible_parameters: Array[Dictionary] = []
 	for parameter_data: Dictionary in parameters:
-		if not _should_show_parameter(parameter_data, values):
-			continue
-		wrapper.add_child(_build_entry_parameter_editor(property_name, index, token, parameter_data, values))
+		if _should_show_parameter(parameter_data, values):
+			visible_parameters.append(parameter_data)
+	if not visible_parameters.is_empty():
+		var parameter_grid := GridContainer.new()
+		parameter_grid.columns = 2
+		parameter_grid.add_theme_constant_override("h_separation", 8)
+		parameter_grid.add_theme_constant_override("v_separation", 8)
+		for parameter_data: Dictionary in visible_parameters:
+			parameter_grid.add_child(_build_entry_parameter_editor(property_name, index, token, parameter_data, values))
+		wrapper.add_child(parameter_grid)
 	var advanced_toggle := _build_advanced_parameter_toggle(property_name, index, token, is_action, values)
 	if advanced_toggle != null:
 		wrapper.add_child(advanced_toggle)
 	return entry_panel
 
+func _build_entry_summary(token: String, values: Dictionary, is_action: bool) -> String:
+	var metadata: Dictionary = service.get_action_metadata(token) if is_action else service.get_validator_metadata(token)
+	var fragments: Array[String] = []
+	var parameters: Array[Dictionary] = []
+	parameters.assign(metadata.get("parameters", []))
+	for parameter_data: Dictionary in parameters:
+		var parameter_name: String = str(parameter_data.get("name", ""))
+		if parameter_name == "" or not values.has(parameter_name):
+			continue
+		if not _should_show_parameter(parameter_data, values):
+			continue
+		fragments.append("%s: %s" % [str(parameter_data.get("label", parameter_name)), _format_inline_value(values[parameter_name])])
+		if len(fragments) >= 3:
+			break
+	if fragments.is_empty():
+		return "No edited parameters."
+	return " | ".join(fragments)
+
 func _build_entry_parameter_editor(property_name: String, index: int, token: String, parameter_data: Dictionary, values: Dictionary) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 8)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 8)
+	padding.add_theme_constant_override("margin_bottom", 8)
 	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	panel.add_child(padding)
+	padding.add_child(wrapper)
 	var label := Label.new()
 	var parameter_name: String = str(parameter_data.get("name", ""))
 	label.text = str(parameter_data.get("label", parameter_name))
+	label.add_theme_font_size_override("font_size", 13)
+	var description: String = str(parameter_data.get("description", ""))
+	label.tooltip_text = description
+	panel.tooltip_text = description
 	wrapper.add_child(label)
 	var current_value: Variant = values.get(parameter_name, parameter_data.get("default_value", null))
 	var value_type: String = str(parameter_data.get("value_type", "variant"))
@@ -664,9 +1228,11 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 		"bool":
 			var checkbox := CheckBox.new()
 			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, bool(current_value))
 			checkbox.toggled.connect(func(pressed: bool):
 				service.update_entry_values(current_session, property_name, index, {parameter_name: pressed})
-				_refresh_editor_panels()
+				_refresh_after_behavior_change()
 			)
 			wrapper.add_child(checkbox)
 		"enum":
@@ -681,9 +1247,12 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 					break
 			dropdown.item_selected.connect(func(option_index: int):
 				service.update_entry_values(current_session, property_name, index, {parameter_name: dropdown.get_item_metadata(option_index)})
-				_refresh_editor_panels()
+				_refresh_after_behavior_change()
 			)
+			dropdown.tooltip_text = description
 			wrapper.add_child(dropdown)
+		"enum_array":
+			wrapper.add_child(_build_enum_array_parameter_editor(property_name, index, parameter_name, parameter_data, current_value))
 		"int", "float":
 			var spin := SpinBox.new()
 			spin.min_value = -999
@@ -692,40 +1261,57 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 			spin.value = float(current_value if current_value != null else 0)
 			spin.value_changed.connect(func(value: float):
 				service.update_entry_values(current_session, property_name, index, {parameter_name: int(value) if value_type == "int" else value})
-				_refresh_editor_panels()
+				_refresh_after_behavior_change()
 			)
+			spin.tooltip_text = description
 			wrapper.add_child(spin)
-		"string_array", "array", "dictionary":
+		"validator_array":
+			wrapper.add_child(_build_nested_validator_array_editor(property_name, index, parameter_name, current_value))
+		"array":
+			if _is_action_array_parameter(parameter_name, current_value):
+				wrapper.add_child(_build_nested_action_array_editor(property_name, index, parameter_name, current_value))
+				return panel
 			var text_edit := TextEdit.new()
 			text_edit.custom_minimum_size = Vector2(0, 72)
 			text_edit.text = JSON.stringify(current_value, "\t")
+			text_edit.tooltip_text = description
 			text_edit.focus_exited.connect(func():
 				var parsed_value: Variant = JSON.parse_string(text_edit.text)
 				if parsed_value != null:
 					service.update_entry_values(current_session, property_name, index, {parameter_name: parsed_value})
-					_refresh_editor_panels()
+					_refresh_after_behavior_change()
+			)
+			wrapper.add_child(text_edit)
+		"card_array":
+			wrapper.add_child(_build_string_array_parameter_editor(property_name, index, parameter_name, current_value, "card_1,card_2"))
+		"string_array":
+			wrapper.add_child(_build_string_array_parameter_editor(property_name, index, parameter_name, current_value, "value_1,value_2"))
+		"dictionary":
+			var text_edit := TextEdit.new()
+			text_edit.custom_minimum_size = Vector2(0, 72)
+			text_edit.text = JSON.stringify(current_value, "\t")
+			text_edit.tooltip_text = description
+			text_edit.focus_exited.connect(func():
+				var parsed_value: Variant = JSON.parse_string(text_edit.text)
+				if parsed_value != null:
+					service.update_entry_values(current_session, property_name, index, {parameter_name: parsed_value})
+					_refresh_after_behavior_change()
 			)
 			wrapper.add_child(text_edit)
 		_:
 			var line_edit := LineEdit.new()
 			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.tooltip_text = description
 			line_edit.text_submitted.connect(func(new_text: String):
 				service.update_entry_values(current_session, property_name, index, {parameter_name: _coerce_string_parameter(new_text, value_type)})
-				_refresh_editor_panels()
+				_refresh_after_behavior_change()
 			)
 			line_edit.focus_exited.connect(func():
 				service.update_entry_values(current_session, property_name, index, {parameter_name: _coerce_string_parameter(line_edit.text, value_type)})
-				_refresh_editor_panels()
+				_refresh_after_behavior_change()
 			)
 			wrapper.add_child(line_edit)
-	var description: String = str(parameter_data.get("description", ""))
-	if description != "":
-		var hint_label := Label.new()
-		hint_label.text = description
-		hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint_label.modulate = Color(0.8, 0.8, 0.8, 0.8)
-		wrapper.add_child(hint_label)
-	return wrapper
+	return panel
 
 func _render_preview() -> void:
 	for child in preview_mount.get_children():
@@ -752,18 +1338,19 @@ func _render_session_summary() -> void:
 	var summary: Dictionary = service.get_card_summary(current_session)
 	var policy_label: String = _format_save_policy(str(summary.get("save_policy", "")))
 	var dirty_label: String = "Unsaved changes" if bool(summary.get("dirty", false)) else "Saved"
-	session_label.text = "%s  |  %s\n%s" % [
+	session_label.text = "%s\n%s | %s" % [
 		"%s (%s)" % [summary.get("card_name", "Untitled Card"), summary.get("object_id", "no_id")],
 		policy_label,
-		summary.get("active_save_path", ""),
+		dirty_label,
 	]
 	session_label.tooltip_text = "State: %s" % dirty_label
 	var diagnostics_lines: Array[String] = []
 	var counts: Dictionary = _get_diagnostic_counts()
 	if counts["errors"] == 0 and counts["warnings"] == 0:
-		diagnostics_lines.append("[color=#9fe2a9]Ready to save.[/color] The current card passes editor validation.")
+		diagnostics_lines.append("[color=#9fe2a9]Ready to save.[/color] No editor issues are currently blocking this card.")
 	else:
-		for diagnostic: Dictionary in current_session.diagnostics:
+		var visible_diagnostics: Array = current_session.diagnostics.slice(0, min(len(current_session.diagnostics), MAX_VISIBLE_DIAGNOSTICS))
+		for diagnostic: Dictionary in visible_diagnostics:
 			var severity: String = str(diagnostic.get("severity", "info"))
 			var severity_color: String = _status_color_hex(severity)
 			var field: String = str(diagnostic.get("field", ""))
@@ -774,6 +1361,8 @@ func _render_session_summary() -> void:
 				suffix,
 				str(diagnostic.get("message", "")).xml_escape(),
 			])
+		if len(current_session.diagnostics) > MAX_VISIBLE_DIAGNOSTICS:
+			diagnostics_lines.append("[color=#d8d8d8]...and %s more issue(s).[/color]" % (len(current_session.diagnostics) - MAX_VISIBLE_DIAGNOSTICS))
 	diagnostics_text.text = "\n".join(diagnostics_lines)
 
 func _refresh_overview() -> void:
@@ -836,11 +1425,13 @@ func _apply_split_layout() -> void:
 		return
 	var total_width: float = body_split.size.x
 	if total_width > 960:
-		var quarter_width: int = int(total_width / 4.0)
-		body_split.set("split_offsets", PackedInt32Array([quarter_width, quarter_width * 3]))
+		var library_width: int = int(total_width * 0.22)
+		var preview_width: int = int(total_width * 0.26)
+		var second_split: int = max(library_width + 320, int(total_width - preview_width))
+		body_split.set("split_offsets", PackedInt32Array([library_width, second_split]))
 	var editor_width: float = editor_split.size.x
 	if editor_width > 480:
-		editor_split.split_offset = int(editor_width / 2.0)
+		editor_split.split_offset = int(editor_width * 0.42)
 	if is_instance_valid(library_sections):
 		call_deferred("_render_library_sections")
 
@@ -891,11 +1482,9 @@ func _build_library_group(group_name: String, entries: Array) -> Control:
 	wrapper.add_child(header)
 	if bool(collapsed_library_groups.get(group_name, false)):
 		return panel
-	var grid := GridContainer.new()
-	grid.columns = _get_library_grid_columns()
+	var grid := VBoxContainer.new()
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
+	grid.add_theme_constant_override("separation", 8)
 	for entry: Dictionary in entries:
 		grid.add_child(_build_library_card_tile(entry))
 	wrapper.add_child(grid)
@@ -903,48 +1492,69 @@ func _build_library_group(group_name: String, entries: Array) -> Control:
 
 func _build_library_card_tile(entry: Dictionary) -> Control:
 	var tile := PanelContainer.new()
-	tile.custom_minimum_size = Vector2(160, 260)
+	tile.custom_minimum_size = Vector2(0, 84)
 	tile.mouse_filter = Control.MOUSE_FILTER_STOP
 	var entry_path: String = str(entry.get("resource_path", ""))
-	if current_session != null and (entry_path == current_session.original_resource_path or entry_path == current_session.get_active_save_path()):
-		tile.modulate = Color(1.0, 0.96, 0.8, 1.0)
+	var is_selected: bool = current_session != null and (entry_path == current_session.original_resource_path or entry_path == current_session.get_active_save_path())
+	_apply_library_tile_style(tile, is_selected, false)
 	var tile_padding := MarginContainer.new()
 	tile_padding.add_theme_constant_override("margin_left", 8)
-	tile_padding.add_theme_constant_override("margin_top", 8)
+	tile_padding.add_theme_constant_override("margin_top", 6)
 	tile_padding.add_theme_constant_override("margin_right", 8)
-	tile_padding.add_theme_constant_override("margin_bottom", 8)
-	var tile_vbox := VBoxContainer.new()
-	tile_vbox.add_theme_constant_override("separation", 6)
-	tile_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tile_padding.add_theme_constant_override("margin_bottom", 6)
+	var tile_row := HBoxContainer.new()
+	tile_row.add_theme_constant_override("separation", 10)
+	tile_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tile.add_child(tile_padding)
-	tile_padding.add_child(tile_vbox)
-	var preview_host := CenterContainer.new()
-	preview_host.custom_minimum_size = Vector2(0, 200)
-	preview_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tile_vbox.add_child(preview_host)
-	var card_resource: Resource = load(str(entry.get("resource_path", "")))
-	if card_resource is CardData:
-		var library_card: Card = Scenes.CARD.instantiate()
-		preview_host.add_child(library_card)
-		library_card.scale = Vector2(0.82, 0.82)
-		library_card.position = Vector2.ZERO
-		library_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_render_preview_card(library_card, card_resource as CardData)
+	tile_padding.add_child(tile_row)
+	var cost_badge := Label.new()
+	var is_variable_cost: bool = false
+	var loaded_card: Resource = load(entry_path)
+	if loaded_card is CardData:
+		is_variable_cost = (loaded_card as CardData).card_energy_cost_is_variable
+	cost_badge.text = "X" if is_variable_cost else str(_load_library_entry_cost(entry_path))
+	cost_badge.custom_minimum_size = Vector2(32, 0)
+	cost_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tile_row.add_child(cost_badge)
+	var text_column := VBoxContainer.new()
+	text_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_column.add_theme_constant_override("separation", 2)
+	tile_row.add_child(text_column)
 	var title_label := Label.new()
 	title_label.text = str(entry.get("card_name", entry.get("object_id", "")))
 	title_label.tooltip_text = "%s\n%s" % [entry.get("object_id", ""), entry_path]
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	title_label.clip_text = true
 	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tile_vbox.add_child(title_label)
+	title_label.add_theme_font_size_override("font_size", 15)
+	text_column.add_child(title_label)
 	var meta_label := Label.new()
 	meta_label.text = _format_library_meta(entry)
-	meta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	meta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	meta_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	meta_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
 	meta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tile_vbox.add_child(meta_label)
+	text_column.add_child(meta_label)
+	var submeta_label := Label.new()
+	submeta_label.text = "%s | %s" % [entry.get("object_id", ""), "Triage" if str(entry.get("source_bucket", "")) == "triage" else "Content"]
+	submeta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	submeta_label.modulate = Color(0.74, 0.78, 0.86, 0.95)
+	submeta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_column.add_child(submeta_label)
+	var art_mount := CenterContainer.new()
+	art_mount.custom_minimum_size = Vector2(72, 72)
+	art_mount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var art_texture := _load_library_entry_texture(entry_path)
+	if art_texture != null:
+		var art_preview := TextureRect.new()
+		art_preview.texture = art_texture
+		art_preview.custom_minimum_size = Vector2(64, 64)
+		art_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art_mount.add_child(art_preview)
+	tile_row.add_child(art_mount)
 	var click_overlay := Button.new()
 	click_overlay.flat = true
 	click_overlay.text = ""
@@ -958,8 +1568,28 @@ func _build_library_card_tile(entry: Dictionary) -> Control:
 	click_overlay.button_up.connect(func():
 		_open_library_entry(entry)
 	)
+	click_overlay.mouse_entered.connect(func():
+		_apply_library_tile_style(tile, is_selected, true)
+	)
+	click_overlay.mouse_exited.connect(func():
+		_apply_library_tile_style(tile, is_selected, false)
+	)
 	tile.add_child(click_overlay)
 	return tile
+
+func _load_library_entry_cost(entry_path: String) -> int:
+	var card_resource: Resource = load(entry_path)
+	if card_resource is CardData:
+		return (card_resource as CardData).card_energy_cost
+	return 0
+
+func _load_library_entry_texture(entry_path: String) -> Texture2D:
+	var card_resource: Resource = load(entry_path)
+	if card_resource is CardData:
+		var texture_path: String = str((card_resource as CardData).card_texture_path)
+		if texture_path != "":
+			return FileLoader.load_texture(texture_path)
+	return null
 
 func _get_library_grid_columns() -> int:
 	if library_scroll.size.x >= 540:
@@ -973,7 +1603,7 @@ func _get_library_group_name(entry: Dictionary) -> String:
 		return "Triage"
 	if owner_bucket == "" or owner_bucket == "unknown":
 		return "Misc"
-	return owner_bucket.replace("/", " / ").capitalize()
+	return owner_bucket.replace("/", " / ")
 
 func _open_library_entry(entry: Dictionary) -> void:
 	current_session = service.load_session(str(entry.get("resource_path", "")))
@@ -1007,24 +1637,840 @@ func _build_advanced_parameter_toggle(property_name: String, index: int, token: 
 		return null
 	var entry_key: String = _entry_visibility_key(property_name, index, token)
 	var wrapper := VBoxContainer.new()
-	wrapper.add_theme_constant_override("separation", 4)
+	wrapper.add_theme_constant_override("separation", 6)
 	var toggle_button := Button.new()
 	toggle_button.text = "Hide advanced fields" if bool(expanded_entry_parameters.get(entry_key, false)) else "Show advanced fields"
 	toggle_button.button_up.connect(func():
 		expanded_entry_parameters[entry_key] = not bool(expanded_entry_parameters.get(entry_key, false))
-		_refresh_editor_panels()
+		_render_behavior()
 	)
 	wrapper.add_child(toggle_button)
 	if not bool(expanded_entry_parameters.get(entry_key, false)):
 		return wrapper
+	var parameter_grid := GridContainer.new()
+	parameter_grid.columns = 2
+	parameter_grid.add_theme_constant_override("h_separation", 8)
+	parameter_grid.add_theme_constant_override("v_separation", 8)
 	for parameter_data: Dictionary in parameters:
 		if _should_show_parameter(parameter_data, values):
 			continue
-		wrapper.add_child(_build_entry_parameter_editor(property_name, index, token, parameter_data, values))
+		parameter_grid.add_child(_build_entry_parameter_editor(property_name, index, token, parameter_data, values))
+	wrapper.add_child(parameter_grid)
 	return wrapper
 
 func _entry_visibility_key(property_name: String, index: int, token: String) -> String:
 	return "%s:%s:%s" % [property_name, index, token]
+
+func _setup_checkbox(checkbox: CheckBox) -> void:
+	checkbox.set_meta("base_text", checkbox.text)
+	checkbox.toggled.connect(_on_styled_checkbox_toggled.bind(checkbox))
+
+func _style_checkbox(checkbox: CheckBox, pressed: bool) -> void:
+	checkbox.custom_minimum_size = Vector2(0, 28)
+	var base_text: String = str(checkbox.get_meta("base_text", ""))
+	var state_text: String = "Enabled" if pressed else "Disabled"
+	checkbox.text = state_text if base_text == "" else "%s (%s)" % [base_text, state_text]
+	checkbox.modulate = Color(0.96, 0.96, 0.98, 1.0) if pressed else Color(0.84, 0.86, 0.9, 1.0)
+
+func _on_styled_checkbox_toggled(pressed: bool, checkbox: CheckBox) -> void:
+	_style_checkbox(checkbox, pressed)
+
+func _refresh_after_behavior_change() -> void:
+	_render_preview()
+	_render_session_summary()
+	_refresh_overview()
+
+func _refresh_after_behavior_structure_change() -> void:
+	_render_behavior()
+	_refresh_after_behavior_change()
+
+func _build_string_array_parameter_editor(property_name: String, index: int, parameter_name: String, current_value: Variant, placeholder_text: String) -> Control:
+	var line_edit := LineEdit.new()
+	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_edit.placeholder_text = placeholder_text
+	line_edit.text = ",".join(_variant_to_string_array(current_value))
+	line_edit.text_submitted.connect(func(_text: String):
+		service.update_entry_values(current_session, property_name, index, {parameter_name: _parse_csv_strings(line_edit.text)})
+		_refresh_after_behavior_change()
+	)
+	line_edit.focus_exited.connect(func():
+		service.update_entry_values(current_session, property_name, index, {parameter_name: _parse_csv_strings(line_edit.text)})
+		_refresh_after_behavior_change()
+	)
+	return line_edit
+
+func _build_enum_array_parameter_editor(property_name: String, index: int, parameter_name: String, parameter_data: Dictionary, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	var current_values: Array = []
+	current_values.assign(current_value if current_value is Array else [])
+	var options: Array = parameter_data.get("options", [])
+	for option_data: Variant in options:
+		var option_label: String = ""
+		var option_value: Variant = option_data
+		if option_data is Dictionary:
+			option_label = str(option_data.get("label", option_data.get("value", "")))
+			option_value = option_data.get("value", null)
+		else:
+			option_label = str(option_data)
+		var checkbox := CheckBox.new()
+		checkbox.text = option_label
+		checkbox.button_pressed = current_values.has(option_value)
+		_setup_checkbox(checkbox)
+		_style_checkbox(checkbox, checkbox.button_pressed)
+		checkbox.toggled.connect(func(pressed: bool):
+			var next_values: Array = []
+			next_values.assign(current_values)
+			if pressed and not next_values.has(option_value):
+				next_values.append(option_value)
+			elif not pressed:
+				next_values.erase(option_value)
+			service.update_entry_values(current_session, property_name, index, {parameter_name: next_values})
+			_refresh_after_behavior_change()
+		)
+		wrapper.add_child(checkbox)
+	return wrapper
+
+func _build_nested_validator_array_editor(property_name: String, index: int, parameter_name: String, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	var entries: Array = []
+	entries.assign(current_value if current_value is Array else [])
+	var add_row := HBoxContainer.new()
+	add_row.add_theme_constant_override("separation", 6)
+	var validator_dropdown := OptionButton.new()
+	validator_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(validator_dropdown, _metadata_options(service.get_validator_options("card_pick")))
+	add_row.add_child(validator_dropdown)
+	var add_button := Button.new()
+	add_button.text = "Add Validator"
+	add_button.button_up.connect(func():
+		var selected_token: Variant = _get_option_button_value(validator_dropdown)
+		if selected_token == null:
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.append(service.create_validator_entry(str(selected_token)))
+		service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+		_refresh_after_behavior_structure_change()
+	)
+	add_row.add_child(add_button)
+	wrapper.add_child(add_row)
+	if entries.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No nested validators."
+		wrapper.add_child(empty_label)
+		return wrapper
+	for nested_index: int in range(len(entries)):
+		var nested_entry: Dictionary = entries[nested_index]
+		if nested_entry.is_empty():
+			continue
+		var nested_token: String = str(nested_entry.keys()[0])
+		var nested_values: Dictionary = nested_entry[nested_token]
+		var nested_panel := PanelContainer.new()
+		var nested_padding := MarginContainer.new()
+		nested_padding.add_theme_constant_override("margin_left", 8)
+		nested_padding.add_theme_constant_override("margin_top", 8)
+		nested_padding.add_theme_constant_override("margin_right", 8)
+		nested_padding.add_theme_constant_override("margin_bottom", 8)
+		var nested_vbox := VBoxContainer.new()
+		nested_vbox.add_theme_constant_override("separation", 6)
+		nested_panel.add_child(nested_padding)
+		nested_padding.add_child(nested_vbox)
+		var header := HBoxContainer.new()
+		var dropdown := OptionButton.new()
+		dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_populate_option_button(dropdown, _metadata_options(service.get_validator_options("card_pick")), nested_token)
+		dropdown.item_selected.connect(func(_selected: int):
+			var selected_token: Variant = _get_option_button_value(dropdown)
+			if selected_token == null:
+				return
+			var replacement: Dictionary = service.create_validator_entry(str(selected_token))
+			if replacement.is_empty():
+				return
+			var next_entries: Array = entries.duplicate(true)
+			next_entries[nested_index] = replacement
+			service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+			_refresh_after_behavior_structure_change()
+		)
+		header.add_child(dropdown)
+		var remove_button := Button.new()
+		remove_button.text = "Remove"
+		remove_button.button_up.connect(func():
+			var next_entries: Array = entries.duplicate(true)
+			next_entries.remove_at(nested_index)
+			service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+			_refresh_after_behavior_structure_change()
+		)
+		header.add_child(remove_button)
+		nested_vbox.add_child(header)
+		var metadata: Dictionary = service.get_validator_metadata(nested_token)
+		var parameters: Array[Dictionary] = []
+		parameters.assign(metadata.get("parameters", []))
+		for parameter_data: Dictionary in parameters:
+			var nested_parameter_name: String = str(parameter_data.get("name", ""))
+			if nested_parameter_name == "":
+				continue
+			nested_vbox.add_child(_build_nested_validator_parameter_row(property_name, index, parameter_name, nested_index, nested_token, nested_values, parameter_data))
+		wrapper.add_child(nested_panel)
+	return wrapper
+
+func _build_nested_action_array_editor(property_name: String, index: int, parameter_name: String, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	var entries: Array = []
+	entries.assign(current_value if current_value is Array else [])
+	var add_row := HBoxContainer.new()
+	add_row.add_theme_constant_override("separation", 6)
+	var action_dropdown := OptionButton.new()
+	action_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(action_dropdown, _metadata_options(service.get_action_options("action_children")))
+	add_row.add_child(action_dropdown)
+	var add_button := Button.new()
+	add_button.text = "Add Child Action"
+	add_button.button_up.connect(func():
+		var selected_token: Variant = _get_option_button_value(action_dropdown)
+		if selected_token == null:
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.append(service.create_action_entry(str(selected_token)))
+		service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+		_refresh_after_behavior_structure_change()
+	)
+	add_row.add_child(add_button)
+	wrapper.add_child(add_row)
+	if entries.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No child actions."
+		wrapper.add_child(empty_label)
+		return wrapper
+	for nested_index: int in range(len(entries)):
+		var nested_entry: Dictionary = entries[nested_index]
+		if nested_entry.is_empty():
+			continue
+		wrapper.add_child(_build_nested_action_entry_editor(property_name, index, parameter_name, nested_index, nested_entry, entries))
+	return wrapper
+
+func _build_nested_action_entry_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_entry: Dictionary, entries: Array) -> Control:
+	var nested_token: String = str(nested_entry.keys()[0])
+	var nested_values: Dictionary = nested_entry[nested_token]
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 8)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 8)
+	padding.add_theme_constant_override("margin_bottom", 8)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	panel.add_child(padding)
+	padding.add_child(vbox)
+	var header := HBoxContainer.new()
+	var dropdown := OptionButton.new()
+	dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(dropdown, _metadata_options(service.get_action_options("action_children")), nested_token)
+	dropdown.item_selected.connect(func(_selected: int):
+		var selected_token: Variant = _get_option_button_value(dropdown)
+		if selected_token == null:
+			return
+		var replacement: Dictionary = service.create_action_entry(str(selected_token))
+		if replacement.is_empty():
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries[nested_index] = replacement
+		service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+		_refresh_after_behavior_structure_change()
+	)
+	header.add_child(dropdown)
+	var remove_button := Button.new()
+	remove_button.text = "Remove"
+	remove_button.button_up.connect(func():
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.remove_at(nested_index)
+		service.update_entry_values(current_session, property_name, index, {parameter_name: next_entries})
+		_refresh_after_behavior_structure_change()
+	)
+	header.add_child(remove_button)
+	vbox.add_child(header)
+	var metadata: Dictionary = service.get_action_metadata(nested_token)
+	var description_label := Label.new()
+	description_label.text = str(metadata.get("description", ""))
+	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
+	if description_label.text != "":
+		vbox.add_child(description_label)
+	for child_parameter: Dictionary in metadata.get("parameters", []):
+		var child_parameter_name: String = str(child_parameter.get("name", ""))
+		if child_parameter_name == "":
+			continue
+		vbox.add_child(_build_nested_action_parameter_row(property_name, index, parameter_name, nested_index, nested_token, nested_values, child_parameter))
+	return panel
+
+func _build_nested_action_parameter_row(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_values: Dictionary, parameter_data: Dictionary) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var nested_parameter_name: String = str(parameter_data.get("name", ""))
+	var parameter_label := Label.new()
+	parameter_label.text = str(parameter_data.get("label", nested_parameter_name))
+	parameter_label.tooltip_text = str(parameter_data.get("description", ""))
+	row.add_child(parameter_label)
+	var value_type: String = str(parameter_data.get("value_type", "variant"))
+	var current_value: Variant = nested_values.get(nested_parameter_name, parameter_data.get("default_value", null))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
+			checkbox.toggled.connect(func(pressed: bool):
+				_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, pressed)
+			)
+			row.add_child(checkbox)
+		"enum":
+			var dropdown := OptionButton.new()
+			var options: Array = parameter_data.get("options", [])
+			for option_data: Variant in options:
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, dropdown.get_item_metadata(option_index))
+			)
+			row.add_child(dropdown)
+		"enum_array":
+			row.add_child(_build_nested_action_enum_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, parameter_data, current_value))
+		"validator_array":
+			row.add_child(_build_nested_action_validator_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, current_value))
+		"array":
+			if _is_action_array_parameter(nested_parameter_name, current_value):
+				row.add_child(_build_deep_nested_action_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, current_value))
+			else:
+				var text_edit := TextEdit.new()
+				text_edit.custom_minimum_size = Vector2(0, 72)
+				text_edit.text = JSON.stringify(current_value, "\t")
+				text_edit.focus_exited.connect(func():
+					var parsed_value: Variant = JSON.parse_string(text_edit.text)
+					if parsed_value != null:
+						_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, parsed_value)
+				)
+				row.add_child(text_edit)
+		"card_array":
+			row.add_child(_build_nested_action_string_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, current_value, "card_1,card_2"))
+		"string_array":
+			row.add_child(_build_nested_action_string_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, current_value, "value_1,value_2"))
+		"int", "float":
+			var spin := SpinBox.new()
+			spin.min_value = -999
+			spin.max_value = 9999
+			spin.step = 1 if value_type == "int" else 0.1
+			spin.value = float(current_value if current_value != null else 0)
+			spin.value_changed.connect(func(value: float):
+				_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, int(value) if value_type == "int" else value)
+			)
+			row.add_child(spin)
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _coerce_string_parameter(new_text, value_type))
+			)
+			line_edit.focus_exited.connect(func():
+				_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _coerce_string_parameter(line_edit.text, value_type))
+			)
+			row.add_child(line_edit)
+	return row
+
+func _build_nested_action_enum_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, parameter_data: Dictionary, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	var current_values: Array = []
+	current_values.assign(current_value if current_value is Array else [])
+	for option_data: Variant in parameter_data.get("options", []):
+		var option_label: String = str(option_data)
+		var option_value: Variant = option_data
+		if option_data is Dictionary:
+			option_label = str(option_data.get("label", option_data.get("value", "")))
+			option_value = option_data.get("value", null)
+		var checkbox := CheckBox.new()
+		checkbox.text = option_label
+		checkbox.button_pressed = current_values.has(option_value)
+		_setup_checkbox(checkbox)
+		_style_checkbox(checkbox, checkbox.button_pressed)
+		checkbox.toggled.connect(func(pressed: bool):
+			var next_values: Array = current_values.duplicate(true)
+			if pressed and not next_values.has(option_value):
+				next_values.append(option_value)
+			elif not pressed:
+				next_values.erase(option_value)
+			_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_values)
+		)
+		wrapper.add_child(checkbox)
+	return wrapper
+
+func _build_nested_action_string_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, current_value: Variant, placeholder_text: String) -> Control:
+	var line_edit := LineEdit.new()
+	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_edit.placeholder_text = placeholder_text
+	line_edit.text = ",".join(_variant_to_string_array(current_value))
+	line_edit.text_submitted.connect(func(_text: String):
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _parse_csv_strings(line_edit.text))
+	)
+	line_edit.focus_exited.connect(func():
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _parse_csv_strings(line_edit.text))
+	)
+	return line_edit
+
+func _build_nested_action_validator_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	var entries: Array = []
+	entries.assign(current_value if current_value is Array else [])
+	var add_row := HBoxContainer.new()
+	var validator_dropdown := OptionButton.new()
+	validator_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(validator_dropdown, _metadata_options(service.get_validator_options("card_pick")))
+	add_row.add_child(validator_dropdown)
+	var add_button := Button.new()
+	add_button.text = "Add Validator"
+	add_button.button_up.connect(func():
+		var selected_token: Variant = _get_option_button_value(validator_dropdown)
+		if selected_token == null:
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.append(service.create_validator_entry(str(selected_token)))
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+	)
+	add_row.add_child(add_button)
+	wrapper.add_child(add_row)
+	if entries.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No nested validators."
+		wrapper.add_child(empty_label)
+		return wrapper
+	for validator_index: int in range(len(entries)):
+		var validator_entry: Dictionary = entries[validator_index]
+		if validator_entry.is_empty():
+			continue
+		var validator_token: String = str(validator_entry.keys()[0])
+		var validator_values: Dictionary = validator_entry[validator_token]
+		var panel := PanelContainer.new()
+		var pad := MarginContainer.new()
+		pad.add_theme_constant_override("margin_left", 8)
+		pad.add_theme_constant_override("margin_top", 8)
+		pad.add_theme_constant_override("margin_right", 8)
+		pad.add_theme_constant_override("margin_bottom", 8)
+		var vbox := VBoxContainer.new()
+		vbox.add_theme_constant_override("separation", 6)
+		panel.add_child(pad)
+		pad.add_child(vbox)
+		var header := HBoxContainer.new()
+		var dropdown := OptionButton.new()
+		dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_populate_option_button(dropdown, _metadata_options(service.get_validator_options("card_pick")), validator_token)
+		dropdown.item_selected.connect(func(_selected: int):
+			var selected_token: Variant = _get_option_button_value(dropdown)
+			if selected_token == null:
+				return
+			var next_entries: Array = entries.duplicate(true)
+			next_entries[validator_index] = service.create_validator_entry(str(selected_token))
+			_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+		)
+		header.add_child(dropdown)
+		var remove_button := Button.new()
+		remove_button.text = "Remove"
+		remove_button.button_up.connect(func():
+			var next_entries: Array = entries.duplicate(true)
+			next_entries.remove_at(validator_index)
+			_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+		)
+		header.add_child(remove_button)
+		vbox.add_child(header)
+		for child_parameter: Dictionary in service.get_validator_metadata(validator_token).get("parameters", []):
+			var child_parameter_name: String = str(child_parameter.get("name", ""))
+			if child_parameter_name == "":
+				continue
+			vbox.add_child(_build_nested_action_validator_parameter_row(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, validator_index, validator_token, validator_values, child_parameter))
+		wrapper.add_child(panel)
+	return wrapper
+
+func _build_nested_action_validator_parameter_row(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, validator_index: int, validator_token: String, validator_values: Dictionary, parameter_data: Dictionary) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var child_parameter_name: String = str(parameter_data.get("name", ""))
+	var label := Label.new()
+	label.text = str(parameter_data.get("label", child_parameter_name))
+	row.add_child(label)
+	var value_type: String = str(parameter_data.get("value_type", "variant"))
+	var current_value: Variant = validator_values.get(child_parameter_name, parameter_data.get("default_value", null))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
+			checkbox.toggled.connect(func(pressed: bool):
+				_update_deep_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, validator_index, validator_token, child_parameter_name, pressed)
+			)
+			row.add_child(checkbox)
+		"enum":
+			var dropdown := OptionButton.new()
+			for option_data: Variant in parameter_data.get("options", []):
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				_update_deep_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, validator_index, validator_token, child_parameter_name, dropdown.get_item_metadata(option_index))
+			)
+			row.add_child(dropdown)
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				_update_deep_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, validator_index, validator_token, child_parameter_name, _coerce_string_parameter(new_text, value_type))
+			)
+			line_edit.focus_exited.connect(func():
+				_update_deep_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, validator_index, validator_token, child_parameter_name, _coerce_string_parameter(line_edit.text, value_type))
+			)
+			row.add_child(line_edit)
+	return row
+
+func _build_deep_nested_action_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	var entries: Array = []
+	entries.assign(current_value if current_value is Array else [])
+	var add_row := HBoxContainer.new()
+	var action_dropdown := OptionButton.new()
+	action_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(action_dropdown, _metadata_options(service.get_action_options("action_children")))
+	add_row.add_child(action_dropdown)
+	var add_button := Button.new()
+	add_button.text = "Add Child Action"
+	add_button.button_up.connect(func():
+		var selected_token: Variant = _get_option_button_value(action_dropdown)
+		if selected_token == null:
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.append(service.create_action_entry(str(selected_token)))
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+	)
+	add_row.add_child(add_button)
+	wrapper.add_child(add_row)
+	if entries.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No child actions."
+		wrapper.add_child(empty_label)
+		return wrapper
+	for deep_index: int in range(len(entries)):
+		var deep_entry: Dictionary = entries[deep_index]
+		if deep_entry.is_empty():
+			continue
+		wrapper.add_child(_build_deep_nested_action_entry_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_entry, entries))
+	return wrapper
+
+func _build_deep_nested_action_entry_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, deep_index: int, deep_entry: Dictionary, entries: Array) -> Control:
+	var deep_token: String = str(deep_entry.keys()[0])
+	var deep_values: Dictionary = deep_entry[deep_token]
+	var panel := PanelContainer.new()
+	var pad := MarginContainer.new()
+	pad.add_theme_constant_override("margin_left", 8)
+	pad.add_theme_constant_override("margin_top", 8)
+	pad.add_theme_constant_override("margin_right", 8)
+	pad.add_theme_constant_override("margin_bottom", 8)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	panel.add_child(pad)
+	pad.add_child(vbox)
+	var header := HBoxContainer.new()
+	var dropdown := OptionButton.new()
+	dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(dropdown, _metadata_options(service.get_action_options("action_children")), deep_token)
+	dropdown.item_selected.connect(func(_selected: int):
+		var selected_token: Variant = _get_option_button_value(dropdown)
+		if selected_token == null:
+			return
+		var next_entries: Array = entries.duplicate(true)
+		next_entries[deep_index] = service.create_action_entry(str(selected_token))
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+	)
+	header.add_child(dropdown)
+	var remove_button := Button.new()
+	remove_button.text = "Remove"
+	remove_button.button_up.connect(func():
+		var next_entries: Array = entries.duplicate(true)
+		next_entries.remove_at(deep_index)
+		_update_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_entries, true)
+	)
+	header.add_child(remove_button)
+	vbox.add_child(header)
+	for child_parameter: Dictionary in service.get_action_metadata(deep_token).get("parameters", []):
+		var child_parameter_name: String = str(child_parameter.get("name", ""))
+		if child_parameter_name == "":
+			continue
+		vbox.add_child(_build_deep_nested_action_parameter_row(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_token, deep_values, child_parameter))
+	return panel
+
+func _build_deep_nested_action_parameter_row(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, deep_index: int, deep_token: String, deep_values: Dictionary, parameter_data: Dictionary) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var child_parameter_name: String = str(parameter_data.get("name", ""))
+	var label := Label.new()
+	label.text = str(parameter_data.get("label", child_parameter_name))
+	row.add_child(label)
+	var value_type: String = str(parameter_data.get("value_type", "variant"))
+	var current_value: Variant = deep_values.get(child_parameter_name, parameter_data.get("default_value", null))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
+			checkbox.toggled.connect(func(pressed: bool):
+				_update_deep_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_token, child_parameter_name, pressed)
+			)
+			row.add_child(checkbox)
+		"enum":
+			var dropdown := OptionButton.new()
+			for option_data: Variant in parameter_data.get("options", []):
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				_update_deep_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_token, child_parameter_name, dropdown.get_item_metadata(option_index))
+			)
+			row.add_child(dropdown)
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				_update_deep_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_token, child_parameter_name, _coerce_string_parameter(new_text, value_type))
+			)
+			line_edit.focus_exited.connect(func():
+				_update_deep_nested_action_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, deep_index, deep_token, child_parameter_name, _coerce_string_parameter(line_edit.text, value_type))
+			)
+			row.add_child(line_edit)
+	return row
+
+func _build_nested_validator_parameter_row(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_values: Dictionary, parameter_data: Dictionary) -> Control:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	var parameter_label := Label.new()
+	var nested_parameter_name: String = str(parameter_data.get("name", ""))
+	parameter_label.text = str(parameter_data.get("label", nested_parameter_name))
+	parameter_label.tooltip_text = str(parameter_data.get("description", ""))
+	row.add_child(parameter_label)
+	var value_type: String = str(parameter_data.get("value_type", "variant"))
+	var current_value: Variant = nested_values.get(nested_parameter_name, parameter_data.get("default_value", null))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
+			checkbox.toggled.connect(func(pressed: bool):
+				_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, pressed)
+			)
+			row.add_child(checkbox)
+		"enum":
+			var dropdown := OptionButton.new()
+			var options: Array = parameter_data.get("options", [])
+			for option_data: Variant in options:
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, dropdown.get_item_metadata(option_index))
+			)
+			row.add_child(dropdown)
+		"enum_array":
+			row.add_child(_build_nested_validator_enum_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, parameter_data, current_value))
+		"int", "float":
+			var spin := SpinBox.new()
+			spin.min_value = -999
+			spin.max_value = 9999
+			spin.step = 1 if value_type == "int" else 0.1
+			spin.value = float(current_value if current_value != null else 0)
+			spin.value_changed.connect(func(value: float):
+				_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, int(value) if value_type == "int" else value)
+			)
+			row.add_child(spin)
+		"string_array":
+			row.add_child(_build_nested_validator_string_array_editor(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, current_value))
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _coerce_string_parameter(new_text, value_type))
+			)
+			line_edit.focus_exited.connect(func():
+				_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _coerce_string_parameter(line_edit.text, value_type))
+			)
+			row.add_child(line_edit)
+	return row
+
+func _build_nested_validator_enum_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, parameter_data: Dictionary, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	var current_values: Array = []
+	current_values.assign(current_value if current_value is Array else [])
+	for option_data: Variant in parameter_data.get("options", []):
+		var option_label: String = str(option_data)
+		var option_value: Variant = option_data
+		if option_data is Dictionary:
+			option_label = str(option_data.get("label", option_data.get("value", "")))
+			option_value = option_data.get("value", null)
+		var checkbox := CheckBox.new()
+		checkbox.text = option_label
+		checkbox.button_pressed = current_values.has(option_value)
+		_setup_checkbox(checkbox)
+		_style_checkbox(checkbox, checkbox.button_pressed)
+		checkbox.toggled.connect(func(pressed: bool):
+			var next_values: Array = current_values.duplicate(true)
+			if pressed and not next_values.has(option_value):
+				next_values.append(option_value)
+			elif not pressed:
+				next_values.erase(option_value)
+			_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, next_values)
+		)
+		wrapper.add_child(checkbox)
+	return wrapper
+
+func _build_nested_validator_string_array_editor(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, current_value: Variant) -> Control:
+	var line_edit := LineEdit.new()
+	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_edit.placeholder_text = "value_1,value_2"
+	line_edit.text = ",".join(_variant_to_string_array(current_value))
+	line_edit.text_submitted.connect(func(_text: String):
+		_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _parse_csv_strings(line_edit.text))
+	)
+	line_edit.focus_exited.connect(func():
+		_update_nested_validator_value(property_name, index, parameter_name, nested_index, nested_token, nested_parameter_name, _parse_csv_strings(line_edit.text))
+	)
+	return line_edit
+
+func _update_nested_validator_value(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, next_value: Variant) -> void:
+	var entries: Array = []
+	var root_entry: Dictionary = current_session.working_card_data.get(property_name)[index]
+	entries.assign(root_entry.get(nested_token, {}).get(parameter_name, []))
+	if nested_index < 0 or nested_index >= len(entries):
+		return
+	var target_entry: Dictionary = entries[nested_index]
+	if target_entry.is_empty():
+		return
+	var target_token: String = str(target_entry.keys()[0])
+	var target_values: Dictionary = target_entry[target_token]
+	target_values[nested_parameter_name] = next_value
+	target_entry[target_token] = target_values
+	entries[nested_index] = target_entry
+	service.update_entry_values(current_session, property_name, index, {parameter_name: entries})
+	_refresh_after_behavior_change()
+
+func _update_nested_action_value(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, next_value: Variant, rerender_behavior: bool = false) -> void:
+	var entries: Array = []
+	var root_entry: Dictionary = current_session.working_card_data.get(property_name)[index]
+	entries.assign(root_entry.get(nested_token, {}).get(parameter_name, []))
+	if nested_index < 0 or nested_index >= len(entries):
+		return
+	var target_entry: Dictionary = entries[nested_index]
+	if target_entry.is_empty():
+		return
+	var target_token: String = str(target_entry.keys()[0])
+	var target_values: Dictionary = target_entry[target_token]
+	target_values[nested_parameter_name] = next_value
+	target_entry[target_token] = target_values
+	entries[nested_index] = target_entry
+	service.update_entry_values(current_session, property_name, index, {parameter_name: entries})
+	if rerender_behavior:
+		_refresh_after_behavior_structure_change()
+	else:
+		_refresh_after_behavior_change()
+
+func _update_deep_nested_validator_value(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, validator_index: int, validator_token: String, child_parameter_name: String, next_value: Variant) -> void:
+	var nested_actions: Array = []
+	var root_entry: Dictionary = current_session.working_card_data.get(property_name)[index]
+	nested_actions.assign(root_entry.get(nested_token, {}).get(parameter_name, []))
+	if nested_index < 0 or nested_index >= len(nested_actions):
+		return
+	var target_action: Dictionary = nested_actions[nested_index]
+	var target_action_token: String = str(target_action.keys()[0])
+	var target_action_values: Dictionary = target_action[target_action_token]
+	var validators: Array = []
+	validators.assign(target_action_values.get(nested_parameter_name, []))
+	if validator_index < 0 or validator_index >= len(validators):
+		return
+	var validator_entry: Dictionary = validators[validator_index]
+	var validator_values: Dictionary = validator_entry[validator_token]
+	validator_values[child_parameter_name] = next_value
+	validator_entry[validator_token] = validator_values
+	validators[validator_index] = validator_entry
+	target_action_values[nested_parameter_name] = validators
+	target_action[target_action_token] = target_action_values
+	nested_actions[nested_index] = target_action
+	service.update_entry_values(current_session, property_name, index, {parameter_name: nested_actions})
+	_refresh_after_behavior_change()
+
+func _update_deep_nested_action_value(property_name: String, index: int, parameter_name: String, nested_index: int, nested_token: String, nested_parameter_name: String, deep_index: int, deep_token: String, child_parameter_name: String, next_value: Variant) -> void:
+	var nested_actions: Array = []
+	var root_entry: Dictionary = current_session.working_card_data.get(property_name)[index]
+	nested_actions.assign(root_entry.get(nested_token, {}).get(parameter_name, []))
+	if nested_index < 0 or nested_index >= len(nested_actions):
+		return
+	var target_action: Dictionary = nested_actions[nested_index]
+	var target_action_token: String = str(target_action.keys()[0])
+	var target_action_values: Dictionary = target_action[target_action_token]
+	var child_actions: Array = []
+	child_actions.assign(target_action_values.get(nested_parameter_name, []))
+	if deep_index < 0 or deep_index >= len(child_actions):
+		return
+	var child_action: Dictionary = child_actions[deep_index]
+	var child_values: Dictionary = child_action[deep_token]
+	child_values[child_parameter_name] = next_value
+	child_action[deep_token] = child_values
+	child_actions[deep_index] = child_action
+	target_action_values[nested_parameter_name] = child_actions
+	target_action[target_action_token] = target_action_values
+	nested_actions[nested_index] = target_action
+	service.update_entry_values(current_session, property_name, index, {parameter_name: nested_actions})
+	_refresh_after_behavior_change()
+
+func _variant_to_string_array(value: Variant) -> Array[String]:
+	var values: Array[String] = []
+	if value is Array:
+		for item: Variant in value:
+			values.append(str(item))
+	return values
+
+func _is_action_array_parameter(parameter_name: String, current_value: Variant) -> bool:
+	if not (current_value is Array):
+		return false
+	return parameter_name in ["action_data", "passed_action_data", "failed_action_data"]
 
 func _populate_static_filters() -> void:
 	var source_options: Array[Dictionary] = [
@@ -1047,16 +2493,10 @@ func _populate_static_filters() -> void:
 		"All Kinds",
 		null
 	)
-	var target_options: Array[Dictionary] = [
-		{"label": "Any Targeting", "value": null},
-		{"label": "Requires Target", "value": true},
-		{"label": "No Target", "value": false},
-	]
 	_populate_option_button(source_filter, source_options)
 	_populate_option_button(type_filter, type_options)
 	_populate_option_button(rarity_filter, rarity_options)
 	_populate_option_button(kind_filter, kind_options)
-	_populate_option_button(target_filter, target_options)
 
 func _populate_dynamic_filters() -> void:
 	var selected_owner: Variant = _get_option_button_value(owner_filter)
@@ -1076,6 +2516,102 @@ func _populate_dynamic_filters() -> void:
 			color_options.append({"label": color_id, "value": color_id})
 	_populate_option_button(owner_filter, owner_options, selected_owner)
 	_populate_option_button(color_filter, color_options, selected_color)
+
+func _get_card_color_options() -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	var seen: Dictionary = {}
+	for color_id: String in DEFAULT_CARD_COLOR_IDS:
+		var color_in_library: bool = false
+		for entry: Dictionary in library_entries:
+			if str(entry.get("card_color_id", "")) == color_id:
+				color_in_library = true
+				break
+		if Global.get_color_data(color_id) == null and not color_in_library:
+			continue
+		options.append({"label": color_id, "value": color_id})
+		seen[color_id] = true
+	for entry: Dictionary in library_entries:
+		var color_id: String = str(entry.get("card_color_id", ""))
+		if color_id == "" or seen.has(color_id):
+			continue
+		options.append({"label": color_id, "value": color_id})
+		seen[color_id] = true
+	return options
+
+func _get_card_value_key_options(existing_values: Dictionary) -> Array[Dictionary]:
+	var suggestions: Array[Dictionary] = []
+	var seen: Dictionary = {}
+	for placeholder_name: String in _collect_card_value_suggestions():
+		if placeholder_name == "" or existing_values.has(placeholder_name) or seen.has(placeholder_name):
+			continue
+		suggestions.append({"label": placeholder_name, "value": placeholder_name})
+		seen[placeholder_name] = true
+	return suggestions
+
+func _get_card_value_definition_options(existing_values: Dictionary, definitions: Dictionary[String, Dictionary]) -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	var sorted_keys: Array[String] = []
+	sorted_keys.assign(definitions.keys())
+	sorted_keys.sort()
+	for key_name: String in sorted_keys:
+		if existing_values.has(key_name):
+			continue
+		var definition: Dictionary = definitions[key_name]
+		var label: String = "%s (%s)" % [str(definition.get("label", key_name)), key_name]
+		options.append({"label": label, "value": key_name})
+	return options
+
+func _collect_card_value_suggestions() -> Array[String]:
+	var suggestions: Array[String] = []
+	for placeholder_name: String in _collect_description_placeholders():
+		if not suggestions.has(placeholder_name):
+			suggestions.append(placeholder_name)
+	for parameter_name: String in _collect_action_value_suggestions():
+		if not suggestions.has(parameter_name):
+			suggestions.append(parameter_name)
+	return suggestions
+
+func _collect_description_placeholders() -> Array[String]:
+	var suggestions: Array[String] = []
+	if current_session == null or current_session.working_card_data == null:
+		return suggestions
+	var regex := RegEx.new()
+	if regex.compile("\\[([A-Za-z0-9_]+)\\]") == OK:
+		for result: RegExMatch in regex.search_all(current_session.working_card_data.card_description):
+			var placeholder_name: String = result.get_string(1)
+			if placeholder_name != "" and placeholder_name != "energy_icon" and not suggestions.has(placeholder_name):
+				suggestions.append(placeholder_name)
+	return suggestions
+
+func _collect_action_value_suggestions() -> Array[String]:
+	var suggestions: Array[String] = []
+	if current_session == null or current_session.working_card_data == null:
+		return suggestions
+	for property_name: String in CardEditorSchema.get_action_property_names():
+		for entry: Dictionary in current_session.working_card_data.get(property_name):
+			if entry.is_empty():
+				continue
+			var token: String = str(entry.keys()[0])
+			var metadata: Dictionary = service.get_action_metadata(token)
+			for parameter_data: Dictionary in metadata.get("parameters", []):
+				var parameter_name: String = str(parameter_data.get("name", ""))
+				if parameter_name == "" or parameter_name == "target_override":
+					continue
+				if parameter_name.begins_with("card_") or parameter_name.begins_with("picked_") or parameter_name.ends_with("_id") or parameter_name.ends_with("_ids") or parameter_name.contains("action_data") or parameter_name == "validator_data":
+					continue
+				if not suggestions.has(parameter_name):
+					suggestions.append(parameter_name)
+	return suggestions
+
+func _property_label(property_name: String, field_definition: Dictionary) -> String:
+	if property_name == "card_requires_target":
+		return "Needs Clicked Target"
+	return str(field_definition.get("label", property_name))
+
+func _property_description(property_name: String, field_definition: Dictionary) -> String:
+	if property_name == "card_requires_target":
+		return "Turn this on only if the player must click an enemy or combatant when playing the card. Leave it off for self-buffs, draw, block, or effects that pick their own targets."
+	return str(field_definition.get("description", ""))
 
 func _populate_group_options() -> void:
 	_populate_option_button(action_group_option, _property_group_options(CardEditorSchema.get_action_property_names()))
@@ -1152,6 +2688,8 @@ func _build_variant_value_editor(current_value: Variant, on_change: Callable) ->
 		"bool":
 			var checkbox := CheckBox.new()
 			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, checkbox.button_pressed)
 			checkbox.toggled.connect(func(pressed: bool): on_change.call(pressed))
 			return checkbox
 		"int":
@@ -1240,16 +2778,35 @@ func _format_library_entry_label(entry: Dictionary) -> String:
 
 func _format_library_meta(entry: Dictionary) -> String:
 	var parts: Array[String] = []
+	var owner_bucket: String = str(entry.get("owner_bucket", ""))
+	if owner_bucket != "" and owner_bucket != "unknown":
+		parts.append(owner_bucket.replace("/", " / "))
 	var type_label: String = _enum_label_from_value(CardData.CARD_TYPES, entry.get("card_type", null))
 	var rarity_label: String = _enum_label_from_value(CardData.CARD_RARITIES, entry.get("card_rarity", null))
 	if rarity_label != "":
 		parts.append(rarity_label.capitalize())
 	if type_label != "":
 		parts.append(type_label.capitalize())
-	var owner_bucket: String = str(entry.get("owner_bucket", ""))
-	if owner_bucket != "" and owner_bucket != "unknown":
-		parts.append(owner_bucket.replace("/", " / "))
 	return " | ".join(parts)
+
+func _apply_library_tile_style(tile: PanelContainer, is_selected: bool, is_hovered: bool) -> void:
+	if is_selected and is_hovered:
+		tile.modulate = Color(1.0, 0.9, 0.66, 1.0)
+	elif is_selected:
+		tile.modulate = Color(1.0, 0.96, 0.8, 1.0)
+	elif is_hovered:
+		tile.modulate = Color(0.86, 0.93, 1.0, 1.0)
+	else:
+		tile.modulate = Color(1.0, 1.0, 1.0, 1.0)
+
+func _format_inline_value(value: Variant) -> String:
+	if value is Array:
+		return "[%s]" % len(value)
+	if value is Dictionary:
+		return "{%s}" % len(value)
+	if value is bool:
+		return "On" if value else "Off"
+	return str(value)
 
 func _enum_label_from_value(enum_map: Dictionary, desired_value: Variant) -> String:
 	for enum_key: String in enum_map.keys():
@@ -1410,7 +2967,7 @@ func _on_filter_changed(_index: int) -> void:
 
 func _on_clear_filters_button_up() -> void:
 	library_search.text = ""
-	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter, target_filter]:
+	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter]:
 		if option_button.get_item_count() > 0:
 			option_button.select(0)
 	_apply_library_filters()

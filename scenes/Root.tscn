@@ -555,9 +555,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("9_uxrgu")
 
-[node name="CardEditorScreen" parent="TitleScreen" instance=ExtResource("30_carded")]
-visible = false
-
 [node name="ScrollContainer" type="ScrollContainer" parent="TitleScreen/CodexMenu" unique_id=1492264713]
 layout_mode = 0
 offset_left = 152.0
@@ -625,6 +622,10 @@ text = "Consumables"
 layout_mode = 2
 theme = ExtResource("2_bi5lp")
 text = "Card Editor"
+
+[node name="CardEditorScreen" parent="TitleScreen" unique_id=879171990 instance=ExtResource("30_carded")]
+visible = false
+layout_mode = 1
 
 [node name="RunScreen" type="Control" parent="." unique_id=1832602911]
 visible = false
