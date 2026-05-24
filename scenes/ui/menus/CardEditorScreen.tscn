@@ -1,10 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bk27jgr43dngi"]
 
-[ext_resource type="Script" path="res://scripts/tools/card_editor/CardEditorScreen.gd" id="1"]
-[ext_resource type="Theme" path="res://themes/title_screen_theme.tres" id="2"]
+[ext_resource type="Script" uid="uid://7yjqxte65tp6" path="res://scripts/tools/card_editor/CardEditorScreen.gd" id="1"]
+[ext_resource type="Theme" uid="uid://cd5rw86bhiyn" path="res://themes/title_screen_theme.tres" id="2"]
 
-[node name="CardEditorScreen" type="Control"]
-visible = false
+[node name="CardEditorScreen" type="Control" unique_id=164921722]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="MainContainer" type="MarginContainer" parent="."]
+[node name="MainContainer" type="MarginContainer" parent="." unique_id=194111316]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,183 +24,319 @@ offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="Header" type="VBoxContainer" parent="MainContainer"]
+[node name="Header" type="VBoxContainer" parent="MainContainer" unique_id=581861731]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BackButton" type="Button" parent="MainContainer/Header"]
+[node name="BackButton" type="Button" parent="MainContainer/Header" unique_id=645530600]
 layout_mode = 2
 theme = ExtResource("2")
 text = "Back"
 
-[node name="ButtonRow" type="HBoxContainer" parent="MainContainer/Header"]
+[node name="ButtonRow" type="HBoxContainer" parent="MainContainer/Header" unique_id=632544242]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="NewButton" type="Button" parent="MainContainer/Header/ButtonRow"]
+[node name="NewButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=959503042]
 layout_mode = 2
 theme = ExtResource("2")
 text = "New"
 
-[node name="DuplicateButton" type="Button" parent="MainContainer/Header/ButtonRow"]
+[node name="DuplicateButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1901306105]
 layout_mode = 2
 theme = ExtResource("2")
 text = "Duplicate"
 
-[node name="PresetOption" type="OptionButton" parent="MainContainer/Header/ButtonRow"]
+[node name="PresetOption" type="OptionButton" parent="MainContainer/Header/ButtonRow" unique_id=1711422268]
 layout_mode = 2
+selected = 0
+item_count = 5
+popup/item_0/text = "Blank Attack"
+popup/item_0/id = 0
+popup/item_1/text = "Blank Block"
+popup/item_1/id = 1
+popup/item_2/text = "Blank Power"
+popup/item_2/id = 2
+popup/item_3/text = "Status Utility"
+popup/item_3/id = 3
+popup/item_4/text = "Right-Click Transform"
+popup/item_4/id = 4
 
-[node name="ApplyPresetButton" type="Button" parent="MainContainer/Header/ButtonRow"]
+[node name="ApplyPresetButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=132812712]
 layout_mode = 2
 theme = ExtResource("2")
 text = "Apply Preset"
 
-[node name="SaveTriageButton" type="Button" parent="MainContainer/Header/ButtonRow"]
+[node name="SaveTriageButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1056815897]
 layout_mode = 2
 theme = ExtResource("2")
 text = "Save To Triage"
 
-[node name="PromoteButton" type="Button" parent="MainContainer/Header/ButtonRow"]
+[node name="PromoteButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1692686542]
 layout_mode = 2
 theme = ExtResource("2")
 text = "Promote To Content"
 
-[node name="Body" type="HSplitContainer" parent="MainContainer/Header"]
+[node name="Body" type="HSplitContainer" parent="MainContainer/Header" unique_id=1455812041]
 custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offset = 260
+split_offsets = PackedInt32Array(420, 840)
+split_offset = 420
 
-[node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body"]
+[node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="LibraryVBox" type="VBoxContainer" parent="MainContainer/Header/Body/LibraryPanel"]
+[node name="LibraryPadding" type="MarginContainer" parent="MainContainer/Header/Body/LibraryPanel"]
 layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="LibraryVBox" type="VBoxContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding" unique_id=1300960848]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SearchRow" type="HBoxContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox"]
+[node name="SearchRow" type="HBoxContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=1445497316]
 layout_mode = 2
 
-[node name="SearchInput" type="LineEdit" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/SearchRow"]
+[node name="SearchInput" type="LineEdit" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow" unique_id=1922047970]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search cards"
 
-[node name="FilterGrid" type="GridContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox"]
+[node name="FilterGrid" type="GridContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=70704918]
 layout_mode = 2
-columns = 1
+columns = 2
 
-[node name="SourceFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
+[node name="SourceFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=188047745]
 layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "All Sources"
+popup/item_0/id = 0
+popup/item_1/text = "Content"
+popup/item_1/id = 1
+popup/item_2/text = "Triage"
+popup/item_2/id = 2
 
-[node name="OwnerFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
-layout_mode = 2
-
-[node name="ColorFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
-layout_mode = 2
-
-[node name="TypeFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
-layout_mode = 2
-
-[node name="RarityFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
-layout_mode = 2
-
-[node name="KindFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
+[node name="OwnerFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=1406252232]
 layout_mode = 2
 
-[node name="TargetFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox/FilterGrid"]
+[node name="ColorFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=857215671]
 layout_mode = 2
 
-[node name="LibraryList" type="ItemList" parent="MainContainer/Header/Body/LibraryPanel/LibraryVBox"]
+[node name="TypeFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=803598134]
+layout_mode = 2
+selected = 0
+item_count = 6
+popup/item_0/text = "All Types"
+popup/item_0/id = 0
+popup/item_1/text = "Attack"
+popup/item_1/id = 1
+popup/item_2/text = "Skill"
+popup/item_2/id = 2
+popup/item_3/text = "Power"
+popup/item_3/id = 3
+popup/item_4/text = "Status"
+popup/item_4/id = 4
+popup/item_5/text = "Curse"
+popup/item_5/id = 5
+
+[node name="RarityFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=1074329757]
+layout_mode = 2
+selected = 0
+item_count = 6
+popup/item_0/text = "All Rarities"
+popup/item_0/id = 0
+popup/item_1/text = "Basic"
+popup/item_1/id = 1
+popup/item_2/text = "Common"
+popup/item_2/id = 2
+popup/item_3/text = "Uncommon"
+popup/item_3/id = 3
+popup/item_4/text = "Rare"
+popup/item_4/id = 4
+popup/item_5/text = "Generated"
+popup/item_5/id = 5
+
+[node name="KindFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=409261280]
+layout_mode = 2
+selected = 0
+item_count = 5
+popup/item_0/text = "All Kinds"
+popup/item_0/id = 0
+popup/item_1/text = "Intro"
+popup/item_1/id = 1
+popup/item_2/text = "Verse"
+popup/item_2/id = 2
+popup/item_3/text = "Jazz"
+popup/item_3/id = 3
+popup/item_4/text = "Outro"
+popup/item_4/id = 4
+
+[node name="TargetFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=2029349195]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Any Targeting"
+popup/item_0/id = 0
+popup/item_1/text = "Requires Target"
+popup/item_1/id = 1
+popup/item_2/text = "No Target"
+popup/item_2/id = 2
+
+[node name="LibraryScroll" type="ScrollContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=1396609044]
 layout_mode = 2
 size_flags_vertical = 3
-allow_reselect = true
-same_column_width = true
-auto_height = true
 
-[node name="EditorPanel" type="PanelContainer" parent="MainContainer/Header/Body"]
-layout_mode = 2
-
-[node name="EditorSplit" type="HSplitContainer" parent="MainContainer/Header/Body/EditorPanel"]
-layout_mode = 2
-split_offset = 420
-
-[node name="InspectorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorSplit"]
+[node name="LibrarySections" type="VBoxContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll" unique_id=408163944]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="EditorPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=828682295]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EditorPadding" type="MarginContainer" parent="MainContainer/Header/Body/EditorPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="EditorSplit" type="HSplitContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding" unique_id=93253884]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(480)
+split_offset = 480
+
+[node name="InspectorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit" unique_id=2063829213]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 follow_focus = true
 
-[node name="InspectorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorSplit/InspectorScroll"]
+[node name="InspectorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll" unique_id=701180321]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="BehaviorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorSplit"]
+[node name="BehaviorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit" unique_id=1882672980]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 follow_focus = true
 
-[node name="BehaviorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorSplit/BehaviorScroll"]
+[node name="BehaviorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll" unique_id=1979327880]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body"]
+[node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=415001899]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="PreviewVBox" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel"]
+[node name="PreviewPadding" type="MarginContainer" parent="MainContainer/Header/Body/PreviewPanel"]
 layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="PreviewVBox" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding" unique_id=345405394]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="PreviewMount" type="Control" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox"]
-custom_minimum_size = Vector2(260, 260)
+[node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
+custom_minimum_size = Vector2(280, 320)
 layout_mode = 2
 
-[node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox"]
+[node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1017348166]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SessionLabel" type="Label" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/SessionSummary"]
+[node name="SessionLabel" type="Label" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=1297326160]
 layout_mode = 2
 text = "No session"
 
-[node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/SessionSummary"]
+[node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=968705889]
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 180)
-bbcode_enabled = false
-scroll_active = true
 
-[node name="QuickActions" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox"]
+[node name="QuickActions" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1356135667]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActionAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions"]
+[node name="ActionAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=222730852]
 layout_mode = 2
 
-[node name="ActionGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ActionAddPanel"]
+[node name="ActionGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=874360833]
+layout_mode = 2
+selected = 0
+item_count = 11
+popup/item_0/text = "Play Actions"
+popup/item_0/id = 0
+popup/item_1/text = "Discard Actions"
+popup/item_1/id = 1
+popup/item_2/text = "End Of Turn Actions"
+popup/item_2/id = 2
+popup/item_3/text = "Exhaust Actions"
+popup/item_3/id = 3
+popup/item_4/text = "Draw Actions"
+popup/item_4/id = 4
+popup/item_5/text = "Retain Actions"
+popup/item_5/id = 5
+popup/item_6/text = "Right Click Actions"
+popup/item_6/id = 6
+popup/item_7/text = "Initial Combat Actions"
+popup/item_7/id = 7
+popup/item_8/text = "Add To Deck Actions"
+popup/item_8/id = 8
+popup/item_9/text = "Remove From Deck Actions"
+popup/item_9/id = 9
+popup/item_10/text = "Transform In Deck Actions"
+popup/item_10/id = 10
+
+[node name="ActionOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1307683061]
 layout_mode = 2
 
-[node name="ActionOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ActionAddPanel"]
-layout_mode = 2
-
-[node name="AddActionButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ActionAddPanel"]
+[node name="AddActionButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1805703847]
 layout_mode = 2
 text = "Add Action"
 
-[node name="ValidatorAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions"]
+[node name="ValidatorAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=863022373]
 layout_mode = 2
 
-[node name="ValidatorGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ValidatorAddPanel"]
+[node name="ValidatorGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=586731295]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Play Validators"
+popup/item_0/id = 0
+popup/item_1/text = "Glow Validators"
+popup/item_1/id = 1
+
+[node name="ValidatorOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=326868515]
 layout_mode = 2
 
-[node name="ValidatorOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ValidatorAddPanel"]
-layout_mode = 2
-
-[node name="AddValidatorButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewVBox/QuickActions/ValidatorAddPanel"]
+[node name="AddValidatorButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=1397110396]
 layout_mode = 2
 text = "Add Validator"

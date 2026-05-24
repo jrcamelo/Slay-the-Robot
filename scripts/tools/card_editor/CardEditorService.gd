@@ -432,6 +432,29 @@ func remove_dictionary_value(session: CardEditorSession, property_name: String, 
 	_after_card_mutation(session, property_name)
 	return true
 
+func rename_dictionary_key(session: CardEditorSession, property_name: String, from_key: String, to_key: String) -> bool:
+	if session == null or session.working_card_data == null:
+		return false
+	var normalized_from_key: String = from_key.strip_edges()
+	var normalized_to_key: String = to_key.strip_edges()
+	if normalized_from_key == "" or normalized_to_key == "":
+		return false
+	if normalized_from_key == normalized_to_key:
+		return true
+	var current_dictionary: Dictionary = session.working_card_data.get(property_name)
+	if not (current_dictionary is Dictionary):
+		return false
+	if not current_dictionary.has(normalized_from_key):
+		return false
+	if current_dictionary.has(normalized_to_key):
+		return false
+	var value: Variant = current_dictionary[normalized_from_key]
+	current_dictionary.erase(normalized_from_key)
+	current_dictionary[normalized_to_key] = value
+	session.working_card_data.set(property_name, current_dictionary)
+	_after_card_mutation(session, property_name)
+	return true
+
 func add_string_array_value(session: CardEditorSession, property_name: String, value: String, allow_duplicates: bool = false) -> bool:
 	if session == null or session.working_card_data == null:
 		return false
