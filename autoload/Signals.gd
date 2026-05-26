@@ -135,6 +135,10 @@ signal enemy_clicked(enemy: Enemy)
 signal enemy_hovered(enemy: Enemy)
 signal enemy_spawn_requested(enemy_object_id: String, slot_id: int)	# requests spawning an enemy in a slot
 
+# players
+signal player_clicked(player: Player)
+signal player_hovered(player: Player)
+
 # artifacts
 signal artifact_proc(artifact_data: ArtifactData)	# an artifact's effect has been triggered
 signal artifact_counter_changed(artifact_data: ArtifactData)

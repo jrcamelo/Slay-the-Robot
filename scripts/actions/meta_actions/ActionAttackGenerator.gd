@@ -35,8 +35,7 @@ func perform_action():
 		# generate a random number to add to damage if it exists
 		var damage_random: int = action_interceptor_processor.get_shadowed_action_values("damage_random", 0)
 		if damage_random > 1:
-			var rng_damage_name: String = get_action_value("rng_damage_name", "rng_damage")
-			var rng_damage: RandomNumberGenerator = Global.player_data.get_player_rng(rng_damage_name)
+			var rng_damage: RandomNumberGenerator = Global.player_data.get_player_rng("rng_damage")
 			var random_damage_amount: int = rng_damage.randi_range(0, damage_random)
 			# add the random damage to the base damage
 			damage += random_damage_amount

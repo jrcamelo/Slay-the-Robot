@@ -21,6 +21,18 @@ func _ready():
 	Signals.artifact_proc.connect(_on_artifact_proc)
 	Signals.run_started.connect(_on_run_started)
 	Signals.run_ended.connect(_on_run_ended)
+	selection_button.mouse_entered.connect(_on_mouse_entered)
+	selection_button.mouse_exited.connect(_on_mouse_exited)
+
+func _on_selection_button_up():
+	if is_alive():
+		Signals.player_clicked.emit(self)
+
+func _on_mouse_entered():
+	Signals.player_hovered.emit(self)
+
+func _on_mouse_exited():
+	Signals.player_hovered.emit(null)
 
 ## Does damage to combatant and returns [unblocked damage dealt, damage to 0 (if player dies), overkill damage (if player dies)].
 ## eg 15 damage on 10 remaining health and 3 block will return [12, 10, 2].

@@ -12,7 +12,7 @@ static func get_card_field_sections() -> Array[Dictionary]:
 		{
 			"id": "classification",
 			"label": "Classification",
-			"fields": ["card_kind", "card_type", "card_rarity", "card_requires_target", "card_appears_in_card_packs"],
+			"fields": ["card_kind", "card_type", "card_rarity", "card_requires_target", "card_clicked_target_mode", "card_appears_in_card_packs"],
 		},
 		{
 			"id": "costs",
@@ -62,6 +62,7 @@ static func get_card_field_definitions() -> Dictionary[String, Dictionary]:
 		"card_type": _field("Type", "enum", "Gameplay type displayed on the card.", {"options": _enum_options(CardData.CARD_TYPES)}),
 		"card_rarity": _field("Rarity", "enum", "Card rarity used in filtering and draft pools.", {"options": _enum_options(CardData.CARD_RARITIES)}),
 		"card_requires_target": _field("Requires Target", "bool", "Whether the card asks the player to choose a target."),
+		"card_clicked_target_mode": _field("Clicked Target Mode", "enum", "Which combatants are valid when the card asks the player to click a target.", {"options": _enum_options_from_strings(CardData.CARD_TARGET_MODES)}),
 		"card_appears_in_card_packs": _field("Appears In Packs", "bool", "Whether this card is included in card pack caches."),
 		"card_energy_cost": _field("Energy Cost", "int", "Base card energy cost."),
 		"card_energy_cost_until_played": _field("Cost Until Played", "int", "Temporary cost override until the card is played. -1 disables."),

@@ -105,6 +105,8 @@ func _ready():
 	
 	Signals.enemy_clicked.connect(_on_enemy_clicked)
 	Signals.enemy_hovered.connect(_on_enemy_hovered)
+	Signals.player_clicked.connect(_on_player_clicked)
+	Signals.player_hovered.connect(_on_player_hovered)
 	
 	confirm_pick_button.button_up.connect(_on_confirm_pick_button_up)
 	
@@ -249,23 +251,53 @@ func _on_background_button_up():
 	current_selected_card = null
 	_unprompt_target()
 
+func _can_card_target_combatant(card_data: CardData, combatant: BaseCombatant) -> bool:
+	if card_data == null or combatant == null or not combatant.is_alive():
+		return false
+	match card_data.get_effective_clicked_target_mode():
+		CardData.CARD_TARGET_MODE_ALLY_ONLY:
+			return combatant is Player
+		CardData.CARD_TARGET_MODE_ANY_COMBATANT:
+			return combatant is Player or combatant is Enemy
+		_:
+			return combatant is Enemy
+
+func _queue_selected_target_card(target: BaseCombatant) -> void:
+	if current_selected_card == null:
+		return
+	if not _can_card_target_combatant(current_selected_card.card_data, target):
+		return
+	_unprompt_target()
+	var card_play_request: CardPlayRequest = CardPlayRequest.new()
+	card_play_request.card_data = current_selected_card.card_data
+	card_play_request.selected_target = target
+	card_play_request.card_values = current_selected_card.card_data.card_values.duplicate(true)
+	add_card_to_play_queue(card_play_request, true, false)
+	current_selected_card = null
+
 func _on_enemy_clicked(enemy: Enemy):
 	if current_selected_card != null:
-		_unprompt_target()
-		
-		# generate the card play request and enqueue it
-		var card_play_request: CardPlayRequest = CardPlayRequest.new()
-		card_play_request.card_data = current_selected_card.card_data
-		card_play_request.selected_target = enemy
-		card_play_request.card_values = current_selected_card.card_data.card_values.duplicate(true)	# copy the card's values into the card play request
-	
-		
-		add_card_to_play_queue(card_play_request, true, false)
-		current_selected_card = null
+		_queue_selected_target_card(enemy)
 
 func _on_enemy_hovered(enemy: Enemy):
-	if current_selected_card != null:
+	if current_selected_card == null:
+		return
+	if enemy == null or _can_card_target_combatant(current_selected_card.card_data, enemy):
 		current_selected_card.update_card_display(enemy)
+	else:
+		current_selected_card.update_card_display()
+
+func _on_player_clicked(player: Player):
+	if current_selected_card != null:
+		_queue_selected_target_card(player)
+
+func _on_player_hovered(player: Player):
+	if current_selected_card == null:
+		return
+	if player == null or _can_card_target_combatant(current_selected_card.card_data, player):
+		current_selected_card.update_card_display(player)
+	else:
+		current_selected_card.update_card_display()
 
 func _prompt_target(_card: Card):
 	select_target_label.visible = true

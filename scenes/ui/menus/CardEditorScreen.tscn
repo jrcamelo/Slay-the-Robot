@@ -38,16 +38,18 @@ theme_override_constants/separation = 4
 
 [node name="ScreenTitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100002]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 24
 text = "Card Workshop"
 
 [node name="ScreenSubtitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100003]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Keep the card basics in front of you, tuck the rare settings away, and tune behavior without drowning in metadata."
+text = "Build cards without fighting the editor."
 autowrap_mode = 2
 
 [node name="StatusBanner" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100004]
+visible = false
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
@@ -85,57 +87,19 @@ theme = ExtResource("2")
 text = "Back"
 
 [node name="ButtonRow" type="HBoxContainer" parent="MainContainer/Header" unique_id=632544242]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 8
-
-[node name="NewButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=959503042]
-layout_mode = 2
-theme = ExtResource("2")
-text = "New"
-
-[node name="DuplicateButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1901306105]
-layout_mode = 2
-theme = ExtResource("2")
-text = "Duplicate"
-
-[node name="PresetOption" type="OptionButton" parent="MainContainer/Header/ButtonRow" unique_id=1711422268]
-layout_mode = 2
-selected = 0
-item_count = 5
-popup/item_0/text = "Blank Attack"
-popup/item_0/id = 0
-popup/item_1/text = "Blank Block"
-popup/item_1/id = 1
-popup/item_2/text = "Blank Power"
-popup/item_2/id = 2
-popup/item_3/text = "Status Utility"
-popup/item_3/id = 3
-popup/item_4/text = "Right-Click Transform"
-popup/item_4/id = 4
-
-[node name="ApplyPresetButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=132812712]
-layout_mode = 2
-theme = ExtResource("2")
-text = "Apply Preset"
-
-[node name="SaveTriageButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1056815897]
-layout_mode = 2
-theme = ExtResource("2")
-text = "Save To Triage"
-
-[node name="PromoteButton" type="Button" parent="MainContainer/Header/ButtonRow" unique_id=1692686542]
-layout_mode = 2
-theme = ExtResource("2")
-text = "Promote To Content"
 
 [node name="Body" type="HSplitContainer" parent="MainContainer/Header" unique_id=1455812041]
 custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(289, 867)
-split_offset = 289
+split_offsets = PackedInt32Array(240, 867)
+split_offset = 240
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -244,17 +208,6 @@ popup/item_3/id = 3
 popup/item_4/text = "Outro"
 popup/item_4/id = 4
 
-[node name="TargetFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=2029349195]
-layout_mode = 2
-selected = 0
-item_count = 3
-popup/item_0/text = "Any Targeting"
-popup/item_0/id = 0
-popup/item_1/text = "Requires Target"
-popup/item_1/id = 1
-popup/item_2/text = "No Target"
-popup/item_2/id = 2
-
 [node name="LibraryScroll" type="ScrollContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=1396609044]
 layout_mode = 2
 size_flags_vertical = 3
@@ -265,6 +218,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="EditorPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=828682295]
+custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -280,8 +234,8 @@ theme_override_constants/margin_bottom = 14
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(480)
-split_offset = 480
+split_offsets = PackedInt32Array(225)
+split_offset = 225
 
 [node name="InspectorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit" unique_id=2063829213]
 layout_mode = 2
@@ -307,6 +261,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=415001899]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

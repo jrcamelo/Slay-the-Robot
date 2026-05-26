@@ -67,7 +67,7 @@ func init(_card_data: CardData, angular_offset: float, connect_combat_signals: b
 		card_listeners = _generate_card_listeners(card_data.card_listeners)
 	
 
-func update_card_display(selected_enemy: Enemy = null) -> void:
+func update_card_display(selected_target: BaseCombatant = null) -> void:
 	if _card_is_rerendering:
 		return
 	if CARDS_RERENDER_LAZILY:
@@ -84,7 +84,7 @@ func update_card_display(selected_enemy: Enemy = null) -> void:
 	# updates the card's display
 	card_name.set_bbcode("[center]" + card_data.get_card_name() + "[/center]")
 	card_kind.set_bbcode("[center]" + card_data.get_card_kind_display_name() + "[/center]")
-	card_description.set_bbcode(get_card_description(selected_enemy))
+	card_description.set_bbcode(get_card_description(selected_target))
 	card_type.text = CardData.CARD_RARITIES.keys()[card_data.card_rarity] + " " + CardData.CARD_TYPES.keys()[card_data.card_type]
 	
 	var color_data: ColorData = Global.get_color_data(card_data.card_color_id)

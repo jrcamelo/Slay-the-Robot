@@ -54,6 +54,15 @@ const STANDARD_CARD_RARITIES: Array[int] = [CARD_RARITIES.COMMON, CARD_RARITIES.
 @export var card_is_retained: bool = false	# if the card innately stays in hand end of turn
 
 @export var card_requires_target: bool = true	# card requires user to select a target to play it
+const CARD_TARGET_MODE_ENEMY_ONLY: String = "ENEMY_ONLY"
+const CARD_TARGET_MODE_ALLY_ONLY: String = "ALLY_ONLY"
+const CARD_TARGET_MODE_ANY_COMBATANT: String = "ANY_COMBATANT"
+const CARD_TARGET_MODES: Array[String] = [
+	CARD_TARGET_MODE_ENEMY_ONLY,
+	CARD_TARGET_MODE_ALLY_ONLY,
+	CARD_TARGET_MODE_ANY_COMBATANT,
+]
+@export var card_clicked_target_mode: String = CARD_TARGET_MODE_ENEMY_ONLY : set = set_card_clicked_target_mode
 
 
 ### Card Values
@@ -177,6 +186,14 @@ func set_card_kind(value: String) -> void:
 		card_kind = normalized_kind
 		Signals.card_properties_changed.emit(self)
 
+func set_card_clicked_target_mode(value: String) -> void:
+	var normalized_mode: String = value.strip_edges().to_upper()
+	if not CARD_TARGET_MODES.has(normalized_mode):
+		normalized_mode = CARD_TARGET_MODE_ENEMY_ONLY
+	if card_clicked_target_mode != normalized_mode:
+		card_clicked_target_mode = normalized_mode
+		Signals.card_properties_changed.emit(self)
+
 func set_card_energy_cost_until_played(energy_cost: int) -> void:
 	if energy_cost != card_energy_cost_until_played:
 		card_energy_cost_until_played = energy_cost
@@ -210,6 +227,12 @@ func get_effective_card_kind() -> String:
 	if normalized_kind == "":
 		return CARD_KIND_VERSE
 	return normalized_kind
+
+func get_effective_clicked_target_mode() -> String:
+	var normalized_mode: String = card_clicked_target_mode.strip_edges().to_upper()
+	if not CARD_TARGET_MODES.has(normalized_mode):
+		return CARD_TARGET_MODE_ENEMY_ONLY
+	return normalized_mode
 
 func synchronize_card_kind_rules() -> void:
 	var filtered_validators: Array[Dictionary] = []

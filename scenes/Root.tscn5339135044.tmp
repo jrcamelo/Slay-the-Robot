@@ -1,0 +1,1633 @@
+[gd_scene format=3 uid="uid://bg7gmq537qyn5"]
+
+[ext_resource type="Script" uid="uid://ckfi22o2jit0b" path="res://scripts/Root.gd" id="1_ak6de"]
+[ext_resource type="Theme" uid="uid://cd5rw86bhiyn" path="res://themes/title_screen_theme.tres" id="2_bi5lp"]
+[ext_resource type="Script" uid="uid://dw0xyfu580mkb" path="res://scripts/ui/menus/TitleScreen.gd" id="2_m6atk"]
+[ext_resource type="Texture2D" uid="uid://nh32y87hcke5" path="res://icon.svg" id="3_8ax2e"]
+[ext_resource type="Script" uid="uid://dao05mln2rw4g" path="res://scripts/ui/Combat.gd" id="3_h4evn"]
+[ext_resource type="Script" uid="uid://cg1kj2nrg24jw" path="res://scripts/ui/menus/MainMenu.gd" id="3_jd5n0"]
+[ext_resource type="Script" uid="uid://dlwowe1wugkh4" path="res://scripts/ui/Hand.gd" id="4_i2yfj"]
+[ext_resource type="Script" uid="uid://p4ouiuival0e" path="res://scripts/ui/EnemyContainer.gd" id="4_kvn7e"]
+[ext_resource type="Script" uid="uid://c4twsg7v4ky8u" path="res://scripts/ui/menus/NewRunMenu.gd" id="5_878fa"]
+[ext_resource type="Script" uid="uid://cedacrx3ip1sl" path="res://scripts/ui/ArtifactContainer.gd" id="5_a7j3r"]
+[ext_resource type="Script" uid="uid://chcjmcum7dbn7" path="res://scripts/ui/CharacterButtonContainer.gd" id="6_2ahpg"]
+[ext_resource type="Script" uid="uid://djp4k7pq27a7e" path="res://scripts/ui/CustomRunModifierButtonContainer.gd" id="8_nlp47"]
+[ext_resource type="Script" uid="uid://cu62o32eaklx7" path="res://scripts/ui/TurnOverlay.gd" id="9_u2w0b"]
+[ext_resource type="Script" uid="uid://dgls5w4w7ym84" path="res://scripts/ui/menus/CodexMenu.gd" id="9_uxrgu"]
+[ext_resource type="Script" uid="uid://brwptyvf1yacl" path="res://scripts/ui/CardSelectionOverlay.gd" id="10_bwtvr"]
+[ext_resource type="Script" uid="uid://ejl2op54o7aw" path="res://scripts/ui/RewardOverlay.gd" id="10_u2l48"]
+[ext_resource type="Script" uid="uid://b8gg8exxeg26k" path="res://scripts/ui/Chest.gd" id="11_1uvyw"]
+[ext_resource type="Script" uid="uid://b5htysy0x53ab" path="res://scripts/ui/Consumables.gd" id="11_c46y0"]
+[ext_resource type="Script" uid="uid://bepy2gle06uwf" path="res://scripts/ui/CardDraftSelectionOverlay.gd" id="11_yys3c"]
+[ext_resource type="Script" uid="uid://dm6o2678kafwr" path="res://scripts/ui/menus/RunScreen.gd" id="12_elxq6"]
+[ext_resource type="Script" uid="uid://c2i6b2ert5jls" path="res://scripts/ui/PauseButton.gd" id="13_i7igs"]
+[ext_resource type="Script" uid="uid://cdp0fx5l64nnt" path="res://scripts/ui/Shop.gd" id="13_w8i8k"]
+[ext_resource type="Script" uid="uid://dnvcyccyhfcmu" path="res://scripts/ui/Map.gd" id="14_fc5ht"]
+[ext_resource type="Script" uid="uid://b2hl2ln4jm0mj" path="res://scripts/ui/RestOverlay.gd" id="14_k6wys"]
+[ext_resource type="Script" uid="uid://cmmpity26foo3" path="res://scripts/ui/PlayerPartyContainer.gd" id="16_tn5yy"]
+[ext_resource type="Script" uid="uid://cw6tfwitjoo0i" path="res://scripts/ui/ShopOverlay.gd" id="17_stqr4"]
+[ext_resource type="Script" uid="uid://pk2e8kasw6rr" path="res://scripts/ui/RunSummaryOverlay.gd" id="21_fj66g"]
+[ext_resource type="Script" uid="uid://s7lqf6p66yti" path="res://scripts/ui/RunStartOptions.gd" id="25_ll3o0"]
+[ext_resource type="Script" uid="uid://b2t515tpjrija" path="res://addons/smooth_scroll_container/SmoothScrollContainer.gd" id="25_t3i5t"]
+[ext_resource type="Script" uid="uid://ci6oby4hmnfg6" path="res://scripts/ui/DialogueOverlay.gd" id="25_tn5yy"]
+[ext_resource type="Script" uid="uid://b3nvcsku8u75w" path="res://addons/smooth_scroll_container/scroll_damper/expo_scroll_damper.gd" id="26_08sam"]
+[ext_resource type="Script" uid="uid://6xsavir53fvp" path="res://scripts/ui/PauseOverlay.gd" id="29_p8axl"]
+[ext_resource type="PackedScene" uid="uid://bk27jgr43dngi" path="res://scenes/ui/menus/CardEditorScreen.tscn" id="30_carded"]
+
+[sub_resource type="Resource" id="Resource_i7igs"]
+script = ExtResource("26_08sam")
+friction = 10.0
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="Resource" id="Resource_elxq6"]
+script = ExtResource("26_08sam")
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="InputEventKey" id="InputEventKey_p8axl"]
+device = -1
+pressed = true
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_i7igs"]
+events = [SubResource("InputEventKey_p8axl")]
+
+[sub_resource type="Animation" id="Animation_m5prp"]
+resource_name = "end_turn"
+length = 0.5
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_on_player_end_turn_animation_finished"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("EndTurnButton:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, true]
+}
+
+[sub_resource type="Animation" id="Animation_beguj"]
+resource_name = "start_turn"
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_on_player_start_turn_animation_finished"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TurnOverlay:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.7, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TurnOverlay")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"update_turn_label"
+}]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TurnOverlay:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("EndTurnButton:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yww7o"]
+_data = {
+&"end_turn": SubResource("Animation_m5prp"),
+&"start_turn": SubResource("Animation_beguj")
+}
+
+[sub_resource type="Resource" id="Resource_uxrgu"]
+script = ExtResource("26_08sam")
+friction = 10.0
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="Resource" id="Resource_p8axl"]
+script = ExtResource("26_08sam")
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="Resource" id="Resource_tn5yy"]
+script = ExtResource("26_08sam")
+friction = 10.0
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="Resource" id="Resource_kpmo0"]
+script = ExtResource("26_08sam")
+metadata/_custom_type_script = "uid://b3nvcsku8u75w"
+
+[sub_resource type="Resource" id="Resource_kqcdx"]
+script = ExtResource("26_08sam")
+friction = 10.0
+
+[sub_resource type="Resource" id="Resource_frd6h"]
+script = ExtResource("26_08sam")
+
+[sub_resource type="InputEventKey" id="InputEventKey_i7igs"]
+device = -1
+pressed = true
+keycode = 4194305
+location = 1
+
+[sub_resource type="Shortcut" id="Shortcut_elxq6"]
+events = [SubResource("InputEventKey_i7igs")]
+
+[node name="Root" type="Node2D" unique_id=1117206138]
+script = ExtResource("1_ak6de")
+
+[node name="TitleScreen" type="Control" parent="." unique_id=1218717873]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("2_m6atk")
+metadata/_edit_lock_ = true
+
+[node name="Background" type="ColorRect" parent="TitleScreen" unique_id=1079703003]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.202309, 0.187588, 0.216973, 1)
+
+[node name="MainMenu" type="Control" parent="TitleScreen" unique_id=458909957]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_jd5n0")
+
+[node name="Label" type="Label" parent="TitleScreen/MainMenu" unique_id=1018612855]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_top = 27.3429
+offset_right = 1160.0
+offset_bottom = 93.0286
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+text = "Slay the Robot"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TitleScreen/MainMenu" unique_id=620333116]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 514.0
+offset_right = 420.0
+offset_bottom = 677.0
+
+[node name="ContinueButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=104322921]
+visible = false
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Continue"
+
+[node name="ForfeitRunButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=1282594431]
+visible = false
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Forfeit Run"
+
+[node name="NewRunButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=2119935392]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "New Game"
+
+[node name="CodexButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=15458145]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Codex"
+
+[node name="SettingsButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=984842632]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+disabled = true
+text = "Settings"
+
+[node name="ExitButton" type="Button" parent="TitleScreen/MainMenu/VBoxContainer" unique_id=257839230]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Exit"
+
+[node name="NewRunMenu" type="Control" parent="TitleScreen" unique_id=1144948512]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_878fa")
+
+[node name="Label" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1789637062]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_top = 27.3429
+offset_right = 1160.0
+offset_bottom = 93.0286
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+text = "New Run"
+horizontal_alignment = 1
+
+[node name="CharacterNameLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1138293299]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 56.0
+offset_top = 126.343
+offset_right = 205.0
+offset_bottom = 159.029
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 24
+text = "Character Name"
+
+[node name="CharacterHealthLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=2120123894]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 56.0
+offset_top = 166.343
+offset_right = 80.0
+offset_bottom = 199.029
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 17
+text = "HP: "
+vertical_alignment = 1
+
+[node name="CharacterMoneyLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1593054916]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 184.0
+offset_top = 166.343
+offset_right = 208.0
+offset_bottom = 199.029
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 17
+text = "Money:"
+
+[node name="CharacterDescriptionLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1716946521]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 56.0
+offset_top = 214.343
+offset_right = 328.0
+offset_bottom = 309.029
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Character Description"
+
+[node name="CharacterArtifactTextureRect" type="TextureRect" parent="TitleScreen/NewRunMenu" unique_id=1048474764]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 56.0
+offset_top = 320.0
+offset_right = 120.0
+offset_bottom = 384.0
+texture = ExtResource("3_8ax2e")
+expand_mode = 1
+
+[node name="CharacterArtifactNameLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1800611614]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 128.0
+offset_top = 318.343
+offset_right = 352.0
+offset_bottom = 349.029
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Artifact Name"
+clip_text = true
+
+[node name="CharacterArtifactDescriptionLabel" type="Label" parent="TitleScreen/NewRunMenu" unique_id=418481965]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 128.0
+offset_top = 350.343
+offset_right = 320.0
+offset_bottom = 461.029
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Description "
+autowrap_mode = 2
+
+[node name="SelectCharacterButton" type="Button" parent="TitleScreen/NewRunMenu" unique_id=511376883]
+layout_mode = 0
+offset_left = 53.0
+offset_top = 486.0
+offset_right = 344.0
+offset_bottom = 520.0
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 16
+text = "Select Character"
+
+[node name="CharacterButtonContainer" type="ScrollContainer" parent="TitleScreen/NewRunMenu" unique_id=1493821997]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 552.0
+offset_right = 344.0
+offset_bottom = 688.0
+script = ExtResource("6_2ahpg")
+
+[node name="GridContainer" type="GridContainer" parent="TitleScreen/NewRunMenu/CharacterButtonContainer" unique_id=115761904]
+layout_mode = 2
+columns = 4
+
+[node name="DifficultySelect" type="Control" parent="TitleScreen/NewRunMenu" unique_id=1252247408]
+anchors_preset = 0
+offset_left = 850.0
+offset_top = 543.0
+offset_right = 1122.0
+offset_bottom = 583.0
+
+[node name="DecreaseDifficultyButton" type="Button" parent="TitleScreen/NewRunMenu/DifficultySelect" unique_id=828404524]
+layout_mode = 0
+offset_top = 8.0
+offset_right = 64.0
+offset_bottom = 40.0
+text = "<--"
+
+[node name="DifficultyLabel" type="Label" parent="TitleScreen/NewRunMenu/DifficultySelect" unique_id=1440851087]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 72.0
+offset_top = 6.34286
+offset_right = -72.0
+offset_bottom = 37.0286
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Difficulty 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="IncreaseDifficultyButton" type="Button" parent="TitleScreen/NewRunMenu/DifficultySelect" unique_id=910238407]
+layout_mode = 0
+offset_left = 208.0
+offset_top = 8.0
+offset_right = 272.0
+offset_bottom = 39.0
+text = "-->"
+
+[node name="CustomRunModifierButtonContainer" type="ScrollContainer" parent="TitleScreen/NewRunMenu" unique_id=691066166]
+layout_mode = 0
+offset_left = 824.0
+offset_top = 168.0
+offset_right = 1168.0
+offset_bottom = 680.0
+script = ExtResource("8_nlp47")
+
+[node name="MarginContainer" type="MarginContainer" parent="TitleScreen/NewRunMenu/CustomRunModifierButtonContainer" unique_id=1934771852]
+layout_mode = 2
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_bottom = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TitleScreen/NewRunMenu/CustomRunModifierButtonContainer/MarginContainer" unique_id=844888052]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="TitleScreen/NewRunMenu" unique_id=1417541442]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 400.0
+offset_top = 550.343
+offset_right = 424.0
+offset_bottom = 583.029
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 24
+text = "Seed"
+vertical_alignment = 1
+
+[node name="Label4" type="Label" parent="TitleScreen/NewRunMenu" unique_id=408914984]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.0414286
+anchor_right = 1.0
+anchor_bottom = 0.0742857
+offset_left = 824.0
+offset_top = 126.343
+offset_right = 1128.0
+offset_bottom = 159.029
+grow_horizontal = 2
+theme = ExtResource("2_bi5lp")
+theme_override_font_sizes/font_size = 24
+text = "Custom Modifiers"
+horizontal_alignment = 1
+
+[node name="SelectedCharactersContainer" type="ScrollContainer" parent="TitleScreen/NewRunMenu" unique_id=970022142]
+layout_mode = 0
+offset_left = 398.0
+offset_top = 448.0
+offset_right = 779.0
+offset_bottom = 538.0
+
+[node name="GridContainer" type="GridContainer" parent="TitleScreen/NewRunMenu/SelectedCharactersContainer" unique_id=442066597]
+layout_mode = 2
+columns = 4
+
+[node name="SeedInput" type="LineEdit" parent="TitleScreen/NewRunMenu" unique_id=1603158789]
+layout_mode = 0
+offset_left = 472.0
+offset_top = 552.0
+offset_right = 784.0
+offset_bottom = 584.0
+text = "1234567890123456"
+alignment = 1
+max_length = 16
+
+[node name="StartRunButton" type="Button" parent="TitleScreen/NewRunMenu" unique_id=37428030]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 600.0
+offset_right = 785.0
+offset_bottom = 634.0
+theme = ExtResource("2_bi5lp")
+text = "Start Run"
+
+[node name="BackButton" type="Button" parent="TitleScreen/NewRunMenu" unique_id=987321118]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 648.0
+offset_right = 785.0
+offset_bottom = 682.0
+theme = ExtResource("2_bi5lp")
+text = "Back"
+
+[node name="CodexMenu" type="Control" parent="TitleScreen" unique_id=208107547]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("9_uxrgu")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TitleScreen/CodexMenu" unique_id=1492264713]
+layout_mode = 0
+offset_left = 152.0
+offset_top = 24.0
+offset_right = 1176.0
+offset_bottom = 632.0
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+script = ExtResource("25_t3i5t")
+wheel_scroll_damper = SubResource("Resource_i7igs")
+dragging_scroll_damper = SubResource("Resource_elxq6")
+follow_focus_margin = 200
+allow_horizontal_scroll = false
+
+[node name="MarginContainer" type="MarginContainer" parent="TitleScreen/CodexMenu/ScrollContainer" unique_id=5657963]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CodexCardContainer" type="GridContainer" parent="TitleScreen/CodexMenu/ScrollContainer/MarginContainer" unique_id=386708457]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 6
+
+[node name="BackButton" type="Button" parent="TitleScreen/CodexMenu" unique_id=981450357]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 648.0
+offset_right = 785.0
+offset_bottom = 682.0
+theme = ExtResource("2_bi5lp")
+text = "Back"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TitleScreen/CodexMenu" unique_id=676252182]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 88.0
+offset_right = 136.0
+offset_bottom = 584.0
+
+[node name="CardsButton" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=731979169]
+layout_mode = 2
+text = "Cards"
+
+[node name="Button2" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=421011930]
+layout_mode = 2
+disabled = true
+text = "Enemies"
+
+[node name="Button3" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=777729379]
+layout_mode = 2
+disabled = true
+text = "Artifacts"
+
+[node name="Button4" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=1220897469]
+layout_mode = 2
+disabled = true
+text = "Consumables"
+
+[node name="CardEditorButton" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=100100012]
+layout_mode = 2
+theme = ExtResource("2_bi5lp")
+text = "Card Editor"
+
+[node name="CardEditorScreen" parent="TitleScreen" unique_id=879171990 instance=ExtResource("30_carded")]
+visible = false
+layout_mode = 1
+
+[node name="RunScreen" type="Control" parent="." unique_id=1832602911]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("12_elxq6")
+
+[node name="Combat" type="Control" parent="RunScreen" unique_id=1715328698]
+unique_name_in_owner = true
+process_mode = 1
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("3_h4evn")
+
+[node name="Background" type="ColorRect" parent="RunScreen/Combat" unique_id=1504521607]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.202309, 0.187588, 0.216973, 1)
+
+[node name="BackgroundButton" type="TextureButton" parent="RunScreen/Combat" unique_id=1104623552]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+button_mask = 3
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="PauseButton" type="TextureButton" parent="RunScreen/Combat" unique_id=1130101149]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 66.0
+offset_bottom = 58.0
+shortcut = SubResource("Shortcut_i7igs")
+shortcut_feedback = false
+shortcut_in_tooltip = false
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("13_i7igs")
+
+[node name="MapButton" type="TextureButton" parent="RunScreen/Combat" unique_id=1491716944]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 72.0
+offset_top = 8.0
+offset_right = 122.0
+offset_bottom = 58.0
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DeckButton" type="TextureButton" parent="RunScreen/Combat" unique_id=544245795]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 8.0
+offset_right = 178.0
+offset_bottom = 58.0
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="MoneyLabel" type="Label" parent="RunScreen/Combat" unique_id=1033850335]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 199.0
+offset_top = 8.0
+offset_right = -887.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 34
+text = "$10000"
+horizontal_alignment = 2
+
+[node name="HealthLabel" type="Label" parent="RunScreen/Combat" unique_id=532815960]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 352.0
+offset_top = 8.0
+offset_right = -712.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 34
+text = "99/99"
+horizontal_alignment = 2
+
+[node name="ArtifactContainer" type="HBoxContainer" parent="RunScreen/Combat" unique_id=351414602]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 64.0
+offset_right = 496.0
+offset_bottom = 104.0
+mouse_filter = 2
+script = ExtResource("5_a7j3r")
+
+[node name="PartyContainer" type="Control" parent="RunScreen/Combat" unique_id=1082257587]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 0.022000002
+anchor_top = 0.42100003
+anchor_right = 0.022000002
+anchor_bottom = 0.42100003
+offset_left = 11.599998
+offset_top = 15.299988
+offset_right = 11.599998
+offset_bottom = 15.299988
+scale = Vector2(0.8, 0.8)
+script = ExtResource("16_tn5yy")
+
+[node name="AutomaticPartyContainer" type="HBoxContainer" parent="RunScreen/Combat/PartyContainer" unique_id=285105571]
+layout_mode = 0
+
+[node name="EnemyContainer" type="Control" parent="RunScreen/Combat" unique_id=145245896]
+anchors_preset = 0
+offset_left = 568.0
+offset_top = 256.0
+offset_right = 1176.0
+offset_bottom = 448.0
+mouse_filter = 2
+script = ExtResource("4_kvn7e")
+metadata/_edit_group_ = true
+
+[node name="AutomaticEnemyContainer" type="HBoxContainer" parent="RunScreen/Combat/EnemyContainer" unique_id=1291886778]
+layout_mode = 0
+offset_right = 608.0
+offset_bottom = 192.0
+mouse_filter = 2
+
+[node name="PositionalEnemyContainer" type="Control" parent="RunScreen/Combat/EnemyContainer" unique_id=1299720876]
+anchors_preset = 0
+offset_right = 608.0
+offset_bottom = 192.0
+mouse_filter = 2
+
+[node name="Consumables" type="Control" parent="RunScreen/Combat" unique_id=2135608204]
+anchors_preset = 0
+offset_left = 512.0
+offset_right = 752.0
+offset_bottom = 104.0
+script = ExtResource("11_c46y0")
+
+[node name="ConsumableContainer" type="HBoxContainer" parent="RunScreen/Combat/Consumables" unique_id=812261663]
+layout_mode = 0
+offset_top = 16.0
+offset_right = 480.0
+offset_bottom = 48.0
+
+[node name="ConsumableActionDropdown" type="Control" parent="RunScreen/Combat/Consumables" unique_id=536973413]
+anchors_preset = 0
+offset_top = 56.0
+offset_right = 144.0
+offset_bottom = 152.0
+
+[node name="ColorRect" type="ColorRect" parent="RunScreen/Combat/Consumables/ConsumableActionDropdown" unique_id=1890124003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.278431, 0.278431, 0.278431, 1)
+
+[node name="UseConsumableButton" type="Button" parent="RunScreen/Combat/Consumables/ConsumableActionDropdown" unique_id=1810984683]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 136.0
+offset_bottom = 39.0
+theme_override_font_sizes/font_size = 16
+text = "Use"
+
+[node name="DiscardConsumableButton" type="Button" parent="RunScreen/Combat/Consumables/ConsumableActionDropdown" unique_id=662388589]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 48.0
+offset_right = 136.0
+offset_bottom = 79.0
+theme_override_font_sizes/font_size = 16
+text = "Discard"
+
+[node name="Chest" type="TextureButton" parent="RunScreen/Combat" unique_id=353664404]
+visible = false
+layout_mode = 0
+offset_left = 768.0
+offset_top = 256.0
+offset_right = 960.0
+offset_bottom = 448.0
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("11_1uvyw")
+
+[node name="Label" type="Label" parent="RunScreen/Combat/Chest" unique_id=2018266579]
+layout_mode = 0
+offset_top = -56.0
+offset_right = 192.0
+offset_bottom = -11.0
+theme_override_font_sizes/font_size = 32
+text = "Chest"
+horizontal_alignment = 1
+
+[node name="Shop" type="TextureButton" parent="RunScreen/Combat" unique_id=1496750418]
+visible = false
+layout_mode = 0
+offset_left = 768.0
+offset_top = 256.0
+offset_right = 960.0
+offset_bottom = 448.0
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("13_w8i8k")
+
+[node name="Label" type="Label" parent="RunScreen/Combat/Shop" unique_id=1337964046]
+layout_mode = 0
+offset_top = -56.0
+offset_right = 192.0
+offset_bottom = -11.0
+theme_override_font_sizes/font_size = 32
+text = "Shop"
+horizontal_alignment = 1
+
+[node name="Energy" type="TextureButton" parent="RunScreen/Combat" unique_id=151271682]
+visible = false
+layout_mode = 0
+offset_left = 24.0
+offset_top = 560.0
+offset_right = 74.0
+offset_bottom = 610.0
+tooltip_text = "Energy"
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="EnergyCount" type="Label" parent="RunScreen/Combat/Energy" unique_id=685649279]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 32.0
+offset_right = 66.0
+offset_bottom = 58.0
+theme_override_font_sizes/font_size = 18
+text = "30"
+horizontal_alignment = 1
+
+[node name="DrawPile" type="TextureButton" parent="RunScreen/Combat" unique_id=469081142]
+visible = false
+layout_mode = 0
+offset_left = 24.0
+offset_top = 616.0
+offset_right = 74.0
+offset_bottom = 666.0
+tooltip_text = "Draw Pile"
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DrawCount" type="Label" parent="RunScreen/Combat/DrawPile" unique_id=1169972159]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 32.0
+offset_right = 66.0
+offset_bottom = 58.0
+theme_override_font_sizes/font_size = 18
+text = "30"
+horizontal_alignment = 1
+
+[node name="DiscardPile" type="TextureButton" parent="RunScreen/Combat" unique_id=265095913]
+visible = false
+layout_mode = 0
+offset_left = 1136.0
+offset_top = 560.0
+offset_right = 1186.0
+offset_bottom = 610.0
+tooltip_text = "Discard Pile"
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DiscardCount" type="Label" parent="RunScreen/Combat/DiscardPile" unique_id=2027359488]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 32.0
+offset_right = 66.0
+offset_bottom = 58.0
+theme_override_font_sizes/font_size = 18
+text = "30"
+horizontal_alignment = 1
+
+[node name="ExhaustPile" type="TextureButton" parent="RunScreen/Combat" unique_id=1726361596]
+visible = false
+layout_mode = 0
+offset_left = 1080.0
+offset_top = 560.0
+offset_right = 1130.0
+offset_bottom = 610.0
+tooltip_text = "Exhaust Pile"
+texture_normal = ExtResource("3_8ax2e")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="ExhaustCount" type="Label" parent="RunScreen/Combat/ExhaustPile" unique_id=548848444]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 32.0
+offset_right = 66.0
+offset_bottom = 58.0
+theme_override_font_sizes/font_size = 18
+text = "30"
+horizontal_alignment = 1
+
+[node name="CardPicking" type="Control" parent="RunScreen/Combat" unique_id=414341457]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 0
+offset_left = 160.0
+offset_top = 208.0
+offset_right = 968.0
+offset_bottom = 568.0
+
+[node name="CardPickLabel" type="Label" parent="RunScreen/Combat/CardPicking" unique_id=701481333]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -180.0
+offset_bottom = -157.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Pick X cards"
+horizontal_alignment = 1
+
+[node name="ConfirmPickButton" type="Button" parent="RunScreen/Combat/CardPicking" unique_id=112245401]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 200.0
+offset_top = 240.0
+offset_right = 584.0
+offset_bottom = 271.0
+text = "Confirm"
+
+[node name="Hand" type="Control" parent="RunScreen/Combat" unique_id=2033808160]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 168.0
+offset_top = 632.0
+offset_right = 1048.0
+offset_bottom = 692.0
+script = ExtResource("4_i2yfj")
+hand_card_rotation_curve = null
+hand_card_y_offset_curve = null
+
+[node name="HandSizeExceededRect" type="ColorRect" parent="RunScreen/Combat" unique_id=200404899]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(1, 1, 1, 0.258824)
+layout_mode = 0
+offset_left = 168.0
+offset_top = 632.0
+offset_right = 1048.0
+offset_bottom = 692.0
+mouse_filter = 2
+
+[node name="EndTurnButton" type="Button" parent="RunScreen/Combat" unique_id=1711328060]
+visible = false
+layout_mode = 0
+offset_left = 1080.0
+offset_top = 624.0
+offset_right = 1192.0
+offset_bottom = 664.0
+disabled = true
+text = "End Turn"
+
+[node name="SelectTargetLabel" type="Label" parent="RunScreen/Combat" unique_id=461244053]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 192.0
+offset_bottom = 240.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 34
+text = "Select a target"
+horizontal_alignment = 1
+
+[node name="TurnOverlay" type="Control" parent="RunScreen/Combat" unique_id=577075952]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_u2w0b")
+
+[node name="ColorRect" type="ColorRect" parent="RunScreen/Combat/TurnOverlay" unique_id=619813673]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0862745, 0.0862745, 0.0862745, 0.192157)
+
+[node name="TurnLabel" type="Label" parent="RunScreen/Combat/TurnOverlay" unique_id=947922772]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -30.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Turn"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CombatAnimation" type="AnimationPlayer" parent="RunScreen/Combat" unique_id=1757204065]
+libraries/ = SubResource("AnimationLibrary_yww7o")
+
+[node name="RestOverlay" type="Control" parent="RunScreen" unique_id=834039682]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("14_k6wys")
+
+[node name="Background" type="ColorRect" parent="RunScreen/RestOverlay" unique_id=1918580655]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.635294)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RunScreen/RestOverlay" unique_id=1024920215]
+layout_mode = 0
+offset_left = 208.0
+offset_top = 104.0
+offset_right = 1008.0
+offset_bottom = 608.0
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+script = ExtResource("25_t3i5t")
+wheel_scroll_damper = SubResource("Resource_uxrgu")
+dragging_scroll_damper = SubResource("Resource_p8axl")
+follow_focus_margin = 200
+allow_horizontal_scroll = false
+
+[node name="MarginContainer" type="MarginContainer" parent="RunScreen/RestOverlay/ScrollContainer" unique_id=2013574148]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="RestActionContainer" type="GridContainer" parent="RunScreen/RestOverlay/ScrollContainer/MarginContainer" unique_id=335520947]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="ContinueButton" type="Button" parent="RunScreen/RestOverlay" unique_id=741654871]
+layout_mode = 0
+offset_left = 528.0
+offset_top = 624.0
+offset_right = 672.0
+offset_bottom = 655.0
+text = "Continue"
+
+[node name="ShopOverlay" type="Control" parent="RunScreen" unique_id=652510034]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("17_stqr4")
+
+[node name="Background" type="ColorRect" parent="RunScreen/ShopOverlay" unique_id=685987206]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.635294)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/ShopOverlay" unique_id=442685453]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -568.0
+offset_top = -286.0
+offset_right = 568.0
+offset_bottom = 290.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0941176, 0.0862745, 0.101961, 0.67451)
+
+[node name="CardContainer" type="HBoxContainer" parent="RunScreen/ShopOverlay" unique_id=1810294659]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -528.0
+offset_top = -278.0
+offset_right = 536.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="ArtifactContainer" type="VBoxContainer" parent="RunScreen/ShopOverlay" unique_id=324288049]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -528.0
+offset_top = 34.0
+offset_right = -248.0
+offset_bottom = 282.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="ConsumableContainer" type="VBoxContainer" parent="RunScreen/ShopOverlay" unique_id=397105462]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = 34.0
+offset_right = 64.0
+offset_bottom = 282.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="ContinueButton" type="Button" parent="RunScreen/ShopOverlay" unique_id=1213372300]
+layout_mode = 0
+offset_left = 528.0
+offset_top = 656.0
+offset_right = 672.0
+offset_bottom = 687.0
+text = "Continue"
+
+[node name="DialogueOverlay" type="Control" parent="RunScreen" unique_id=1781190524]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("25_tn5yy")
+
+[node name="Background" type="ColorRect" parent="RunScreen/DialogueOverlay" unique_id=1580372094]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.635294)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/DialogueOverlay" unique_id=724026770]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -568.0
+offset_top = -286.0
+offset_right = 568.0
+offset_bottom = 290.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0941176, 0.0862745, 0.101961, 0.67451)
+
+[node name="DialogueTextureRect" type="TextureRect" parent="RunScreen/DialogueOverlay" unique_id=1339953806]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 64.0
+offset_top = 88.0
+offset_right = 592.0
+offset_bottom = 616.0
+texture = ExtResource("3_8ax2e")
+expand_mode = 1
+
+[node name="DialoguePromptLabel" type="RichTextLabel" parent="RunScreen/DialogueOverlay" unique_id=753960224]
+layout_mode = 0
+offset_left = 608.0
+offset_top = 96.0
+offset_right = 1152.0
+offset_bottom = 392.0
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "[color=green]Dialogue Prompt Rich Text[/color]"
+
+[node name="DialogueOptionContainer" type="VBoxContainer" parent="RunScreen/DialogueOverlay" unique_id=921870722]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 8.0
+offset_top = -22.0
+offset_right = 544.0
+offset_bottom = 226.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="RunSummaryOverlay" type="Control" parent="RunScreen" unique_id=1600084623]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("21_fj66g")
+
+[node name="Background" type="ColorRect" parent="RunScreen/RunSummaryOverlay" unique_id=288031344]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.635294)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/RunSummaryOverlay" unique_id=1216121634]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -568.0
+offset_top = -286.0
+offset_right = 568.0
+offset_bottom = 290.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0941176, 0.0862745, 0.101961, 0.67451)
+
+[node name="VictoryLabel" type="Label" parent="RunScreen/RunSummaryOverlay" unique_id=647749665]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 64.0
+offset_right = 1168.0
+offset_bottom = 224.0
+theme_override_font_sizes/font_size = 50
+text = "Victory"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefeatLabel" type="Label" parent="RunScreen/RunSummaryOverlay" unique_id=804941945]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 64.0
+offset_right = 1168.0
+offset_bottom = 224.0
+theme_override_font_sizes/font_size = 50
+text = "Defeat"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EndRunButton" type="Button" parent="RunScreen/RunSummaryOverlay" unique_id=559592066]
+layout_mode = 0
+offset_left = 352.0
+offset_top = 528.0
+offset_right = 856.0
+offset_bottom = 609.0
+theme_override_font_sizes/font_size = 32
+text = "Back To Main Menu"
+
+[node name="RunStartOptions" type="Control" parent="RunScreen" unique_id=1144657552]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("25_ll3o0")
+
+[node name="StartingOptionContainer" type="VBoxContainer" parent="RunScreen/RunStartOptions" unique_id=1720654455]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 528.0
+offset_right = 520.0
+offset_bottom = 640.0
+
+[node name="RewardOverlay" type="Control" parent="RunScreen" unique_id=2054255246]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("10_u2l48")
+
+[node name="Background" type="ColorRect" parent="RunScreen/RewardOverlay" unique_id=822727071]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.635294)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/RewardOverlay" unique_id=1114190089]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -224.0
+offset_top = -196.0
+offset_right = 224.0
+offset_bottom = 187.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0941176, 0.0862745, 0.101961, 0.67451)
+
+[node name="RewardContainer" type="VBoxContainer" parent="RunScreen/RewardOverlay" unique_id=440697116]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = -190.0
+offset_right = 216.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="ContinueButton" type="Button" parent="RunScreen/RewardOverlay" unique_id=1109580725]
+layout_mode = 0
+offset_left = 528.0
+offset_top = 544.0
+offset_right = 672.0
+offset_bottom = 575.0
+text = "Continue"
+
+[node name="CardSelectionOverlay" type="Control" parent="RunScreen" unique_id=108231080]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("10_bwtvr")
+
+[node name="Background" type="ColorRect" parent="RunScreen/CardSelectionOverlay" unique_id=1056394633]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.631373)
+
+[node name="BackButton" type="Button" parent="RunScreen/CardSelectionOverlay" unique_id=1900955599]
+visible = false
+layout_mode = 0
+offset_left = 504.0
+offset_top = 40.0
+offset_right = 648.0
+offset_bottom = 71.0
+text = "<----"
+
+[node name="ConfirmButton" type="Button" parent="RunScreen/CardSelectionOverlay" unique_id=406534079]
+visible = false
+layout_mode = 0
+offset_left = 504.0
+offset_top = 40.0
+offset_right = 648.0
+offset_bottom = 71.0
+text = "Confirm"
+
+[node name="CardPickLabel" type="Label" parent="RunScreen/CardSelectionOverlay" unique_id=1074500612]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 8.0
+offset_right = 1016.0
+offset_bottom = 32.0
+text = "Pick X Cards"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RunScreen/CardSelectionOverlay" unique_id=117378990]
+layout_mode = 0
+offset_left = 152.0
+offset_top = 80.0
+offset_right = 1000.0
+offset_bottom = 680.0
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+script = ExtResource("25_t3i5t")
+wheel_scroll_damper = SubResource("Resource_tn5yy")
+dragging_scroll_damper = SubResource("Resource_kpmo0")
+follow_focus_margin = 200
+allow_horizontal_scroll = false
+metadata/_edit_group_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="RunScreen/CardSelectionOverlay/ScrollContainer" unique_id=1373509874]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 96
+
+[node name="CardContainer" type="GridContainer" parent="RunScreen/CardSelectionOverlay/ScrollContainer/MarginContainer" unique_id=1548123468]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 5
+
+[node name="CardDraftSelectionOverlay" type="Control" parent="RunScreen" unique_id=611673015]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 10
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("11_yys3c")
+
+[node name="Background" type="ColorRect" parent="RunScreen/CardDraftSelectionOverlay" unique_id=1322315578]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.631373)
+
+[node name="CardContainer" type="HBoxContainer" parent="RunScreen/CardDraftSelectionOverlay" unique_id=1020402386]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -120.0
+offset_right = 400.0
+offset_bottom = 74.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SkipButton" type="Button" parent="RunScreen/CardDraftSelectionOverlay" unique_id=1277425926]
+layout_mode = 0
+offset_left = 528.0
+offset_top = 432.0
+offset_right = 672.0
+offset_bottom = 463.0
+text = "Skip"
+
+[node name="Map" type="Control" parent="RunScreen" unique_id=106979935]
+unique_name_in_owner = true
+process_mode = 1
+visible = false
+z_index = 100
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("14_fc5ht")
+
+[node name="Background" type="ColorRect" parent="RunScreen/Map" unique_id=1158303461]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.631373)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/Map" unique_id=610373310]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -448.0
+offset_top = -278.0
+offset_right = 443.0
+offset_bottom = 306.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.701961, 0.67451, 0.721569, 1)
+
+[node name="BackButton" type="Button" parent="RunScreen/Map" unique_id=1378007803]
+layout_mode = 0
+offset_left = 504.0
+offset_top = 32.0
+offset_right = 648.0
+offset_bottom = 63.0
+text = "<----"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RunScreen/Map" unique_id=604814265]
+layout_mode = 0
+offset_left = 152.0
+offset_top = 72.0
+offset_right = 1040.0
+offset_bottom = 656.0
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+script = ExtResource("25_t3i5t")
+wheel_scroll_damper = SubResource("Resource_kqcdx")
+dragging_scroll_damper = SubResource("Resource_frd6h")
+follow_focus_margin = 200
+allow_horizontal_scroll = false
+
+[node name="LocationContainer" type="Control" parent="RunScreen/Map/ScrollContainer" unique_id=1133733434]
+layout_mode = 2
+
+[node name="PauseOverlay" type="Control" parent="RunScreen" unique_id=312541700]
+unique_name_in_owner = true
+process_mode = 3
+visible = false
+z_index = 100
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+script = ExtResource("29_p8axl")
+
+[node name="Background" type="ColorRect" parent="RunScreen/PauseOverlay" unique_id=1023808620]
+layout_mode = 0
+offset_right = 1200.0
+offset_bottom = 700.0
+color = Color(0.203922, 0.188235, 0.215686, 0.141176)
+
+[node name="Background2" type="ColorRect" parent="RunScreen/PauseOverlay" unique_id=175799952]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.0
+offset_top = -238.0
+offset_right = 232.0
+offset_bottom = 234.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.290196, 0.266667, 0.305882, 0.662745)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RunScreen/PauseOverlay/Background2" unique_id=1570070869]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResumeButton" type="Button" parent="RunScreen/PauseOverlay/Background2/VBoxContainer" unique_id=738042046]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+shortcut = SubResource("Shortcut_elxq6")
+shortcut_feedback = false
+shortcut_in_tooltip = false
+text = "Resume"
+
+[node name="ReturnToTitleButton" type="Button" parent="RunScreen/PauseOverlay/Background2/VBoxContainer" unique_id=1867896016]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Return to Title"
+
+[node name="ForfeitRunButton" type="Button" parent="RunScreen/PauseOverlay/Background2/VBoxContainer" unique_id=1899407437]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Forfeit Run"

@@ -36,13 +36,13 @@ const ESSENTIAL_FIELD_GROUPS := [
 		"title": "Identity",
 		"description": "Start with the fields that actually define the card a player will recognize.",
 		"columns": 2,
-		"fields": ["card_name", "object_id", "card_type", "card_rarity", "card_color_id", "card_kind", "card_texture_path", "card_tags", "card_exhausts", "card_is_ethereal", "card_is_retained"],
+		"fields": ["card_name", "object_id", "card_type", "card_rarity", "card_color_id", "card_texture_path", "card_tags", "card_exhausts", "card_is_ethereal", "card_is_retained", "card_unremovable_from_deck", "card_untransformable_from_deck"],
 	},
 	{
 		"title": "Play Profile",
 		"description": "These are the knobs that usually matter first when prototyping.",
 		"columns": 2,
-		"fields": ["card_energy_cost", "card_requires_target", "card_is_playable", "card_appears_in_card_packs"],
+		"fields": ["card_energy_cost", "card_kind", "card_requires_target", "card_clicked_target_mode", "card_is_playable", "card_appears_in_card_packs"],
 	},
 	{
 		"title": "Text And Values",
@@ -81,8 +81,6 @@ const ADVANCED_FIELD_GROUPS := [
 		"columns": 1,
 		"fields": [
 			"card_description_preview_overrides",
-			"card_unremovable_from_deck",
-			"card_untransformable_from_deck",
 		],
 	},
 ]
@@ -127,25 +125,27 @@ const DEFAULT_CARD_COLOR_IDS := [
 	"color_white",
 	"color_purple",
 ]
+const COLLAPSED_PANEL_WIDTH := 0
+const LIBRARY_PANEL_MIN_WIDTH := 240
+const EDITOR_PANEL_MIN_WIDTH := 560
+const PREVIEW_PANEL_MIN_WIDTH := 300
 
 @onready var title_screen: Control = get_parent() as Control
 @onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
 @onready var screen_subtitle: Label = $MainContainer/Header/ScreenSummary/ScreenSubtitle
 @onready var status_banner: Label = $MainContainer/Header/ScreenSummary/StatusBanner
+@onready var header_container: VBoxContainer = $MainContainer/Header
 @onready var library_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/LibraryCountLabel
 @onready var filter_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/FilterCountLabel
 @onready var selection_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/SelectionCountLabel
 @onready var diagnostics_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/DiagnosticsCountLabel
 @onready var body_split: HSplitContainer = $MainContainer/Header/Body
 @onready var editor_split: HSplitContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit
+@onready var library_panel: PanelContainer = $MainContainer/Header/Body/LibraryPanel
+@onready var editor_panel: PanelContainer = $MainContainer/Header/Body/EditorPanel
+@onready var preview_panel: PanelContainer = $MainContainer/Header/Body/PreviewPanel
 @onready var back_button: Button = $MainContainer/Header/BackButton
 @onready var button_row: HBoxContainer = $MainContainer/Header/ButtonRow
-@onready var new_button: Button = $MainContainer/Header/ButtonRow/NewButton
-@onready var duplicate_button: Button = $MainContainer/Header/ButtonRow/DuplicateButton
-@onready var preset_option: OptionButton = $MainContainer/Header/ButtonRow/PresetOption
-@onready var apply_preset_button: Button = $MainContainer/Header/ButtonRow/ApplyPresetButton
-@onready var save_triage_button: Button = $MainContainer/Header/ButtonRow/SaveTriageButton
-@onready var promote_button: Button = $MainContainer/Header/ButtonRow/PromoteButton
 @onready var library_search: LineEdit = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/SearchInput
 @onready var clear_filters_button: Button = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/ClearFiltersButton
 @onready var source_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/SourceFilter
@@ -154,14 +154,16 @@ const DEFAULT_CARD_COLOR_IDS := [
 @onready var type_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/TypeFilter
 @onready var rarity_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/RarityFilter
 @onready var kind_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/KindFilter
-@onready var target_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/TargetFilter
 @onready var library_scroll: ScrollContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll
 @onready var library_sections: VBoxContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll/LibrarySections
+@onready var library_vbox: VBoxContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox
+@onready var editor_padding: MarginContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding
 @onready var inspector_scroll: ScrollContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll
 @onready var inspector_container: VBoxContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll/InspectorVBox
 @onready var behavior_scroll: ScrollContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll
 @onready var behavior_container: VBoxContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll/BehaviorVBox
 @onready var preview_mount: Control = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/PreviewMount
+@onready var preview_vbox: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox
 @onready var session_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/SessionLabel
 @onready var diagnostics_text: RichTextLabel = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/DiagnosticsText
 @onready var save_status_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SaveStatusLabel
@@ -190,10 +192,27 @@ var collapsed_behavior_groups: Dictionary[String, bool] = {}
 var expanded_entry_parameters: Dictionary[String, bool] = {}
 var collapsed_behavior_entries: Dictionary[String, bool] = {}
 var show_secondary_behavior_groups: bool = false
+var new_button: Button = null
+var duplicate_button: Button = null
+var preset_option: OptionButton = null
+var apply_preset_button: Button = null
+var save_triage_button: Button = null
+var promote_button: Button = null
+var target_filter: OptionButton = null
+var library_panel_collapsed: bool = false
+var editor_panel_collapsed: bool = false
+var preview_panel_collapsed: bool = false
+var collapsed_panel_row: HBoxContainer = null
+var library_panel_toggle: Button = null
+var editor_panel_toggle: Button = null
+var preview_panel_toggle: Button = null
+var behavior_render_queued: bool = false
+var editor_panels_refresh_queued: bool = false
 var status_message: String = "Open a card to inspect it, or start a new triage draft."
 var status_severity: String = "info"
 
 func _ready() -> void:
+	_bind_optional_header_nodes()
 	visible = not _is_embedded_in_title_screen()
 	screen_title.text = "Card Workshop"
 	screen_subtitle.text = "Build cards without fighting the editor."
@@ -201,11 +220,16 @@ func _ready() -> void:
 	diagnostics_text.fit_content = true
 	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
 	back_button.button_up.connect(_on_back_button_up)
-	new_button.button_up.connect(_on_new_button_up)
-	duplicate_button.button_up.connect(_on_duplicate_button_up)
-	apply_preset_button.button_up.connect(_on_apply_preset_button_up)
-	save_triage_button.button_up.connect(_on_save_triage_button_up)
-	promote_button.button_up.connect(_on_promote_button_up)
+	if new_button != null:
+		new_button.button_up.connect(_on_new_button_up)
+	if duplicate_button != null:
+		duplicate_button.button_up.connect(_on_duplicate_button_up)
+	if apply_preset_button != null:
+		apply_preset_button.button_up.connect(_on_apply_preset_button_up)
+	if save_triage_button != null:
+		save_triage_button.button_up.connect(_on_save_triage_button_up)
+	if promote_button != null:
+		promote_button.button_up.connect(_on_promote_button_up)
 	clear_filters_button.button_up.connect(_on_clear_filters_button_up)
 	library_search.text_changed.connect(_on_library_search_changed)
 	for option_button: OptionButton in [source_filter, owner_filter, color_filter, type_filter, rarity_filter, kind_filter]:
@@ -226,6 +250,15 @@ func _ready() -> void:
 	else:
 		back_button.visible = false
 		call_deferred("populate_editor")
+
+func _bind_optional_header_nodes() -> void:
+	new_button = get_node_or_null("MainContainer/Header/ButtonRow/NewButton") as Button
+	duplicate_button = get_node_or_null("MainContainer/Header/ButtonRow/DuplicateButton") as Button
+	preset_option = get_node_or_null("MainContainer/Header/ButtonRow/PresetOption") as OptionButton
+	apply_preset_button = get_node_or_null("MainContainer/Header/ButtonRow/ApplyPresetButton") as Button
+	save_triage_button = get_node_or_null("MainContainer/Header/ButtonRow/SaveTriageButton") as Button
+	promote_button = get_node_or_null("MainContainer/Header/ButtonRow/PromoteButton") as Button
+	target_filter = get_node_or_null("MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/TargetFilter") as OptionButton
 
 func show_editor() -> void:
 	visible = true
@@ -290,6 +323,7 @@ func _update_library_selection() -> void:
 	pass
 
 func _refresh_editor_panels() -> void:
+	editor_panels_refresh_queued = false
 	_render_inspector()
 	_render_behavior()
 	_render_preview()
@@ -297,9 +331,18 @@ func _refresh_editor_panels() -> void:
 	_populate_action_option_list()
 	_populate_validator_option_list()
 	_refresh_overview()
-	duplicate_button.disabled = current_session == null
-	save_triage_button.disabled = current_session == null
-	promote_button.disabled = current_session == null
+	if duplicate_button != null:
+		duplicate_button.disabled = current_session == null
+	if save_triage_button != null:
+		save_triage_button.disabled = current_session == null
+	if promote_button != null:
+		promote_button.disabled = current_session == null
+
+func _request_editor_panels_refresh() -> void:
+	if editor_panels_refresh_queued:
+		return
+	editor_panels_refresh_queued = true
+	call_deferred("_refresh_editor_panels")
 
 func _render_inspector() -> void:
 	for child in inspector_container.get_children():
@@ -320,6 +363,8 @@ func _compact_header_layout() -> void:
 	if is_instance_valid(target_filter):
 		target_filter.visible = false
 		target_filter.queue_free()
+	_install_panel_headers()
+	_apply_panel_collapse_state()
 	var search_row: HBoxContainer = library_search.get_parent() as HBoxContainer
 	if search_row != null:
 		var library_actions := HBoxContainer.new()
@@ -328,6 +373,8 @@ func _compact_header_layout() -> void:
 		search_row.get_parent().add_child(library_actions)
 		search_row.get_parent().move_child(library_actions, search_row.get_index() + 1)
 		for control: Control in [new_button, duplicate_button, preset_option, apply_preset_button]:
+			if control == null:
+				continue
 			if control.get_parent() != null:
 				control.get_parent().remove_child(control)
 			library_actions.add_child(control)
@@ -336,14 +383,98 @@ func _compact_header_layout() -> void:
 		var render_actions := HBoxContainer.new()
 		render_actions.name = "RenderActions"
 		render_actions.add_theme_constant_override("separation", 8)
-		if save_triage_button.get_parent() != null:
+		if save_triage_button != null and save_triage_button.get_parent() != null:
 			save_triage_button.get_parent().remove_child(save_triage_button)
-		if promote_button.get_parent() != null:
+		if promote_button != null and promote_button.get_parent() != null:
 			promote_button.get_parent().remove_child(promote_button)
-		render_actions.add_child(save_triage_button)
-		render_actions.add_child(promote_button)
+		if save_triage_button != null:
+			render_actions.add_child(save_triage_button)
+		if promote_button != null:
+			render_actions.add_child(promote_button)
 		preview_vbox.add_child(render_actions)
 		preview_vbox.move_child(render_actions, preview_mount.get_index() + 1)
+
+func _install_panel_headers() -> void:
+	if collapsed_panel_row == null and is_instance_valid(header_container):
+		collapsed_panel_row = HBoxContainer.new()
+		collapsed_panel_row.name = "CollapsedPanelRow"
+		collapsed_panel_row.add_theme_constant_override("separation", 8)
+		header_container.add_child(collapsed_panel_row)
+		header_container.move_child(collapsed_panel_row, header_container.get_child_count() - 1)
+	if library_panel_toggle == null and is_instance_valid(library_vbox):
+		library_panel_toggle = _create_panel_toggle_row(library_vbox, "Library", "_on_library_panel_toggle")
+	if editor_panel_toggle == null and is_instance_valid(editor_padding):
+		editor_panel_toggle = _create_panel_toggle_row(editor_padding, "Editor", "_on_editor_panel_toggle")
+	if preview_panel_toggle == null and is_instance_valid(preview_vbox):
+		preview_panel_toggle = _create_panel_toggle_row(preview_vbox, "Preview", "_on_preview_panel_toggle")
+
+func _create_panel_toggle_row(parent: Control, title_text: String, method_name: String) -> Button:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var title := Label.new()
+	title.text = title_text
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(title)
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(42, 0)
+	button.button_up.connect(Callable(self, method_name))
+	row.add_child(button)
+	parent.add_child(row)
+	parent.move_child(row, 0)
+	return button
+
+func _apply_panel_collapse_state() -> void:
+	library_panel.visible = not library_panel_collapsed
+	editor_panel.visible = not editor_panel_collapsed
+	preview_panel.visible = not preview_panel_collapsed
+	if library_panel_toggle != null:
+		library_panel_toggle.text = ">" if library_panel_collapsed else "<"
+		library_panel_toggle.tooltip_text = "Expand library" if library_panel_collapsed else "Collapse library"
+	if editor_panel_toggle != null:
+		editor_panel_toggle.text = ">" if editor_panel_collapsed else "<"
+		editor_panel_toggle.tooltip_text = "Expand editor" if editor_panel_collapsed else "Collapse editor"
+	if preview_panel_toggle != null:
+		preview_panel_toggle.text = "<" if preview_panel_collapsed else ">"
+		preview_panel_toggle.tooltip_text = "Expand preview" if preview_panel_collapsed else "Collapse preview"
+	_refresh_collapsed_panel_buttons()
+	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if library_panel_collapsed else LIBRARY_PANEL_MIN_WIDTH
+	editor_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if editor_panel_collapsed else EDITOR_PANEL_MIN_WIDTH
+	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if preview_panel_collapsed else PREVIEW_PANEL_MIN_WIDTH
+	library_panel.size_flags_horizontal = 0 if library_panel_collapsed else Control.SIZE_EXPAND_FILL
+	editor_panel.size_flags_horizontal = 0 if editor_panel_collapsed else Control.SIZE_EXPAND_FILL
+	preview_panel.size_flags_horizontal = 0 if preview_panel_collapsed else Control.SIZE_EXPAND_FILL
+	call_deferred("_apply_split_layout")
+
+func _refresh_collapsed_panel_buttons() -> void:
+	if collapsed_panel_row == null:
+		return
+	for child: Node in collapsed_panel_row.get_children():
+		child.queue_free()
+	if library_panel_collapsed:
+		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Library", "_on_library_panel_toggle"))
+	if editor_panel_collapsed:
+		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Editor", "_on_editor_panel_toggle"))
+	if preview_panel_collapsed:
+		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Preview", "_on_preview_panel_toggle"))
+	collapsed_panel_row.visible = collapsed_panel_row.get_child_count() > 0
+
+func _create_collapsed_panel_button(label_text: String, method_name: String) -> Button:
+	var button := Button.new()
+	button.text = label_text
+	button.button_up.connect(Callable(self, method_name))
+	return button
+
+func _on_library_panel_toggle() -> void:
+	library_panel_collapsed = not library_panel_collapsed
+	_apply_panel_collapse_state()
+
+func _on_editor_panel_toggle() -> void:
+	editor_panel_collapsed = not editor_panel_collapsed
+	_apply_panel_collapse_state()
+
+func _on_preview_panel_toggle() -> void:
+	preview_panel_collapsed = not preview_panel_collapsed
+	_apply_panel_collapse_state()
 
 func _build_editor_hero() -> Control:
 	var card_data: CardData = current_session.working_card_data
@@ -353,6 +484,9 @@ func _build_editor_hero() -> Control:
 		severity_text = "%s error(s)" % counts["errors"]
 	elif counts["warnings"] > 0:
 		severity_text = "%s warning(s)" % counts["warnings"]
+	var target_text: String = "No clicked target"
+	if card_data.card_requires_target:
+		target_text = "Needs %s target" % _format_clicked_target_mode(card_data.get_effective_clicked_target_mode())
 	var lines: Array[String] = [
 		"%s" % card_data.get_card_name(),
 		"%s | %s | %s" % [
@@ -362,7 +496,7 @@ func _build_editor_hero() -> Control:
 		],
 		"Cost %s | %s | %s" % [
 			"X" if card_data.card_energy_cost_is_variable else str(card_data.card_energy_cost),
-			"Needs clicked target" if card_data.card_requires_target else "No clicked target",
+			target_text,
 			severity_text,
 		],
 	]
@@ -520,7 +654,10 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			checkbox.button_pressed = bool(property_value)
 			_setup_checkbox(checkbox)
 			_style_checkbox(checkbox, bool(property_value))
-			checkbox.toggled.connect(func(pressed: bool): service.set_card_property(current_session, property_name, pressed); _refresh_editor_panels())
+			checkbox.toggled.connect(func(pressed: bool):
+				service.set_card_property(current_session, property_name, pressed)
+				_request_editor_panels_refresh()
+			)
 			wrapper.add_child(checkbox)
 		"enum":
 			var dropdown := OptionButton.new()
@@ -534,7 +671,7 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 					break
 			dropdown.item_selected.connect(func(index: int):
 				service.set_card_property(current_session, property_name, dropdown.get_item_metadata(index))
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			dropdown.tooltip_text = description
 			wrapper.add_child(dropdown)
@@ -546,7 +683,7 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			spin.value = float(property_value)
 			spin.value_changed.connect(func(value: float):
 				service.set_card_property(current_session, property_name, int(value))
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			spin.tooltip_text = description
 			wrapper.add_child(spin)
@@ -558,7 +695,7 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			text_edit.tooltip_text = description
 			text_edit.focus_exited.connect(func():
 				service.set_card_property(current_session, property_name, text_edit.text)
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			wrapper.add_child(text_edit)
 		"string_array":
@@ -569,11 +706,11 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			line_edit.tooltip_text = description
 			line_edit.text_submitted.connect(func(_text: String):
 				service.set_card_property(current_session, property_name, _parse_csv_strings(line_edit.text))
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			line_edit.focus_exited.connect(func():
 				service.set_card_property(current_session, property_name, _parse_csv_strings(line_edit.text))
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			wrapper.add_child(line_edit)
 		"array":
@@ -586,7 +723,7 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 				var parsed_value: Variant = JSON.parse_string(text_edit.text)
 				if parsed_value != null:
 					service.set_card_property(current_session, property_name, parsed_value)
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			wrapper.add_child(text_edit)
 		_:
@@ -596,11 +733,11 @@ func _build_property_editor(property_name: String, field_definition: Dictionary)
 			line_edit.tooltip_text = description
 			line_edit.text_submitted.connect(func(new_text: String):
 				service.set_card_property(current_session, property_name, new_text)
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			line_edit.focus_exited.connect(func():
 				service.set_card_property(current_session, property_name, line_edit.text)
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			)
 			wrapper.add_child(line_edit)
 	return wrapper
@@ -659,7 +796,7 @@ func _build_card_color_editor(property_name: String, current_color_id: String, d
 		if selected_color_id == null:
 			return
 		service.set_card_property(current_session, property_name, str(selected_color_id))
-		_refresh_editor_panels()
+		_request_editor_panels_refresh()
 	)
 	return dropdown
 
@@ -667,6 +804,10 @@ func _build_card_values_editor(property_name: String, dictionary_value: Dictiona
 	var wrapper := VBoxContainer.new()
 	wrapper.add_theme_constant_override("separation", 8)
 	var definitions: Dictionary[String, Dictionary] = service.get_card_value_definitions()
+	var suggested_keys: Array[String] = _collect_card_value_suggestions()
+	var used_key_lookup: Dictionary = {}
+	for suggested_key: String in suggested_keys:
+		used_key_lookup[suggested_key] = true
 	var suggestion_panel := PanelContainer.new()
 	var suggestion_padding := MarginContainer.new()
 	suggestion_padding.add_theme_constant_override("margin_left", 8)
@@ -680,16 +821,11 @@ func _build_card_values_editor(property_name: String, dictionary_value: Dictiona
 	var suggestion_label := Label.new()
 	suggestion_label.text = "Suggested entries for this card"
 	suggestion_vbox.add_child(suggestion_label)
-	var description_keys: Array[String] = _collect_description_placeholders()
-	var action_keys: Array[String] = _collect_action_value_suggestions()
-	var description_text := Label.new()
-	description_text.text = "Description placeholders: %s" % (", ".join(description_keys) if not description_keys.is_empty() else "none detected")
-	description_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	suggestion_vbox.add_child(description_text)
-	var action_text := Label.new()
-	action_text.text = "Action value keys in use: %s" % (", ".join(action_keys) if not action_keys.is_empty() else "none detected")
-	action_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	suggestion_vbox.add_child(action_text)
+	var missing_suggested_keys: Array[String] = []
+	for suggested_key: String in suggested_keys:
+		if not dictionary_value.has(suggested_key):
+			missing_suggested_keys.append(suggested_key)
+	suggestion_vbox.add_child(_build_card_value_suggestion_row(property_name, missing_suggested_keys, definitions))
 	wrapper.add_child(suggestion_panel)
 	var sorted_keys: Array[String] = []
 	for dictionary_key: Variant in dictionary_value.keys():
@@ -700,11 +836,33 @@ func _build_card_values_editor(property_name: String, dictionary_value: Dictiona
 		empty_label.text = "No card values configured."
 		wrapper.add_child(empty_label)
 	for key_name: String in sorted_keys:
-		wrapper.add_child(_build_card_value_row(property_name, key_name, dictionary_value.get(key_name), definitions.get(key_name, {})))
+		wrapper.add_child(_build_card_value_row(property_name, key_name, dictionary_value.get(key_name), definitions.get(key_name, {}), bool(used_key_lookup.get(key_name, false))))
 	wrapper.add_child(_build_card_value_add_panel(property_name, dictionary_value, definitions))
 	return wrapper
 
-func _build_card_value_row(property_name: String, key_name: String, current_value: Variant, definition: Dictionary) -> Control:
+func _build_card_value_suggestion_row(property_name: String, suggested_keys: Array[String], definitions: Dictionary[String, Dictionary]) -> Control:
+	if suggested_keys.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "All detected suggestions are already present."
+		empty_label.modulate = Color(0.76, 0.8, 0.88, 0.95)
+		return empty_label
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 6)
+	flow.add_theme_constant_override("v_separation", 6)
+	for key_name: String in suggested_keys:
+		var definition: Dictionary = definitions.get(key_name, {})
+		var button := Button.new()
+		button.text = str(definition.get("label", key_name))
+		button.tooltip_text = "%s (%s)" % [key_name, str(definition.get("description", "Suggested from this card's description or actions."))]
+		button.button_up.connect(func():
+			var resolved_definition: Dictionary = definitions.get(key_name, {})
+			if service.set_dictionary_value(current_session, property_name, key_name, resolved_definition.get("default_value", null)):
+				_request_editor_panels_refresh()
+		)
+		flow.add_child(button)
+	return flow
+
+func _build_card_value_row(property_name: String, key_name: String, current_value: Variant, definition: Dictionary, is_referenced: bool) -> Control:
 	var panel := PanelContainer.new()
 	var padding := MarginContainer.new()
 	padding.add_theme_constant_override("margin_left", 8)
@@ -725,6 +883,11 @@ func _build_card_value_row(property_name: String, key_name: String, current_valu
 	title_label.text = display_label
 	title_label.add_theme_font_size_override("font_size", 14)
 	title_box.add_child(title_label)
+	if not is_referenced:
+		var stale_label := Label.new()
+		stale_label.text = "Not referenced by current description/actions"
+		stale_label.modulate = Color(0.95, 0.78, 0.48, 0.98)
+		title_box.add_child(stale_label)
 	var meta_label := Label.new()
 	var value_type: String = str(definition.get("value_type", _infer_variant_type(current_value)))
 	meta_label.text = "%s | %s" % [key_name, value_type]
@@ -748,7 +911,7 @@ func _build_card_value_row(property_name: String, key_name: String, current_valu
 				key_edit.text = key_name
 				return
 			if service.rename_dictionary_key(current_session, property_name, key_name, renamed_key):
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 			else:
 				key_edit.text = key_name
 		)
@@ -759,14 +922,14 @@ func _build_card_value_row(property_name: String, key_name: String, current_valu
 		type_option.item_selected.connect(func(_index: int):
 			var next_type: String = str(_get_option_button_value(type_option))
 			if service.set_dictionary_value(current_session, property_name, key_name, _coerce_variant_value(current_value, next_type)):
-				_refresh_editor_panels()
+				_request_editor_panels_refresh()
 		)
 		header.add_child(type_option)
 	var remove_button := Button.new()
 	remove_button.text = "Remove"
 	remove_button.button_up.connect(func():
 		if service.remove_dictionary_value(current_session, property_name, key_name):
-			_refresh_editor_panels()
+			_request_editor_panels_refresh()
 	)
 	header.add_child(remove_button)
 	row.add_child(header)
@@ -783,7 +946,7 @@ func _build_card_value_value_editor(property_name: String, key_name: String, cur
 			_style_checkbox(checkbox, checkbox.button_pressed)
 			checkbox.toggled.connect(func(pressed: bool):
 				if service.set_dictionary_value(current_session, property_name, key_name, pressed):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			return checkbox
 		"int":
@@ -794,7 +957,7 @@ func _build_card_value_value_editor(property_name: String, key_name: String, cur
 			int_spin.value = float(current_value if current_value != null else 0)
 			int_spin.value_changed.connect(func(value: float):
 				if service.set_dictionary_value(current_session, property_name, key_name, int(value)):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			return int_spin
 		"float":
@@ -805,7 +968,7 @@ func _build_card_value_value_editor(property_name: String, key_name: String, cur
 			float_spin.value = float(current_value if current_value != null else 0)
 			float_spin.value_changed.connect(func(value: float):
 				if service.set_dictionary_value(current_session, property_name, key_name, value):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			return float_spin
 		"enum":
@@ -824,7 +987,7 @@ func _build_card_value_value_editor(property_name: String, key_name: String, cur
 					break
 			dropdown.item_selected.connect(func(option_index: int):
 				if service.set_dictionary_value(current_session, property_name, key_name, dropdown.get_item_metadata(option_index)):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			return dropdown
 		_:
@@ -833,11 +996,11 @@ func _build_card_value_value_editor(property_name: String, key_name: String, cur
 			line_edit.text = "" if current_value == null else str(current_value)
 			line_edit.text_submitted.connect(func(new_text: String):
 				if service.set_dictionary_value(current_session, property_name, key_name, _coerce_string_parameter(new_text, value_type)):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			line_edit.focus_exited.connect(func():
 				if service.set_dictionary_value(current_session, property_name, key_name, _coerce_string_parameter(line_edit.text, value_type)):
-					_refresh_editor_panels()
+					_request_editor_panels_refresh()
 			)
 			return line_edit
 
@@ -1001,7 +1164,9 @@ func _build_dictionary_row(property_name: String, key_name: String, current_valu
 	return panel
 
 func _render_behavior() -> void:
+	behavior_render_queued = false
 	for child in behavior_container.get_children():
+		behavior_container.remove_child(child)
 		child.queue_free()
 	if current_session == null or current_session.working_card_data == null:
 		return
@@ -1017,7 +1182,7 @@ func _render_behavior() -> void:
 		show_secondary_behavior_groups,
 		func():
 			show_secondary_behavior_groups = not show_secondary_behavior_groups
-			_render_behavior()
+			_request_behavior_render()
 	)
 	behavior_container.add_child(secondary_toggle)
 	if show_secondary_behavior_groups:
@@ -1050,7 +1215,7 @@ func _build_entry_group(property_name: String, is_action: bool) -> Control:
 	collapse_button.text = COLLAPSED_ARROW if collapsed_behavior_groups.get(property_name, false) else EXPANDED_ARROW
 	collapse_button.button_up.connect(func():
 		collapsed_behavior_groups[property_name] = not bool(collapsed_behavior_groups.get(property_name, false))
-		_render_behavior()
+		_request_behavior_render()
 	)
 	header.add_child(collapse_button)
 	vbox.add_child(header)
@@ -1110,7 +1275,7 @@ func _build_entry_editor(property_name: String, index: int, entry: Dictionary, i
 	collapse_button.text = COLLAPSED_ARROW if collapsed_behavior_entries.get(entry_key, false) else EXPANDED_ARROW
 	collapse_button.button_up.connect(func():
 		collapsed_behavior_entries[entry_key] = not bool(collapsed_behavior_entries.get(entry_key, false))
-		_render_behavior()
+		_request_behavior_render()
 	)
 	toolbar.add_child(collapse_button)
 	var up_button := Button.new()
@@ -1424,16 +1589,21 @@ func _apply_split_layout() -> void:
 	if not visible:
 		return
 	var total_width: float = body_split.size.x
-	if total_width > 960:
-		var library_width: int = int(total_width * 0.22)
-		var preview_width: int = int(total_width * 0.26)
-		var second_split: int = max(library_width + 320, int(total_width - preview_width))
-		body_split.set("split_offsets", PackedInt32Array([library_width, second_split]))
-	var editor_width: float = editor_split.size.x
-	if editor_width > 480:
-		editor_split.split_offset = int(editor_width * 0.42)
+	if total_width > 960 and not library_panel_collapsed and (not editor_panel_collapsed or not preview_panel_collapsed):
+		body_split.split_offset = _get_body_split_offset(int(total_width))
+	var middle_width: float = editor_split.size.x
+	if not editor_panel_collapsed and middle_width > 480:
+		editor_split.split_offset = int(middle_width * 0.42)
 	if is_instance_valid(library_sections):
 		call_deferred("_render_library_sections")
+
+func _get_body_split_offset(total_width: int) -> int:
+	var target_library_width: int = int(total_width * 0.16)
+	target_library_width = max(target_library_width, LIBRARY_PANEL_MIN_WIDTH)
+	var max_library_width: int = total_width - (PREVIEW_PANEL_MIN_WIDTH if not preview_panel_collapsed else 0) - (EDITOR_PANEL_MIN_WIDTH if not editor_panel_collapsed else 0)
+	if max_library_width < LIBRARY_PANEL_MIN_WIDTH:
+		max_library_width = LIBRARY_PANEL_MIN_WIDTH
+	return min(target_library_width, max_library_width)
 
 func _render_library_sections() -> void:
 	for child in library_sections.get_children():
@@ -1642,7 +1812,7 @@ func _build_advanced_parameter_toggle(property_name: String, index: int, token: 
 	toggle_button.text = "Hide advanced fields" if bool(expanded_entry_parameters.get(entry_key, false)) else "Show advanced fields"
 	toggle_button.button_up.connect(func():
 		expanded_entry_parameters[entry_key] = not bool(expanded_entry_parameters.get(entry_key, false))
-		_render_behavior()
+		_request_behavior_render()
 	)
 	wrapper.add_child(toggle_button)
 	if not bool(expanded_entry_parameters.get(entry_key, false)):
@@ -1681,8 +1851,14 @@ func _refresh_after_behavior_change() -> void:
 	_refresh_overview()
 
 func _refresh_after_behavior_structure_change() -> void:
-	_render_behavior()
+	_request_behavior_render()
 	_refresh_after_behavior_change()
+
+func _request_behavior_render() -> void:
+	if behavior_render_queued:
+		return
+	behavior_render_queued = true
+	call_deferred("_render_behavior")
 
 func _build_string_array_parameter_editor(property_name: String, index: int, parameter_name: String, current_value: Variant, placeholder_text: String) -> Control:
 	var line_edit := LineEdit.new()
@@ -2606,18 +2782,33 @@ func _collect_action_value_suggestions() -> Array[String]:
 func _property_label(property_name: String, field_definition: Dictionary) -> String:
 	if property_name == "card_requires_target":
 		return "Needs Clicked Target"
+	if property_name == "card_clicked_target_mode":
+		return "Clicked Target Mode"
 	return str(field_definition.get("label", property_name))
 
 func _property_description(property_name: String, field_definition: Dictionary) -> String:
 	if property_name == "card_requires_target":
-		return "Turn this on only if the player must click an enemy or combatant when playing the card. Leave it off for self-buffs, draw, block, or effects that pick their own targets."
+		return "Turn this on only if the player must click a combatant when playing the card. Leave it off for self-buffs, draw, block, or effects that pick their own targets."
+	if property_name == "card_clicked_target_mode":
+		return "When clicked targeting is enabled, this decides whether the card may click enemies only, allies only, or any combatant."
 	return str(field_definition.get("description", ""))
+
+func _format_clicked_target_mode(target_mode: String) -> String:
+	match target_mode:
+		CardData.CARD_TARGET_MODE_ALLY_ONLY:
+			return "ally"
+		CardData.CARD_TARGET_MODE_ANY_COMBATANT:
+			return "combatant"
+		_:
+			return "enemy"
 
 func _populate_group_options() -> void:
 	_populate_option_button(action_group_option, _property_group_options(CardEditorSchema.get_action_property_names()))
 	_populate_option_button(validator_group_option, _property_group_options(CardEditorSchema.get_validator_property_names()))
 
 func _populate_preset_options() -> void:
+	if preset_option == null:
+		return
 	var options: Array[Dictionary] = []
 	for preset: Dictionary in service.list_presets():
 		options.append({
@@ -2934,7 +3125,7 @@ func _on_duplicate_button_up() -> void:
 	_refresh_editor_panels()
 
 func _on_apply_preset_button_up() -> void:
-	if current_session == null:
+	if current_session == null or preset_option == null:
 		return
 	var preset_id: Variant = _get_option_button_value(preset_option)
 	if preset_id == null:
