@@ -3,20 +3,20 @@ extends Control
 class_name CardEditorScreen
 
 const PROPERTY_GROUP_LABELS := {
+	"card_play_validators": "Play Validators",
+	"card_glow_validators": "Glow Validators",
 	"card_play_actions": "Play Actions",
-	"card_additional_actions": "Additional Actions",
+	"card_additional_actions": "Internal Actions",
+	"card_right_click_actions": "Right Click Actions",
 	"card_discard_actions": "Discard Actions",
 	"card_end_of_turn_actions": "End Of Turn Actions",
 	"card_exhaust_actions": "Exhaust Actions",
 	"card_draw_actions": "Draw Actions",
 	"card_retain_actions": "Retain Actions",
-	"card_right_click_actions": "Right Click Actions",
 	"card_initial_combat_actions": "Initial Combat Actions",
 	"card_add_to_deck_actions": "Add To Deck Actions",
 	"card_remove_from_deck_actions": "Remove From Deck Actions",
 	"card_transform_in_deck_actions": "Transform In Deck Actions",
-	"card_play_validators": "Play Validators",
-	"card_glow_validators": "Glow Validators",
 }
 const COLLAPSED_ARROW := "Show"
 const EXPANDED_ARROW := "Hide"
@@ -86,12 +86,12 @@ const ADVANCED_FIELD_GROUPS := [
 	},
 ]
 const PRIMARY_BEHAVIOR_GROUPS := [
-	"card_play_actions",
 	"card_play_validators",
 	"card_glow_validators",
-	"card_right_click_actions",
+	"card_play_actions",
 ]
 const SECONDARY_BEHAVIOR_GROUPS := [
+	"card_right_click_actions",
 	"card_discard_actions",
 	"card_end_of_turn_actions",
 	"card_exhaust_actions",
@@ -103,10 +103,10 @@ const SECONDARY_BEHAVIOR_GROUPS := [
 	"card_transform_in_deck_actions",
 ]
 const BEHAVIOR_GROUP_DESCRIPTIONS := {
-	"card_play_actions": "What the card does when played.",
-	"card_additional_actions": "Reusable child actions referenced by action parameters. These do not run unless another action points to them.",
 	"card_play_validators": "Rules that block the card from being played.",
 	"card_glow_validators": "Rules that make the card light up without blocking play.",
+	"card_play_actions": "What the card does when played.",
+	"card_additional_actions": "Reusable child actions referenced by other actions. These are internal helpers and do not run unless another action points to them.",
 	"card_right_click_actions": "Optional utility behavior while the card is in hand.",
 	"card_discard_actions": "Triggered only by manual discard effects.",
 	"card_end_of_turn_actions": "Triggered while the card remains in hand at turn end.",
@@ -134,7 +134,6 @@ const PREVIEW_PANEL_MIN_WIDTH := 300
 
 @onready var title_screen: Control = get_parent() as Control
 @onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
-@onready var screen_subtitle: Label = $MainContainer/Header/ScreenSummary/ScreenSubtitle
 @onready var status_banner: Label = $MainContainer/Header/ScreenSummary/StatusBanner
 @onready var header_container: VBoxContainer = $MainContainer/Header
 @onready var library_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/LibraryCountLabel
@@ -217,7 +216,6 @@ func _ready() -> void:
 	_bind_optional_header_nodes()
 	visible = not _is_embedded_in_title_screen()
 	screen_title.text = "Card Workshop"
-	screen_subtitle.text = "Build cards without fighting the editor."
 	diagnostics_text.bbcode_enabled = true
 	diagnostics_text.fit_content = true
 	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
@@ -359,7 +357,6 @@ func _render_inspector() -> void:
 
 func _compact_header_layout() -> void:
 	screen_title.add_theme_font_size_override("font_size", 24)
-	screen_subtitle.visible = false
 	status_banner.visible = false
 	button_row.visible = false
 	if is_instance_valid(target_filter):
@@ -1180,8 +1177,8 @@ func _render_behavior() -> void:
 		behavior_container.add_child(_build_entry_group(property_name, not property_name.contains("validators")))
 	behavior_container.add_child(_build_additional_action_group())
 	var secondary_toggle := _build_simple_toggle_row(
-		"Triggered and deck hooks",
-		"Discard, draw, retain, and deck-change hooks are usually niche. Open them only when the card needs them.",
+		"Internal and triggered hooks",
+		"Internal actions, right-click behavior, and discard/draw/deck hooks are usually niche. Open them only when the card needs them.",
 		show_secondary_behavior_groups,
 		func():
 			show_secondary_behavior_groups = not show_secondary_behavior_groups
@@ -1280,7 +1277,7 @@ func _build_additional_action_group() -> Control:
 		return panel
 	if entries.is_empty():
 		var no_entries := Label.new()
-		no_entries.text = "No additional actions yet. Use an action parameter's Add Action button to create one."
+		no_entries.text = "No internal actions yet. Use an action parameter's Add Action button to create one."
 		no_entries.modulate = Color(0.78, 0.8, 0.84, 0.9)
 		vbox.add_child(no_entries)
 		return panel
@@ -3163,20 +3160,22 @@ func _collect_action_value_suggestions() -> Array[String]:
 	var suggestions: Array[String] = []
 	if current_session == null or current_session.working_card_data == null:
 		return suggestions
+	var card_value_definitions: Dictionary[String, Dictionary] = service.get_card_value_definitions()
 	for property_name: String in CardEditorSchema.get_action_property_names():
 		for entry: Dictionary in current_session.working_card_data.get(property_name):
 			if entry.is_empty():
 				continue
 			var token: String = str(entry.keys()[0])
 			var metadata: Dictionary = service.get_action_metadata(token)
-			for parameter_data: Dictionary in metadata.get("parameters", []):
-				var parameter_name: String = str(parameter_data.get("name", ""))
-				if parameter_name == "" or parameter_name == "target_override":
+			var relevant_value_names: Array[String] = []
+			relevant_value_names.assign(metadata.get("relevant_value_names", []))
+			for value_name: String in relevant_value_names:
+				if value_name == "":
 					continue
-				if parameter_name.begins_with("card_") or parameter_name.begins_with("picked_") or parameter_name.ends_with("_id") or parameter_name.ends_with("_ids") or parameter_name.contains("action_data") or parameter_name == "validator_data":
+				if not card_value_definitions.has(value_name):
 					continue
-				if not suggestions.has(parameter_name):
-					suggestions.append(parameter_name)
+				if not suggestions.has(value_name):
+					suggestions.append(value_name)
 	return suggestions
 
 func _property_label(property_name: String, field_definition: Dictionary) -> String:

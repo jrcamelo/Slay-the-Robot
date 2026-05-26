@@ -45,7 +45,6 @@ text = "Card Workshop"
 visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Build cards without fighting the editor."
 autowrap_mode = 2
 
 [node name="StatusBanner" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100004]
@@ -53,7 +52,6 @@ visible = false
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Started a new triage session. Use a preset or open a library card to begin."
 autowrap_mode = 2
 
 [node name="StatsRow" type="HBoxContainer" parent="MainContainer/Header/ScreenSummary" unique_id=100100005]
