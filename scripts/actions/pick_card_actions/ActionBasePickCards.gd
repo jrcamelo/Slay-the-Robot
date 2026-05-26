@@ -6,6 +6,25 @@
 extends BaseAsyncAction
 class_name ActionBasePickCards
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [
+		ActionValueRegistry.CARD_PICK_TYPE,
+		ActionValueRegistry.CARD_PICK_TEXT,
+		ActionValueRegistry.MIN_CARD_AMOUNT,
+		ActionValueRegistry.MAX_CARD_AMOUNT,
+		ActionValueRegistry.MIN_CARDS_ARE_REQUIRED_FOR_ACTION,
+		ActionValueRegistry.PICKABLE_CARDS_MAX_AMOUNT,
+		ActionValueRegistry.QUICK_PICK,
+		ActionValueRegistry.RANDOM_SELECTION,
+		ActionValueRegistry.PICK_DRAFT_CARDS,
+		ActionValueRegistry.DRAFT_FROM_CARD_POOL,
+		ActionValueRegistry.DRAFT_CARD_PACK_ID,
+		ActionValueRegistry.DRAFT_USE_PLAYER_DRAFT,
+		ActionValueRegistry.DRAFT_IS_WEIGHTED,
+		ActionValueRegistry.DRAFT_USE_PITY_SYSTEM,
+		ActionValueRegistry.DRAFT_MAX_CARD_AMOUNT,
+	]
+
 ## The final cards picked automatically or by the player. Child actions of this will typically use
 ## this value.
 var picked_cards: Array[CardData] = []
@@ -46,7 +65,7 @@ func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	var parameter_definitions: Array[Dictionary] = super()
 	parameter_definitions.append(
 		_editor_param(
-			"card_pick_type",
+			ActionValueRegistry.CARD_PICK_TYPE,
 			"Card Pick Type",
 			"enum",
 			CARD_PICK_TYPES.HAND,
@@ -66,23 +85,22 @@ func _get_editor_parameter_definitions() -> Array[Dictionary]:
 			}
 		)
 	)
-	parameter_definitions.append(_editor_param("card_pick_text", "Card Pick Text", "string", "Choose {0} card(s). {1} cards selected", "UI prompt shown during selection."))
-	parameter_definitions.append(_editor_param("min_card_amount", "Minimum Cards", "int", 0, "Minimum number of cards that must be picked."))
-	parameter_definitions.append(_editor_param("max_card_amount", "Maximum Cards", "int", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX, "Maximum number of cards the player can pick."))
-	parameter_definitions.append(_editor_param("min_cards_are_required_for_action", "Require Minimum Cards", "bool", false, "If true and not enough cards are available, the action does nothing."))
-	parameter_definitions.append(_editor_param("pickable_cards_max_amount", "Pickable Cards Max", "int", -1, "Restricts the number of cards exposed after filtering."))
-	parameter_definitions.append(_editor_param("quick_pick", "Quick Pick", "bool", true, "Auto-confirms once the maximum allowed cards have been selected."))
-	parameter_definitions.append(_editor_param("random_selection", "Random Selection", "bool", false, "Selects cards automatically instead of prompting the user."))
-	parameter_definitions.append(_editor_param("rng_name", "RNG Name", "string", "rng_card_picking", "RNG track used for random card selection."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.CARD_PICK_TEXT, "Card Pick Text", "string", "Choose {0} card(s). {1} cards selected", "UI prompt shown during selection."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.MIN_CARD_AMOUNT, "Minimum Cards", "int", 0, "Minimum number of cards that must be picked."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.MAX_CARD_AMOUNT, "Maximum Cards", "int", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX, "Maximum number of cards the player can pick."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.MIN_CARDS_ARE_REQUIRED_FOR_ACTION, "Require Minimum Cards", "bool", false, "If true and not enough cards are available, the action does nothing."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.PICKABLE_CARDS_MAX_AMOUNT, "Pickable Cards Max", "int", -1, "Restricts the number of cards exposed after filtering."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.QUICK_PICK, "Quick Pick", "bool", true, "Auto-confirms once the maximum allowed cards have been selected."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.RANDOM_SELECTION, "Random Selection", "bool", false, "Selects cards automatically instead of prompting the user."))
 	parameter_definitions.append(_editor_param("validator_data", "Validator Data", "validator_array", [], "Validators used to narrow pickable cards."))
-	parameter_definitions.append(_editor_param("pick_draft_cards", "Pick Draft Cards", "bool", false, "Uses provided draft cards instead of reading from a pile."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.PICK_DRAFT_CARDS, "Pick Draft Cards", "bool", false, "Uses provided draft cards instead of reading from a pile."))
 	parameter_definitions.append(_editor_param("draft_cards", "Draft Cards", "card_array", [], "Explicit cards to present in draft mode."))
-	parameter_definitions.append(_editor_param("draft_from_card_pool", "Draft From Card Pool", "bool", false, "Generates draft choices from the broader card pool."))
-	parameter_definitions.append(_editor_param("draft_card_pack_id", "Draft Card Pack ID", "string", "", "Card pack to draft from, if any."))
-	parameter_definitions.append(_editor_param("draft_use_player_draft", "Use Player Draft Pool", "bool", false, "Uses the player's draft-eligible card pool."))
-	parameter_definitions.append(_editor_param("draft_is_weighted", "Weighted Draft", "bool", false, "Uses rarity weighting when drafting from the player's pool."))
-	parameter_definitions.append(_editor_param("draft_use_pity_system", "Use Pity System", "bool", false, "Applies the player's pity system for rare drafts."))
-	parameter_definitions.append(_editor_param("draft_max_card_amount", "Draft Max Cards", "int", 3, "Maximum number of generated draft cards."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_FROM_CARD_POOL, "Draft From Card Pool", "bool", false, "Generates draft choices from the broader card pool."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_CARD_PACK_ID, "Draft Card Pack ID", "string", "", "Card pack to draft from, if any."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_USE_PLAYER_DRAFT, "Use Player Draft Pool", "bool", false, "Uses the player's draft-eligible card pool."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_IS_WEIGHTED, "Weighted Draft", "bool", false, "Uses rarity weighting when drafting from the player's pool."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_USE_PITY_SYSTEM, "Use Pity System", "bool", false, "Applies the player's pity system for rare drafts."))
+	parameter_definitions.append(_editor_param(ActionValueRegistry.DRAFT_MAX_CARD_AMOUNT, "Draft Max Cards", "int", 3, "Maximum number of generated draft cards."))
 	return parameter_definitions
 
 func _assign_generated_card_owners(cards: Array[CardData]) -> Array[CardData]:
@@ -113,7 +131,7 @@ func get_card_pick_text() -> String:
 	var remaining_card_amount: int = max_card_amount - picked_card_amount
 	var pickable_cards_max_amount: int = get_pickable_cards_max_amount()
 	
-	var card_pick_text: String = get_action_value("card_pick_text", "Choose {0} card(s). {1} cards selected")
+	var card_pick_text: String = get_action_value(ActionValueRegistry.CARD_PICK_TEXT, "Choose {0} card(s). {1} cards selected")
 	var returned_text: String = card_pick_text.format([max_card_amount, picked_card_amount, remaining_card_amount, pickable_cards_max_amount])
 	return returned_text
 
@@ -130,7 +148,7 @@ func get_input_cardset() -> Array[CardData]:
 	
 	# can inject cards to select from via draft_cards
 	# useful for RewardOverlay which pre-generates card rewards
-	var pick_draft_cards: bool = get_action_value("pick_draft_cards", false)
+	var pick_draft_cards: bool = get_action_value(ActionValueRegistry.PICK_DRAFT_CARDS, false)
 	if pick_draft_cards:
 		var draft_cards: Array[CardData] = []
 		draft_cards.assign(get_action_value("draft_cards", []))
@@ -142,7 +160,7 @@ func get_input_cardset() -> Array[CardData]:
 	
 	# can generate random cards to pick from
 	# mainly useful for combat
-	var draft_from_card_pool: bool = get_action_value("draft_from_card_pool", false)
+	var draft_from_card_pool: bool = get_action_value(ActionValueRegistry.DRAFT_FROM_CARD_POOL, false)
 
 	if draft_from_card_pool:
 		return get_drafted_cards()
@@ -157,7 +175,7 @@ func perform_action():
 	
 	# card selection params
 	var min_cards_are_required: bool = get_min_cards_are_required_for_action()
-	var random_selection: bool = get_action_value("random_selection", false) 	# to select the cards randomly without player input
+	var random_selection: bool = get_action_value(ActionValueRegistry.RANDOM_SELECTION, false) 	# to select the cards randomly without player input
 	var min_card_amount: int = get_card_pick_min_amount()
 	
 	if len(pickable_cards) < min_card_amount:
@@ -183,8 +201,7 @@ func perform_action():
 		# more than min cards
 		if random_selection:
 			# automatically randomly select the cards
-			var rng_name: String = get_action_value("rng_name", "rng_card_picking")
-			var rng_card_picking: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)
+			var rng_card_picking: RandomNumberGenerator = Global.player_data.get_player_rng("rng_card_picking")
 			
 			# randomize card order and pick first X cards
 			pickable_cards = Random.shuffle_array(rng_card_picking, pickable_cards)
@@ -219,15 +236,14 @@ func get_drafted_cards() -> Array[CardData]:
 	# a specific card pack to use
 	# for complex queries you may wish to generate a card pack specific for the draft rather
 	# than narrowing from all cards with validators each time
-	var draft_card_pack_id: String = get_action_value("draft_card_pack_id", "")
+	var draft_card_pack_id: String = get_action_value(ActionValueRegistry.DRAFT_CARD_PACK_ID, "")
 	
 	# use the cards that the player is capable of drafting, from PlayerData
-	var draft_use_player_draft: bool = get_action_value("draft_use_player_draft", false)
+	var draft_use_player_draft: bool = get_action_value(ActionValueRegistry.DRAFT_USE_PLAYER_DRAFT, false)
 	
 	# randomize ordering and reduce to a max number of cards
-	var rng_name: String = get_action_value("rng_name", "rng_non_reward_card_drafting")
-	var rng_non_reward_card_drafting: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)
-	var draft_max_card_amount: int = get_action_value("draft_max_card_amount", 3) # 0 or negative for all cards. Use DECK card pick type for larger ui selections
+	var rng_non_reward_card_drafting: RandomNumberGenerator = Global.player_data.get_player_rng("rng_non_reward_card_drafting")
+	var draft_max_card_amount: int = get_action_value(ActionValueRegistry.DRAFT_MAX_CARD_AMOUNT, 3) # 0 or negative for all cards. Use DECK card pick type for larger ui selections
 	
 	if draft_card_pack_id != "":
 		#TODO support weighting for card pack based drafting
@@ -237,8 +253,8 @@ func get_drafted_cards() -> Array[CardData]:
 		# can be weighted or unweighted
 		# NOTE: validator_data should be empty for this kind of draft or it may break the
 		# draft once it hits get_pickable_cards() and runs the validator over them
-		var draft_probability_is_weighted: bool = get_action_value("draft_is_weighted", false)
-		var draft_use_pity_system: bool = get_action_value("draft_use_pity_system", false)
+		var draft_probability_is_weighted: bool = get_action_value(ActionValueRegistry.DRAFT_IS_WEIGHTED, false)
+		var draft_use_pity_system: bool = get_action_value(ActionValueRegistry.DRAFT_USE_PITY_SYSTEM, false)
 		if draft_probability_is_weighted:
 			filtered_card_draft = Random.generate_rarity_weighted_card_draft(rng_non_reward_card_drafting, draft_max_card_amount, Random.CARD_DRAFT_TABLE_TYPES.STANDARD, draft_use_pity_system, source_party_member)
 		else:
@@ -259,14 +275,14 @@ func get_drafted_cards() -> Array[CardData]:
 ## Validates if manual selection will automatically confirm when maximum number of cards are picked.
 ## Especially useful for when there's only 1 card.
 func is_quick_pick() -> bool:
-	var quick_pick: bool = get_action_value("quick_pick", true)
+	var quick_pick: bool = get_action_value(ActionValueRegistry.QUICK_PICK, true)
 	if quick_pick:
 		var picked_card_amount: int = len(picked_cards)
 		return len(picked_cards) >= get_card_pick_max_amount()
 	return false
 
 func get_card_pick_type() -> int:
-	return get_action_value("card_pick_type", CARD_PICK_TYPES.HAND)
+	return get_action_value(ActionValueRegistry.CARD_PICK_TYPE, CARD_PICK_TYPES.HAND)
 	
 func get_card_pick_validator_data() -> Array:
 	# returns validators applied to any cards the user can pick
@@ -274,19 +290,19 @@ func get_card_pick_validator_data() -> Array:
 
 ## The number of cards needed to be selected or the following actions will not be performed
 func get_min_cards_are_required_for_action() -> int:
-	return get_action_value("min_cards_are_required_for_action", false)
+	return get_action_value(ActionValueRegistry.MIN_CARDS_ARE_REQUIRED_FOR_ACTION, false)
 
 ## The minimum number of cards required for this card pick to be 
 func get_card_pick_min_amount() -> int:
-	return get_action_value("min_card_amount", 0)
+	return get_action_value(ActionValueRegistry.MIN_CARD_AMOUNT, 0)
 
 func get_card_pick_max_amount() -> int:
-	return get_action_value("max_card_amount", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
+	return get_action_value(ActionValueRegistry.MAX_CARD_AMOUNT, PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
 
 ## Gets how many cards are available after a card filter is applied. Useful for things like
 ## getting first X cards from top of discard/draw pile
 func get_pickable_cards_max_amount() -> int:
-	return get_action_value("pickable_cards_max_amount", -1)
+	return get_action_value(ActionValueRegistry.PICKABLE_CARDS_MAX_AMOUNT, -1)
 
 func get_pickable_cards() -> Array[CardData]:
 	# gets all cards that meet pickable criteria from a given input list of cards

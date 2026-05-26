@@ -3,8 +3,16 @@
 # see also ActionVariableCostModifiier
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.MULTIPLIED_VALUES, ActionValueRegistry.MULTIPLIED_VALUES_BASES, ActionValueRegistry.MULTIPLIER_OFFSET]
+
 func _get_editor_description() -> String:
 	return "Wraps child actions and scales selected values based on the size of an input card set."
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	return [
+		_editor_param("action_data", "Action Data", "array", [], "Additional actions generated after scaling their configured values."),
+	]
 
 func is_instant_action() -> bool:
 	return true
@@ -15,9 +23,9 @@ func perform_action():
 	for action_interceptor_processor in action_interceptor_processors:
 		var modified_action_data: Array[Dictionary] = []
 		var action_data = action_interceptor_processor.get_shadowed_action_values("action_data", [])
-		var multiplied_values: Array = action_interceptor_processor.get_shadowed_action_values("multiplied_values", [])	# the key names of the values of child actions multiplied by this action
-		var multiplier_offset: int = max(0, action_interceptor_processor.get_shadowed_action_values("multiplier_offset", 0))	# an additional amount to improve the multiplier by. Eg 1 would be X + 1. Must be positive
-		var multiplied_values_bases: Dictionary = action_interceptor_processor.get_shadowed_action_values("multiplied_values_bases", {})	# allows for a base value on top of modified values. eg Base + (X x Value)
+		var multiplied_values: Array = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MULTIPLIED_VALUES, [])	# the key names of the values of child actions multiplied by this action
+		var multiplier_offset: int = max(0, action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MULTIPLIER_OFFSET, 0))	# an additional amount to improve the multiplier by. Eg 1 would be X + 1. Must be positive
+		var multiplied_values_bases: Dictionary = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MULTIPLIED_VALUES_BASES, {})	# allows for a base value on top of modified values. eg Base + (X x Value)
 		
 		var picked_cards: Array[CardData] = _get_picked_cards()
 		var input_energy: int = len(picked_cards)

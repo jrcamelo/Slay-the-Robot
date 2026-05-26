@@ -1,13 +1,16 @@
 ## Interceptable action to use a consumable in a given slot
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.CONSUMABLE_SLOT_INDEX]
+
 func _get_editor_description() -> String:
 	return "Consumes the item in a given slot and executes that consumable's action payload."
 
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
-		var consumable_slot_index: int = action_interceptor_processor.get_shadowed_action_values("consumable_slot_index", 0)
+		var consumable_slot_index: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.CONSUMABLE_SLOT_INDEX, 0)
 		
 		var consumable_data: ConsumableData = Global.get_player_consumable_in_slot_index(consumable_slot_index)
 		if consumable_data != null:
@@ -27,5 +30,5 @@ func perform_action():
 		
 
 func _to_string():
-	var consumable_slot_index: int = get_action_value("consumable_slot_index", "")
+	var consumable_slot_index: int = get_action_value(ActionValueRegistry.CONSUMABLE_SLOT_INDEX, "")
 	return "Use Consumable Action: " + str(consumable_slot_index)

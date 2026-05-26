@@ -1,6 +1,9 @@
 ## Swaps the player's starting artifact(s) for the next available boss artifact.
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_description() -> String:
 	return "Replaces the player's starting artifacts with the next available boss artifact."
 

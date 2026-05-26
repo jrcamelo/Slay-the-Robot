@@ -6,5 +6,8 @@
 ## See: ActionCardPlayEnd for an action which is performed, signifying the end of a card play
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_description() -> String:
 	return "Synthetic pre-play action used only so interceptors and statuses can react to a card play starting."

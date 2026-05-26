@@ -3,6 +3,9 @@
 # See also: StatusEffectAttachedCard
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Attaches selected cards onto a single enemy as an attached-card style status payload."
 

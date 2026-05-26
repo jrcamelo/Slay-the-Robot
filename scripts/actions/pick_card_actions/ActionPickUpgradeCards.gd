@@ -5,11 +5,16 @@
 ## For more control you'll want to use validators and ActionUpgradeCards with ActionPickCards
 extends ActionBasePickCards
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	var relevant_value_names: Array[String] = super()
+	relevant_value_names.append(ActionValueRegistry.UPGRADE_PARENT_CARD)
+	return relevant_value_names
+
 func _get_editor_description() -> String:
 	return "Picks cards and upgrades them directly, optionally applying upgrades to permanent parent deck copies."
 
 func perform_async_action() -> void:
-	var upgrade_parent_card: bool = get_action_value("upgrade_parent_card", false) # This should be false if using CARD_PICK_TYPES.DECK
+	var upgrade_parent_card: bool = get_action_value(ActionValueRegistry.UPGRADE_PARENT_CARD, false) # This should be false if using CARD_PICK_TYPES.DECK
 	for card in picked_cards:
 		card.upgrade_card()
 		# potentially upgrade parent if it exists
@@ -20,8 +25,8 @@ func perform_async_action() -> void:
 
 func is_card_pickable(_card: CardData) -> bool:
 	# determine if cards can qualify for user upgrade selection
-	var max_card_amount: int = get_action_value("max_card_amount", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
-	var upgrade_parent_card: bool = get_action_value("upgrade_parent_card", false)	# This should be false if using CARD_PICK_TYPES.DECK
+	var max_card_amount: int = get_action_value(ActionValueRegistry.MAX_CARD_AMOUNT, PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
+	var upgrade_parent_card: bool = get_action_value(ActionValueRegistry.UPGRADE_PARENT_CARD, false)	# This should be false if using CARD_PICK_TYPES.DECK
 	
 	# determine to check the card or its parent
 	var card: CardData = _card

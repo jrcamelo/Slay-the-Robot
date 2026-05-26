@@ -2,6 +2,9 @@
 # NOTE: If action does nothing, ensure a target override of PARENT is provded
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.BLOCK]
+
 func _get_editor_description() -> String:
 	return "Adds block to each resolved target, or to the parent when Target Override is set to Parent."
 
@@ -21,9 +24,9 @@ func perform_action():
 		if target == null:
 			return
 
-		var block_amount: int = action_interceptor_processor.get_shadowed_action_values("block", 0)
+		var block_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BLOCK, 0)
 		target.add_block(block_amount)
 
 func _to_string():
-	var block: int = get_action_value("block", 0)
+	var block: int = get_action_value(ActionValueRegistry.BLOCK, 0)
 	return "Block Action: " + str(block)

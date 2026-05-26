@@ -5,6 +5,9 @@
 ## generation algorithms.
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.ACT_ID, ActionValueRegistry.ACT_NUMBER, ActionValueRegistry.FLOORS_PER_ACT, ActionValueRegistry.LOCATION_NON_COMBAT_EVENT_RATE, ActionValueRegistry.LOCATION_OBFUSCATION_RATE, ActionValueRegistry.LOCATIONS_PER_FLOOR]
+
 func _get_editor_description() -> String:
 	return "Generates a run map for an act, including floor counts, node spacing, obfuscation, and non-combat rates."
 
@@ -19,23 +22,22 @@ func perform_action() -> void:
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
 		### Set rng seed
-		var rng_name: String = action_interceptor_processor.get_shadowed_action_values("rng_name", "rng_world_generation") # allows using different rng
-		var rng_world_generation: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)
+		var rng_world_generation: RandomNumberGenerator = Global.player_data.get_player_rng("rng_world_generation")
 		
 		### Get the read only act data to determine additional generation
-		var act_id: String = get_action_value("act_id", "")
+		var act_id: String = get_action_value(ActionValueRegistry.ACT_ID, "")
 		var act_data: ActData = Global.get_act_data(act_id)
-		var act_number: int = get_action_value("act_number", Global.player_data.player_act)
+		var act_number: int = get_action_value(ActionValueRegistry.ACT_NUMBER, Global.player_data.player_act)
 		
 		## Set player act to new act
 		Global.player_data.player_act_id = act_id
 		Global.player_data.player_act = act_number
 		
 		### parameters of grid
-		var floors_per_act: int = action_interceptor_processor.get_shadowed_action_values("floors_per_act", 10)
-		var locations_per_floor: int = action_interceptor_processor.get_shadowed_action_values("locations_per_floor", 5)
-		var location_obfuscation_rate: float = action_interceptor_processor.get_shadowed_action_values("location_obfuscation_rate", 0.5) # how often locations will be obfuscated
-		var location_non_combat_event_rate: float = action_interceptor_processor.get_shadowed_action_values("location_non_combat_event_rate", 0.3) # how often locations will be a non combat event
+		var floors_per_act: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.FLOORS_PER_ACT, 10)
+		var locations_per_floor: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOCATIONS_PER_FLOOR, 5)
+		var location_obfuscation_rate: float = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOCATION_OBFUSCATION_RATE, 0.5) # how often locations will be obfuscated
+		var location_non_combat_event_rate: float = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOCATION_NON_COMBAT_EVENT_RATE, 0.3) # how often locations will be a non combat event
 		
 		var generate_start_node: bool = act_number == 1
 		const MIDDLE: int = 400

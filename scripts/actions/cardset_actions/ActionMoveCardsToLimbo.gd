@@ -3,6 +3,9 @@
 # re-uses banishment logic (see ActionBanishCards), but not counted as a "true" card banishment mechanically
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Moves selected cards into limbo so they are temporarily out of all normal combat piles."
 

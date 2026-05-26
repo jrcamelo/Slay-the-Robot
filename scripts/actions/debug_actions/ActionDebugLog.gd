@@ -1,6 +1,9 @@
 ## Logs a message to console
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.LOG_MESSAGE, ActionValueRegistry.LOG_MESSAGE_COLOR_HTML, ActionValueRegistry.LOG_SEVERITY]
+
 func _get_editor_description() -> String:
 	return "Writes a colored debug log line to the in-game debug logger."
 
@@ -17,10 +20,10 @@ func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([null])
 	
 	for action_interceptor_processor in action_interceptor_processors:
-		var log_message: String = action_interceptor_processor.get_shadowed_action_values("log_message", "")
-		var log_message_color_html: String = action_interceptor_processor.get_shadowed_action_values("log_message_color_html", Color.WHITE.to_html(true))
+		var log_message: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOG_MESSAGE, "")
+		var log_message_color_html: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOG_MESSAGE_COLOR_HTML, Color.WHITE.to_html(true))
 		var log_color: Color = Color(log_message_color_html, false)
-		var log_severity: int = action_interceptor_processor.get_shadowed_action_values("log_severity", DebugLogger.Severities.STANDARD)
+		var log_severity: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.LOG_SEVERITY, DebugLogger.Severities.STANDARD)
 		DebugLogger.log_line(log_message, log_color, log_severity)
 
 func is_instant_action() -> bool:

@@ -15,13 +15,11 @@ func _get_editor_contexts() -> Array[String]:
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	var parameters: Array[Dictionary] = super()
 	parameters.append(_editor_param("chance", "Chance", "float", 1.0, "Passes when a random roll is less than or equal to this value."))
-	parameters.append(_editor_param("rng_name", "RNG Name", "string", "rng_general", "RNG track used for the roll."))
 	return parameters
 
 func _validation(_card_data: CardData, _action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	var chance: float = values.get("chance", 1.0)
 	
-	var rng_name: String = values.get("rng_name", "rng_general")
-	var rng: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)	
+	var rng: RandomNumberGenerator = Global.player_data.get_player_rng("rng_general")	
 	
 	return chance >= rng.randf()

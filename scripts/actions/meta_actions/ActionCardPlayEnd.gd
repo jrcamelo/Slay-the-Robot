@@ -5,6 +5,9 @@
 ## and add to the action stack, without actually ending the processing of actions.
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_description() -> String:
 	return "Synthetic post-play action that signals the end of a card play."
 

@@ -1,14 +1,17 @@
 # Changes the energy cost values of given cards
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.CARD_ENERGY_COST, ActionValueRegistry.CARD_ENERGY_COST_UNTIL_COMBAT, ActionValueRegistry.CARD_ENERGY_COST_UNTIL_PLAYED, ActionValueRegistry.CARD_ENERGY_COST_UNTIL_TURN, ActionValueRegistry.PICK_PLAYED_CARD]
+
 func _get_editor_description() -> String:
 	return "Overwrites one or more energy cost layers on the selected cards."
 
 func perform_action() -> void:
-	var card_energy_cost: int = get_action_value("card_energy_cost", -1)
-	var card_energy_cost_until_combat: int = get_action_value("card_energy_cost_until_combat", -1)
-	var card_energy_cost_until_played: int = get_action_value("card_energy_cost_until_played", -1)
-	var card_energy_cost_until_turn: int = get_action_value("card_energy_cost_until_turn", -1)
+	var card_energy_cost: int = get_action_value(ActionValueRegistry.CARD_ENERGY_COST, -1)
+	var card_energy_cost_until_combat: int = get_action_value(ActionValueRegistry.CARD_ENERGY_COST_UNTIL_COMBAT, -1)
+	var card_energy_cost_until_played: int = get_action_value(ActionValueRegistry.CARD_ENERGY_COST_UNTIL_PLAYED, -1)
+	var card_energy_cost_until_turn: int = get_action_value(ActionValueRegistry.CARD_ENERGY_COST_UNTIL_TURN, -1)
 	
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	

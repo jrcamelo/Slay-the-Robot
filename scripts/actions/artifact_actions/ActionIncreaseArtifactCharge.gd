@@ -2,14 +2,17 @@
 ## instance of an artifact
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.ARTIFACT_CHARGE_INCREASE, ActionValueRegistry.ARTIFACT_ID]
+
 func _get_editor_description() -> String:
 	return "Increases or decreases charges on artifacts by id or on specific artifact instances."
 
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
-		var artifact_id: String = action_interceptor_processor.get_shadowed_action_values("artifact_id", "")
-		var artifact_charge_increase: int = action_interceptor_processor.get_shadowed_action_values("artifact_charge_increase", 1)
+		var artifact_id: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.ARTIFACT_ID, "")
+		var artifact_charge_increase: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.ARTIFACT_CHARGE_INCREASE, 1)
 		
 		# increment artifacts of a specific id (technically allows duplicates)
 		if artifact_id != "":
@@ -29,5 +32,5 @@ func is_instant_action() -> bool:
 	return true
 
 func _to_string():
-	var artifact_charge_increase: int = get_action_value("artifact_charge_increase", 0)
+	var artifact_charge_increase: int = get_action_value(ActionValueRegistry.ARTIFACT_CHARGE_INCREASE, 0)
 	return "Increase Artifact Charge Action" + str(artifact_charge_increase)

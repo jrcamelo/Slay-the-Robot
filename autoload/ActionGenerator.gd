@@ -20,6 +20,8 @@ func create_actions(_parent_combatant: BaseCombatant, _card_play_request: CardPl
 			
 			var action_values: Dictionary[String, Variant] = {}
 			action_values.assign(action_data[action_token]) # assign to force typed dict
+			if _card_play_request != null and _card_play_request.card_data != null:
+				action_values = _card_play_request.card_data.resolve_action_value_references(action_values)
 			
 			action.init(_parent_combatant, _card_play_request, _targets, action_values, _parent_action)
 			actions.append(action)

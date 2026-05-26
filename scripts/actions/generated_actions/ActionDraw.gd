@@ -2,13 +2,16 @@
 ## Intercept hand_card_count_max to change hand size max allowed for this action.
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.HAND_CARD_COUNT_MAX]
+
 func _get_editor_description() -> String:
 	return "Draws a single card, usually generated through Draw Generator."
 
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
-		var hand_card_count_max: int = action_interceptor_processor.get_shadowed_action_values("hand_card_count_max", PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
+		var hand_card_count_max: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HAND_CARD_COUNT_MAX, PlayerData.PLAYER_DEFAULT_HAND_CARD_COUNT_MAX)
 		Signals.card_draw_requested.emit(1, hand_card_count_max)
 
 func _to_string():

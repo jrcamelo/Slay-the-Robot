@@ -2,6 +2,9 @@
 # this only works if the event's event_enemy_placement_is_automatic flag is false and positions defined
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.NUMBER_OF_SPAWNS, ActionValueRegistry.RANDOM_ENEMY_OBJECT_IDS, ActionValueRegistry.SPAWN_SLOTS]
+
 func _get_editor_description() -> String:
 	return "Summons enemies into specific slots or from a random list of enemy ids."
 
@@ -18,12 +21,12 @@ func perform_action():
 	
 	for action_interceptor_processor in action_interceptor_processors:
 		# number of spawns
-		var number_of_spawns: int = action_interceptor_processor.get_shadowed_action_values("number_of_spawns", 1)
+		var number_of_spawns: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.NUMBER_OF_SPAWNS, 1)
 		# spawn slots that may be filled
 		var spawn_slots: Array[int] = []
-		spawn_slots.assign(action_interceptor_processor.get_shadowed_action_values("spawn_slots", []))
+		spawn_slots.assign(action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SPAWN_SLOTS, []))
 		# a list of enemy ids that could spawn
-		var random_enemy_object_ids: Array = action_interceptor_processor.get_shadowed_action_values("random_enemy_object_ids", []).duplicate()
+		var random_enemy_object_ids: Array = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.RANDOM_ENEMY_OBJECT_IDS, []).duplicate()
 		if len(random_enemy_object_ids) == 0:
 			push_error("No enemy type ids specified")
 			return
@@ -53,8 +56,7 @@ func perform_action():
 					enemy.queue_free()	# replace existing dead enemy
 			
 			# randomize enemy type
-			var rng_name: String = get_action_value("rng_name", "rng_enemy_spawning")
-			var rng_enemy_spawning: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)
+			var rng_enemy_spawning: RandomNumberGenerator = Global.player_data.get_player_rng("rng_enemy_spawning")
 			
 			random_enemy_object_ids = Random.shuffle_array(rng_enemy_spawning, random_enemy_object_ids)
 			

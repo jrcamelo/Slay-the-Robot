@@ -1,6 +1,9 @@
 ## Action that forces targeted enemies to cycle their attack intent
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_description() -> String:
 	return "Forces targeted enemies to reroll and refresh their intent."
 

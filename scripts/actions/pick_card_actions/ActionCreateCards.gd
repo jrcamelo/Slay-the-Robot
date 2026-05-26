@@ -3,6 +3,11 @@
 # Make sure to have child BaseCardSetAction(s) to actually do something such as add to hand
 extends ActionPickCards
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	var relevant_value_names: Array[String] = super()
+	relevant_value_names.append_array([ActionValueRegistry.CREATED_CARD_OBJECT_ID, ActionValueRegistry.NUMBER_OF_CARDS])
+	return relevant_value_names
+
 func _get_editor_description() -> String:
 	return "Generates fresh card instances instead of prompting the user, then passes them through the normal pick-card child action flow."
 
@@ -10,8 +15,8 @@ func perform_action():
 	# overrides user card selection with generating cards
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
-		var created_card_object_id: String = action_interceptor_processor.get_shadowed_action_values("created_card_object_id", "")
-		var number_of_cards: int = action_interceptor_processor.get_shadowed_action_values("number_of_cards", 0)
+		var created_card_object_id: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.CREATED_CARD_OBJECT_ID, "")
+		var number_of_cards: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.NUMBER_OF_CARDS, 0)
 		if created_card_object_id != "":
 			for i in number_of_cards:
 				var card_data: CardData = Global.get_card_data_from_prototype(created_card_object_id)

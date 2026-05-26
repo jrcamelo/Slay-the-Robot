@@ -1,6 +1,9 @@
 # Action to exhaust selected cards
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Exhausts the selected cards."
 

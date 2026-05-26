@@ -1,6 +1,9 @@
 # plays given cards
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Queues the selected cards to be played, usually against random or inherited targets."
 

@@ -4,6 +4,9 @@
 ## for use in interception logic.
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.DRAW_COUNT]
+
 func _get_editor_description() -> String:
 	return "Generates repeated draw actions from a single draw-count payload."
 
@@ -11,7 +14,7 @@ func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	
 	for action_interceptor_processor in action_interceptor_processors:
-		var draw_count: int = action_interceptor_processor.get_shadowed_action_values("draw_count", 1)
+		var draw_count: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DRAW_COUNT, 1)
 
 		var generated_draw_actions: Array[BaseAction] = []
 		for i in draw_count:
@@ -22,5 +25,5 @@ func perform_action():
 		ActionHandler.add_actions(generated_draw_actions)
 
 func _to_string():
-	var draw_count: int = get_action_value("draw_count", 1)
+	var draw_count: int = get_action_value(ActionValueRegistry.DRAW_COUNT, 1)
 	return "Draw Generator Action: " + str(draw_count)

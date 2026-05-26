@@ -20,6 +20,13 @@ const CARD_ARRAY_PROPERTIES := {
 	"card_play_validators": BaseValidator.EDITOR_CONTEXT_CARD_PLAY_VALIDATORS,
 	"card_glow_validators": BaseValidator.EDITOR_CONTEXT_CARD_GLOW_VALIDATORS,
 }
+const ADDITIONAL_ACTIONS_PROPERTY := "card_additional_actions"
+const ACTION_REFERENCE_PARAMETER_NAMES := {
+	"action_data": true,
+	"passed_action_data": true,
+	"failed_action_data": true,
+	"actions_on_lethal": true,
+}
 
 const TARGETED_ACTION_TOKENS := {
 	Scripts.ACTION_ATTACK: true,
@@ -129,6 +136,7 @@ func create_blank_session(
 	save_policy: String = CardEditorSession.SAVE_POLICY_MANAGED_TRIAGE
 ) -> CardEditorSession:
 	var card_data := CardData.new()
+	_migrate_nested_action_references(card_data)
 	var session := CardEditorSession.new(card_data, "", content_root, triage_root, save_policy)
 	session.recompute_managed_paths()
 	session.refresh_diagnostics(self)
@@ -163,6 +171,8 @@ func load_session(
 			resolved_save_policy = CardEditorSession.SAVE_POLICY_MANAGED_CONTENT
 	var session_card: CardData = (resource as CardData).duplicate(true)
 	var session := CardEditorSession.new(session_card, resource_path, content_root, triage_root, resolved_save_policy)
+	if _migrate_nested_action_references(session_card):
+		session.mark_dirty()
 	session.recompute_managed_paths()
 	session.refresh_diagnostics(self)
 	return session
@@ -181,6 +191,7 @@ func duplicate_session(
 	if source_session == null or source_session.working_card_data == null:
 		return null
 	var duplicated_card: CardData = source_session.working_card_data.duplicate(true)
+	_migrate_nested_action_references(duplicated_card)
 	var session := CardEditorSession.new(duplicated_card, "", content_root, triage_root, save_policy)
 	session.recompute_managed_paths()
 	session.mark_dirty()
@@ -221,6 +232,7 @@ func apply_preset_to_session(session: CardEditorSession, preset_id: String, pres
 		return false
 	var applied: bool = CardEditorPresets.apply_preset(session.working_card_data, preset_id, preserve_identity)
 	if applied:
+		_migrate_nested_action_references(session.working_card_data)
 		_after_card_mutation(session, "")
 	return applied
 
@@ -235,6 +247,9 @@ func get_card_field_definitions() -> Dictionary[String, Dictionary]:
 
 func get_card_value_definitions() -> Dictionary[String, Dictionary]:
 	return CardEditorSchema.get_card_value_definitions()
+
+func get_card_value_name_options() -> Array[Dictionary]:
+	return CardEditorSchema.get_card_value_name_options()
 
 func get_library_filter_definitions() -> Array[Dictionary]:
 	return CardEditorSchema.get_library_filter_definitions()
@@ -274,6 +289,7 @@ func validate_session(session: CardEditorSession) -> Array[Dictionary]:
 		_validate_save_path_policy(session, active_save_path, diagnostics)
 
 	_validate_token_entries(card_data.card_play_actions, "card_play_actions", true, diagnostics)
+	_validate_additional_action_entries(card_data, diagnostics)
 	_validate_token_entries(card_data.card_discard_actions, "card_discard_actions", true, diagnostics)
 	_validate_token_entries(card_data.card_end_of_turn_actions, "card_end_of_turn_actions", true, diagnostics)
 	_validate_token_entries(card_data.card_exhaust_actions, "card_exhaust_actions", true, diagnostics)
@@ -329,6 +345,148 @@ func create_validator_entry(token_or_path: String) -> Dictionary:
 
 func get_entry_context(property_name: String) -> String:
 	return str(CARD_ARRAY_PROPERTIES.get(property_name, ""))
+
+func get_additional_action_entries(session: CardEditorSession) -> Array:
+	if session == null or session.working_card_data == null:
+		return []
+	return session.working_card_data.card_additional_actions
+
+func create_additional_action(session: CardEditorSession, token_or_path: String, values: Dictionary = {}, insert_index: int = -1) -> Dictionary:
+	if session == null or session.working_card_data == null:
+		return {}
+	var action_entry: Dictionary = CardEditorMetadataAdapter.create_default_entry(token_or_path)
+	if action_entry.is_empty():
+		return {}
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Dictionary = action_entry[action_token]
+	action_values.merge(values, true)
+	action_entry[action_token] = action_values
+	var additional_action_id: String = _generate_additional_action_id(session.working_card_data)
+	var stored_entry := {
+		"id": additional_action_id,
+		"action": action_entry,
+	}
+	var additional_actions: Array = session.working_card_data.card_additional_actions.duplicate(true)
+	if insert_index < 0 or insert_index >= len(additional_actions):
+		additional_actions.append(stored_entry)
+	else:
+		additional_actions.insert(insert_index, stored_entry)
+	session.working_card_data.card_additional_actions = additional_actions
+	_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+	return stored_entry
+
+func replace_additional_action(session: CardEditorSession, additional_action_id: String, token_or_path: String, values: Dictionary = {}) -> Dictionary:
+	if session == null or session.working_card_data == null:
+		return {}
+	var action_entry: Dictionary = CardEditorMetadataAdapter.create_default_entry(token_or_path)
+	if action_entry.is_empty():
+		return {}
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Dictionary = action_entry[action_token]
+	action_values.merge(values, true)
+	action_entry[action_token] = action_values
+	var additional_actions: Array = session.working_card_data.card_additional_actions.duplicate(true)
+	for index: int in range(len(additional_actions)):
+		if str(additional_actions[index].get("id", "")) != additional_action_id:
+			continue
+		additional_actions[index]["action"] = action_entry
+		session.working_card_data.card_additional_actions = additional_actions
+		_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+		return additional_actions[index]
+	return {}
+
+func update_additional_action_values(session: CardEditorSession, additional_action_id: String, values: Dictionary, merge_values: bool = true) -> Dictionary:
+	if session == null or session.working_card_data == null:
+		return {}
+	var additional_actions: Array = session.working_card_data.card_additional_actions.duplicate(true)
+	for index: int in range(len(additional_actions)):
+		var additional_action: Dictionary = additional_actions[index]
+		if str(additional_action.get("id", "")) != additional_action_id:
+			continue
+		var action_entry: Dictionary = additional_action.get("action", {})
+		if len(action_entry.keys()) != 1:
+			return {}
+		var action_token: String = str(action_entry.keys()[0])
+		var action_values: Dictionary = action_entry[action_token]
+		if not merge_values:
+			action_values.clear()
+		action_values.merge(values, true)
+		action_entry[action_token] = action_values
+		additional_action["action"] = action_entry
+		additional_actions[index] = additional_action
+		session.working_card_data.card_additional_actions = additional_actions
+		_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+		return additional_action
+	return {}
+
+func remove_additional_action(session: CardEditorSession, additional_action_id: String) -> bool:
+	if session == null or session.working_card_data == null:
+		return false
+	var additional_actions: Array = session.working_card_data.card_additional_actions.duplicate(true)
+	for index: int in range(len(additional_actions)):
+		if str(additional_actions[index].get("id", "")) != additional_action_id:
+			continue
+		additional_actions.remove_at(index)
+		session.working_card_data.card_additional_actions = additional_actions
+		_remove_additional_action_references(session.working_card_data, additional_action_id)
+		_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+		return true
+	return false
+
+func move_additional_action(session: CardEditorSession, from_index: int, to_index: int) -> bool:
+	if session == null or session.working_card_data == null:
+		return false
+	var additional_actions: Array = session.working_card_data.card_additional_actions.duplicate(true)
+	if from_index < 0 or from_index >= len(additional_actions):
+		return false
+	if to_index < 0 or to_index >= len(additional_actions):
+		return false
+	var moved_entry: Variant = additional_actions[from_index]
+	additional_actions.remove_at(from_index)
+	additional_actions.insert(to_index, moved_entry)
+	session.working_card_data.card_additional_actions = additional_actions
+	_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+	return true
+
+func create_additional_action_reference(session: CardEditorSession, owner_type: String, owner_key: String, parameter_name: String, token_or_path: String) -> String:
+	var created_action: Dictionary = create_additional_action(session, token_or_path)
+	if created_action.is_empty():
+		return ""
+	var additional_action_id: String = str(created_action.get("id", ""))
+	if additional_action_id == "":
+		return ""
+	if not append_action_reference(session, owner_type, owner_key, parameter_name, additional_action_id):
+		return ""
+	return additional_action_id
+
+func append_action_reference(session: CardEditorSession, owner_type: String, owner_key: String, parameter_name: String, additional_action_id: String) -> bool:
+	return _mutate_action_reference_array(session, owner_type, owner_key, parameter_name, func(reference_ids: Array) -> Array:
+		var next_reference_ids: Array = reference_ids.duplicate(true)
+		next_reference_ids.append(additional_action_id)
+		return next_reference_ids
+	)
+
+func remove_action_reference(session: CardEditorSession, owner_type: String, owner_key: String, parameter_name: String, reference_index: int) -> bool:
+	return _mutate_action_reference_array(session, owner_type, owner_key, parameter_name, func(reference_ids: Array) -> Array:
+		if reference_index < 0 or reference_index >= len(reference_ids):
+			return reference_ids
+		var next_reference_ids: Array = reference_ids.duplicate(true)
+		next_reference_ids.remove_at(reference_index)
+		return next_reference_ids
+	)
+
+func move_action_reference(session: CardEditorSession, owner_type: String, owner_key: String, parameter_name: String, from_index: int, to_index: int) -> bool:
+	return _mutate_action_reference_array(session, owner_type, owner_key, parameter_name, func(reference_ids: Array) -> Array:
+		if from_index < 0 or from_index >= len(reference_ids):
+			return reference_ids
+		if to_index < 0 or to_index >= len(reference_ids):
+			return reference_ids
+		var next_reference_ids: Array = reference_ids.duplicate(true)
+		var moved_reference: Variant = next_reference_ids[from_index]
+		next_reference_ids.remove_at(from_index)
+		next_reference_ids.insert(to_index, moved_reference)
+		return next_reference_ids
+	)
 
 func add_entry(session: CardEditorSession, property_name: String, token_or_path: String, values: Dictionary = {}, insert_index: int = -1) -> Dictionary:
 	var entries: Array = _get_card_array_property(session, property_name)
@@ -487,6 +645,114 @@ func get_card_summary(session: CardEditorSession) -> Dictionary:
 		return {}
 	return session.to_summary()
 
+func _generate_additional_action_id(card_data: CardData) -> String:
+	var used_ids: Dictionary = {}
+	for additional_action: Dictionary in card_data.card_additional_actions:
+		used_ids[str(additional_action.get("id", ""))] = true
+	for next_index: int in range(len(card_data.card_additional_actions) + 1):
+		var candidate_id: String = "additional_action_%s" % (next_index + 1)
+		if not used_ids.has(candidate_id):
+			return candidate_id
+	return "additional_action_%s" % (len(card_data.card_additional_actions) + 1)
+
+func _mutate_action_reference_array(session: CardEditorSession, owner_type: String, owner_key: String, parameter_name: String, mutate: Callable) -> bool:
+	if session == null or session.working_card_data == null:
+		return false
+	var owner_entry: Dictionary = _get_action_owner_entry(session.working_card_data, owner_type, owner_key)
+	if owner_entry.is_empty() or len(owner_entry.keys()) != 1:
+		return false
+	var action_token: String = str(owner_entry.keys()[0])
+	var action_values: Dictionary = owner_entry[action_token]
+	var reference_ids: Array = []
+	reference_ids.assign(action_values.get(parameter_name, []))
+	var next_reference_ids: Variant = mutate.call(reference_ids)
+	if not (next_reference_ids is Array):
+		return false
+	action_values[parameter_name] = next_reference_ids
+	owner_entry[action_token] = action_values
+	_set_action_owner_entry(session.working_card_data, owner_type, owner_key, owner_entry)
+	_after_card_mutation(session, ADDITIONAL_ACTIONS_PROPERTY)
+	return true
+
+func _get_action_owner_entry(card_data: CardData, owner_type: String, owner_key: String) -> Dictionary:
+	match owner_type:
+		"card_entry":
+			var key_parts: PackedStringArray = owner_key.split("::")
+			if len(key_parts) != 2:
+				return {}
+			var property_name: String = key_parts[0]
+			var entry_index: int = int(key_parts[1])
+			var entries: Array = card_data.get(property_name)
+			if entry_index < 0 or entry_index >= len(entries):
+				return {}
+			if entries[entry_index] is Dictionary:
+				return entries[entry_index].duplicate(true)
+		"additional_action":
+			for additional_action: Dictionary in card_data.card_additional_actions:
+				if str(additional_action.get("id", "")) != owner_key:
+					continue
+				var action_entry: Variant = additional_action.get("action", {})
+				if action_entry is Dictionary:
+					return (action_entry as Dictionary).duplicate(true)
+	return {}
+
+func _set_action_owner_entry(card_data: CardData, owner_type: String, owner_key: String, owner_entry: Dictionary) -> void:
+	match owner_type:
+		"card_entry":
+			var key_parts: PackedStringArray = owner_key.split("::")
+			if len(key_parts) != 2:
+				return
+			var property_name: String = key_parts[0]
+			var entry_index: int = int(key_parts[1])
+			var entries: Array = card_data.get(property_name)
+			if entry_index < 0 or entry_index >= len(entries):
+				return
+			entries[entry_index] = owner_entry
+			card_data.set(property_name, entries)
+		"additional_action":
+			var additional_actions: Array = card_data.card_additional_actions.duplicate(true)
+			for index: int in range(len(additional_actions)):
+				if str(additional_actions[index].get("id", "")) != owner_key:
+					continue
+				additional_actions[index]["action"] = owner_entry
+				card_data.card_additional_actions = additional_actions
+				return
+
+func _remove_additional_action_references(card_data: CardData, additional_action_id: String) -> void:
+	for property_name: String in CardEditorSchema.get_action_property_names():
+		var entries: Array = card_data.get(property_name)
+		for index: int in range(len(entries)):
+			_remove_action_references_from_entry(entries[index], additional_action_id)
+		card_data.set(property_name, entries)
+	var additional_actions: Array = card_data.card_additional_actions.duplicate(true)
+	for additional_action: Dictionary in additional_actions:
+		var action_entry: Variant = additional_action.get("action", {})
+		if action_entry is Dictionary:
+			_remove_action_references_from_entry(action_entry, additional_action_id)
+	card_data.card_additional_actions = additional_actions
+
+func _remove_action_references_from_entry(action_entry: Dictionary, additional_action_id: String) -> void:
+	if len(action_entry.keys()) != 1:
+		return
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Variant = action_entry[action_token]
+	if not (action_values is Dictionary):
+		return
+	action_entry[action_token] = _remove_action_references_from_values(action_values, additional_action_id)
+
+func _remove_action_references_from_values(action_values: Dictionary, additional_action_id: String) -> Dictionary:
+	var next_values: Dictionary = action_values.duplicate(true)
+	for parameter_name: String in ACTION_REFERENCE_PARAMETER_NAMES.keys():
+		if not next_values.has(parameter_name):
+			continue
+		var next_references: Array = []
+		for reference_entry: Variant in next_values[parameter_name]:
+			if reference_entry is String and str(reference_entry) == additional_action_id:
+				continue
+			next_references.append(reference_entry)
+		next_values[parameter_name] = next_references
+	return next_values
+
 func _save_session_internal(session: CardEditorSession, save_as_path: String) -> Dictionary:
 	if session == null or session.working_card_data == null:
 		return {
@@ -504,6 +770,7 @@ func _save_session_internal(session: CardEditorSession, save_as_path: String) ->
 		else:
 			session.save_policy = CardEditorSession.SAVE_POLICY_MANUAL
 	session.recompute_managed_paths()
+	_migrate_nested_action_references(session.working_card_data)
 	_normalize_card_resource(session.working_card_data)
 	var diagnostics: Array[Dictionary] = validate_session(session)
 	if _has_error_diagnostics(diagnostics):
@@ -627,6 +894,34 @@ func _make_card_library_entry(
 		"search_blob": " ".join(search_blob_parts).to_lower(),
 	}
 
+func _validate_additional_action_entries(card_data: CardData, diagnostics: Array[Dictionary]) -> void:
+	var seen_ids: Dictionary = {}
+	for index: int in range(len(card_data.card_additional_actions)):
+		var additional_action: Variant = card_data.card_additional_actions[index]
+		if not (additional_action is Dictionary):
+			diagnostics.append(_make_diagnostic("malformed_additional_action_entry", "error", "Additional action entry must be a Dictionary.", ADDITIONAL_ACTIONS_PROPERTY, {"index": index}))
+			continue
+		var additional_action_id: String = str(additional_action.get("id", ""))
+		if additional_action_id == "":
+			diagnostics.append(_make_diagnostic("missing_additional_action_id", "error", "Additional action entry is missing its id.", ADDITIONAL_ACTIONS_PROPERTY, {"index": index}))
+		elif seen_ids.has(additional_action_id):
+			diagnostics.append(_make_diagnostic("duplicate_additional_action_id", "error", "Additional action ids must be unique.", ADDITIONAL_ACTIONS_PROPERTY, {"index": index, "id": additional_action_id}))
+		else:
+			seen_ids[additional_action_id] = true
+		var action_entry: Variant = additional_action.get("action", {})
+		if not (action_entry is Dictionary):
+			diagnostics.append(_make_diagnostic("malformed_additional_action_entry", "error", "Additional action payload must be a Dictionary.", ADDITIONAL_ACTIONS_PROPERTY, {"index": index, "id": additional_action_id}))
+			continue
+		_validate_token_entries([action_entry], ADDITIONAL_ACTIONS_PROPERTY, true, diagnostics)
+	for property_name: String in CardEditorSchema.get_action_property_names():
+		var entries: Array = card_data.get(property_name)
+		for index: int in range(len(entries)):
+			_validate_action_reference_payloads(card_data, property_name, index, entries[index], diagnostics)
+	for additional_action: Dictionary in card_data.card_additional_actions:
+		var action_entry: Variant = additional_action.get("action", {})
+		if action_entry is Dictionary:
+			_validate_action_reference_payloads(card_data, ADDITIONAL_ACTIONS_PROPERTY, -1, action_entry, diagnostics)
+
 func _validate_token_entries(entries: Array, property_name: String, is_action: bool, diagnostics: Array[Dictionary]) -> void:
 	for index: int in range(len(entries)):
 		var entry: Variant = entries[index]
@@ -651,6 +946,10 @@ func _validate_entry_payload(token_or_path: String, values: Dictionary, property
 	var metadata: Dictionary = ScriptEditorMetadataRegistry.get_resolved_script_metadata(token_or_path)
 	if metadata.is_empty():
 		return
+	var invalid_relevant_value_names: Array[String] = []
+	invalid_relevant_value_names.assign(metadata.get("invalid_relevant_value_names", []))
+	if not invalid_relevant_value_names.is_empty():
+		diagnostics.append(_make_diagnostic("invalid_action_value_registry_names", "warning", "Action metadata references value names that are missing from the central action value registry.", property_name, {"index": index, "token": token_or_path, "invalid_value_names": invalid_relevant_value_names}))
 	var parameter_definitions: Array[Dictionary] = []
 	parameter_definitions.assign(metadata.get("parameters", []))
 	var parameters_by_name: Dictionary[String, Dictionary] = {}
@@ -669,6 +968,78 @@ func _validate_entry_payload(token_or_path: String, values: Dictionary, property
 		var value: Variant = values[value_key]
 		if not _value_matches_editor_type(value, value_type, parameter_definition):
 			diagnostics.append(_make_diagnostic("parameter_type_mismatch", "warning", "Entry parameter type does not match editor metadata.", property_name, {"index": index, "token": token_or_path, "parameter": parameter_name_str, "value_type": value_type}))
+
+func _validate_action_reference_payloads(card_data: CardData, property_name: String, index: int, action_entry: Dictionary, diagnostics: Array[Dictionary]) -> void:
+	if len(action_entry.keys()) != 1:
+		return
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Variant = action_entry[action_token]
+	if not (action_values is Dictionary):
+		return
+	for parameter_name: String in ACTION_REFERENCE_PARAMETER_NAMES.keys():
+		if not action_values.has(parameter_name):
+			continue
+		var parameter_value: Variant = action_values[parameter_name]
+		if not (parameter_value is Array):
+			continue
+		for reference_index: int in range(len(parameter_value)):
+			var reference_value: Variant = parameter_value[reference_index]
+			if reference_value is Dictionary:
+				_validate_action_reference_payloads(card_data, property_name, index, reference_value, diagnostics)
+				continue
+			if not (reference_value is String):
+				diagnostics.append(_make_diagnostic("invalid_additional_action_reference", "warning", "Child action references should be additional action ids.", property_name, {"index": index, "token": action_token, "parameter": parameter_name, "reference_index": reference_index}))
+				continue
+			if card_data.get_additional_action_entry(str(reference_value)).is_empty():
+				diagnostics.append(_make_diagnostic("missing_additional_action_reference", "warning", "Child action reference points to a missing additional action.", property_name, {"index": index, "token": action_token, "parameter": parameter_name, "reference_id": str(reference_value)}))
+
+func _migrate_nested_action_references(card_data: CardData) -> bool:
+	var migration_state := {"changed": false}
+	for property_name: String in CardEditorSchema.get_action_property_names():
+		var entries: Array = card_data.get(property_name)
+		for index: int in range(len(entries)):
+			var migrated_entry: Dictionary = _migrate_action_entry_references(card_data, entries[index], migration_state)
+			if not migrated_entry.is_empty():
+				entries[index] = migrated_entry
+		card_data.set(property_name, entries)
+	var additional_actions: Array = card_data.card_additional_actions.duplicate(true)
+	for index: int in range(len(additional_actions)):
+		var action_entry: Variant = additional_actions[index].get("action", {})
+		if not (action_entry is Dictionary):
+			continue
+		additional_actions[index]["action"] = _migrate_action_entry_references(card_data, action_entry, migration_state)
+	card_data.card_additional_actions = additional_actions
+	return bool(migration_state.get("changed", false))
+
+func _migrate_action_entry_references(card_data: CardData, action_entry: Dictionary, migration_state: Dictionary) -> Dictionary:
+	if len(action_entry.keys()) != 1:
+		return action_entry
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Variant = action_entry[action_token]
+	if not (action_values is Dictionary):
+		return action_entry
+	var next_values: Dictionary = action_values.duplicate(true)
+	for parameter_name: String in ACTION_REFERENCE_PARAMETER_NAMES.keys():
+		if not next_values.has(parameter_name) or not (next_values[parameter_name] is Array):
+			continue
+		var next_reference_ids: Array = []
+		for nested_action_entry: Variant in next_values[parameter_name]:
+			if nested_action_entry is String:
+				next_reference_ids.append(nested_action_entry)
+				continue
+			if not (nested_action_entry is Dictionary):
+				continue
+			var migrated_nested_entry: Dictionary = _migrate_action_entry_references(card_data, nested_action_entry, migration_state)
+			var created_action: Dictionary = {
+				"id": _generate_additional_action_id(card_data),
+				"action": migrated_nested_entry,
+			}
+			card_data.card_additional_actions.append(created_action)
+			next_reference_ids.append(created_action["id"])
+			migration_state["changed"] = true
+		next_values[parameter_name] = next_reference_ids
+	action_entry[action_token] = next_values
+	return action_entry
 
 func _validate_save_collision(session: CardEditorSession, save_path: String) -> Dictionary:
 	if not ResourceLoader.exists(save_path):

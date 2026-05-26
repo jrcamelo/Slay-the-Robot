@@ -2,6 +2,9 @@
 # Use this action instead of just invoking an AttackDamage action
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.DAMAGE, ActionValueRegistry.DAMAGE_RANDOM, ActionValueRegistry.MERGE_ATTACKS, ActionValueRegistry.NUMBER_OF_ATTACKS]
+
 func _get_editor_description() -> String:
 	return "Builds one or more attack actions from a shared damage payload, including random variance and lethal children."
 
@@ -11,6 +14,11 @@ func _get_editor_contexts() -> Array[String]:
 		EDITOR_CONTEXT_CARD_TRIGGER_ACTIONS,
 		EDITOR_CONTEXT_ACTION_CHILDREN,
 		EDITOR_CONTEXT_ENEMY_ACTIONS,
+	]
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	return [
+		_editor_param("actions_on_lethal", "Actions On Lethal", "array", [], "Additional actions attached to each generated attack when it kills a target."),
 	]
 
 func is_instant_action() -> bool:
@@ -23,17 +31,17 @@ func perform_action():
 		if parent_combatant != null:
 			parent_combatant.play_attack_animation()
 		
-		var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
+		var damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
 		var delay: float = action_interceptor_processor.get_shadowed_action_values("time_delay", 0.25)
-		var number_of_attacks: int = action_interceptor_processor.get_shadowed_action_values("number_of_attacks", 1)
-		var merge_attacks: bool = action_interceptor_processor.get_shadowed_action_values("merge_attacks", false)	# this will take all attacks and merge them into a single attack with combined damage
+		var number_of_attacks: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.NUMBER_OF_ATTACKS, 1)
+		var merge_attacks: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MERGE_ATTACKS, false)	# this will take all attacks and merge them into a single attack with combined damage
 		var target_override: int = action_interceptor_processor.get_shadowed_action_values("target_override", BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS)
 		
 		var actions_on_lethal: Array[Dictionary] = []
 		actions_on_lethal.assign(action_interceptor_processor.get_shadowed_action_values("actions_on_lethal", []))
 		
 		# generate a random number to add to damage if it exists
-		var damage_random: int = action_interceptor_processor.get_shadowed_action_values("damage_random", 0)
+		var damage_random: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE_RANDOM, 0)
 		if damage_random > 1:
 			var rng_damage: RandomNumberGenerator = Global.player_data.get_player_rng("rng_damage")
 			var random_damage_amount: int = rng_damage.randi_range(0, damage_random)
@@ -47,13 +55,13 @@ func perform_action():
 		# generate the individual attack actions
 		var generated_attack_actions: Array[BaseAction] = []
 		for i in number_of_attacks:
-			var action_data: Array[Dictionary] = [{Scripts.ACTION_ATTACK: {"damage": damage, "time_delay": delay, "target_override": target_override, "actions_on_lethal": actions_on_lethal}}]
+			var action_data: Array[Dictionary] = [{Scripts.ACTION_ATTACK: {ActionValueRegistry.DAMAGE: damage, "time_delay": delay, "target_override": target_override, "actions_on_lethal": actions_on_lethal}}]
 			var attack_action: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, targets, action_data, self)
 			generated_attack_actions += attack_action
 		
 		ActionHandler.add_actions(generated_attack_actions)
 
 func _to_string():
-	var damage: int = get_action_value("damage", 0)
-	var number_of_attacks: int = get_action_value("number_of_attacks", 0)
+	var damage: int = get_action_value(ActionValueRegistry.DAMAGE, 0)
+	var number_of_attacks: int = get_action_value(ActionValueRegistry.NUMBER_OF_ATTACKS, 0)
 	return "Attack Generator Action: " + str(damage) + " x " + str(number_of_attacks)

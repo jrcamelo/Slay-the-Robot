@@ -1,6 +1,9 @@
 # adds both permanent and combat energy to the player
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.ENERGY_AMOUNT, ActionValueRegistry.ENERGY_AMOUNT_MAX]
+
 func _get_editor_description() -> String:
 	return "Adds current-turn energy and optionally raises the maximum available energy."
 
@@ -9,15 +12,15 @@ func perform_action():
 	
 	for action_interceptor_processor in action_interceptor_processors:
 		# max energy (permanent)
-		var energy_amount_max: int = action_interceptor_processor.get_shadowed_action_values("energy_amount_max", 0)
+		var energy_amount_max: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.ENERGY_AMOUNT_MAX, 0)
 		Global.player_data.player_energy_max = max(Global.player_data.player_energy_max + energy_amount_max, 1)
 		# combat energy in the inverted system reduces the filled meter, opening room for more plays
-		var energy_amount: int = action_interceptor_processor.get_shadowed_action_values("energy_amount", 0)
+		var energy_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.ENERGY_AMOUNT, 0)
 		Global.player_data.player_energy = clamp(Global.player_data.player_energy - energy_amount, 0, Global.player_data.player_energy_max)
 		
 		Signals.energy_added.emit(energy_amount)
 
 func _to_string():
-	var energy_amount: int = get_action_value("energy_amount", 0)
-	var energy_amount_max: int = get_action_value("energy_amount_max", 0)
+	var energy_amount: int = get_action_value(ActionValueRegistry.ENERGY_AMOUNT, 0)
+	var energy_amount_max: int = get_action_value(ActionValueRegistry.ENERGY_AMOUNT_MAX, 0)
 	return "Add Energy Action: {0}, {1}".format([energy_amount, energy_amount_max])

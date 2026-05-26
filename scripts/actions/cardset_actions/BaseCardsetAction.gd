@@ -3,6 +3,9 @@
 extends BaseAction
 class_name BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.PICK_PLAYED_CARD]
+
 func get_editor_script_type() -> String:
 	return "cardset_action"
 
@@ -12,7 +15,7 @@ func _get_editor_description() -> String:
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	var parameter_definitions: Array[Dictionary] = super()
 	parameter_definitions.append(
-		_editor_param("pick_played_card", "Pick Played Card", "bool", false, "Uses the currently played card as the cardset source.")
+		_editor_param(ActionValueRegistry.PICK_PLAYED_CARD, "Pick Played Card", "bool", false, "Uses the currently played card as the cardset source.")
 	)
 	parameter_definitions.append(
 		_editor_param("picked_cards", "Picked Cards", "card_array", [], "Explicit cards to operate on when no parent pick action provides them.")
@@ -34,7 +37,7 @@ func perform_action() -> void:
 ## or use the card that invoked it with pick_played_card parameter 
 func _get_picked_cards() -> Array[CardData]:
 	# if pick_played_card, use the card that invoked the action as the cardset
-	var pick_played_card: bool = get_action_value("pick_played_card", false)
+	var pick_played_card: bool = get_action_value(ActionValueRegistry.PICK_PLAYED_CARD, false)
 	if pick_played_card:
 		if card_play_request == null:
 			push_error("No CardPlayRequest found")

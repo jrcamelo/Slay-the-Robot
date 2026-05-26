@@ -1,6 +1,9 @@
 # Action remove given cards from your permanent deck
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Removes selected cards from the player's permanent deck."
 

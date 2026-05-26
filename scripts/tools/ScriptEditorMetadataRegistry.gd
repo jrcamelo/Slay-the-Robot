@@ -4,8 +4,14 @@ class_name ScriptEditorMetadataRegistry
 
 const ACTION_TOKEN_PREFIX := "ACTION_"
 const VALIDATOR_TOKEN_PREFIX := "VALIDATOR_"
+static var _resolved_metadata_cache: Dictionary[String, Dictionary] = {}
+static var _script_metadata_cache: Dictionary[String, Dictionary] = {}
+static var _all_action_metadata_cache: Array[Dictionary] = []
+static var _all_validator_metadata_cache: Array[Dictionary] = []
 
 static func get_resolved_script_metadata(token_or_path: String) -> Dictionary:
+	if _resolved_metadata_cache.has(token_or_path):
+		return _resolved_metadata_cache[token_or_path]
 	var script: Script = Scripts.resolve_script(token_or_path)
 	if script == null:
 		return {}
@@ -15,33 +21,66 @@ static func get_resolved_script_metadata(token_or_path: String) -> Dictionary:
 	metadata["token_or_path"] = token_or_path
 	metadata["resolved_path"] = Scripts.resolve_script_path(token_or_path)
 	metadata["resolved_token"] = Scripts.get_token_for_path(metadata["resolved_path"])
+	_resolved_metadata_cache[token_or_path] = metadata
 	return metadata
 
 static func get_script_metadata(script: Script) -> Dictionary:
 	if script == null or not script.can_instantiate():
 		return {}
+	var script_path: String = script.resource_path
+	if _script_metadata_cache.has(script_path):
+		return _script_metadata_cache[script_path]
 	var instance: Variant = script.new()
 	if not (instance is BaseAction or instance is BaseValidator):
 		return {}
 	var metadata: Dictionary = instance.get_editor_metadata()
-	metadata["script_path"] = script.resource_path
+	metadata["script_path"] = script_path
 	metadata["script_global_name"] = script.get_global_name()
 	metadata["script_class_name"] = instance.get_class()
 	if instance is BaseAction:
-		var source_text: String = _load_script_source(script.resource_path)
-		var inferred_parameters: Array[Dictionary] = _infer_action_parameters_from_source(script.resource_path, source_text)
+		var source_text: String = _load_script_source(script_path)
+		var inferred_parameters: Array[Dictionary] = _infer_action_parameters_from_source(script_path, source_text)
 		var common_parameters: Array[Dictionary] = _infer_common_action_parameters(instance, source_text, inferred_parameters)
 		var merged_parameters: Array[Dictionary] = _merge_parameter_definitions(common_parameters, inferred_parameters)
 		merged_parameters = _merge_parameter_definitions(metadata.get("parameters", []), merged_parameters)
+		var normalized_relevant_value_names: Array[String] = _normalize_value_name_list(instance._get_editor_relevant_value_names())
+		var relevant_value_names: Array[String] = []
+		var invalid_relevant_value_names: Array[String] = []
+		for value_name: String in normalized_relevant_value_names:
+			if ActionValueRegistry.has_definition(value_name):
+				relevant_value_names.append(value_name)
+			else:
+				invalid_relevant_value_names.append(value_name)
+		merged_parameters = _apply_central_action_value_metadata(merged_parameters)
 		metadata["parameters"] = merged_parameters
 		metadata["used_parameter_names"] = _parameter_names_from_definitions(merged_parameters)
+		metadata["relevant_value_names"] = relevant_value_names
+		metadata["invalid_relevant_value_names"] = invalid_relevant_value_names
+		metadata["relevant_value_options"] = ActionValueRegistry.get_value_options(relevant_value_names)
+		metadata["all_value_name_options"] = get_action_value_name_options()
+	_script_metadata_cache[script_path] = metadata
 	return metadata
 
 static func get_all_action_metadata() -> Array[Dictionary]:
-	return _get_all_token_metadata(ACTION_TOKEN_PREFIX)
+	if not _all_action_metadata_cache.is_empty():
+		return _all_action_metadata_cache
+	_all_action_metadata_cache = _get_all_token_metadata(ACTION_TOKEN_PREFIX)
+	return _all_action_metadata_cache
 
 static func get_all_validator_metadata() -> Array[Dictionary]:
-	return _get_all_token_metadata(VALIDATOR_TOKEN_PREFIX)
+	if not _all_validator_metadata_cache.is_empty():
+		return _all_validator_metadata_cache
+	_all_validator_metadata_cache = _get_all_token_metadata(VALIDATOR_TOKEN_PREFIX)
+	return _all_validator_metadata_cache
+
+static func get_action_value_names() -> Array[String]:
+	return ActionValueRegistry.get_all_value_names()
+
+static func get_action_value_name_options() -> Array[Dictionary]:
+	return ActionValueRegistry.get_value_options()
+
+static func is_action_value_candidate(parameter_name: String, _parameter_definition: Dictionary = {}) -> bool:
+	return ActionValueRegistry.has_definition(parameter_name)
 
 static func _get_all_token_metadata(token_prefix: String) -> Array[Dictionary]:
 	var metadata_list: Array[Dictionary] = []
@@ -153,6 +192,24 @@ static func _has_parameter_named(parameter_definitions: Array[Dictionary], param
 		if str(parameter_definition.get("name", "")) == parameter_name:
 			return true
 	return false
+
+static func _apply_central_action_value_metadata(parameter_definitions: Array[Dictionary]) -> Array[Dictionary]:
+	var updated_parameters: Array[Dictionary] = []
+	for parameter_definition: Dictionary in parameter_definitions:
+		updated_parameters.append(ActionValueRegistry.apply_definition(parameter_definition))
+	return updated_parameters
+
+static func _normalize_value_name_list(value_names: Array[String]) -> Array[String]:
+	var normalized_lookup: Dictionary[String, bool] = {}
+	for value_name: String in value_names:
+		var normalized_name: String = value_name.strip_edges()
+		if normalized_name == "":
+			continue
+		normalized_lookup[normalized_name] = true
+	var normalized_value_names: Array[String] = []
+	normalized_value_names.assign(normalized_lookup.keys())
+	normalized_value_names.sort()
+	return normalized_value_names
 
 static func _parameter_names_from_definitions(parameter_definitions: Array[Dictionary]) -> Array[String]:
 	var parameter_names: Array[String] = []

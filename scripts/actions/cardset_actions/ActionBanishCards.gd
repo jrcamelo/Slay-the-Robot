@@ -1,6 +1,9 @@
 # Action to completely remove cards from play (hand, all piles), in effect removing the card from play
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Removes selected cards from all combat piles and banishes them from play."
 

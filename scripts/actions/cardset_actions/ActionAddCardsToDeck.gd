@@ -1,6 +1,9 @@
 # Action add given cards to your permanent deck
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Adds the selected cards to the player's permanent deck."
 

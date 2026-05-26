@@ -1,5 +1,8 @@
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_description() -> String:
 	return "Resets the block value of each resolved target back to zero."
 

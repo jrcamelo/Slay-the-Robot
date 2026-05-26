@@ -4,11 +4,14 @@
 ## See ActionImproveCardValues for additive version that affects card_values
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.CHANGE_PARENT_CARD, ActionValueRegistry.PICK_PLAYED_CARD]
+
 func _get_editor_description() -> String:
 	return "Sets raw CardData properties on selected cards, optionally on their parent deck copies."
 
 func perform_action():
-	var change_parent_card: bool = get_action_value("change_parent_card", true)
+	var change_parent_card: bool = get_action_value(ActionValueRegistry.CHANGE_PARENT_CARD, true)
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	
 	for card_data in picked_cards:

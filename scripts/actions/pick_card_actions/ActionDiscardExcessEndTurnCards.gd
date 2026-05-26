@@ -1,6 +1,9 @@
 extends ActionBasePickCards
 class_name ActionDiscardExcessEndTurnCards
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Async helper that discards the cards selected for end-of-turn overflow handling."
 

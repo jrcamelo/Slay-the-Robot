@@ -3,6 +3,9 @@
 # Note: one is automatically created at the start of combat by RewardOverlay and cycled back to prepopulate end of combat rewards
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.ARTIFACT_IDS, ActionValueRegistry.CARD_DRAFTS, ActionValueRegistry.MONEY_AMOUNT, ActionValueRegistry.REWARD_GROUP]
+
 func _get_editor_description() -> String:
 	return "Pushes money, card drafts, artifacts, and custom reward buttons into the reward overlay."
 
@@ -18,11 +21,11 @@ func perform_action():
 	
 	for action_interceptor_processor in action_interceptor_processors:
 		# reward groups allow mutually exclusive rewards. 0 is standard, -1 for auto create new group, positive for specific groups
-		var reward_group: int = action_interceptor_processor.get_shadowed_action_values("reward_group", 0)
-		var money_amount: int = action_interceptor_processor.get_shadowed_action_values("money_amount", 0)
+		var reward_group: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.REWARD_GROUP, 0)
+		var money_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MONEY_AMOUNT, 0)
 		# array of array of CardData
-		var card_drafts: Array[Array] = action_interceptor_processor.get_shadowed_action_values("card_drafts", [])
-		var artifact_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values("artifact_ids", [])
+		var card_drafts: Array[Array] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.CARD_DRAFTS, [])
+		var artifact_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.ARTIFACT_IDS, [])
 		# custom_action_data allows defining of unique reward actions through extensible data payloads
 		# This would allow a card, artifact, or status to define a unique reward outside the standard ones
 		# Example of a payload that adds a reward button to heal the user

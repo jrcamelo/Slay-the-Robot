@@ -1,5 +1,8 @@
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.DAMAGE]
+
 func _get_editor_description() -> String:
 	return "Deals bypass-block damage to each resolved target, intended for corrosion-style status processing."
 
@@ -12,11 +15,11 @@ func _get_editor_contexts() -> Array[String]:
 	]
 
 func perform_action():
-	var damage: int = get_action_value("damage", 0)
+	var damage: int = get_action_value(ActionValueRegistry.DAMAGE, 0)
 	var adjusted_targets: Array[BaseCombatant] = get_adjusted_action_targets()
 	for target in adjusted_targets:
 		var _damages: Array[int] = target.damage(damage, true)
 
 func _to_string():
-	var damage: int = get_action_value("damage", 0)
+	var damage: int = get_action_value(ActionValueRegistry.DAMAGE, 0)
 	return "Attack Corrosion: " + str(damage)

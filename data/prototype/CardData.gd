@@ -78,6 +78,12 @@ const CARD_TARGET_MODES: Array[String] = [
 	#Scripts.ACTION_ATTACK_GENERATOR: {"damage": 5, "number_of_attacks": 2, "time_delay": 0.0}
 	#}
 ]
+@export var card_additional_actions: Array[Dictionary] = [
+	#{
+	#"id": "additional_action_1",
+	#"action": {Scripts.ACTION_BLOCK: {"block": 5}}
+	#}
+]
 @export var card_discard_actions: Array[Dictionary] = []	# actions that trigger when card is manually discarded
 @export var card_end_of_turn_actions: Array[Dictionary] = []	# actions that trigger when the card is in hand end of turn
 @export var card_exhaust_actions: Array[Dictionary] = []	# actions that trigger when card is exhausted
@@ -122,6 +128,13 @@ const CARD_TARGET_MODES: Array[String] = [
 ### Deck Flags
 @export var card_unremovable_from_deck: bool = false	# if the card cannot be removed from the permanent deck. Does nothing by itself, this should be enforced through validators
 @export var card_untransformable_from_deck: bool = false	# if the card cannot be transformed from the permanent deck. Does nothing by itself, this should be enforced through validators
+
+const ACTION_REFERENCE_PARAMETER_NAMES := {
+	"action_data": true,
+	"passed_action_data": true,
+	"failed_action_data": true,
+	"actions_on_lethal": true,
+}
 
 func _to_string():
 	return get_card_name()
@@ -233,6 +246,57 @@ func get_effective_clicked_target_mode() -> String:
 	if not CARD_TARGET_MODES.has(normalized_mode):
 		return CARD_TARGET_MODE_ENEMY_ONLY
 	return normalized_mode
+
+func get_additional_action_entry(additional_action_id: String) -> Dictionary:
+	for additional_action_data: Dictionary in card_additional_actions:
+		if str(additional_action_data.get("id", "")) != additional_action_id:
+			continue
+		var action_entry: Variant = additional_action_data.get("action", {})
+		if action_entry is Dictionary:
+			return (action_entry as Dictionary).duplicate(true)
+	return {}
+
+func resolve_action_value_references(action_values: Dictionary, visited_additional_action_ids: Array[String] = []) -> Dictionary:
+	var resolved_values: Dictionary = action_values.duplicate(true)
+	for key: Variant in resolved_values.keys():
+		var key_name: String = str(key)
+		if not ACTION_REFERENCE_PARAMETER_NAMES.has(key_name):
+			continue
+		resolved_values[key_name] = _resolve_action_reference_array(resolved_values[key_name], visited_additional_action_ids)
+	return resolved_values
+
+func _resolve_action_reference_array(action_data: Variant, visited_additional_action_ids: Array[String]) -> Array[Dictionary]:
+	var resolved_actions: Array[Dictionary] = []
+	if not (action_data is Array):
+		return resolved_actions
+	for action_entry: Variant in action_data:
+		if action_entry is String:
+			var additional_action_id: String = str(action_entry)
+			if visited_additional_action_ids.has(additional_action_id):
+				push_error("CardData: Circular additional action reference detected: %s" % additional_action_id)
+				continue
+			var additional_action_entry: Dictionary = get_additional_action_entry(additional_action_id)
+			if additional_action_entry.is_empty():
+				push_error("CardData: Missing additional action reference: %s" % additional_action_id)
+				continue
+			var next_visited_ids: Array[String] = visited_additional_action_ids.duplicate()
+			next_visited_ids.append(additional_action_id)
+			resolved_actions.append(_resolve_action_entry(additional_action_entry, next_visited_ids))
+			continue
+		if action_entry is Dictionary:
+			resolved_actions.append(_resolve_action_entry(action_entry, visited_additional_action_ids))
+	return resolved_actions
+
+func _resolve_action_entry(action_entry: Dictionary, visited_additional_action_ids: Array[String]) -> Dictionary:
+	if len(action_entry.keys()) != 1:
+		return action_entry.duplicate(true)
+	var action_token: String = str(action_entry.keys()[0])
+	var action_values: Variant = action_entry[action_token]
+	if not (action_values is Dictionary):
+		return action_entry.duplicate(true)
+	return {
+		action_token: resolve_action_value_references(action_values, visited_additional_action_ids)
+	}
 
 func synchronize_card_kind_rules() -> void:
 	var filtered_validators: Array[Dictionary] = []

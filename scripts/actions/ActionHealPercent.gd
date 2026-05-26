@@ -1,6 +1,9 @@
 # Heals the player by a percentage
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.PERCENTAGE_HEAL_AMOUNT]
+
 func _get_editor_description() -> String:
 	return "Heals the relevant player or party member by a percentage of max health."
 
@@ -15,7 +18,7 @@ func perform_action():
 	# TODO: Generalize percentage healing to target specific allies once ally-targeting UI exists.
 	
 	for action_interceptor_processor in action_interceptor_processors:
-		var percentage_heal_amount: float = action_interceptor_processor.get_shadowed_action_values("percentage_heal_amount", 1.0)
+		var percentage_heal_amount: float = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.PERCENTAGE_HEAL_AMOUNT, 1.0)
 		if party_member_data != null:
 			var percentage_health: int = int(ceil(float(party_member_data.party_member_health_max) * percentage_heal_amount))
 			party_member_data.add_health(percentage_health, 0)
@@ -27,5 +30,5 @@ func perform_action():
 	
 
 func _to_string():
-	var percentage_heal_amount: float = get_action_value("percentage_heal_amount", 1.0)
+	var percentage_heal_amount: float = get_action_value(ActionValueRegistry.PERCENTAGE_HEAL_AMOUNT, 1.0)
 	return "Percent Heal Action %s%" % (percentage_heal_amount * 100)

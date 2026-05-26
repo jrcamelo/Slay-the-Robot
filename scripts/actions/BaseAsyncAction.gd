@@ -7,6 +7,9 @@
 extends BaseAction
 class_name BaseAsyncAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 ## Flag used to check if the action is currently await'ing a signal
 var async_awaiting: bool = false
 

@@ -86,40 +86,10 @@ static func get_card_field_definitions() -> Dictionary[String, Dictionary]:
 	}
 
 static func get_card_value_definitions() -> Dictionary[String, Dictionary]:
-	var definitions: Dictionary[String, Dictionary] = {
-		"damage": _card_value("Damage", "Primary damage amount used by attacks.", "int", 0),
-		"block": _card_value("Block", "Primary block amount granted by the card.", "int", 0),
-		"amount": _card_value("Amount", "Generic amount used by statuses and scalar effects.", "int", 0),
-		"number_of_attacks": _card_value("Hits", "How many repeated attack actions this card should generate.", "int", 1),
-		"transform_into_card_object_id": _card_value("Transform Target Card ID", "Card object_id used by transform-style effects.", "string", ""),
-		"transform_parent_card": _card_value("Transform Parent Card", "When true, transforms the parent card instead of the temporary combat copy.", "bool", false),
-		"pick_played_card": _card_value("Pick Played Card", "When true, uses the currently played card as the cardset source.", "bool", false),
-	}
-	for metadata: Dictionary in ScriptEditorMetadataRegistry.get_all_action_metadata():
-		for parameter_definition: Dictionary in metadata.get("parameters", []):
-			var parameter_name: String = str(parameter_definition.get("name", ""))
-			if not _is_card_value_candidate(parameter_name, parameter_definition):
-				continue
-			var normalized_definition: Dictionary = {
-				"label": str(parameter_definition.get("label", parameter_name)),
-				"description": str(parameter_definition.get("description", "")),
-				"value_type": str(parameter_definition.get("value_type", "variant")),
-				"default_value": parameter_definition.get("default_value", null),
-				"options": parameter_definition.get("options", []),
-			}
-			if not definitions.has(parameter_name):
-				definitions[parameter_name] = normalized_definition
-			else:
-				var merged_definition: Dictionary = definitions[parameter_name]
-				if str(merged_definition.get("description", "")) == "" and normalized_definition["description"] != "":
-					merged_definition["description"] = normalized_definition["description"]
-				if str(merged_definition.get("value_type", "variant")) == "variant" and normalized_definition["value_type"] != "variant":
-					merged_definition["value_type"] = normalized_definition["value_type"]
-					merged_definition["default_value"] = normalized_definition["default_value"]
-				if len(merged_definition.get("options", [])) == 0 and len(normalized_definition.get("options", [])) > 0:
-					merged_definition["options"] = normalized_definition["options"]
-				definitions[parameter_name] = merged_definition
-	return definitions
+	return ActionValueRegistry.get_card_value_definitions()
+
+static func get_card_value_name_options() -> Array[Dictionary]:
+	return ActionValueRegistry.get_value_options()
 
 static func get_action_property_names() -> Array[String]:
 	return [
@@ -175,36 +145,22 @@ static func _card_value(label: String, description: String, value_type: String, 
 	return value_data
 
 static func _is_card_value_candidate(parameter_name: String, parameter_definition: Dictionary) -> bool:
-	if parameter_name == "":
-		return false
-	if parameter_name in [
-		"time_delay",
-		"action_tags",
-		"action_short_circuits",
-		"target_override",
-		"validator_data",
-		"action_data",
-		"passed_action_data",
-		"failed_action_data",
-		"picked_cards",
-		"draft_cards",
-		"card_pick_text",
-		"rng_name",
-	]:
-		return false
-	var value_type: String = str(parameter_definition.get("value_type", "variant"))
-	return value_type in ["int", "float", "bool", "string", "enum"]
+	return ActionValueRegistry.has_definition(parameter_name)
 
 static func _enum_options(enum_map: Dictionary) -> Array[Dictionary]:
-	var options: Array[Dictionary] = []
+	var enum_values: Array[int] = []
+	var enum_labels_by_value: Dictionary[int, String] = {}
 	for enum_key: String in enum_map.keys():
+		var enum_value: int = enum_map[enum_key]
+		enum_values.append(enum_value)
+		enum_labels_by_value[enum_value] = enum_key.to_snake_case().replace("_", " ").capitalize()
+	enum_values.sort()
+	var options: Array[Dictionary] = []
+	for enum_value: int in enum_values:
 		options.append({
-			"label": enum_key.to_snake_case().replace("_", " ").capitalize(),
-			"value": enum_map[enum_key],
+			"label": enum_labels_by_value.get(enum_value, str(enum_value)),
+			"value": enum_value,
 		})
-	options.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
-		return int(left.get("value", 0)) < int(right.get("value", 0))
-	)
 	return options
 
 static func _enum_options_from_strings(values: Array[String]) -> Array[Dictionary]:

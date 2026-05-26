@@ -3,8 +3,16 @@
 extends ActionBasePickCards
 class_name ActionPickCards
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return super()
+
 func _get_editor_description() -> String:
 	return "Prompts for or auto-selects cards, then generates child cardset actions that operate on the picked cards."
+
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameter_definitions: Array[Dictionary] = super()
+	parameter_definitions.append(_editor_param("action_data", "Action Data", "array", [], "Additional actions generated after the card pick completes."))
+	return parameter_definitions
 
 func perform_async_action() -> void:
 	_generate_child_actions()

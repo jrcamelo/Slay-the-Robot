@@ -2,11 +2,14 @@
 # This can target a list of cards, or their parent cards (making it permanent if in player's deck)
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.PICK_PLAYED_CARD, ActionValueRegistry.UPGRADE_PARENT_CARD]
+
 func _get_editor_description() -> String:
 	return "Upgrades selected cards, optionally applying the upgrade to their parent deck copies."
 
 func perform_action():
-	var upgrade_parent_card: bool = get_action_value("upgrade_parent_card", true)
+	var upgrade_parent_card: bool = get_action_value(ActionValueRegistry.UPGRADE_PARENT_CARD, true)
 	var picked_cards: Array[CardData] = _get_picked_cards()
 	
 	# iterate over the cards, upgrading them and/or their parent

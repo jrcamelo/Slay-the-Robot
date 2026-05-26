@@ -4,6 +4,9 @@
 ## See: ShopData.visit_shop() and ActionGenerator.generate_populate_shop_items() 
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.SHOP_ARTIFACT_IDS, ActionValueRegistry.SHOP_ARTIFACT_PRICES, ActionValueRegistry.SHOP_CARD_PRICES, ActionValueRegistry.SHOP_CONSUMABLE_IDS, ActionValueRegistry.SHOP_CONSUMABLE_PRICES]
+
 func _get_editor_description() -> String:
 	return "Populates the current shop with cards, artifacts, consumables, and their prices."
 
@@ -25,13 +28,13 @@ func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
 		var shop_cards: Array[CardData] = action_interceptor_processor.get_shadowed_action_values("shop_cards", [] as Array[CardData])
-		var shop_card_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values("shop_card_prices", [] as Array[int])
+		var shop_card_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_CARD_PRICES, [] as Array[int])
 		
-		var shop_artifact_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values("shop_artifact_ids", [] as Array[String])
-		var shop_artifact_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values("shop_artifact_prices", [] as Array[int])
+		var shop_artifact_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_ARTIFACT_IDS, [] as Array[String])
+		var shop_artifact_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_ARTIFACT_PRICES, [] as Array[int])
 
-		var shop_consumable_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values("shop_consumable_ids", [] as Array[String])
-		var shop_consumable_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values("shop_consumable_prices", [] as Array[int])
+		var shop_consumable_ids: Array[String] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_CONSUMABLE_IDS, [] as Array[String])
+		var shop_consumable_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_CONSUMABLE_PRICES, [] as Array[int])
 		
 		# add cards
 		for i: int in len(shop_cards):

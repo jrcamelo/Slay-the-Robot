@@ -1,14 +1,17 @@
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.ARTIFACT_ID]
+
 func _get_editor_description() -> String:
 	return "Adds an artifact to the player by artifact id."
 
 func perform_action():
-	var artifact_id: String = get_action_value("artifact_id", "")
+	var artifact_id: String = get_action_value(ActionValueRegistry.ARTIFACT_ID, "")
 	var artifact_data: ArtifactData = Global.get_artifact_data_from_prototype(artifact_id)
 	if artifact_data != null:
 		Global.player_data.add_artifact(artifact_id)
 
 func _to_string():
-	var artifact_id: String = get_action_value("artifact_id", "")
+	var artifact_id: String = get_action_value(ActionValueRegistry.ARTIFACT_ID, "")
 	return "Add Artifact Action: " + artifact_id

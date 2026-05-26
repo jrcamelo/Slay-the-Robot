@@ -4,6 +4,7 @@ class_name CardEditorScreen
 
 const PROPERTY_GROUP_LABELS := {
 	"card_play_actions": "Play Actions",
+	"card_additional_actions": "Additional Actions",
 	"card_discard_actions": "Discard Actions",
 	"card_end_of_turn_actions": "End Of Turn Actions",
 	"card_exhaust_actions": "Exhaust Actions",
@@ -103,6 +104,7 @@ const SECONDARY_BEHAVIOR_GROUPS := [
 ]
 const BEHAVIOR_GROUP_DESCRIPTIONS := {
 	"card_play_actions": "What the card does when played.",
+	"card_additional_actions": "Reusable child actions referenced by action parameters. These do not run unless another action points to them.",
 	"card_play_validators": "Rules that block the card from being played.",
 	"card_glow_validators": "Rules that make the card light up without blocking play.",
 	"card_right_click_actions": "Optional utility behavior while the card is in hand.",
@@ -1176,6 +1178,7 @@ func _render_behavior() -> void:
 	))
 	for property_name: String in PRIMARY_BEHAVIOR_GROUPS:
 		behavior_container.add_child(_build_entry_group(property_name, not property_name.contains("validators")))
+	behavior_container.add_child(_build_additional_action_group())
 	var secondary_toggle := _build_simple_toggle_row(
 		"Triggered and deck hooks",
 		"Discard, draw, retain, and deck-change hooks are usually niche. Open them only when the card needs them.",
@@ -1238,6 +1241,164 @@ func _build_entry_group(property_name: String, is_action: bool) -> Control:
 		var entry: Dictionary = entries[index]
 		vbox.add_child(_build_entry_editor(property_name, index, entry, is_action))
 	return panel
+
+func _build_additional_action_group() -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 12)
+	padding.add_theme_constant_override("margin_top", 12)
+	padding.add_theme_constant_override("margin_right", 12)
+	padding.add_theme_constant_override("margin_bottom", 12)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	panel.add_child(padding)
+	padding.add_child(vbox)
+	var property_name := "card_additional_actions"
+	var entries: Array = service.get_additional_action_entries(current_session)
+	var header := HBoxContainer.new()
+	var title := Label.new()
+	title.text = "%s (%s)" % [PROPERTY_GROUP_LABELS[property_name], len(entries)]
+	title.add_theme_font_size_override("font_size", 16)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+	var collapse_button := Button.new()
+	collapse_button.text = COLLAPSED_ARROW if collapsed_behavior_groups.get(property_name, false) else EXPANDED_ARROW
+	collapse_button.button_up.connect(func():
+		collapsed_behavior_groups[property_name] = not bool(collapsed_behavior_groups.get(property_name, false))
+		_request_behavior_render()
+	)
+	header.add_child(collapse_button)
+	vbox.add_child(header)
+	var description := Label.new()
+	description.text = str(BEHAVIOR_GROUP_DESCRIPTIONS.get(property_name, ""))
+	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.modulate = Color(0.8, 0.82, 0.86, 0.9)
+	vbox.add_child(description)
+	if bool(collapsed_behavior_groups.get(property_name, false)):
+		return panel
+	if entries.is_empty():
+		var no_entries := Label.new()
+		no_entries.text = "No additional actions yet. Use an action parameter's Add Action button to create one."
+		no_entries.modulate = Color(0.78, 0.8, 0.84, 0.9)
+		vbox.add_child(no_entries)
+		return panel
+	for entry_index: int in range(len(entries)):
+		var additional_action: Dictionary = entries[entry_index]
+		vbox.add_child(_build_additional_action_editor(entry_index, additional_action))
+	return panel
+
+func _build_additional_action_editor(entry_index: int, additional_action: Dictionary) -> Control:
+	var additional_action_id: String = str(additional_action.get("id", ""))
+	var action_entry: Dictionary = additional_action.get("action", {})
+	if additional_action_id == "" or action_entry.is_empty():
+		return Label.new()
+	var token: String = str(action_entry.keys()[0])
+	var entry_panel := PanelContainer.new()
+	entry_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 10)
+	padding.add_theme_constant_override("margin_top", 10)
+	padding.add_theme_constant_override("margin_right", 10)
+	padding.add_theme_constant_override("margin_bottom", 10)
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	entry_panel.add_child(padding)
+	padding.add_child(wrapper)
+	var toolbar := HBoxContainer.new()
+	var option_entries: Array[Dictionary] = service.get_action_options("action_children")
+	var token_option := OptionButton.new()
+	for option_data: Dictionary in option_entries:
+		token_option.add_item(str(option_data.get("display_name", option_data.get("resolved_token", ""))))
+		token_option.set_item_metadata(token_option.get_item_count() - 1, option_data)
+	var display_name: String = token
+	for item_index: int in range(token_option.get_item_count()):
+		var metadata: Dictionary = token_option.get_item_metadata(item_index)
+		if str(metadata.get("resolved_token", "")) == Scripts.normalize_script_reference(token):
+			token_option.select(item_index)
+			display_name = str(metadata.get("display_name", token))
+			break
+	var title_label := Label.new()
+	title_label.text = "%s (%s)" % [display_name, additional_action_id]
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.add_theme_font_size_override("font_size", 15)
+	toolbar.add_child(title_label)
+	var entry_key: String = _entry_visibility_key("card_additional_actions", entry_index, additional_action_id)
+	var collapse_button := Button.new()
+	collapse_button.text = COLLAPSED_ARROW if collapsed_behavior_entries.get(entry_key, false) else EXPANDED_ARROW
+	collapse_button.button_up.connect(func():
+		collapsed_behavior_entries[entry_key] = not bool(collapsed_behavior_entries.get(entry_key, false))
+		_request_behavior_render()
+	)
+	toolbar.add_child(collapse_button)
+	var up_button := Button.new()
+	up_button.text = "Up"
+	up_button.button_up.connect(func():
+		if service.move_additional_action(current_session, entry_index, max(entry_index - 1, 0)):
+			_refresh_editor_panels()
+	)
+	toolbar.add_child(up_button)
+	var down_button := Button.new()
+	down_button.text = "Down"
+	down_button.button_up.connect(func():
+		if service.move_additional_action(current_session, entry_index, min(entry_index + 1, len(service.get_additional_action_entries(current_session)) - 1)):
+			_refresh_editor_panels()
+	)
+	toolbar.add_child(down_button)
+	var remove_button := Button.new()
+	remove_button.text = "Remove"
+	remove_button.button_up.connect(func():
+		if service.remove_additional_action(current_session, additional_action_id):
+			_refresh_editor_panels()
+	)
+	toolbar.add_child(remove_button)
+	wrapper.add_child(toolbar)
+	if bool(collapsed_behavior_entries.get(entry_key, false)):
+		var collapsed_summary := Label.new()
+		collapsed_summary.text = _build_entry_summary(token, action_entry[token], true)
+		collapsed_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		collapsed_summary.modulate = Color(0.82, 0.82, 0.86, 0.95)
+		wrapper.add_child(collapsed_summary)
+		return entry_panel
+	var token_metadata: Dictionary = service.get_action_metadata(token)
+	var token_description: String = str(token_metadata.get("description", ""))
+	if token_description != "":
+		var description_label := Label.new()
+		description_label.text = token_description
+		description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
+		wrapper.add_child(description_label)
+	var token_row := HBoxContainer.new()
+	var token_label := Label.new()
+	token_label.text = "Effect"
+	token_label.custom_minimum_size = Vector2(52, 0)
+	token_row.add_child(token_label)
+	token_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	token_row.add_child(token_option)
+	wrapper.add_child(token_row)
+	token_option.item_selected.connect(func(selected_index: int):
+		var metadata: Dictionary = token_option.get_item_metadata(selected_index)
+		var next_token: String = str(metadata.get("resolved_token", metadata.get("token_or_path", "")))
+		service.replace_additional_action(current_session, additional_action_id, next_token)
+		_refresh_after_behavior_structure_change()
+	)
+	var parameters: Array[Dictionary] = []
+	parameters.assign(token_metadata.get("parameters", []))
+	var values: Dictionary = action_entry[token]
+	var visible_parameters: Array[Dictionary] = []
+	for parameter_data: Dictionary in parameters:
+		if _should_show_parameter(parameter_data, values):
+			visible_parameters.append(parameter_data)
+	if not visible_parameters.is_empty():
+		var parameter_grid := GridContainer.new()
+		parameter_grid.columns = 2
+		parameter_grid.add_theme_constant_override("h_separation", 8)
+		parameter_grid.add_theme_constant_override("v_separation", 8)
+		for parameter_data: Dictionary in visible_parameters:
+			parameter_grid.add_child(_build_additional_action_parameter_editor(additional_action_id, token, parameter_data, values))
+		wrapper.add_child(parameter_grid)
+	return entry_panel
 
 func _build_entry_editor(property_name: String, index: int, entry: Dictionary, is_action: bool) -> Control:
 	var token: String = str(entry.keys()[0])
@@ -1403,9 +1564,13 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 		"enum":
 			var dropdown := OptionButton.new()
 			var options: Array = parameter_data.get("options", [])
-			for option_data: Dictionary in options:
-				dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
-				dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+			for option_data: Variant in options:
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
 			for option_index: int in range(dropdown.get_item_count()):
 				if dropdown.get_item_metadata(option_index) == current_value:
 					dropdown.select(option_index)
@@ -1433,8 +1598,8 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 		"validator_array":
 			wrapper.add_child(_build_nested_validator_array_editor(property_name, index, parameter_name, current_value))
 		"array":
-			if _is_action_array_parameter(parameter_name, current_value):
-				wrapper.add_child(_build_nested_action_array_editor(property_name, index, parameter_name, current_value))
+			if _is_action_reference_parameter(parameter_name):
+				wrapper.add_child(_build_action_reference_array_editor("card_entry", _card_entry_owner_key(property_name, index), parameter_name, current_value))
 				return panel
 			var text_edit := TextEdit.new()
 			text_edit.custom_minimum_size = Vector2(0, 72)
@@ -1477,6 +1642,238 @@ func _build_entry_parameter_editor(property_name: String, index: int, token: Str
 			)
 			wrapper.add_child(line_edit)
 	return panel
+
+func _build_additional_action_parameter_editor(additional_action_id: String, token: String, parameter_data: Dictionary, values: Dictionary) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var padding := MarginContainer.new()
+	padding.add_theme_constant_override("margin_left", 8)
+	padding.add_theme_constant_override("margin_top", 8)
+	padding.add_theme_constant_override("margin_right", 8)
+	padding.add_theme_constant_override("margin_bottom", 8)
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	panel.add_child(padding)
+	padding.add_child(wrapper)
+	var parameter_name: String = str(parameter_data.get("name", ""))
+	var label := Label.new()
+	label.text = str(parameter_data.get("label", parameter_name))
+	label.add_theme_font_size_override("font_size", 13)
+	var description: String = str(parameter_data.get("description", ""))
+	label.tooltip_text = description
+	panel.tooltip_text = description
+	wrapper.add_child(label)
+	var current_value: Variant = values.get(parameter_name, parameter_data.get("default_value", null))
+	var value_type: String = str(parameter_data.get("value_type", "variant"))
+	match value_type:
+		"bool":
+			var checkbox := CheckBox.new()
+			checkbox.button_pressed = bool(current_value)
+			_setup_checkbox(checkbox)
+			_style_checkbox(checkbox, bool(current_value))
+			checkbox.toggled.connect(func(pressed: bool):
+				service.update_additional_action_values(current_session, additional_action_id, {parameter_name: pressed})
+				_refresh_after_behavior_change()
+			)
+			wrapper.add_child(checkbox)
+		"enum":
+			var dropdown := OptionButton.new()
+			var options: Array = parameter_data.get("options", [])
+			for option_data: Variant in options:
+				if option_data is Dictionary:
+					dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data.get("value", null))
+				else:
+					dropdown.add_item(str(option_data))
+					dropdown.set_item_metadata(dropdown.get_item_count() - 1, option_data)
+			for option_index: int in range(dropdown.get_item_count()):
+				if dropdown.get_item_metadata(option_index) == current_value:
+					dropdown.select(option_index)
+					break
+			dropdown.item_selected.connect(func(option_index: int):
+				service.update_additional_action_values(current_session, additional_action_id, {parameter_name: dropdown.get_item_metadata(option_index)})
+				_refresh_after_behavior_change()
+			)
+			wrapper.add_child(dropdown)
+		"enum_array":
+			wrapper.add_child(_build_additional_action_enum_array_editor(additional_action_id, parameter_name, parameter_data, current_value))
+		"validator_array":
+			var text_edit := TextEdit.new()
+			text_edit.custom_minimum_size = Vector2(0, 72)
+			text_edit.text = JSON.stringify(current_value, "\t")
+			text_edit.focus_exited.connect(func():
+				var parsed_value: Variant = JSON.parse_string(text_edit.text)
+				if parsed_value != null:
+					service.update_additional_action_values(current_session, additional_action_id, {parameter_name: parsed_value})
+					_refresh_after_behavior_change()
+			)
+			wrapper.add_child(text_edit)
+		"array":
+			if _is_action_reference_parameter(parameter_name):
+				wrapper.add_child(_build_action_reference_array_editor("additional_action", additional_action_id, parameter_name, current_value))
+				return panel
+			var array_text := TextEdit.new()
+			array_text.custom_minimum_size = Vector2(0, 72)
+			array_text.text = JSON.stringify(current_value, "\t")
+			array_text.focus_exited.connect(func():
+				var parsed_value: Variant = JSON.parse_string(array_text.text)
+				if parsed_value != null:
+					service.update_additional_action_values(current_session, additional_action_id, {parameter_name: parsed_value})
+					_refresh_after_behavior_change()
+			)
+			wrapper.add_child(array_text)
+		"card_array":
+			wrapper.add_child(_build_additional_action_string_array_editor(additional_action_id, parameter_name, current_value, "card_1,card_2"))
+		"string_array":
+			wrapper.add_child(_build_additional_action_string_array_editor(additional_action_id, parameter_name, current_value, "value_1,value_2"))
+		"int", "float":
+			var spin := SpinBox.new()
+			spin.min_value = -999
+			spin.max_value = 9999
+			spin.step = 1 if value_type == "int" else 0.1
+			spin.value = float(current_value if current_value != null else 0)
+			spin.value_changed.connect(func(value: float):
+				service.update_additional_action_values(current_session, additional_action_id, {parameter_name: int(value) if value_type == "int" else value})
+				_refresh_after_behavior_change()
+			)
+			wrapper.add_child(spin)
+		_:
+			var line_edit := LineEdit.new()
+			line_edit.text = "" if current_value == null else str(current_value)
+			line_edit.text_submitted.connect(func(new_text: String):
+				service.update_additional_action_values(current_session, additional_action_id, {parameter_name: _coerce_string_parameter(new_text, value_type)})
+				_refresh_after_behavior_change()
+			)
+			line_edit.focus_exited.connect(func():
+				service.update_additional_action_values(current_session, additional_action_id, {parameter_name: _coerce_string_parameter(line_edit.text, value_type)})
+				_refresh_after_behavior_change()
+			)
+			wrapper.add_child(line_edit)
+	return panel
+
+func _build_action_reference_array_editor(owner_type: String, owner_key: String, parameter_name: String, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 6)
+	var reference_ids: Array = []
+	reference_ids.assign(current_value if current_value is Array else [])
+	var add_row := HBoxContainer.new()
+	add_row.add_theme_constant_override("separation", 6)
+	var action_dropdown := OptionButton.new()
+	action_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_populate_option_button(action_dropdown, _metadata_options(service.get_action_options("action_children")))
+	add_row.add_child(action_dropdown)
+	var add_button := Button.new()
+	add_button.text = "Add Action"
+	add_button.button_up.connect(func():
+		var selected_token: Variant = _get_option_button_value(action_dropdown)
+		if selected_token == null:
+			return
+		if service.create_additional_action_reference(current_session, owner_type, owner_key, parameter_name, str(selected_token)) != "":
+			_refresh_after_behavior_structure_change()
+	)
+	add_row.add_child(add_button)
+	wrapper.add_child(add_row)
+	if reference_ids.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No additional actions referenced."
+		wrapper.add_child(empty_label)
+		return wrapper
+	for reference_index: int in range(len(reference_ids)):
+		var reference_value: Variant = reference_ids[reference_index]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		var reference_id: String = str(reference_value)
+		var reference_label := Label.new()
+		reference_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		reference_label.text = _get_action_reference_label(reference_id, reference_value)
+		row.add_child(reference_label)
+		var up_button := Button.new()
+		up_button.text = "Up"
+		up_button.button_up.connect(func():
+			if service.move_action_reference(current_session, owner_type, owner_key, parameter_name, reference_index, max(reference_index - 1, 0)):
+				_refresh_after_behavior_structure_change()
+		)
+		row.add_child(up_button)
+		var down_button := Button.new()
+		down_button.text = "Down"
+		down_button.button_up.connect(func():
+			if service.move_action_reference(current_session, owner_type, owner_key, parameter_name, reference_index, min(reference_index + 1, len(reference_ids) - 1)):
+				_refresh_after_behavior_structure_change()
+		)
+		row.add_child(down_button)
+		var remove_button := Button.new()
+		remove_button.text = "Remove"
+		remove_button.button_up.connect(func():
+			if service.remove_action_reference(current_session, owner_type, owner_key, parameter_name, reference_index):
+				_refresh_after_behavior_structure_change()
+		)
+		row.add_child(remove_button)
+		wrapper.add_child(row)
+	return wrapper
+
+func _build_additional_action_enum_array_editor(additional_action_id: String, parameter_name: String, parameter_data: Dictionary, current_value: Variant) -> Control:
+	var wrapper := VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 4)
+	var current_values: Array = []
+	current_values.assign(current_value if current_value is Array else [])
+	for option_data: Variant in parameter_data.get("options", []):
+		var option_label: String = str(option_data)
+		var option_value: Variant = option_data
+		if option_data is Dictionary:
+			option_label = str(option_data.get("label", option_data.get("value", "")))
+			option_value = option_data.get("value", null)
+		var checkbox := CheckBox.new()
+		checkbox.text = option_label
+		checkbox.button_pressed = current_values.has(option_value)
+		_setup_checkbox(checkbox)
+		_style_checkbox(checkbox, checkbox.button_pressed)
+		checkbox.toggled.connect(func(pressed: bool):
+			var next_values: Array = current_values.duplicate(true)
+			if pressed and not next_values.has(option_value):
+				next_values.append(option_value)
+			elif not pressed:
+				next_values.erase(option_value)
+			service.update_additional_action_values(current_session, additional_action_id, {parameter_name: next_values})
+			_refresh_after_behavior_change()
+		)
+		wrapper.add_child(checkbox)
+	return wrapper
+
+func _build_additional_action_string_array_editor(additional_action_id: String, parameter_name: String, current_value: Variant, placeholder_text: String) -> Control:
+	var line_edit := LineEdit.new()
+	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_edit.placeholder_text = placeholder_text
+	line_edit.text = ",".join(_variant_to_string_array(current_value))
+	line_edit.text_submitted.connect(func(_text: String):
+		service.update_additional_action_values(current_session, additional_action_id, {parameter_name: _parse_csv_strings(line_edit.text)})
+		_refresh_after_behavior_change()
+	)
+	line_edit.focus_exited.connect(func():
+		service.update_additional_action_values(current_session, additional_action_id, {parameter_name: _parse_csv_strings(line_edit.text)})
+		_refresh_after_behavior_change()
+	)
+	return line_edit
+
+func _card_entry_owner_key(property_name: String, index: int) -> String:
+	return "%s::%s" % [property_name, index]
+
+func _get_action_reference_label(reference_id: String, reference_value: Variant) -> String:
+	var additional_entries: Array = service.get_additional_action_entries(current_session)
+	for additional_action: Dictionary in additional_entries:
+		if str(additional_action.get("id", "")) != reference_id:
+			continue
+		var action_entry: Dictionary = additional_action.get("action", {})
+		if action_entry.is_empty():
+			break
+		var token: String = str(action_entry.keys()[0])
+		var metadata: Dictionary = service.get_action_metadata(token)
+		var display_name: String = str(metadata.get("display_name", token))
+		return "%s (%s)" % [display_name, reference_id]
+	if reference_value is Dictionary:
+		var legacy_entry: Dictionary = reference_value
+		if not legacy_entry.is_empty():
+			return "Legacy inline action"
+	return "Missing action (%s)" % reference_id
 
 func _render_preview() -> void:
 	for child in preview_mount.get_children():
@@ -2643,10 +3040,13 @@ func _variant_to_string_array(value: Variant) -> Array[String]:
 			values.append(str(item))
 	return values
 
+func _is_action_reference_parameter(parameter_name: String) -> bool:
+	return parameter_name in ["action_data", "passed_action_data", "failed_action_data", "actions_on_lethal"]
+
 func _is_action_array_parameter(parameter_name: String, current_value: Variant) -> bool:
 	if not (current_value is Array):
 		return false
-	return parameter_name in ["action_data", "passed_action_data", "failed_action_data"]
+	return _is_action_reference_parameter(parameter_name)
 
 func _populate_static_filters() -> void:
 	var source_options: Array[Dictionary] = [

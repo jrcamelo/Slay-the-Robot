@@ -2,6 +2,9 @@
 # affected by fewer interceptors compared to an AttackAction
 extends BaseAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.BYPASS_BLOCK, ActionValueRegistry.DAMAGE, ActionValueRegistry.OVERKILL_DAMAGE, ActionValueRegistry.UNBLOCKED_DAMAGE, ActionValueRegistry.UNBLOCKED_DAMAGE_CAPPED]
+
 func _get_editor_description() -> String:
 	return "Deals direct damage immediately, with optional bypass-block behavior and lethal follow-up actions."
 
@@ -13,6 +16,11 @@ func _get_editor_contexts() -> Array[String]:
 		EDITOR_CONTEXT_ENEMY_ACTIONS,
 	]
 
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	return [
+		_editor_param("actions_on_lethal", "Actions On Lethal", "array", [], "Additional actions triggered if this damage kills the target."),
+	]
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	
@@ -21,8 +29,8 @@ func perform_action():
 		if target == null:
 			return
 		
-		var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values("bypass_block", false)
+		var damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
+		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BYPASS_BLOCK, false)
 		
 		var damages: Array[int] = target.damage(damage, bypass_block)
 		var unblocked_damage: int = damages[0]
@@ -35,12 +43,12 @@ func perform_action():
 		# an action that provides block based on overkill_damage. These will require providing
 		# custom_key_names into the subsequent actions.
 		if card_play_request != null:
-			var previous_unblocked_damage: int = get_action_value("unblocked_damage", 0)
-			card_play_request.card_values["unblocked_damage"] = unblocked_damage + previous_unblocked_damage
-			var previous_unblocked_damage_capped: int = get_action_value("unblocked_damage_capped", 0)
-			card_play_request.card_values["unblocked_damage_capped"] = unblocked_damage_capped + previous_unblocked_damage_capped
-			var previous_overkill_damage: int = get_action_value("overkill_damage", 0)
-			card_play_request.card_values["overkill_damage"] = overkill_damage + previous_overkill_damage
+			var previous_unblocked_damage: int = get_action_value(ActionValueRegistry.UNBLOCKED_DAMAGE, 0)
+			card_play_request.card_values[ActionValueRegistry.UNBLOCKED_DAMAGE] = unblocked_damage + previous_unblocked_damage
+			var previous_unblocked_damage_capped: int = get_action_value(ActionValueRegistry.UNBLOCKED_DAMAGE_CAPPED, 0)
+			card_play_request.card_values[ActionValueRegistry.UNBLOCKED_DAMAGE_CAPPED] = unblocked_damage_capped + previous_unblocked_damage_capped
+			var previous_overkill_damage: int = get_action_value(ActionValueRegistry.OVERKILL_DAMAGE, 0)
+			card_play_request.card_values[ActionValueRegistry.OVERKILL_DAMAGE] = overkill_damage + previous_overkill_damage
 		
 		# target killed by attack
 		if not target.is_alive():
@@ -52,5 +60,5 @@ func perform_action():
 				ActionHandler.add_actions(generated_on_lethal_actions)
 			
 func _to_string():
-	var damage: int = get_action_value("damage", 0)
+	var damage: int = get_action_value(ActionValueRegistry.DAMAGE, 0)
 	return "Damage Action: " + str(damage)

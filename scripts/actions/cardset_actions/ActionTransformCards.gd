@@ -2,6 +2,9 @@
 # This can target a list of cards, or their parent cards (making it permanent if in player's deck)
 extends BaseCardsetAction
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return [ActionValueRegistry.FORCE_UPGRADE_LEVEL, ActionValueRegistry.KEEP_COLOR, ActionValueRegistry.KEEP_RARITY, ActionValueRegistry.KEEP_TYPE, ActionValueRegistry.KEEP_UPGRADE_LEVEL, ActionValueRegistry.PICK_PLAYED_CARD, ActionValueRegistry.TRANSFORM_COLORS, ActionValueRegistry.TRANSFORM_INTO_CARD_OBJECT_ID, ActionValueRegistry.TRANSFORM_PARENT_CARD, ActionValueRegistry.TRANSFORM_RARITIES, ActionValueRegistry.TRANSFORM_TYPES]
+
 func _get_editor_description() -> String:
 	return "Transforms selected cards into other cards, with optional preservation of color, rarity, type, and upgrades."
 
@@ -11,25 +14,25 @@ func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
 	for action_interceptor_processor in action_interceptor_processors:
 		# whether to transform the combat card or permanent card
-		var transform_parent_card: bool = action_interceptor_processor.get_shadowed_action_values("transform_parent_card", true)
+		var transform_parent_card: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.TRANSFORM_PARENT_CARD, true)
 		# use this flag for a specific card id. Empty string for random transform
-		var transform_into_card_object_id: String = action_interceptor_processor.get_shadowed_action_values("transform_into_card_object_id", "")
+		var transform_into_card_object_id: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.TRANSFORM_INTO_CARD_OBJECT_ID, "")
 		# use upgrade of original card
-		var keep_upgrade_level: bool = action_interceptor_processor.get_shadowed_action_values("keep_upgrade_level", false)
+		var keep_upgrade_level: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.KEEP_UPGRADE_LEVEL, false)
 		# force transformed card to be upgraded to a level, -1 for no force
-		var force_upgrade_level: int = action_interceptor_processor.get_shadowed_action_values("force_upgrade_level", -1)
+		var force_upgrade_level: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.FORCE_UPGRADE_LEVEL, -1)
 		### randomized tranform params
 		# limits the kind of card each card can transform into
-		var keep_rarity: bool = action_interceptor_processor.get_shadowed_action_values("keep_rarity", false)
-		var keep_color: bool = action_interceptor_processor.get_shadowed_action_values("keep_color", true)
-		var keep_type: bool = action_interceptor_processor.get_shadowed_action_values("keep_type", false)
+		var keep_rarity: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.KEEP_RARITY, false)
+		var keep_color: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.KEEP_COLOR, true)
+		var keep_type: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.KEEP_TYPE, false)
 		# if keep flags are not used, use these
 		var transform_rarities: Array[int] = []
-		transform_rarities.assign(action_interceptor_processor.get_shadowed_action_values("transform_rarities", CardData.CARD_RARITIES.values()))
+		transform_rarities.assign(action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.TRANSFORM_RARITIES, CardData.CARD_RARITIES.values()))
 		var transform_colors: Array[String] = []
-		transform_colors.assign(action_interceptor_processor.get_shadowed_action_values("transform_colors", Global._id_to_color_data.keys()))
+		transform_colors.assign(action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.TRANSFORM_COLORS, Global._id_to_color_data.keys()))
 		var transform_types: Array[int] = []
-		transform_types.assign(action_interceptor_processor.get_shadowed_action_values("transform_types", CardData.STANDARD_CARD_TYPES))
+		transform_types.assign(action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.TRANSFORM_TYPES, CardData.STANDARD_CARD_TYPES))
 		
 		# iterate over the cards, transforming them and/or their parent
 		for card_data in picked_cards:
@@ -65,8 +68,7 @@ func perform_action():
 					.convert_to_card_object_ids()
 					)
 				
-				var rng_name: String = action_interceptor_processor.get_shadowed_action_values("rng_name", "rng_card_transforming")
-				var rng_card_transforming: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)	
+				var rng_card_transforming: RandomNumberGenerator = Global.player_data.get_player_rng("rng_card_transforming")	
 				
 				card_object_ids = Random.shuffle_array(rng_card_transforming, card_object_ids)
 				

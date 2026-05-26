@@ -88,6 +88,9 @@ func _get_editor_contexts() -> Array[String]:
 func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	return []
 
+func _get_editor_relevant_value_names() -> Array[String]:
+	return []
+
 func _get_editor_common_parameter_definitions(parameter_names: Array[String]) -> Array[Dictionary]:
 	var parameter_definitions: Array[Dictionary] = []
 	for parameter_name: String in parameter_names:
@@ -247,8 +250,7 @@ func get_adjusted_action_targets() -> Array[BaseCombatant]:
 		TARGET_OVERRIDES.RANDOM_ENEMY:
 			var enemies: Array[Node] = Global.get_tree().get_nodes_in_group("enemies")
 			
-			var rng_name: String = get_action_value("rng_name", "rng_targeting")
-			var rng_targeting: RandomNumberGenerator = Global.player_data.get_player_rng(rng_name)
+			var rng_targeting: RandomNumberGenerator = Global.player_data.get_player_rng("rng_targeting")
 			
 			enemies = Random.shuffle_array(rng_targeting, enemies)
 			if len(enemies) > 0:
