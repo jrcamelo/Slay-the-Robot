@@ -75,7 +75,7 @@ static func build_property_section(screen, group_data: Dictionary) -> Control:
 	if bool(screen.collapsed_property_groups.get(group_title, false)):
 		return panel
 	var grid := GridContainer.new()
-	grid.columns = int(group_data.get("columns", 1))
+	grid.columns = screen._get_inspector_section_columns(int(group_data.get("columns", 1)))
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
@@ -142,6 +142,7 @@ static func build_property_editor(screen, property_name: String, field_definitio
 			wrapper.add_child(checkbox)
 		"enum":
 			var dropdown := OptionButton.new()
+			dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			var options: Array = field_definition.get("options", [])
 			for option_data: Dictionary in options:
 				dropdown.add_item(str(option_data.get("label", option_data.get("value", ""))))
@@ -158,6 +159,7 @@ static func build_property_editor(screen, property_name: String, field_definitio
 			wrapper.add_child(dropdown)
 		"int":
 			var spin := SpinBox.new()
+			spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			spin.min_value = -999
 			spin.max_value = 9999
 			spin.step = 1
@@ -226,7 +228,9 @@ static func build_property_editor(screen, property_name: String, field_definitio
 static func build_keyword_editor(screen, property_name: String, values: Array[String]) -> Control:
 	var wrapper := VBoxContainer.new()
 	wrapper.add_theme_constant_override("separation", 6)
-	var add_row := HBoxContainer.new()
+	var add_row: BoxContainer = VBoxContainer.new() if screen._use_compact_inspector_controls() else HBoxContainer.new()
+	add_row.add_theme_constant_override("separation", 6)
+	add_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var dropdown := OptionButton.new()
 	dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	screen._populate_option_button(dropdown, get_keyword_options(values))
@@ -249,7 +253,9 @@ static func build_keyword_editor(screen, property_name: String, values: Array[St
 		wrapper.add_child(empty_label)
 		return wrapper
 	for keyword_id: String in values:
-		var row := HBoxContainer.new()
+		var row: BoxContainer = VBoxContainer.new() if screen._use_compact_inspector_controls() else HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var keyword_label := Label.new()
 		keyword_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var keyword_data: KeywordData = Global.get_keyword_data(keyword_id)
@@ -344,6 +350,7 @@ static func build_card_value_suggestion_row(screen, property_name: String, sugge
 
 static func build_card_value_row(screen, property_name: String, key_name: String, current_value: Variant, definition: Dictionary, is_referenced: bool) -> Control:
 	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var padding := MarginContainer.new()
 	padding.add_theme_constant_override("margin_left", 8)
 	padding.add_theme_constant_override("margin_top", 8)
@@ -353,7 +360,8 @@ static func build_card_value_row(screen, property_name: String, key_name: String
 	row.add_theme_constant_override("separation", 6)
 	panel.add_child(padding)
 	padding.add_child(row)
-	var header := HBoxContainer.new()
+	var compact_controls: bool = screen._use_compact_inspector_controls()
+	var header: BoxContainer = VBoxContainer.new() if compact_controls else HBoxContainer.new()
 	header.add_theme_constant_override("separation", 6)
 	var title_box := VBoxContainer.new()
 	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -383,7 +391,7 @@ static func build_card_value_row(screen, property_name: String, key_name: String
 	header.add_child(title_box)
 	if definition.is_empty():
 		var key_edit := LineEdit.new()
-		key_edit.custom_minimum_size = Vector2(180, 0)
+		key_edit.custom_minimum_size = Vector2(120, 0)
 		key_edit.text = key_name
 		key_edit.focus_exited.connect(func():
 			var renamed_key: String = key_edit.text.strip_edges()
@@ -404,6 +412,7 @@ static func build_card_value_row(screen, property_name: String, key_name: String
 			if screen.service.set_dictionary_value(screen.current_session, property_name, key_name, coerce_variant_value(current_value, next_type)):
 				screen._request_editor_panels_refresh()
 		)
+		type_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		header.add_child(type_option)
 	var remove_button := Button.new()
 	remove_button.text = "Remove"
@@ -431,6 +440,7 @@ static func build_card_value_value_editor(screen, property_name: String, key_nam
 			return checkbox
 		"int":
 			var int_spin := SpinBox.new()
+			int_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			int_spin.min_value = -9999
 			int_spin.max_value = 99999
 			int_spin.step = 1
@@ -442,6 +452,7 @@ static func build_card_value_value_editor(screen, property_name: String, key_nam
 			return int_spin
 		"float":
 			var float_spin := SpinBox.new()
+			float_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			float_spin.min_value = -9999
 			float_spin.max_value = 99999
 			float_spin.step = 0.1
@@ -453,6 +464,7 @@ static func build_card_value_value_editor(screen, property_name: String, key_nam
 			return float_spin
 		"enum":
 			var dropdown := OptionButton.new()
+			dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			var options: Array = definition.get("options", [])
 			for option_data: Variant in options:
 				if option_data is Dictionary:
@@ -486,6 +498,7 @@ static func build_card_value_value_editor(screen, property_name: String, key_nam
 
 static func build_card_value_add_panel(screen, property_name: String, dictionary_value: Dictionary, definitions: Dictionary[String, Dictionary]) -> Control:
 	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var padding := MarginContainer.new()
 	padding.add_theme_constant_override("margin_left", 8)
 	padding.add_theme_constant_override("margin_top", 8)
@@ -493,13 +506,16 @@ static func build_card_value_add_panel(screen, property_name: String, dictionary
 	padding.add_theme_constant_override("margin_bottom", 8)
 	var wrapper := VBoxContainer.new()
 	wrapper.add_theme_constant_override("separation", 8)
+	wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.add_child(padding)
 	padding.add_child(wrapper)
 	var known_title := Label.new()
 	known_title.text = "Add Known Value"
 	wrapper.add_child(known_title)
-	var known_row := HBoxContainer.new()
+	var compact_controls: bool = screen._use_compact_inspector_controls()
+	var known_row: BoxContainer = VBoxContainer.new() if compact_controls else HBoxContainer.new()
 	known_row.add_theme_constant_override("separation", 6)
+	known_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var known_option := OptionButton.new()
 	known_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	screen._populate_option_button(known_option, get_card_value_definition_options(dictionary_value, definitions))
@@ -521,13 +537,15 @@ static func build_card_value_add_panel(screen, property_name: String, dictionary
 	var custom_title := Label.new()
 	custom_title.text = "Add Custom Value"
 	wrapper.add_child(custom_title)
-	var custom_row := HBoxContainer.new()
+	var custom_row: BoxContainer = VBoxContainer.new() if compact_controls else HBoxContainer.new()
 	custom_row.add_theme_constant_override("separation", 6)
+	custom_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var add_key_edit := LineEdit.new()
 	add_key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_key_edit.placeholder_text = "custom_key_name"
 	custom_row.add_child(add_key_edit)
 	var add_type_option := OptionButton.new()
+	add_type_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	screen._populate_option_button(add_type_option, variant_type_options())
 	custom_row.add_child(add_type_option)
 	var add_custom_button := Button.new()
@@ -558,8 +576,10 @@ static func build_dictionary_editor(screen, property_name: String, dictionary_va
 	for key_name: String in sorted_keys:
 		wrapper.add_child(build_dictionary_row(screen, property_name, key_name, dictionary_value.get(key_name)))
 	var add_panel := PanelContainer.new()
+	add_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var add_vbox := VBoxContainer.new()
 	add_vbox.add_theme_constant_override("separation", 6)
+	add_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_panel.add_child(add_vbox)
 	var add_label := Label.new()
 	add_label.text = "Add Entry"
@@ -567,12 +587,15 @@ static func build_dictionary_editor(screen, property_name: String, dictionary_va
 	var suggested_key_option: OptionButton = null
 	if use_suggestions:
 		suggested_key_option = OptionButton.new()
+		suggested_key_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		screen._populate_option_button(suggested_key_option, get_card_value_key_options(screen, dictionary_value))
 		add_vbox.add_child(suggested_key_option)
 	var add_key_edit := LineEdit.new()
+	add_key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_key_edit.placeholder_text = "key_name"
 	add_vbox.add_child(add_key_edit)
 	var add_type_option := OptionButton.new()
+	add_type_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	screen._populate_option_button(add_type_option, variant_type_options())
 	add_vbox.add_child(add_type_option)
 	if suggested_key_option != null:
@@ -599,10 +622,15 @@ static func build_dictionary_editor(screen, property_name: String, dictionary_va
 
 static func build_dictionary_row(screen, property_name: String, key_name: String, current_value: Variant) -> Control:
 	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 6)
 	panel.add_child(row)
-	var header := HBoxContainer.new()
+	var compact_controls: bool = screen._use_compact_inspector_controls()
+	var header: BoxContainer = VBoxContainer.new() if compact_controls else HBoxContainer.new()
+	header.add_theme_constant_override("separation", 6)
+	header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var key_edit := LineEdit.new()
 	key_edit.text = key_name
 	key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -618,6 +646,7 @@ static func build_dictionary_row(screen, property_name: String, key_name: String
 	)
 	header.add_child(key_edit)
 	var type_option := OptionButton.new()
+	type_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	screen._populate_option_button(type_option, variant_type_options())
 	select_option_value(type_option, infer_variant_type(current_value))
 	type_option.item_selected.connect(func(_index: int):
@@ -788,6 +817,7 @@ static func build_variant_value_editor(screen, current_value: Variant, on_change
 			return checkbox
 		"int":
 			var int_spin := SpinBox.new()
+			int_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			int_spin.min_value = -9999
 			int_spin.max_value = 99999
 			int_spin.step = 1
@@ -796,6 +826,7 @@ static func build_variant_value_editor(screen, current_value: Variant, on_change
 			return int_spin
 		"float":
 			var float_spin := SpinBox.new()
+			float_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			float_spin.min_value = -9999
 			float_spin.max_value = 99999
 			float_spin.step = 0.1
@@ -804,6 +835,7 @@ static func build_variant_value_editor(screen, current_value: Variant, on_change
 			return float_spin
 		_:
 			var line_edit := LineEdit.new()
+			line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			line_edit.text = "" if current_value == null else str(current_value)
 			line_edit.text_submitted.connect(func(new_text: String): on_change.call(new_text))
 			line_edit.focus_exited.connect(func(): on_change.call(line_edit.text))

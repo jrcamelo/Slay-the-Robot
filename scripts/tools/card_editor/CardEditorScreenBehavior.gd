@@ -14,7 +14,7 @@ static func render_behavior(screen) -> void:
 	for property_name: String in screen.PRIMARY_BEHAVIOR_GROUPS:
 		screen.behavior_container.add_child(build_entry_group(screen, property_name, not property_name.contains("validators")))
 	screen.behavior_container.add_child(build_additional_action_group(screen))
-	var secondary_toggle := screen._build_simple_toggle_row(
+	var secondary_toggle: Control = screen._build_simple_toggle_row(
 		"Internal and triggered hooks",
 		"Internal actions, right-click behavior, and discard/draw/deck hooks are usually niche. Open them only when the card needs them.",
 		screen.show_secondary_behavior_groups,
@@ -227,7 +227,8 @@ static func build_additional_action_editor(screen, entry_index: int, additional_
 			visible_parameters.append(parameter_data)
 	if not visible_parameters.is_empty():
 		var parameter_grid := GridContainer.new()
-		parameter_grid.columns = 2
+		parameter_grid.columns = screen._get_behavior_parameter_columns()
+		parameter_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		parameter_grid.add_theme_constant_override("h_separation", 8)
 		parameter_grid.add_theme_constant_override("v_separation", 8)
 		for parameter_data: Dictionary in visible_parameters:
@@ -334,13 +335,14 @@ static func build_entry_editor(screen, property_name: String, index: int, entry:
 			visible_parameters.append(parameter_data)
 	if not visible_parameters.is_empty():
 		var parameter_grid := GridContainer.new()
-		parameter_grid.columns = 2
+		parameter_grid.columns = screen._get_behavior_parameter_columns()
+		parameter_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		parameter_grid.add_theme_constant_override("h_separation", 8)
 		parameter_grid.add_theme_constant_override("v_separation", 8)
 		for parameter_data: Dictionary in visible_parameters:
 			parameter_grid.add_child(build_entry_parameter_editor(screen, property_name, index, token, parameter_data, values))
 		wrapper.add_child(parameter_grid)
-	var advanced_toggle := build_advanced_parameter_toggle(screen, property_name, index, token, is_action, values)
+	var advanced_toggle: Control = build_advanced_parameter_toggle(screen, property_name, index, token, is_action, values)
 	if advanced_toggle != null:
 		wrapper.add_child(advanced_toggle)
 	return entry_panel
@@ -747,7 +749,8 @@ static func build_advanced_parameter_toggle(screen, property_name: String, index
 	if not bool(screen.expanded_entry_parameters.get(entry_key, false)):
 		return wrapper
 	var parameter_grid := GridContainer.new()
-	parameter_grid.columns = 2
+	parameter_grid.columns = screen._get_behavior_parameter_columns()
+	parameter_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	parameter_grid.add_theme_constant_override("h_separation", 8)
 	parameter_grid.add_theme_constant_override("v_separation", 8)
 	for parameter_data: Dictionary in parameters:

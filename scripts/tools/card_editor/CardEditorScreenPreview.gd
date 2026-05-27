@@ -13,7 +13,9 @@ static func render_preview(screen) -> void:
 		return
 	screen.preview_card = Scenes.CARD.instantiate()
 	screen.preview_mount.add_child(screen.preview_card)
-	screen.preview_card.scale = Vector2(1.5, 1.5)
+	var preview_width: float = maxf(screen.preview_panel.size.x, screen.preview_panel.custom_minimum_size.x)
+	var preview_scale: float = clampf((preview_width - 48.0) / 260.0, 0.9, 1.35)
+	screen.preview_card.scale = Vector2.ONE * preview_scale
 	screen.preview_card.position = Vector2.ZERO
 	render_preview_card(screen, screen.preview_card, screen.current_session.working_card_data)
 
@@ -103,24 +105,78 @@ static func status_color_hex(screen, severity: String) -> String:
 	return "#" + color.to_html()
 
 static func apply_split_layout(screen) -> void:
-	if not screen.visible:
-		return
-	var total_width: float = screen.body_split.size.x
-	if total_width > 960 and not screen.library_panel_collapsed and (not screen.editor_panel_collapsed or not screen.preview_panel_collapsed):
-		screen.body_split.split_offset = get_body_split_offset(screen, int(total_width))
-	var middle_width: float = screen.editor_split.size.x
-	if not screen.editor_panel_collapsed and middle_width > 480:
-		screen.editor_split.split_offset = int(middle_width * 0.42)
-	if is_instance_valid(screen.library_sections):
-		screen.call_deferred("_render_library_sections")
+	pass
 
-static func get_body_split_offset(screen, total_width: int) -> int:
-	var target_library_width: int = int(total_width * 0.16)
-	target_library_width = max(target_library_width, screen.LIBRARY_PANEL_MIN_WIDTH)
-	var max_library_width: int = total_width - (screen.PREVIEW_PANEL_MIN_WIDTH if not screen.preview_panel_collapsed else 0) - (screen.EDITOR_PANEL_MIN_WIDTH if not screen.editor_panel_collapsed else 0)
-	if max_library_width < screen.LIBRARY_PANEL_MIN_WIDTH:
-		max_library_width = screen.LIBRARY_PANEL_MIN_WIDTH
-	return min(target_library_width, max_library_width)
+static func get_body_split_offset(_screen, _total_width: int) -> int:
+	return 0
+
+# static func _get_library_width(screen, total_width: int, editor_width: int, preview_width: int) -> int:
+# 	var remaining_width: int = total_width - editor_width - preview_width
+# 	if total_width >= screen.RESPONSIVE_FOUR_COLUMN_BREAKPOINT:
+# 		return clampi(int(total_width * 0.17), screen.LIBRARY_PANEL_MIN_WIDTH, max(remaining_width, screen.LIBRARY_PANEL_MIN_WIDTH))
+# 	if total_width >= screen.RESPONSIVE_COMPACT_BREAKPOINT:
+# 		return clampi(int(total_width * 0.18), screen.LIBRARY_PANEL_MIN_WIDTH, max(remaining_width, screen.LIBRARY_PANEL_MIN_WIDTH))
+# 	return max(screen.LIBRARY_PANEL_MIN_WIDTH, remaining_width)
+
+# static func _get_editor_host_width(screen, total_width: int) -> int:
+# 	var target_width: int = int(total_width * 0.56)
+# 	if total_width >= screen.RESPONSIVE_FOUR_COLUMN_BREAKPOINT:
+# 		target_width = int(total_width * 0.60)
+# 	elif total_width >= screen.RESPONSIVE_COMPACT_BREAKPOINT:
+# 		target_width = int(total_width * 0.62)
+# 	elif total_width >= screen.RESPONSIVE_TWO_COLUMN_BREAKPOINT:
+# 		target_width = int(total_width * 0.64)
+# 	return max(target_width, screen.INSPECTOR_PANEL_MIN_WIDTH + screen.BEHAVIOR_PANEL_MIN_WIDTH + 24)
+
+# static func _get_preview_width(screen, total_width: int, editor_width: int) -> int:
+# 	var target_width: int = int(total_width * 0.18)
+# 	if total_width < screen.RESPONSIVE_FOUR_COLUMN_BREAKPOINT:
+# 		target_width = int(total_width * 0.20)
+# 	if total_width < screen.RESPONSIVE_COMPACT_BREAKPOINT:
+# 		target_width = int(total_width * 0.18)
+# 	var max_preview_width: int = total_width - editor_width - screen.LIBRARY_PANEL_MIN_WIDTH
+# 	return clampi(target_width, screen.PREVIEW_PANEL_MIN_WIDTH, max(max_preview_width, screen.PREVIEW_PANEL_MIN_WIDTH))
+
+# static func _apply_split_offsets(screen, total_width: int, library_width: int, editor_width: int, _preview_width: int, layout_band: String) -> void:
+# 	var should_retarget: bool = not screen.layout_initialized
+# 	if not should_retarget and screen.last_layout_band != layout_band:
+# 		should_retarget = true
+# 	elif not should_retarget and abs(total_width - screen.last_layout_width) >= 140:
+# 		should_retarget = true
+# 	if should_retarget:
+# 		screen.body_split.split_offset = library_width
+# 		screen.workspace_split.split_offset = editor_width
+# 		screen.editor_split.split_offset = _get_editor_split_target(screen, editor_width, layout_band)
+# 		screen.layout_initialized = true
+# 	screen.last_layout_width = total_width
+# 	screen.last_layout_band = layout_band
+# 	var min_editor_split: int = screen.INSPECTOR_PANEL_MIN_WIDTH
+# 	var max_editor_split: int = max(editor_width - screen.BEHAVIOR_PANEL_MIN_WIDTH, min_editor_split)
+# 	screen.editor_split.split_offset = clampi(screen.editor_split.split_offset, min_editor_split, max_editor_split)
+# 	var min_workspace_split: int = screen.INSPECTOR_PANEL_MIN_WIDTH + screen.BEHAVIOR_PANEL_MIN_WIDTH + 24
+# 	var max_workspace_split: int = max(total_width - screen.LIBRARY_PANEL_MIN_WIDTH - screen.PREVIEW_PANEL_MIN_WIDTH, min_workspace_split)
+# 	screen.workspace_split.split_offset = clampi(screen.workspace_split.split_offset, min_workspace_split, max_workspace_split)
+# 	var max_body_split: int = max(total_width - screen.PREVIEW_PANEL_MIN_WIDTH - min_workspace_split, screen.LIBRARY_PANEL_MIN_WIDTH)
+# 	screen.body_split.split_offset = clampi(screen.body_split.split_offset, screen.LIBRARY_PANEL_MIN_WIDTH, max_body_split)
+
+static func _get_layout_band(screen, total_width: int) -> String:
+	if total_width >= screen.RESPONSIVE_FOUR_COLUMN_BREAKPOINT:
+		return "wide"
+	if total_width >= screen.RESPONSIVE_COMPACT_BREAKPOINT:
+		return "regular"
+	if total_width >= screen.RESPONSIVE_TWO_COLUMN_BREAKPOINT:
+		return "compact"
+	return "tight"
+
+static func _get_editor_split_target(screen, editor_width: int, layout_band: String) -> int:
+	var ratio: float = 0.25
+	if layout_band == "wide":
+		ratio = 0.40
+	elif layout_band == "regular":
+		ratio = 0.35
+	elif layout_band == "compact":
+		ratio = 0.30
+	return clampi(int(editor_width * ratio), screen.INSPECTOR_PANEL_MIN_WIDTH, max(editor_width - screen.BEHAVIOR_PANEL_MIN_WIDTH, screen.INSPECTOR_PANEL_MIN_WIDTH))
 
 static func render_preview_card(screen, card: Card, card_data: CardData) -> void:
 	var preview_data: CardData = card_data.duplicate(true)

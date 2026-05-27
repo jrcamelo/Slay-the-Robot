@@ -52,6 +52,7 @@ visible = false
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
+text = "Started a new triage session. Use a preset or open a library card to begin."
 autowrap_mode = 2
 
 [node name="StatsRow" type="HBoxContainer" parent="MainContainer/Header/ScreenSummary" unique_id=100100005]
@@ -93,11 +94,11 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(240, 867)
-split_offset = 240
+split_offsets = PackedInt32Array(620, 1248, 620)
+split_offset = 620
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -215,83 +216,129 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="EditorPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=828682295]
-custom_minimum_size = Vector2(560, 0)
+[node name="WorkspaceSplit" type="HSplitContainer" parent="MainContainer/Header/Body" unique_id=100100015]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(1248, 620)
+split_offset = 1248
+
+[node name="EditorHostPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=100100016]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EditorPadding" type="MarginContainer" parent="MainContainer/Header/Body/EditorPanel" unique_id=679262923]
+[node name="EditorHostPadding" type="MarginContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel" unique_id=100100017]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="EditorSplit" type="HSplitContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding" unique_id=100100018]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(620, 620)
+split_offset = 620
+
+[node name="InspectorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=828682295]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="InspectorPadding" type="MarginContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel" unique_id=679262923]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="EditorSplit" type="HSplitContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding" unique_id=93253884]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-split_offsets = PackedInt32Array(225)
-split_offset = 225
-
-[node name="InspectorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit" unique_id=2063829213]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-follow_focus = true
-
-[node name="InspectorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll" unique_id=701180321]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="BehaviorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit" unique_id=1882672980]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-follow_focus = true
-
-[node name="BehaviorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll" unique_id=1979327880]
+[node name="InspectorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding" unique_id=93253884]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=415001899]
-custom_minimum_size = Vector2(300, 0)
+[node name="InspectorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox" unique_id=2063829213]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="InspectorContent" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox/InspectorScroll" unique_id=701180321]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BehaviorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=100100012]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="PreviewPadding" type="MarginContainer" parent="MainContainer/Header/Body/PreviewPanel" unique_id=1245224155]
+[node name="BehaviorPadding" type="MarginContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel" unique_id=100100013]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="PreviewVBox" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding" unique_id=345405394]
+[node name="BehaviorVBox" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding" unique_id=100100014]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
+[node name="BehaviorScroll" type="ScrollContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox" unique_id=1882672980]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="BehaviorContent" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox/BehaviorScroll" unique_id=1979327880]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=415001899]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PreviewPadding" type="MarginContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel" unique_id=1245224155]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="PreviewVBox" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding" unique_id=345405394]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
 custom_minimum_size = Vector2(280, 320)
 layout_mode = 2
 
-[node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1017348166]
+[node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1017348166]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SessionLabel" type="Label" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=1297326160]
+[node name="SessionLabel" type="Label" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=1297326160]
 layout_mode = 2
 tooltip_text = "State: Saved"
 text = " ()
 Triage save | Saved"
 
-[node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=968705889]
+[node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=968705889]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 bbcode_enabled = true
@@ -300,21 +347,21 @@ text = "[color=#f5a1a1ff][ERROR][/color] [i](object_id)[/i] Card object_id canno
 [color=#f2d68aff][WARNING][/color] [i](card_requires_target)[/i] Card requires a target, but no play action appears to use a target."
 fit_content = true
 
-[node name="SaveStatusLabel" type="Label" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=100100011]
+[node name="SaveStatusLabel" type="Label" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=100100011]
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Started a new triage session. Use a preset or open a library card to begin."
 autowrap_mode = 2
 
-[node name="QuickActions" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1356135667]
+[node name="QuickActions" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1356135667]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActionAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=222730852]
+[node name="ActionAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=222730852]
 layout_mode = 2
 
-[node name="ActionGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=874360833]
+[node name="ActionGroupOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=874360833]
 layout_mode = 2
 selected = 0
 item_count = 11
@@ -341,17 +388,17 @@ popup/item_9/id = 9
 popup/item_10/text = "Transform In Deck Actions"
 popup/item_10/id = 10
 
-[node name="ActionOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1307683061]
+[node name="ActionOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1307683061]
 layout_mode = 2
 
-[node name="AddActionButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1805703847]
+[node name="AddActionButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1805703847]
 layout_mode = 2
 text = "Add Action"
 
-[node name="ValidatorAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=863022373]
+[node name="ValidatorAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=863022373]
 layout_mode = 2
 
-[node name="ValidatorGroupOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=586731295]
+[node name="ValidatorGroupOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=586731295]
 layout_mode = 2
 selected = 0
 item_count = 2
@@ -360,9 +407,9 @@ popup/item_0/id = 0
 popup/item_1/text = "Glow Validators"
 popup/item_1/id = 1
 
-[node name="ValidatorOption" type="OptionButton" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=326868515]
+[node name="ValidatorOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=326868515]
 layout_mode = 2
 
-[node name="AddValidatorButton" type="Button" parent="MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=1397110396]
+[node name="AddValidatorButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=1397110396]
 layout_mode = 2
 text = "Add Validator"

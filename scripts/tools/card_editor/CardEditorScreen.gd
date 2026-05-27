@@ -23,8 +23,13 @@ const MAX_VISIBLE_DIAGNOSTICS := CardEditorScreenConfig.MAX_VISIBLE_DIAGNOSTICS
 const DEFAULT_CARD_COLOR_IDS := CardEditorScreenConfig.DEFAULT_CARD_COLOR_IDS
 const COLLAPSED_PANEL_WIDTH := CardEditorScreenConfig.COLLAPSED_PANEL_WIDTH
 const LIBRARY_PANEL_MIN_WIDTH := CardEditorScreenConfig.LIBRARY_PANEL_MIN_WIDTH
-const EDITOR_PANEL_MIN_WIDTH := CardEditorScreenConfig.EDITOR_PANEL_MIN_WIDTH
+const INSPECTOR_PANEL_MIN_WIDTH := CardEditorScreenConfig.INSPECTOR_PANEL_MIN_WIDTH
+const BEHAVIOR_PANEL_MIN_WIDTH := CardEditorScreenConfig.BEHAVIOR_PANEL_MIN_WIDTH
 const PREVIEW_PANEL_MIN_WIDTH := CardEditorScreenConfig.PREVIEW_PANEL_MIN_WIDTH
+const RESPONSIVE_COMPACT_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_COMPACT_BREAKPOINT
+const RESPONSIVE_TWO_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_TWO_COLUMN_BREAKPOINT
+const RESPONSIVE_FOUR_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_FOUR_COLUMN_BREAKPOINT
+const RESPONSIVE_PANEL_GAP := CardEditorScreenConfig.RESPONSIVE_PANEL_GAP
 const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_CHARACTER_ID
 
 @onready var title_screen: Control = get_parent() as Control
@@ -36,10 +41,12 @@ const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_C
 @onready var selection_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/SelectionCountLabel
 @onready var diagnostics_count_label: Label = $MainContainer/Header/ScreenSummary/StatsRow/DiagnosticsCountLabel
 @onready var body_split: HSplitContainer = $MainContainer/Header/Body
-@onready var editor_split: HSplitContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit
+@onready var workspace_split: HSplitContainer = $MainContainer/Header/Body/WorkspaceSplit
+@onready var editor_split: HSplitContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit
 @onready var library_panel: PanelContainer = $MainContainer/Header/Body/LibraryPanel
-@onready var editor_panel: PanelContainer = $MainContainer/Header/Body/EditorPanel
-@onready var preview_panel: PanelContainer = $MainContainer/Header/Body/PreviewPanel
+@onready var inspector_panel: PanelContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel
+@onready var behavior_panel: PanelContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel
+@onready var preview_panel: PanelContainer = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel
 @onready var back_button: Button = $MainContainer/Header/BackButton
 @onready var button_row: HBoxContainer = $MainContainer/Header/ButtonRow
 @onready var library_search: LineEdit = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/SearchInput
@@ -53,24 +60,25 @@ const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_C
 @onready var library_scroll: ScrollContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll
 @onready var library_sections: VBoxContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll/LibrarySections
 @onready var library_vbox: VBoxContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox
-@onready var editor_padding: MarginContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding
-@onready var inspector_scroll: ScrollContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll
-@onready var inspector_container: VBoxContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/InspectorScroll/InspectorVBox
-@onready var behavior_scroll: ScrollContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll
-@onready var behavior_container: VBoxContainer = $MainContainer/Header/Body/EditorPanel/EditorPadding/EditorSplit/BehaviorScroll/BehaviorVBox
-@onready var preview_mount: Control = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/PreviewMount
-@onready var preview_vbox: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox
-@onready var session_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/SessionLabel
-@onready var diagnostics_text: RichTextLabel = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/DiagnosticsText
-@onready var save_status_label: Label = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/SaveStatusLabel
-@onready var action_add_panel: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel
-@onready var validator_add_panel: VBoxContainer = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel
-@onready var action_group_option: OptionButton = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/ActionGroupOption
-@onready var action_option: OptionButton = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/ActionOption
-@onready var add_action_button: Button = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/AddActionButton
-@onready var validator_group_option: OptionButton = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/ValidatorGroupOption
-@onready var validator_option: OptionButton = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/ValidatorOption
-@onready var add_validator_button: Button = $MainContainer/Header/Body/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/AddValidatorButton
+@onready var inspector_vbox: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox
+@onready var behavior_vbox: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox
+@onready var inspector_scroll: ScrollContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox/InspectorScroll
+@onready var inspector_container: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox/InspectorScroll/InspectorContent
+@onready var behavior_scroll: ScrollContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox/BehaviorScroll
+@onready var behavior_container: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox/BehaviorScroll/BehaviorContent
+@onready var preview_mount: Control = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/PreviewMount
+@onready var preview_vbox: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox
+@onready var session_label: Label = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/SessionLabel
+@onready var diagnostics_text: RichTextLabel = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/DiagnosticsText
+@onready var save_status_label: Label = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveStatusLabel
+@onready var action_add_panel: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel
+@onready var validator_add_panel: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel
+@onready var action_group_option: OptionButton = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/ActionGroupOption
+@onready var action_option: OptionButton = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/ActionOption
+@onready var add_action_button: Button = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel/AddActionButton
+@onready var validator_group_option: OptionButton = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/ValidatorGroupOption
+@onready var validator_option: OptionButton = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/ValidatorOption
+@onready var add_validator_button: Button = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel/AddValidatorButton
 
 var service := CardEditorService.new()
 var current_session: CardEditorSession = null
@@ -95,16 +103,22 @@ var save_triage_button: Button = null
 var promote_button: Button = null
 var target_filter: OptionButton = null
 var library_panel_collapsed: bool = false
-var editor_panel_collapsed: bool = false
+var inspector_panel_collapsed: bool = false
+var behavior_panel_collapsed: bool = false
 var preview_panel_collapsed: bool = false
 var collapsed_panel_row: HBoxContainer = null
 var library_panel_toggle: Button = null
-var editor_panel_toggle: Button = null
+var inspector_panel_toggle: Button = null
+var behavior_panel_toggle: Button = null
 var preview_panel_toggle: Button = null
 var behavior_render_queued: bool = false
 var editor_panels_refresh_queued: bool = false
 var status_message: String = "Open a card to inspect it, or start a new triage draft."
 var status_severity: String = "info"
+var initial_split_widths_pending: bool = true
+var layout_initialized: bool = false
+var last_layout_width: int = 0
+var last_layout_band: String = ""
 
 func _ready() -> void:
 	_bind_optional_header_nodes()
@@ -112,6 +126,8 @@ func _ready() -> void:
 	screen_title.text = "Card Workshop"
 	diagnostics_text.bbcode_enabled = true
 	diagnostics_text.fit_content = true
+	inspector_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	behavior_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
 	back_button.button_up.connect(_on_back_button_up)
 	if new_button != null:
@@ -156,6 +172,7 @@ func _bind_optional_header_nodes() -> void:
 
 func show_editor() -> void:
 	visible = true
+	initial_split_widths_pending = true
 	call_deferred("_apply_split_layout")
 	populate_editor()
 
@@ -229,6 +246,8 @@ func _request_editor_panels_refresh() -> void:
 
 func _render_inspector() -> void:
 	CardEditorScreenInspector.render_inspector(self)
+	_relax_horizontal_sizing(inspector_container)
+	call_deferred("_apply_initial_split_widths")
 
 func _compact_header_layout() -> void:
 	screen_title.add_theme_font_size_override("font_size", 24)
@@ -277,8 +296,10 @@ func _install_panel_headers() -> void:
 		header_container.move_child(collapsed_panel_row, header_container.get_child_count() - 1)
 	if library_panel_toggle == null and is_instance_valid(library_vbox):
 		library_panel_toggle = _create_panel_toggle_row(library_vbox, "Library", "_on_library_panel_toggle")
-	if editor_panel_toggle == null and is_instance_valid(editor_padding):
-		editor_panel_toggle = _create_panel_toggle_row(editor_padding, "Editor", "_on_editor_panel_toggle")
+	if inspector_panel_toggle == null and is_instance_valid(inspector_vbox):
+		inspector_panel_toggle = _create_panel_toggle_row(inspector_vbox, "Card", "_on_inspector_panel_toggle")
+	if behavior_panel_toggle == null and is_instance_valid(behavior_vbox):
+		behavior_panel_toggle = _create_panel_toggle_row(behavior_vbox, "Actions", "_on_behavior_panel_toggle")
 	if preview_panel_toggle == null and is_instance_valid(preview_vbox):
 		preview_panel_toggle = _create_panel_toggle_row(preview_vbox, "Preview", "_on_preview_panel_toggle")
 
@@ -299,24 +320,30 @@ func _create_panel_toggle_row(parent: Control, title_text: String, method_name: 
 
 func _apply_panel_collapse_state() -> void:
 	library_panel.visible = not library_panel_collapsed
-	editor_panel.visible = not editor_panel_collapsed
+	inspector_panel.visible = not inspector_panel_collapsed
+	behavior_panel.visible = not behavior_panel_collapsed
 	preview_panel.visible = not preview_panel_collapsed
 	if library_panel_toggle != null:
-		library_panel_toggle.text = ">" if library_panel_collapsed else "<"
+		library_panel_toggle.text = "Show" if library_panel_collapsed else "Hide"
 		library_panel_toggle.tooltip_text = "Expand library" if library_panel_collapsed else "Collapse library"
-	if editor_panel_toggle != null:
-		editor_panel_toggle.text = ">" if editor_panel_collapsed else "<"
-		editor_panel_toggle.tooltip_text = "Expand editor" if editor_panel_collapsed else "Collapse editor"
+	if inspector_panel_toggle != null:
+		inspector_panel_toggle.text = "Show" if inspector_panel_collapsed else "Hide"
+		inspector_panel_toggle.tooltip_text = "Expand card panel" if inspector_panel_collapsed else "Collapse card panel"
+	if behavior_panel_toggle != null:
+		behavior_panel_toggle.text = "Show" if behavior_panel_collapsed else "Hide"
+		behavior_panel_toggle.tooltip_text = "Expand actions panel" if behavior_panel_collapsed else "Collapse actions panel"
 	if preview_panel_toggle != null:
-		preview_panel_toggle.text = "<" if preview_panel_collapsed else ">"
+		preview_panel_toggle.text = "Show" if preview_panel_collapsed else "Hide"
 		preview_panel_toggle.tooltip_text = "Expand preview" if preview_panel_collapsed else "Collapse preview"
 	_refresh_collapsed_panel_buttons()
 	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if library_panel_collapsed else LIBRARY_PANEL_MIN_WIDTH
-	editor_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if editor_panel_collapsed else EDITOR_PANEL_MIN_WIDTH
+	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if inspector_panel_collapsed else INSPECTOR_PANEL_MIN_WIDTH
+	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if behavior_panel_collapsed else BEHAVIOR_PANEL_MIN_WIDTH
 	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if preview_panel_collapsed else PREVIEW_PANEL_MIN_WIDTH
-	library_panel.size_flags_horizontal = 0 if library_panel_collapsed else Control.SIZE_EXPAND_FILL
-	editor_panel.size_flags_horizontal = 0 if editor_panel_collapsed else Control.SIZE_EXPAND_FILL
-	preview_panel.size_flags_horizontal = 0 if preview_panel_collapsed else Control.SIZE_EXPAND_FILL
+	library_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if library_panel_collapsed else Control.SIZE_EXPAND_FILL
+	inspector_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if inspector_panel_collapsed else Control.SIZE_EXPAND_FILL
+	behavior_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if behavior_panel_collapsed else Control.SIZE_EXPAND_FILL
+	preview_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if preview_panel_collapsed else Control.SIZE_EXPAND_FILL
 	call_deferred("_apply_split_layout")
 
 func _refresh_collapsed_panel_buttons() -> void:
@@ -326,8 +353,10 @@ func _refresh_collapsed_panel_buttons() -> void:
 		child.queue_free()
 	if library_panel_collapsed:
 		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Library", "_on_library_panel_toggle"))
-	if editor_panel_collapsed:
-		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Editor", "_on_editor_panel_toggle"))
+	if inspector_panel_collapsed:
+		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Card", "_on_inspector_panel_toggle"))
+	if behavior_panel_collapsed:
+		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Actions", "_on_behavior_panel_toggle"))
 	if preview_panel_collapsed:
 		collapsed_panel_row.add_child(_create_collapsed_panel_button("Show Preview", "_on_preview_panel_toggle"))
 	collapsed_panel_row.visible = collapsed_panel_row.get_child_count() > 0
@@ -342,8 +371,12 @@ func _on_library_panel_toggle() -> void:
 	library_panel_collapsed = not library_panel_collapsed
 	_apply_panel_collapse_state()
 
-func _on_editor_panel_toggle() -> void:
-	editor_panel_collapsed = not editor_panel_collapsed
+func _on_inspector_panel_toggle() -> void:
+	inspector_panel_collapsed = not inspector_panel_collapsed
+	_apply_panel_collapse_state()
+
+func _on_behavior_panel_toggle() -> void:
+	behavior_panel_collapsed = not behavior_panel_collapsed
 	_apply_panel_collapse_state()
 
 func _on_preview_panel_toggle() -> void:
@@ -443,6 +476,8 @@ func _build_dictionary_row(property_name: String, key_name: String, current_valu
 
 func _render_behavior() -> void:
 	CardEditorScreenBehavior.render_behavior(self)
+	_relax_horizontal_sizing(behavior_container)
+	call_deferred("_apply_initial_split_widths")
 
 func _build_entry_group(property_name: String, is_action: bool) -> Control:
 	return CardEditorScreenBehavior.build_entry_group(self, property_name, is_action)
@@ -508,12 +543,40 @@ func _status_color_hex(severity: String) -> String:
 
 func _apply_split_layout() -> void:
 	CardEditorScreenPreview.apply_split_layout(self)
+	call_deferred("_rebalance_split_widths")
+
+func _rebalance_split_widths() -> void:
+	if not is_instance_valid(body_split) or not is_instance_valid(workspace_split) or not is_instance_valid(editor_split):
+		return
+	var total_width: float = maxf(body_split.size.x, size.x)
+	if total_width <= 0.0:
+		return
+	var body_separation: float = float(body_split.get_theme_constant("separation"))
+	var workspace_separation: float = float(workspace_split.get_theme_constant("separation"))
+	var editor_separation: float = float(editor_split.get_theme_constant("separation"))
+	var available_width: float = maxf(total_width - body_separation - workspace_separation - editor_separation, 0.0)
+	var panel_width: int = int(round(available_width / 4.0))
+	panel_width = max(panel_width, LIBRARY_PANEL_MIN_WIDTH, INSPECTOR_PANEL_MIN_WIDTH, BEHAVIOR_PANEL_MIN_WIDTH, PREVIEW_PANEL_MIN_WIDTH)
+	var body_usable_width: float = maxf(total_width - body_separation, 0.0)
+	body_split.split_offset = int(round(float(panel_width) - (body_usable_width * 0.5)))
+	var workspace_total_width: float = maxf(body_usable_width - float(panel_width), 0.0)
+	var workspace_usable_width: float = maxf(workspace_total_width - workspace_separation, 0.0)
+	var editor_target_width: float = maxf(workspace_usable_width - float(panel_width), 0.0)
+	workspace_split.split_offset = int(round(editor_target_width - (workspace_usable_width * 0.5)))
+	editor_split.split_offset = 0
+
+func _apply_initial_split_widths() -> void:
+	if not initial_split_widths_pending:
+		return
+	call_deferred("_rebalance_split_widths")
+	initial_split_widths_pending = false
 
 func _get_body_split_offset(total_width: int) -> int:
 	return CardEditorScreenPreview.get_body_split_offset(self, total_width)
 
 func _render_library_sections() -> void:
 	CardEditorScreenLibrary.render_library_sections(self)
+	call_deferred("_apply_initial_split_widths")
 
 func _build_library_group(group_name: String, entries: Array) -> Control:
 	return CardEditorScreenLibrary.build_library_group(self, group_name, entries)
@@ -797,6 +860,45 @@ func _get_option_button_value(option_button: OptionButton) -> Variant:
 	if selected_index < 0:
 		return null
 	return option_button.get_item_metadata(selected_index)
+
+func _get_inspector_section_columns(preferred_columns: int = 1) -> int:
+	if preferred_columns <= 1:
+		return 1
+	return preferred_columns
+
+func _get_behavior_parameter_columns() -> int:
+	var panel_width: float = maxf(behavior_panel.size.x, behavior_panel.custom_minimum_size.x)
+	if panel_width >= 900.0:
+		return 2
+	return 1
+
+func _use_compact_inspector_controls() -> bool:
+	return false
+
+func _relax_horizontal_sizing(root: Node) -> void:
+	if root == null:
+		return
+	for child: Node in root.get_children():
+		_relax_horizontal_sizing(child)
+	if not (root is Control):
+		return
+	var control: Control = root as Control
+	control.custom_minimum_size.x = 0.0
+	if control is PanelContainer or control is MarginContainer or control is VBoxContainer or control is GridContainer:
+		control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if control is Label:
+		var label: Label = control as Label
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.clip_text = false
+	elif control is OptionButton:
+		var option_button: OptionButton = control as OptionButton
+		option_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	elif control is LineEdit:
+		var line_edit: LineEdit = control as LineEdit
+		line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	elif control is SpinBox:
+		var spin_box: SpinBox = control as SpinBox
+		spin_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 func _parse_csv_strings(raw_text: String) -> Array[String]:
 	var values: Array[String] = []
