@@ -8,6 +8,8 @@ enemy_name = "Green Enemy"
 enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
 enemy_health = 25
 enemy_health_max = 25
+enemy_poise = 12
+enemy_poise_max = 12
 enemy_actions_on_death = Array[Dictionary]([{
 "ACTION_APPLY_STATUS": {
 "status_charge_amount": 5,
@@ -22,7 +24,9 @@ enemy_initial_status_effects = Dictionary[String, int]({
 enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
 "1": {
 "enemy_health": 30,
-"enemy_health_max": 30
+"enemy_health_max": 30,
+"enemy_poise": 15,
+"enemy_poise_max": 15
 }
 })
 object_id = "enemy_3"

@@ -142,6 +142,9 @@ const VALIDATOR_TURN_COUNT: String = "res://scripts/validators/ValidatorTurnCoun
 # enemy validators
 const VALIDATOR_ENEMY_TYPE: String = "res://scripts/validators/ValidatorEnemyType.gd"
 const VALIDATOR_ENEMY_ATTACKING: String = "res://scripts/validators/ValidatorEnemyAttacking.gd"
+const VALIDATOR_ENEMY_BROKEN_POISE: String = "res://scripts/validators/ValidatorEnemyBrokenPoise.gd"
+const VALIDATOR_ENEMY_HALF_POISE: String = "res://scripts/validators/ValidatorEnemyHalfPoise.gd"
+const VALIDATOR_ENEMY_HALF_HEALTH: String = "res://scripts/validators/ValidatorEnemyHalfHealth.gd"
 const VALIDATOR_SOURCE_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorSourceHasStatusEffect.gd"
 const VALIDATOR_TARGET_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorTargetHasStatusEffect.gd"
 

@@ -8,6 +8,8 @@ enemy_name = "Act 1 Boss"
 enemy_texture_path = "external/sprites/enemies/enemy_red_large.png"
 enemy_health = 200
 enemy_health_max = 200
+enemy_poise = 100
+enemy_poise_max = 100
 enemy_type = 2
 enemy_attack_states = Dictionary[String, Dictionary]({
 "1": {
@@ -49,7 +51,9 @@ enemy_attack_states = Dictionary[String, Dictionary]({
 enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
 "3": {
 "enemy_health": 25,
-"enemy_health_max": 25
+"enemy_health_max": 25,
+"enemy_poise": 12,
+"enemy_poise_max": 12
 }
 })
 object_id = "enemy_act_1_boss_1"

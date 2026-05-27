@@ -8,11 +8,15 @@ enemy_name = "Minion 1"
 enemy_texture_path = "external/sprites/enemies/enemy_purple_small.png"
 enemy_health = 4
 enemy_health_max = 4
+enemy_poise = 2
+enemy_poise_max = 2
 enemy_is_minion = true
 enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
 "1": {
 "enemy_health": 5,
-"enemy_health_max": 5
+"enemy_health_max": 5,
+"enemy_poise": 2,
+"enemy_poise_max": 2
 }
 })
 object_id = "enemy_minion_1"

@@ -92,6 +92,24 @@ func add_block(amount: int) -> void:
 	if amount > 0:
 		Signals.combatant_block_added.emit(self)
 
+func set_poise(poise_amount: int, poise_max_amount: int = enemy_data.enemy_poise_max) -> void:
+	enemy_data.set_poise(poise_amount, poise_max_amount)
+
+func add_poise(poise_amount: int, poise_max_amount: int = 0) -> void:
+	enemy_data.add_poise(poise_amount, poise_max_amount)
+
+func get_poise() -> int:
+	return enemy_data.enemy_poise
+
+func get_poise_max() -> int:
+	return enemy_data.enemy_poise_max
+
+func is_poise_depleted() -> bool:
+	return enemy_data.is_poise_depleted()
+
+func is_poise_at_or_below_half() -> bool:
+	return enemy_data.is_poise_at_or_below_half()
+
 func update_health_bar(as_damage: bool = false) -> void:
 	if as_damage:
 		layered_health_bar.apply_damage(enemy_data.enemy_health, enemy_data.enemy_health_max, status_id_to_status_effects)

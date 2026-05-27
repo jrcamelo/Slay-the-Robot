@@ -7,6 +7,8 @@ class_name EnemyData
 
 @export var enemy_health: int = 20
 @export var enemy_health_max: int = 20
+@export var enemy_poise: int = 10
+@export var enemy_poise_max: int = 10
 
 @export var enemy_block: int = 0
 
@@ -153,3 +155,16 @@ func get_current_attack_custom_actions() -> Array[Dictionary]:
 	var attack_actions: Array[Dictionary] = []
 	attack_actions.assign(current_attack_state.get("custom_actions", []))
 	return attack_actions
+
+func set_poise(poise_amount: int, poise_max_amount: int = enemy_poise_max) -> void:
+	enemy_poise_max = max(0, poise_max_amount)
+	enemy_poise = clamp(poise_amount, 0, enemy_poise_max)
+
+func add_poise(poise_amount: int, poise_max_amount: int = 0) -> void:
+	set_poise(enemy_poise + poise_amount, enemy_poise_max + poise_max_amount)
+
+func is_poise_depleted() -> bool:
+	return enemy_poise <= 0
+
+func is_poise_at_or_below_half() -> bool:
+	return enemy_poise * 2 <= enemy_poise_max

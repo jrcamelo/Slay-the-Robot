@@ -8,11 +8,15 @@ enemy_name = "Act 1 Miniboss"
 enemy_texture_path = "external/sprites/enemies/enemy_green_medium.png"
 enemy_health = 100
 enemy_health_max = 100
+enemy_poise = 50
+enemy_poise_max = 50
 enemy_type = 1
 enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
 "2": {
 "enemy_health": 120,
-"enemy_health_max": 120
+"enemy_health_max": 120,
+"enemy_poise": 60,
+"enemy_poise_max": 60
 }
 })
 object_id = "enemy_act_1_miniboss_1"

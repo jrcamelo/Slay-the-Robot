@@ -8,6 +8,8 @@ enemy_name = "Big Attack Enemy"
 enemy_texture_path = "external/sprites/enemies/enemy_purple_medium.png"
 enemy_health = 40
 enemy_health_max = 40
+enemy_poise = 20
+enemy_poise_max = 20
 enemy_actions_on_death = Array[Dictionary]([{
 "ACTION_APPLY_STATUS": {
 "status_charge_amount": 5,
@@ -64,7 +66,9 @@ enemy_attack_states = Dictionary[String, Dictionary]({
 enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
 "1": {
 "enemy_health": 50,
-"enemy_health_max": 50
+"enemy_health_max": 50,
+"enemy_poise": 25,
+"enemy_poise_max": 25
 }
 })
 object_id = "enemy_4"
