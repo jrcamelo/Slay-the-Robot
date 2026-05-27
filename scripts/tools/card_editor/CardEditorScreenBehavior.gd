@@ -205,9 +205,11 @@ static func build_additional_action_editor(screen, entry_index: int, additional_
 		description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
 		wrapper.add_child(description_label)
 	var token_row := HBoxContainer.new()
+	token_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var token_label := Label.new()
 	token_label.text = "Effect"
-	token_label.custom_minimum_size = Vector2(52, 0)
+	token_label.custom_minimum_size = Vector2(72, 0)
+	token_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	token_row.add_child(token_label)
 	token_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	token_row.add_child(token_option)
@@ -313,9 +315,11 @@ static func build_entry_editor(screen, property_name: String, index: int, entry:
 		description_label.modulate = Color(0.82, 0.82, 0.86, 0.95)
 		wrapper.add_child(description_label)
 	var token_row := HBoxContainer.new()
+	token_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var token_label := Label.new()
 	token_label.text = "Effect"
-	token_label.custom_minimum_size = Vector2(52, 0)
+	token_label.custom_minimum_size = Vector2(72, 0)
+	token_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	token_row.add_child(token_label)
 	token_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	token_row.add_child(token_option)

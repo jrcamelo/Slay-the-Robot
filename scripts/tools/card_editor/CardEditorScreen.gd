@@ -883,14 +883,11 @@ func _relax_horizontal_sizing(root: Node) -> void:
 	if not (root is Control):
 		return
 	var control: Control = root as Control
-	control.custom_minimum_size.x = 0.0
+	if not (control is Label):
+		control.custom_minimum_size.x = 0.0
 	if control is PanelContainer or control is MarginContainer or control is VBoxContainer or control is GridContainer:
 		control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if control is Label:
-		var label: Label = control as Label
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.clip_text = false
-	elif control is OptionButton:
+	if control is OptionButton:
 		var option_button: OptionButton = control as OptionButton
 		option_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	elif control is LineEdit:

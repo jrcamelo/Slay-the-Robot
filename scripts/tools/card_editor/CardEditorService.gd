@@ -1221,8 +1221,10 @@ func _value_matches_editor_type(value: Variant, value_type: String, parameter_de
 			var options: Array = parameter_definition.get("options", [])
 			if len(options) == 0:
 				return value is int or value is String
-			for option: Dictionary in options:
-				if option.get("value", null) == value:
+			for option: Variant in options:
+				if option is Dictionary and (option as Dictionary).get("value", null) == value:
+					return true
+				if not (option is Dictionary) and option == value:
 					return true
 			return false
 		_:
