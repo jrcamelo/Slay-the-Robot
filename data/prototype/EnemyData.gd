@@ -31,8 +31,11 @@ enum ENEMY_TYPES {STANDARD, MINIBOSS, BOSS}
 
 func apply_enemy_difficulty_modifiers():
 	var player_run_difficulty_level: int = Global.player_data.player_run_difficulty_level
+	apply_enemy_difficulty_modifiers_for_level(player_run_difficulty_level)
+
+func apply_enemy_difficulty_modifiers_for_level(difficulty_level: int) -> void:
 	for difficulty_override: EnemyDifficultyOverrideData in difficulty_overrides:
-		if difficulty_override.difficulty_level > player_run_difficulty_level:
+		if difficulty_override.difficulty_level > difficulty_level:
 			continue
 		_apply_single_difficulty_override(difficulty_override)
 
@@ -113,6 +116,13 @@ func is_poise_at_or_below_half() -> bool:
 	return enemy_poise * 2 <= enemy_poise_max
 
 func validate_enemy_behavior(push_errors: bool = true) -> bool:
+	var errors: Array[String] = collect_enemy_behavior_validation_errors()
+	if push_errors:
+		for error_message: String in errors:
+			push_error(error_message)
+	return len(errors) == 0
+
+func collect_enemy_behavior_validation_errors() -> Array[String]:
 	var errors: Array[String] = []
 	var stage_ids: Dictionary[String, bool] = {}
 	var reactive_stage_ids: Dictionary[String, bool] = {}
@@ -168,10 +178,7 @@ func validate_enemy_behavior(push_errors: bool = true) -> bool:
 			else:
 				_validate_override_indices(errors, "reactive stage", reactive_stage_override.reactive_stage_id, reactive_stage_override.intent_overrides, get_reactive_stage(reactive_stage_override.reactive_stage_id).intents)
 
-	if push_errors:
-		for error_message: String in errors:
-			push_error(error_message)
-	return len(errors) == 0
+	return errors
 
 func _validate_intent_variants(errors: Array[String], owner_id: String, intent_variants: Array[EnemyIntentVariantData]) -> void:
 	if len(intent_variants) == 0:
