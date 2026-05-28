@@ -26,7 +26,7 @@ func _validation(card_data: CardData, action: BaseAction, values: Dictionary[Str
 	var status_effect_object_id: String = _get_validator_value("status_effect_object_id", values, action, "")
 	var operator: String = _get_validator_value("operator", values, action, ">")
 	var comparison_value: int = _get_validator_value("comparison_value", values, action, 0)
-	var combatant: BaseCombatant = _get_context_source_combatant(card_data, action)
+	var combatant: BaseCombatant = _get_context_source_combatant(card_data, action, values)
 
 	if combatant == null:
 		return false

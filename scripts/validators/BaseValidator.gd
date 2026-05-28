@@ -116,7 +116,9 @@ func _get_validator_value(key_name: String, values: Dictionary[String, Variant],
 	else:
 		return values.get(key_name, default_value)
 
-func _get_context_source_combatant(card_data: CardData, action: BaseAction) -> BaseCombatant:
+func _get_context_source_combatant(card_data: CardData, action: BaseAction, values: Dictionary[String, Variant] = {}) -> BaseCombatant:
+	if values.has("_source_combatant"):
+		return values["_source_combatant"]
 	if action != null:
 		if action.parent_combatant != null:
 			return action.parent_combatant
@@ -126,7 +128,13 @@ func _get_context_source_combatant(card_data: CardData, action: BaseAction) -> B
 		return Global.get_card_owner_player(card_data)
 	return null
 
-func _get_context_targets(action: BaseAction) -> Array[BaseCombatant]:
+func _get_context_targets(action: BaseAction, values: Dictionary[String, Variant] = {}) -> Array[BaseCombatant]:
+	if values.has("_targets"):
+		var explicit_targets: Array[BaseCombatant] = []
+		for target in values["_targets"]:
+			if target is BaseCombatant:
+				explicit_targets.append(target)
+		return explicit_targets
 	if action == null:
 		return []
 	if action.card_play_request != null and action.card_play_request.selected_target != null:

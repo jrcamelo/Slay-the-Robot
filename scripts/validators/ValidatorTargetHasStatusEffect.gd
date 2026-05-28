@@ -29,7 +29,7 @@ func _validation(_card_data: CardData, action: BaseAction, values: Dictionary[St
 		push_error("Missing status_effect_object_id")
 		return false
 
-	var targets: Array[BaseCombatant] = _get_context_targets(action)
+	var targets: Array[BaseCombatant] = _get_context_targets(action, values)
 	if len(targets) == 0:
 		return false
 

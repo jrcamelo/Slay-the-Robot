@@ -10,11 +10,8 @@ func _get_editor_description() -> String:
 func _get_editor_contexts() -> Array[String]:
 	return [EDITOR_CONTEXT_ACTION_VALIDATORS]
 
-func _validation(_card_data: CardData, action: BaseAction, _values: Dictionary[String, Variant]) -> bool:
-	if action == null:
-		return false
-
-	var targets: Array[BaseCombatant] = _get_context_targets(action)
+func _validation(_card_data: CardData, action: BaseAction, values: Dictionary[String, Variant]) -> bool:
+	var targets: Array[BaseCombatant] = _get_context_targets(action, values)
 	if len(targets) != 1:
 		return false
 

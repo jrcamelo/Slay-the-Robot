@@ -15,7 +15,7 @@ func _get_editor_parameter_definitions() -> Array[Dictionary]:
 
 func _validation(_card_data: CardData, action: BaseAction, values: Dictionary[String, Variant]) -> bool:
 	var enemy_type: int = _get_validator_value("enemy_type", values, action, EnemyData.ENEMY_TYPES.STANDARD)
-	var targets: Array[BaseCombatant] = action.targets	# don't use adjusted targets
+	var targets: Array[BaseCombatant] = _get_context_targets(action, values)
 	if len(targets) != 1:
 		return false
 	var combatant: BaseCombatant = targets[0]
