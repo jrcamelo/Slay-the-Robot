@@ -1,9 +1,60 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3]
 
-[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_t5hua"]
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageOverrideData.gd" id="2_utyp4"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageOverrideData.gd" id="3_jfa8l"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_ek4sp"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="4_intent"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="5_diff"]
+
+[sub_resource type="Resource" id="Resource_utyp4"]
+script = ExtResource("5_diff")
+difficulty_level = 1
+top_level_overrides = Dictionary[String, Variant]({
+"enemy_health": 30,
+"enemy_health_max": 30,
+"enemy_poise": 15,
+"enemy_poise_max": 15
+})
+
+[sub_resource type="Resource" id="Resource_jfa8l"]
+script = ExtResource("4_intent")
+damage = 5
+block = 5
+number_of_attacks = 1
+
+[sub_resource type="Resource" id="Resource_ek4sp"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_jfa8l")
+
+[sub_resource type="Resource" id="Resource_eavoe"]
+script = ExtResource("2_stage")
+label = "Attack"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_ek4sp")])
+next_stage_id = "stage_2"
+object_id = "stage_1"
+
+[sub_resource type="Resource" id="Resource_0eldq"]
+script = ExtResource("4_intent")
+damage = 3
+block = 7
+number_of_attacks = 2
+
+[sub_resource type="Resource" id="Resource_x1cys"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_0eldq")
+
+[sub_resource type="Resource" id="Resource_idx0m"]
+script = ExtResource("2_stage")
+label = "Multi Attack"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_x1cys")])
+next_stage_id = "stage_1"
+object_id = "stage_2"
 
 [resource]
-script = ExtResource("1_t5hua")
+script = ExtResource("1_enemy")
 enemy_name = "Green Enemy"
 enemy_texture_path = "external/sprites/enemies/enemy_green_small.png"
 enemy_health = 25
@@ -18,15 +69,10 @@ enemy_actions_on_death = Array[Dictionary]([{
 "time_delay": 0.5
 }
 }])
+opening_stage_id = "stage_1"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_eavoe"), SubResource("Resource_idx0m")])
 enemy_initial_status_effects = Dictionary[String, int]({
 "status_effect_negate_debuff": 1
 })
-enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
-"1": {
-"enemy_health": 30,
-"enemy_health_max": 30,
-"enemy_poise": 15,
-"enemy_poise_max": 15
-}
-})
+difficulty_overrides = Array[ExtResource("5_diff")]([SubResource("Resource_utyp4")])
 object_id = "enemy_3"

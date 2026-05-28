@@ -1,9 +1,81 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cceu4io5bbaj4"]
 
-[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_cbauc"]
+[ext_resource type="Script" uid="uid://cj3y70fl8axw4" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://b067a6l3e5r5y" path="res://data/prototype/EnemyReactiveStageOverrideData.gd" id="2_048h2"]
+[ext_resource type="Script" uid="uid://dj34vbrmf0qht" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" uid="uid://b0xsbagodi6xe" path="res://data/prototype/EnemyStageOverrideData.gd" id="3_6yeht"]
+[ext_resource type="Script" uid="uid://bbifsysuoj6fm" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" uid="uid://c155fccbdbhl1" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_8yuwt"]
+[ext_resource type="Script" uid="uid://dxjaantaubfmu" path="res://data/prototype/EnemyIntentData.gd" id="4_intent"]
+[ext_resource type="Script" uid="uid://dtcres3v8kv0p" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="5_diff"]
+
+[sub_resource type="Resource" id="Resource_048h2"]
+script = ExtResource("5_diff")
+difficulty_level = 1
+top_level_overrides = Dictionary[String, Variant]({
+"enemy_health": 50,
+"enemy_health_max": 50,
+"enemy_poise": 25,
+"enemy_poise_max": 25
+})
+
+[sub_resource type="Resource" id="Resource_6yeht"]
+script = ExtResource("4_intent")
+damage = 10
+number_of_attacks = 1
+
+[sub_resource type="Resource" id="Resource_8yuwt"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_6yeht")
+
+[sub_resource type="Resource" id="Resource_qim1a"]
+script = ExtResource("2_stage")
+label = "Big Attack"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_8yuwt")])
+extra_actions = Array[Dictionary]([{
+"ACTION_APPLY_STATUS": {
+"status_effect_charges": 2,
+"status_effect_object_id": "status_effect_vulnerable",
+"target_override": 2
+}
+}])
+next_stage_id = "stage_multi_attack"
+object_id = "stage_big_attack"
+
+[sub_resource type="Resource" id="Resource_ebbwd"]
+script = ExtResource("4_intent")
+damage = 4
+number_of_attacks = 2
+
+[sub_resource type="Resource" id="Resource_w7heh"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_ebbwd")
+
+[sub_resource type="Resource" id="Resource_8xrkj"]
+script = ExtResource("2_stage")
+label = "Multi Attack"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_w7heh")])
+next_stage_id = "stage_defend"
+object_id = "stage_multi_attack"
+
+[sub_resource type="Resource" id="Resource_35usf"]
+script = ExtResource("4_intent")
+block = 10
+targeting_rule = "all_living_players"
+
+[sub_resource type="Resource" id="Resource_lx30k"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_35usf")
+
+[sub_resource type="Resource" id="Resource_r2a4w"]
+script = ExtResource("2_stage")
+label = "Defend"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_lx30k")])
+next_stage_id = "stage_big_attack"
+object_id = "stage_defend"
 
 [resource]
-script = ExtResource("1_cbauc")
+script = ExtResource("1_enemy")
 enemy_name = "Big Attack Enemy"
 enemy_texture_path = "external/sprites/enemies/enemy_purple_medium.png"
 enemy_health = 40
@@ -18,57 +90,7 @@ enemy_actions_on_death = Array[Dictionary]([{
 "time_delay": 0.5
 }
 }])
-enemy_attack_states = Dictionary[String, Dictionary]({
-"1": {
-"attack_damage": 10,
-"block": 0,
-"custom_actions": [{
-"ACTION_APPLY_STATUS": {
-"status_effect_charges": 2,
-"status_effect_object_id": "status_effect_vulnerable",
-"target_override": 2
-}
-}],
-"next_attack_weights": {
-"2": 1
-},
-"number_of_attacks": 1
-},
-"2": {
-"attack_damage": 4,
-"block": 0,
-"custom_actions": [],
-"next_attack_weights": {
-"2": 1,
-"3": 1
-},
-"number_of_attacks": 2
-},
-"3": {
-"attack_damage": 0,
-"block": 10,
-"custom_actions": [],
-"next_attack_weights": {
-"1": 1
-},
-"number_of_attacks": 0
-},
-"initial": {
-"attack_damage": 0,
-"block": 0,
-"custom_actions": [],
-"next_attack_weights": {
-"1": 1
-},
-"number_of_attacks": 0
-}
-})
-enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
-"1": {
-"enemy_health": 50,
-"enemy_health_max": 50,
-"enemy_poise": 25,
-"enemy_poise_max": 25
-}
-})
+opening_stage_id = "stage_big_attack"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_qim1a"), SubResource("Resource_8xrkj"), SubResource("Resource_r2a4w")])
+difficulty_overrides = Array[ExtResource("5_diff")]([SubResource("Resource_048h2")])
 object_id = "enemy_4"

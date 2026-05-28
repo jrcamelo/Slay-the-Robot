@@ -246,40 +246,19 @@ func perform_enemy_turn():
 		### perform intent
 		# NOTE: remember these go in reverse order on the stack
 		if enemy.is_alive():
-			# add custom actions
-			var enemy_actions_data: Array[Dictionary] = []
-			enemy_actions_data.assign(enemy.enemy_data.get_current_attack_custom_actions())
-			
-			# add attacks
-			var enemy_attack: Array = enemy.enemy_data.get_current_attack_damages()
-			if enemy_attack[1] > 0:
-				enemy_actions_data.append(
-				{
-				Scripts.ACTION_ATTACK_GENERATOR: {"damage": enemy_attack[0], "number_of_attacks": enemy_attack[1], "time_delay": EnemyData.ENEMY_ATTACK_DELAY}
-				}
-				)
-			
-			# add block
-			var enemy_block: int = enemy.enemy_data.get_current_attack_block()
-			if enemy_block > 0:
-				enemy_actions_data.append(
-					{
-					Scripts.ACTION_BLOCK: {
-						"block": enemy_block,
-						"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-						"time_delay": 0.0,
-						}
-					}
-			)
-			
-			# perform them and wait
-			var enemy_target: Player = enemy.get_intent_target_player()
-			if enemy_target == null:
-				return
-			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, [enemy_target], enemy_actions_data, null)
+			enemy.hide_intent_preview()
+			enemy.update_enemy_intent()
+			var enemy_targets: Array[Player] = enemy.get_intent_target_players()
+			if len(enemy_targets) == 0 and enemy.is_attacking():
+				continue
+			var enemy_actions_data: Array[Dictionary] = enemy.build_enemy_turn_actions_data()
+			var enemy_action_targets: Array[BaseCombatant] = []
+			enemy_action_targets.assign(enemy_targets)
+			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, enemy_action_targets, enemy_actions_data, null)
 			ActionHandler.add_actions(enemy_attack_actions)
 			if ActionHandler.actions_being_performed:
 				await ActionHandler.actions_ended
+			enemy.advance_planned_stage_after_execution()
 		
 		### Perform enemy end of turn statuses
 		if enemy.is_alive():

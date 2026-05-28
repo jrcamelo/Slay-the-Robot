@@ -54,6 +54,7 @@ func spawn_enemy(enemy_object_id: String, container: Control = automatic_enemy_c
 	var enemy_data: EnemyData = Global.get_enemy_data_from_prototype(enemy_object_id)
 	
 	enemy_data.apply_enemy_difficulty_modifiers()
+	enemy_data.validate_enemy_behavior()
 	
 	container.add_child(enemy)
 	enemy.init(enemy_data)

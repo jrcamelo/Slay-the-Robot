@@ -1,21 +1,37 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3]
 
-[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_glhwr"]
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageOverrideData.gd" id="2_u74vt"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageOverrideData.gd" id="3_mo48r"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="4_intent"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_ksc1s"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="5_diff"]
 
-[resource]
-script = ExtResource("1_glhwr")
-enemy_name = "Act 1 Boss"
-enemy_texture_path = "external/sprites/enemies/enemy_red_large.png"
-enemy_health = 200
-enemy_health_max = 200
-enemy_poise = 100
-enemy_poise_max = 100
-enemy_type = 2
-enemy_attack_states = Dictionary[String, Dictionary]({
-"1": {
-"attack_damage": 0,
-"block": 0,
-"custom_actions": [{
+[sub_resource type="Resource" id="Resource_u74vt"]
+script = ExtResource("5_diff")
+difficulty_level = 3
+top_level_overrides = Dictionary[String, Variant]({
+"enemy_health": 25,
+"enemy_health_max": 25,
+"enemy_poise": 12,
+"enemy_poise_max": 12
+})
+
+[sub_resource type="Resource" id="Resource_mo48r"]
+script = ExtResource("4_intent")
+targeting_rule = "all_living_players"
+
+[sub_resource type="Resource" id="Resource_ksc1s"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_mo48r")
+
+[sub_resource type="Resource" id="Resource_egltr"]
+script = ExtResource("2_stage")
+label = "Summon"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_ksc1s")])
+extra_actions = Array[Dictionary]([{
 "ACTION_SUMMON_ENEMIES": {
 "number_of_spawns": 2,
 "random_enemy_object_ids": ["enemy_minion_1", "enemy_minion_2"],
@@ -23,37 +39,37 @@ enemy_attack_states = Dictionary[String, Dictionary]({
 "target_override": 1,
 "time_delay": 0.5
 }
-}],
-"next_attack_weights": {
-"2": 1
-},
-"number_of_attacks": 0
-},
-"2": {
-"attack_damage": 3,
-"block": 7,
-"custom_actions": [],
-"next_attack_weights": {
-"2": 1
-},
-"number_of_attacks": 2
-},
-"initial": {
-"attack_damage": 0,
-"block": 0,
-"custom_actions": [],
-"next_attack_weights": {
-"1": 1
-},
-"number_of_attacks": 0
-}
-})
-enemy_difficulty_to_enemy_modfiers = Dictionary[String, Dictionary]({
-"3": {
-"enemy_health": 25,
-"enemy_health_max": 25,
-"enemy_poise": 12,
-"enemy_poise_max": 12
-}
-})
+}])
+next_stage_id = "stage_attack"
+object_id = "stage_summon"
+
+[sub_resource type="Resource" id="Resource_4yrsu"]
+script = ExtResource("4_intent")
+damage = 3
+block = 7
+number_of_attacks = 2
+
+[sub_resource type="Resource" id="Resource_imumv"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_4yrsu")
+
+[sub_resource type="Resource" id="Resource_k2u71"]
+script = ExtResource("2_stage")
+label = "Attack"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_imumv")])
+next_stage_id = "stage_attack"
+object_id = "stage_attack"
+
+[resource]
+script = ExtResource("1_enemy")
+enemy_name = "Act 1 Boss"
+enemy_texture_path = "external/sprites/enemies/enemy_red_large.png"
+enemy_health = 200
+enemy_health_max = 200
+enemy_poise = 100
+enemy_poise_max = 100
+enemy_type = 2
+opening_stage_id = "stage_summon"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_egltr"), SubResource("Resource_k2u71")])
+difficulty_overrides = Array[ExtResource("5_diff")]([SubResource("Resource_u74vt")])
 object_id = "enemy_act_1_boss_1"

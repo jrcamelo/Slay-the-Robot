@@ -142,10 +142,9 @@ func update_incoming_damage_amount(recalculate_enemy_intent: bool = true) -> voi
 		
 		if recalculate_enemy_intent:
 			enemy.update_enemy_intent()
-		if enemy.get_intent_target_player() != self:
-			continue
-		
-		incoming_damage_amount += enemy.enemy_intent_attack_damage * enemy.enemy_intent_number_of_attacks
+		for targeted_player: Player in enemy.get_intent_target_players():
+			if targeted_player == self:
+				incoming_damage_amount += enemy.enemy_intent_attack_damage * enemy.enemy_intent_number_of_attacks
 
 	incoming_damage_amount_text.text = str(incoming_damage_amount)
 	incoming_damage.visible = incoming_damage_amount > 0
@@ -175,6 +174,12 @@ func _get_health_max() -> int:
 	if party_member_data != null:
 		return party_member_data.party_member_health_max
 	return Global.player_data.player_health_max
+
+func get_health() -> int:
+	return _get_health()
+
+func get_health_max() -> int:
+	return _get_health_max()
 
 func _sync_primary_member_state_if_needed() -> void:
 	if Global.player_data.has_party_members() and party_member_index == 0:
