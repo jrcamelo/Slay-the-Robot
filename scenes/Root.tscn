@@ -33,6 +33,7 @@
 [ext_resource type="Script" uid="uid://b3nvcsku8u75w" path="res://addons/smooth_scroll_container/scroll_damper/expo_scroll_damper.gd" id="26_08sam"]
 [ext_resource type="Script" uid="uid://6xsavir53fvp" path="res://scripts/ui/PauseOverlay.gd" id="29_p8axl"]
 [ext_resource type="PackedScene" uid="uid://bk27jgr43dngi" path="res://scenes/ui/menus/CardEditorScreen.tscn" id="30_carded"]
+[ext_resource type="PackedScene" uid="uid://cvn2dhxnd2lmi" path="res://scenes/ui/menus/EnemyEditorScreen.tscn" id="31_enemyed"]
 
 [sub_resource type="Resource" id="Resource_i7igs"]
 script = ExtResource("26_08sam")
@@ -605,8 +606,8 @@ text = "Cards"
 
 [node name="Button2" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=421011930]
 layout_mode = 2
-disabled = true
-text = "Enemies"
+theme = ExtResource("2_bi5lp")
+text = "Enemy Editor"
 
 [node name="Button3" type="Button" parent="TitleScreen/CodexMenu/VBoxContainer" unique_id=777729379]
 layout_mode = 2
@@ -624,6 +625,10 @@ theme = ExtResource("2_bi5lp")
 text = "Card Editor"
 
 [node name="CardEditorScreen" parent="TitleScreen" unique_id=879171990 instance=ExtResource("30_carded")]
+visible = false
+layout_mode = 1
+
+[node name="EnemyEditorScreen" parent="TitleScreen" unique_id=1278511988 instance=ExtResource("31_enemyed")]
 visible = false
 layout_mode = 1
 

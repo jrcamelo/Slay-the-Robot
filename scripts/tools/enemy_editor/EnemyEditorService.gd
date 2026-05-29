@@ -255,7 +255,7 @@ func get_enemy_summary(session: EnemyEditorSession) -> Dictionary:
 	summary["difficulty_summaries"] = _collect_difficulty_summaries(session.working_enemy_data.difficulty_overrides)
 	return summary
 
-func validate_session(session: EnemyEditorSession) -> Array[Dictionary]:
+func validate_session(session: EnemyEditorSession, include_library_collision_validation: bool = true) -> Array[Dictionary]:
 	var diagnostics: Array[Dictionary] = []
 	if session == null:
 		diagnostics.append(_make_diagnostic("session_missing", "error", "No enemy editor session was provided."))
@@ -295,7 +295,8 @@ func validate_session(session: EnemyEditorSession) -> Array[Dictionary]:
 	_validate_stage_collection(enemy_data.stages, false, diagnostics)
 	_validate_reactive_stage_collection(enemy_data.reactive_stages, diagnostics)
 	_validate_difficulty_overrides(enemy_data, diagnostics)
-	_validate_library_object_id_collisions(session, diagnostics)
+	if include_library_collision_validation:
+		_validate_library_object_id_collisions(session, diagnostics)
 
 	session.diagnostics = diagnostics
 	return diagnostics
@@ -661,9 +662,30 @@ func _discover_enemies_in_root(root_path: String, source_bucket: String, content
 	var directory: DirAccess = DirAccess.open(enemies_root)
 	if directory == null:
 		return
-	_discover_enemies_recursive(enemies_root, source_bucket, content_root, triage_root, output_enemies)
+	_discover_enemies_recursive(enemies_root, source_bucket, content_root, triage_root, output_enemies, {})
 
-func _discover_enemies_recursive(directory_path: String, source_bucket: String, content_root: String, triage_root: String, output_enemies: Array[Dictionary]) -> void:
+func _discover_enemies_recursive(
+	directory_path: String,
+	source_bucket: String,
+	content_root: String,
+	triage_root: String,
+	output_enemies: Array[Dictionary],
+	visited_directories: Dictionary[String, bool]
+) -> void:
+	var normalized_directory_path: String = directory_path.strip_edges().trim_suffix("/")
+	if normalized_directory_path == "":
+		return
+	if visited_directories.has(normalized_directory_path):
+		last_discovery_diagnostics.append(_make_diagnostic(
+			"directory_cycle_skipped",
+			"warning",
+			"Skipped a directory that was already visited during enemy discovery.",
+			"resource_path",
+			{"path": normalized_directory_path}
+		))
+		return
+	visited_directories[normalized_directory_path] = true
+
 	var directory: DirAccess = DirAccess.open(directory_path)
 	if directory == null:
 		last_discovery_diagnostics.append(_make_diagnostic("directory_open_failed", "warning", "Could not open enemy directory.", "resource_path", {"path": directory_path}))
@@ -677,7 +699,7 @@ func _discover_enemies_recursive(directory_path: String, source_bucket: String, 
 			continue
 		var child_path: String = directory_path.path_join(entry_name)
 		if directory.current_is_dir():
-			_discover_enemies_recursive(child_path, source_bucket, content_root, triage_root, output_enemies)
+			_discover_enemies_recursive(child_path, source_bucket, content_root, triage_root, output_enemies, visited_directories)
 			continue
 		if not entry_name.to_lower().ends_with(".tres") and not entry_name.to_lower().ends_with(".res"):
 			continue
@@ -693,7 +715,7 @@ func _discover_enemies_recursive(directory_path: String, source_bucket: String, 
 func _make_enemy_library_entry(enemy_data: EnemyData, resource_path: String, source_bucket: String, content_root: String, triage_root: String) -> Dictionary:
 	var path_metadata: Dictionary = EnemyEditorPathUtils.analyze_enemy_resource_path(resource_path, content_root, triage_root)
 	var temp_session := EnemyEditorSession.new((enemy_data as EnemyData).duplicate(true), resource_path, content_root, triage_root, EnemyEditorSession.SAVE_POLICY_MANAGED_CONTENT if source_bucket == "content" else EnemyEditorSession.SAVE_POLICY_MANAGED_TRIAGE)
-	var diagnostics: Array[Dictionary] = validate_session(temp_session)
+	var diagnostics: Array[Dictionary] = validate_session(temp_session, false)
 	var counts: Dictionary = _count_diagnostics(diagnostics)
 	var search_blob_parts: Array[String] = [
 		enemy_data.object_id,
@@ -1000,12 +1022,15 @@ func _reorder_index_mapping(item_count: int, from_index: int, to_index: int) -> 
 
 func _generate_unique_stage_id(enemy_data: EnemyData, is_reactive: bool) -> String:
 	var base_prefix: String = "reactive_stage_" if is_reactive else "stage_"
+	var max_unique_stage_id_attempts: int = 100000
 	var next_index: int = 1
-	while true:
+	while next_index <= max_unique_stage_id_attempts:
 		var candidate: String = "%s%s" % [base_prefix, next_index]
 		if enemy_data.get_stage(candidate) == null and enemy_data.get_reactive_stage(candidate) == null:
 			return candidate
 		next_index += 1
+	push_error("EnemyEditorService: Could not generate a unique stage id for prefix %s after %s attempts." % [base_prefix, max_unique_stage_id_attempts])
+	return "%soverflow" % base_prefix
 
 func _assign_typed_array(target_array: Variant, next_values: Array) -> void:
 	target_array.clear()

@@ -1,0 +1,250 @@
+[gd_scene format=3 uid="uid://cvn2dhxnd2lmi"]
+
+[ext_resource type="Script" uid="uid://dudcy0o6kbqht" path="res://scripts/tools/enemy_editor/EnemyEditorScreen.gd" id="1"]
+[ext_resource type="Theme" uid="uid://cd5rw86bhiyn" path="res://themes/title_screen_theme.tres" id="2"]
+
+[node name="EnemyEditorScreen" type="Control" unique_id=758952540]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="MainMargin" type="MarginContainer" parent="." unique_id=70441500]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RootVBox" type="VBoxContainer" parent="MainMargin" unique_id=1549115516]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Header" type="VBoxContainer" parent="MainMargin/RootVBox" unique_id=1994670571]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=692259361]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Enemy Workshop"
+
+[node name="SubtitleLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=1348901227]
+layout_mode = 2
+text = "Single-enemy authoring with triage-first saves, safe controls, and a live preview."
+autowrap_mode = 2
+
+[node name="StatusLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=1642481504]
+modulate = Color(0.83, 0.88, 0.95, 1)
+layout_mode = 2
+text = "Open an enemy from the library or start a new triage draft."
+autowrap_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="MainMargin/RootVBox/Header" unique_id=1241467974]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BackButton" type="Button" parent="MainMargin/RootVBox/Header/ButtonRow" unique_id=768847127]
+layout_mode = 2
+text = "Back"
+
+[node name="NewButton" type="Button" parent="MainMargin/RootVBox/Header/ButtonRow" unique_id=290267359]
+layout_mode = 2
+text = "New Enemy"
+
+[node name="DuplicateButton" type="Button" parent="MainMargin/RootVBox/Header/ButtonRow" unique_id=807210321]
+layout_mode = 2
+text = "Duplicate"
+
+[node name="SaveTriageButton" type="Button" parent="MainMargin/RootVBox/Header/ButtonRow" unique_id=79689223]
+layout_mode = 2
+text = "Save To Triage"
+
+[node name="PromoteButton" type="Button" parent="MainMargin/RootVBox/Header/ButtonRow" unique_id=683626405]
+layout_mode = 2
+text = "Promote To Content"
+
+[node name="StatsLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=1542279245]
+layout_mode = 2
+text = "Library: 0 | Visible: 0 | Base stages: 0 | Reactive: 0 | Errors: 0 | Warnings: 0"
+autowrap_mode = 2
+
+[node name="BodySplit" type="HSplitContainer" parent="MainMargin/RootVBox" unique_id=1502138836]
+custom_minimum_size = Vector2(0, 620)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(-360)
+split_offset = -360
+
+[node name="LeftPanel" type="PanelContainer" parent="MainMargin/RootVBox/BodySplit" unique_id=2145151153]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LeftMargin" type="MarginContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel" unique_id=2144950354]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="LeftVBox" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin" unique_id=67883565]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="LibraryLabel" type="Label" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=2103472344]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Library"
+
+[node name="SearchInput" type="LineEdit" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=1873420564]
+layout_mode = 2
+placeholder_text = "Search by enemy name, id, stage, or path"
+
+[node name="FilterRow" type="HBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=1130753772]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SourceFilter" type="OptionButton" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow" unique_id=615123663]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "All Sources"
+popup/item_0/id = 0
+popup/item_1/text = "Content"
+popup/item_1/id = 1
+popup/item_2/text = "Triage"
+popup/item_2/id = 2
+
+[node name="TypeFilter" type="OptionButton" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow" unique_id=2005992528]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 4
+popup/item_0/text = "All Types"
+popup/item_0/id = 0
+popup/item_1/text = "Standard"
+popup/item_1/id = 1
+popup/item_2/text = "Miniboss"
+popup/item_2/id = 2
+popup/item_3/text = "Boss"
+popup/item_3/id = 3
+
+[node name="MinionFilter" type="OptionButton" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow" unique_id=1488939185]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "Minions and Non-Minions"
+popup/item_0/id = 0
+popup/item_1/text = "Non-Minion"
+popup/item_1/id = 1
+popup/item_2/text = "Minion"
+popup/item_2/id = 2
+
+[node name="LibraryScroll" type="ScrollContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=310837465]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="LibraryList" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/LibraryScroll" unique_id=178231856]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="NavigatorLabel" type="Label" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=463430981]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Navigator"
+
+[node name="NavigatorScroll" type="ScrollContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=236941668]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="NavigatorContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/NavigatorScroll" unique_id=58812584]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="WorkspaceSplit" type="HSplitContainer" parent="MainMargin/RootVBox/BodySplit" unique_id=348245593]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(240)
+split_offset = 240
+
+[node name="CenterPanel" type="PanelContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit" unique_id=1011537375]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterMargin" type="MarginContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel" unique_id=229372690]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CenterScroll" type="ScrollContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel/CenterMargin" unique_id=1001738271]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="EditorContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel/CenterMargin/CenterScroll" unique_id=97376194]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="RightPanel" type="PanelContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit" unique_id=1483136254]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightMargin" type="MarginContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel" unique_id=1680489663]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="RightScroll" type="ScrollContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel/RightMargin" unique_id=1305302378]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="PreviewContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel/RightMargin/RightScroll" unique_id=1797162461]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12

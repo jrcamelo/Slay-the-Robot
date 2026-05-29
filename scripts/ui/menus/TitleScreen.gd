@@ -7,6 +7,7 @@ extends Control
 @onready var new_run_menu = $NewRunMenu
 @onready var codex_menu = $CodexMenu
 @onready var card_editor_screen = $CardEditorScreen
+@onready var enemy_editor_screen = $EnemyEditorScreen
 
 func _ready():
 	Signals.run_started.connect(_on_run_started)
@@ -17,6 +18,7 @@ func hide_menus():
 	new_run_menu.visible = false
 	codex_menu.visible = false
 	card_editor_screen.visible = false
+	enemy_editor_screen.visible = false
 
 func show_main_menu():
 	hide_menus()
@@ -35,6 +37,10 @@ func show_codex_menu():
 func show_card_editor():
 	hide_menus()
 	card_editor_screen.show_editor()
+
+func show_enemy_editor():
+	hide_menus()
+	enemy_editor_screen.show_editor()
 
 func _on_run_started():
 	visible = false

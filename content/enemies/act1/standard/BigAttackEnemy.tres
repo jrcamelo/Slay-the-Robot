@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cceu4io5bbaj4"]
+[gd_resource type="Resource" script_class="EnemyData" format=3]
 
-[ext_resource type="Script" uid="uid://cj3y70fl8axw4" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
-[ext_resource type="Script" uid="uid://b067a6l3e5r5y" path="res://data/prototype/EnemyReactiveStageOverrideData.gd" id="2_048h2"]
-[ext_resource type="Script" uid="uid://dj34vbrmf0qht" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
-[ext_resource type="Script" uid="uid://b0xsbagodi6xe" path="res://data/prototype/EnemyStageOverrideData.gd" id="3_6yeht"]
-[ext_resource type="Script" uid="uid://bbifsysuoj6fm" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
-[ext_resource type="Script" uid="uid://c155fccbdbhl1" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_8yuwt"]
-[ext_resource type="Script" uid="uid://dxjaantaubfmu" path="res://data/prototype/EnemyIntentData.gd" id="4_intent"]
-[ext_resource type="Script" uid="uid://dtcres3v8kv0p" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="5_diff"]
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageOverrideData.gd" id="2_048h2"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageOverrideData.gd" id="3_6yeht"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_8yuwt"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="4_intent"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="5_diff"]
 
 [sub_resource type="Resource" id="Resource_048h2"]
 script = ExtResource("5_diff")

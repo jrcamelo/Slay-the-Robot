@@ -5,11 +5,13 @@ extends Control
 @onready var back_button: Button = $BackButton
 @onready var codex_card_container: GridContainer = $ScrollContainer/MarginContainer/CodexCardContainer
 @onready var cards_button: Button = $VBoxContainer/CardsButton
+@onready var enemy_editor_button: Button = $VBoxContainer/Button2
 @onready var card_editor_button: Button = $VBoxContainer/CardEditorButton
 
 func _ready():
 	back_button.button_up.connect(_on_back_button_up)
 	cards_button.button_up.connect(_on_cards_button_up)
+	enemy_editor_button.button_up.connect(_on_enemy_editor_button_up)
 	card_editor_button.button_up.connect(_on_card_editor_button_up)
 
 func populate_codex_menu() -> void:
@@ -43,3 +45,7 @@ func _on_cards_button_up() -> void:
 func _on_card_editor_button_up() -> void:
 	clear_codex_card_container()
 	title_screen.show_card_editor()
+
+func _on_enemy_editor_button_up() -> void:
+	clear_codex_card_container()
+	title_screen.show_enemy_editor()
