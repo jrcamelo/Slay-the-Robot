@@ -6,6 +6,7 @@ const SUPPORTED_PREVIEW_VALIDATORS := {
 	"ValidatorEnemyBrokenPoise": true,
 	"ValidatorEnemyHalfHealth": true,
 	"ValidatorEnemyHalfPoise": true,
+	"ValidatorSourceBrokenPoise": true,
 	"ValidatorPlayerCurrentEnergy": true,
 	"ValidatorPreviousExecutedStageId": true,
 	"ValidatorCurrentPlannedStageId": true,
@@ -78,7 +79,7 @@ static func resolve_preview(enemy_data: EnemyData, preview_state_input: Variant 
 		"next_planned_stage_id_after_execution": next_planned_stage_id,
 		"cached_random_target_signature": preview_state.cached_random_target_signature,
 		"cached_random_target_party_member_indices": preview_state.cached_random_target_party_member_indices.duplicate(true),
-		"extra_actions": [] if stage_data == null else stage_data.extra_actions.duplicate(true),
+		"extra_actions": _collect_preview_extra_actions(stage_data, intent_variant_data),
 	}
 
 static func _coerce_preview_state(preview_state_input: Variant) -> EnemyEditorPreviewState:
@@ -175,6 +176,8 @@ static func _evaluate_validator(validator_token: String, validator_values: Dicti
 			return enemy_data.enemy_health * 2 <= max(1, enemy_data.enemy_health_max)
 		"ValidatorEnemyHalfPoise":
 			return enemy_data.enemy_poise * 2 <= max(1, enemy_data.enemy_poise_max)
+		"ValidatorSourceBrokenPoise":
+			return enemy_data.enemy_poise <= 0
 		"ValidatorPlayerCurrentEnergy":
 			return _compare(preview_state.player_energy, int(validator_values.get("comparison_value", 0)), str(validator_values.get("operator", ">=")))
 		"ValidatorPreviousExecutedStageId":
@@ -226,6 +229,14 @@ static func _evaluate_living_ally_minion_count(validator_values: Dictionary, pre
 			_:
 				current_count += 1
 	return _compare(current_count, comparison_value, operator)
+
+static func _collect_preview_extra_actions(stage_data, intent_variant: EnemyIntentVariantData) -> Array[Dictionary]:
+	var extra_actions: Array[Dictionary] = []
+	if stage_data != null:
+		extra_actions.append_array(stage_data.extra_actions.duplicate(true))
+	if intent_variant != null:
+		extra_actions.append_array(intent_variant.extra_actions.duplicate(true))
+	return extra_actions
 
 static func _resolve_targets_for_intent(intent_data: EnemyIntentData, enemy_data: EnemyData, preview_state: EnemyEditorPreviewState, reactive_stage_id: String = "") -> Array[Dictionary]:
 	var living_players: Array[Dictionary] = _get_living_players(preview_state)
@@ -353,7 +364,7 @@ static func _format_target_summary(intent_data: EnemyIntentData, resolved_target
 		return "%s | No living targets" % summary
 	var target_labels: Array[String] = []
 	for target_data: Dictionary in resolved_targets:
-		target_labels.append("P%s" % target_data.get("party_member_index", "?"))
+		target_labels.append("PC %s" % (int(target_data.get("party_member_index", 0)) + 1))
 	return "%s | %s" % [summary, ", ".join(target_labels)]
 
 static func _compare(value: Variant, comparison_value: Variant, operator: String = "<") -> bool:

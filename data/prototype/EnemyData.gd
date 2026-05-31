@@ -42,6 +42,10 @@ func apply_enemy_difficulty_modifiers_for_level(difficulty_level: int) -> void:
 func _apply_single_difficulty_override(difficulty_override: EnemyDifficultyOverrideData) -> void:
 	for property_name: String in difficulty_override.top_level_overrides.keys():
 		set(property_name, difficulty_override.top_level_overrides[property_name])
+	if difficulty_override.top_level_overrides.has("enemy_health_max") and not difficulty_override.top_level_overrides.has("enemy_health"):
+		enemy_health = enemy_health_max
+	if difficulty_override.top_level_overrides.has("enemy_poise_max") and not difficulty_override.top_level_overrides.has("enemy_poise"):
+		enemy_poise = enemy_poise_max
 
 	for stage_override: EnemyStageOverrideData in difficulty_override.stage_overrides:
 		var stage_data: EnemyStageData = get_stage(stage_override.stage_id)

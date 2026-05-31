@@ -2,12 +2,12 @@
 extends Control
 class_name EnemyEditorScreen
 
-const DEFAULT_PARTY_SIZE := 4
+const DEFAULT_PC_HEALTHS := [100, 50, 25]
 const SECTION_TITLE_SIZE := 18
 const BODY_FONT_SIZE := 15
 const CONTROL_PAD_X := 12
 const CONTROL_PAD_Y := 7
-const SUPPORTED_CONDITION_CLASSES := EnemyEditorPreviewService.SUPPORTED_PREVIEW_VALIDATORS
+const TWO_COLUMN_MIN_WIDTH := 720.0
 
 @onready var title_screen: Control = get_parent() as Control
 @onready var status_label: Label = $MainMargin/RootVBox/Header/StatusLabel
@@ -36,6 +36,9 @@ var selected_reactive_stage_id: String = ""
 var selected_difficulty_index: int = -1
 var last_preview_result: Dictionary = {}
 var editor_theme: Theme = null
+var last_left_layout_columns: int = 1
+var last_editor_layout_columns: int = 1
+var last_preview_layout_columns: int = 1
 
 func _ready() -> void:
 	visible = not _is_embedded_in_title_screen()
@@ -49,6 +52,9 @@ func _ready() -> void:
 	source_filter.item_selected.connect(_on_filter_changed)
 	type_filter.item_selected.connect(_on_filter_changed)
 	minion_filter.item_selected.connect(_on_filter_changed)
+	navigator_content.resized.connect(_on_form_layout_resized)
+	editor_content.resized.connect(_on_form_layout_resized)
+	preview_content.resized.connect(_on_form_layout_resized)
 	_populate_filters()
 	_apply_compact_font_sizes(self)
 	if not _is_embedded_in_title_screen():
@@ -101,6 +107,9 @@ func _render_all() -> void:
 	_ensure_preview_defaults()
 	_select_default_navigation_targets()
 	last_preview_result = service.resolve_preview(current_session)
+	last_left_layout_columns = _resolved_form_columns(navigator_content)
+	last_editor_layout_columns = _resolved_form_columns(editor_content)
+	last_preview_layout_columns = _resolved_form_columns(preview_content)
 	_render_library()
 	_render_navigator()
 	_render_editor()
@@ -120,32 +129,54 @@ func _render_library() -> void:
 	for entry: Dictionary in filtered_entries:
 		var panel := PanelContainer.new()
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		var padding := MarginContainer.new()
 		padding.add_theme_constant_override("margin_left", 12)
 		padding.add_theme_constant_override("margin_top", 10)
 		padding.add_theme_constant_override("margin_right", 12)
 		padding.add_theme_constant_override("margin_bottom", 10)
 		panel.add_child(padding)
-		var button := Button.new()
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.text = "%s\n%s | %s | %s stage(s), %s reactive" % [
-			str(entry.get("enemy_name", entry.get("object_id", "Enemy"))),
+		var row := HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_theme_constant_override("separation", 10)
+		padding.add_child(row)
+		var text_box := VBoxContainer.new()
+		text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text_box.add_theme_constant_override("separation", 4)
+		text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(text_box)
+		var title := Label.new()
+		title.text = str(entry.get("enemy_name", entry.get("object_id", "Enemy")))
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		text_box.add_child(title)
+		var meta := Label.new()
+		meta.text = "%s | %s | %s reactive" % [
 			str(entry.get("object_id", "")),
 			str(entry.get("source_bucket", "")),
 			int(entry.get("stage_count", 0)),
 			int(entry.get("reactive_stage_count", 0)),
 		]
-		button.tooltip_text = str(entry.get("resource_path", ""))
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size = Vector2(0, 64)
-		button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
-		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		if str(entry.get("resource_path", "")) == selected_library_path:
-			button.disabled = true
-		button.button_up.connect(func() -> void:
-			_open_library_entry(entry)
+		meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		meta.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		text_box.add_child(meta)
+		var thumbnail := TextureRect.new()
+		thumbnail.custom_minimum_size = Vector2(72, 72)
+		thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		thumbnail.texture = _load_library_entry_texture(str(entry.get("resource_path", "")))
+		row.add_child(thumbnail)
+		panel.tooltip_text = str(entry.get("resource_path", ""))
+		panel.custom_minimum_size = Vector2(0, 84)
+		var is_selected: bool = str(entry.get("resource_path", "")) == selected_library_path
+		panel.modulate = Color(1.0, 0.95, 0.8, 1.0) if is_selected else Color(1, 1, 1, 1)
+		panel.gui_input.connect(func(event: InputEvent) -> void:
+			if is_selected:
+				return
+			if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				_open_library_entry(entry)
 		)
-		padding.add_child(button)
 		library_list.add_child(panel)
 
 func _render_navigator() -> void:
@@ -153,14 +184,42 @@ func _render_navigator() -> void:
 	if current_session == null or current_session.working_enemy_data == null:
 		navigator_content.add_child(_make_note_label("No active enemy session."))
 		return
+	_render_enemy_profile_section(navigator_content)
 
-	var session_section := _add_section(navigator_content, "Session")
+func _render_editor() -> void:
+	_clear_children(editor_content)
+	if current_session == null or current_session.working_enemy_data == null:
+		editor_content.add_child(_make_note_label("No active enemy session."))
+		return
+	_render_stage_navigator(editor_content)
+	if selected_base_stage_id != "":
+		var stage_data: EnemyStageData = current_session.working_enemy_data.get_stage(selected_base_stage_id)
+		if stage_data != null:
+			_render_base_stage_editor(editor_content, stage_data)
+			return
+	if selected_reactive_stage_id != "":
+		var reactive_stage: EnemyReactiveStageData = current_session.working_enemy_data.get_reactive_stage(selected_reactive_stage_id)
+		if reactive_stage != null:
+			_render_reactive_stage_editor(editor_content, reactive_stage)
+			return
+	if selected_difficulty_index >= 0 and selected_difficulty_index < current_session.working_enemy_data.difficulty_overrides.size():
+		_render_difficulty_editor(editor_content, selected_difficulty_index)
+		return
+	editor_content.add_child(_make_note_label("Select a base stage, reactive stage, or difficulty override from the navigator."))
+
+func _render_stage_navigator(parent: VBoxContainer) -> void:
+	var root_section := _add_section(parent, "Stage Navigator")
+	var session_section := _add_section(root_section, "Session")
 	session_section.add_child(_make_note_label("%s\n%s" % [
 		current_session.working_enemy_data.enemy_name,
 		current_session.get_active_save_path(),
 	]))
-
-	var stages_section := _add_section(navigator_content, "Base Stages")
+	session_section.add_child(_build_option_field("Opening Stage", _base_stage_options(), current_session.working_enemy_data.opening_stage_id, func(next_value: Variant) -> void:
+		if service.set_enemy_property(current_session, "opening_stage_id", str(next_value)):
+			selected_base_stage_id = str(next_value)
+			_render_all()
+	))
+	var stages_section := _add_section(root_section, "Base Stages")
 	var stage_add_row := HBoxContainer.new()
 	var add_stage_button := Button.new()
 	add_stage_button.text = "Add Base Stage"
@@ -177,8 +236,7 @@ func _render_navigator() -> void:
 	stages_section.add_child(stage_add_row)
 	for stage_data: EnemyStageData in current_session.working_enemy_data.stages:
 		stages_section.add_child(_build_stage_nav_row(stage_data))
-
-	var reactive_section := _add_section(navigator_content, "Reactive Stages")
+	var reactive_section := _add_section(root_section, "Reactive Stages")
 	var add_reactive_button := Button.new()
 	add_reactive_button.text = "Add Reactive Stage"
 	add_reactive_button.button_up.connect(func() -> void:
@@ -192,13 +250,9 @@ func _render_navigator() -> void:
 	)
 	reactive_section.add_child(add_reactive_button)
 	var reactive_stages: Array[EnemyReactiveStageData] = current_session.working_enemy_data.reactive_stages.duplicate()
-	reactive_stages.sort_custom(func(left: EnemyReactiveStageData, right: EnemyReactiveStageData) -> bool:
-		return left.priority > right.priority
-	)
 	for stage_data: EnemyReactiveStageData in reactive_stages:
 		reactive_section.add_child(_build_reactive_nav_row(stage_data))
-
-	var difficulty_section := _add_section(navigator_content, "Difficulty")
+	var difficulty_section := _add_section(root_section, "Difficulty")
 	var add_difficulty_button := Button.new()
 	add_difficulty_button.text = "Add Difficulty Override"
 	add_difficulty_button.button_up.connect(func() -> void:
@@ -215,27 +269,6 @@ func _render_navigator() -> void:
 		var override_data: EnemyDifficultyOverrideData = current_session.working_enemy_data.difficulty_overrides[index]
 		difficulty_section.add_child(_build_difficulty_nav_row(override_data, index))
 
-func _render_editor() -> void:
-	_clear_children(editor_content)
-	if current_session == null or current_session.working_enemy_data == null:
-		editor_content.add_child(_make_note_label("No active enemy session."))
-		return
-	_render_enemy_profile_section(editor_content)
-	if selected_base_stage_id != "":
-		var stage_data: EnemyStageData = current_session.working_enemy_data.get_stage(selected_base_stage_id)
-		if stage_data != null:
-			_render_base_stage_editor(editor_content, stage_data)
-			return
-	if selected_reactive_stage_id != "":
-		var reactive_stage: EnemyReactiveStageData = current_session.working_enemy_data.get_reactive_stage(selected_reactive_stage_id)
-		if reactive_stage != null:
-			_render_reactive_stage_editor(editor_content, reactive_stage)
-			return
-	if selected_difficulty_index >= 0 and selected_difficulty_index < current_session.working_enemy_data.difficulty_overrides.size():
-		_render_difficulty_editor(editor_content, selected_difficulty_index)
-		return
-	editor_content.add_child(_make_note_label("Select a base stage, reactive stage, or difficulty override from the navigator."))
-
 func _render_preview() -> void:
 	_clear_children(preview_content)
 	if current_session == null:
@@ -248,53 +281,44 @@ func _render_preview() -> void:
 func _render_enemy_profile_section(parent: VBoxContainer) -> void:
 	var section := _add_section(parent, "Enemy Profile")
 	var enemy_data: EnemyData = current_session.working_enemy_data
-	section.add_child(_build_string_field("Enemy Name", enemy_data.enemy_name, func(next_value: String) -> void:
+	var fields := _add_two_column_fields(section)
+	fields.add_child(_build_string_field("Enemy Name", enemy_data.enemy_name, func(next_value: String) -> void:
 		if service.set_enemy_property(current_session, "enemy_name", next_value):
 			_render_all()
 	))
-	section.add_child(_build_string_field("Stable Object ID", enemy_data.object_id, func(next_value: String) -> void:
+	fields.add_child(_build_string_field("Stable Object ID", enemy_data.object_id, func(next_value: String) -> void:
 		if service.set_enemy_property(current_session, "object_id", next_value):
 			_render_all()
 	))
-	section.add_child(_build_string_field("Legacy Enemy ID", enemy_data.enemy_object_id, func(next_value: String) -> void:
+	fields.add_child(_build_string_field("Legacy Enemy ID", enemy_data.enemy_object_id, func(next_value: String) -> void:
 		if service.set_enemy_property(current_session, "enemy_object_id", next_value):
 			_render_all()
 	))
-	section.add_child(_build_string_field("Texture Path", enemy_data.enemy_texture_path, func(next_value: String) -> void:
+	fields.add_child(_build_string_field("Texture Path", enemy_data.enemy_texture_path, func(next_value: String) -> void:
 		if service.set_enemy_property(current_session, "enemy_texture_path", next_value):
 			_render_all()
 	))
-	section.add_child(_build_int_field("Health", enemy_data.enemy_health, 0, 9999, func(next_value: int) -> void:
-		if service.set_enemy_property(current_session, "enemy_health", next_value):
+	fields.add_child(_build_int_field("Max Health", enemy_data.enemy_health_max, 0, 9999, func(next_value: int) -> void:
+		var updated: bool = service.set_enemy_property(current_session, "enemy_health_max", next_value)
+		updated = service.set_enemy_property(current_session, "enemy_health", next_value) or updated
+		if updated:
 			_render_all()
 	))
-	section.add_child(_build_int_field("Max Health", enemy_data.enemy_health_max, 0, 9999, func(next_value: int) -> void:
-		if service.set_enemy_property(current_session, "enemy_health_max", next_value):
+	fields.add_child(_build_int_field("Max Poise", enemy_data.enemy_poise_max, 0, 9999, func(next_value: int) -> void:
+		var updated: bool = service.set_enemy_property(current_session, "enemy_poise_max", next_value)
+		updated = service.set_enemy_property(current_session, "enemy_poise", next_value) or updated
+		if updated:
 			_render_all()
 	))
-	section.add_child(_build_int_field("Poise", enemy_data.enemy_poise, 0, 9999, func(next_value: int) -> void:
-		if service.set_enemy_property(current_session, "enemy_poise", next_value):
-			_render_all()
-	))
-	section.add_child(_build_int_field("Max Poise", enemy_data.enemy_poise_max, 0, 9999, func(next_value: int) -> void:
-		if service.set_enemy_property(current_session, "enemy_poise_max", next_value):
-			_render_all()
-	))
-	section.add_child(_build_int_field("Starting Block", enemy_data.enemy_block, 0, 9999, func(next_value: int) -> void:
+	fields.add_child(_build_int_field("Starting Block", enemy_data.enemy_block, 0, 9999, func(next_value: int) -> void:
 		if service.set_enemy_property(current_session, "enemy_block", next_value):
 			_render_all()
 	))
-	section.add_child(_build_option_field("Enemy Type", EnemyEditorSchema.enemy_type_options(), enemy_data.enemy_type, func(next_value: Variant) -> void:
-		if service.set_enemy_property(current_session, "enemy_type", int(next_value)):
-			_render_all()
-	))
-	section.add_child(_build_bool_field("Minion", enemy_data.enemy_is_minion, func(next_value: bool) -> void:
-		if service.set_enemy_property(current_session, "enemy_is_minion", next_value):
-			_render_all()
-	))
-	section.add_child(_build_option_field("Opening Stage", _base_stage_options(), enemy_data.opening_stage_id, func(next_value: Variant) -> void:
-		if service.set_enemy_property(current_session, "opening_stage_id", str(next_value)):
-			selected_base_stage_id = str(next_value)
+	fields.add_child(_build_option_field("Enemy Role", _enemy_role_options(), _enemy_role_value(enemy_data.enemy_type, enemy_data.enemy_is_minion), func(next_value: Variant) -> void:
+		var role_data: Dictionary = _decode_enemy_role_value(next_value)
+		var updated: bool = service.set_enemy_property(current_session, "enemy_type", int(role_data.get("enemy_type", EnemyData.ENEMY_TYPES.STANDARD)))
+		updated = service.set_enemy_property(current_session, "enemy_is_minion", bool(role_data.get("enemy_is_minion", false))) or updated
+		if updated:
 			_render_all()
 	))
 	section.add_child(_make_note_label("Save policy: %s\nManaged triage: %s\nManaged content: %s" % [
@@ -306,16 +330,17 @@ func _render_enemy_profile_section(parent: VBoxContainer) -> void:
 func _render_base_stage_editor(parent: VBoxContainer, stage_data: EnemyStageData) -> void:
 	var section := _add_section(parent, "Base Stage")
 	section.add_child(_make_note_label(EnemyEditorSchema.summarize_stage(stage_data)))
-	section.add_child(_build_string_field("Stage ID", stage_data.object_id, func(next_value: String) -> void:
+	var fields := _add_two_column_fields(section)
+	fields.add_child(_build_string_field("Stage ID", stage_data.object_id, func(next_value: String) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "object_id", next_value, false):
 			selected_base_stage_id = next_value
 			_render_all()
 	))
-	section.add_child(_build_string_field("Label", stage_data.label, func(next_value: String) -> void:
+	fields.add_child(_build_string_field("Label", stage_data.label, func(next_value: String) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "label", next_value, false):
 			_render_all()
 	))
-	section.add_child(_build_option_field("Next Stage", _base_stage_options(), stage_data.next_stage_id, func(next_value: Variant) -> void:
+	fields.add_child(_build_option_field("Next Stage", _base_stage_options(), stage_data.next_stage_id, func(next_value: Variant) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "next_stage_id", str(next_value), false):
 			_render_all()
 	))
@@ -342,33 +367,36 @@ func _render_base_stage_editor(parent: VBoxContainer, stage_data: EnemyStageData
 		var variant: EnemyIntentVariantData = stage_data.intents[variant_index]
 		variants_section.add_child(_build_variant_panel(stage_data.object_id, variant_index, variant, false))
 
-	var actions_section := _add_section(parent, "Extra Actions")
-	_render_action_entries(actions_section, stage_data.extra_actions, BaseAction.EDITOR_CONTEXT_ENEMY_ACTIONS, func(next_entries: Array[Dictionary]) -> void:
-		if service.set_stage_property(current_session, stage_data.object_id, "extra_actions", next_entries, false):
-			_render_all()
-	)
-
 func _render_reactive_stage_editor(parent: VBoxContainer, stage_data: EnemyReactiveStageData) -> void:
 	var section := _add_section(parent, "Reactive Stage")
 	section.add_child(_make_note_label("Interrupt | %s" % EnemyEditorSchema.summarize_reactive_stage(stage_data)))
-	section.add_child(_build_string_field("Reactive Stage ID", stage_data.object_id, func(next_value: String) -> void:
+	var fields := _add_two_column_fields(section)
+	fields.add_child(_build_string_field("Reactive Stage ID", stage_data.object_id, func(next_value: String) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "object_id", next_value, true):
 			selected_reactive_stage_id = next_value
 			_render_all()
 	))
-	section.add_child(_build_string_field("Label", stage_data.label, func(next_value: String) -> void:
+	fields.add_child(_build_string_field("Label", stage_data.label, func(next_value: String) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "label", next_value, true):
 			_render_all()
 	))
-	section.add_child(_build_int_field("Priority", stage_data.priority, -999, 999, func(next_value: int) -> void:
-		if service.set_stage_property(current_session, stage_data.object_id, "priority", next_value, true):
+	var priority_field := _build_int_field("Priority", stage_data.priority, -999, 999, func(next_value: int) -> void:
+		if stage_data.priority_override_enabled and service.set_stage_property(current_session, stage_data.object_id, "priority", next_value, true):
+			_render_all()
+	)
+	_set_controls_disabled(priority_field, not stage_data.priority_override_enabled)
+	fields.add_child(priority_field)
+	fields.add_child(_build_bool_field("Priority Override", stage_data.priority_override_enabled, func(next_value: bool) -> void:
+		if service.set_stage_property(current_session, stage_data.object_id, "priority_override_enabled", next_value, true):
 			_render_all()
 	))
-	section.add_child(_build_option_field("Resume Mode", EnemyEditorSchema.resume_mode_options(), stage_data.resume_mode, func(next_value: Variant) -> void:
+	if not stage_data.priority_override_enabled:
+		section.add_child(_make_note_label("Auto Priority: %s (derived from PC Energy condition)" % stage_data.priority))
+	fields.add_child(_build_option_field("Resume Mode", EnemyEditorSchema.resume_mode_options(), stage_data.resume_mode, func(next_value: Variant) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "resume_mode", str(next_value), true):
 			_render_all()
 	))
-	section.add_child(_build_option_field("Resume Stage", _prepend_none(_base_stage_options(), "Resume Previous"), stage_data.resume_stage_id, func(next_value: Variant) -> void:
+	fields.add_child(_build_option_field("Resume Stage", _prepend_none(_base_stage_options(), "Resume Previous"), stage_data.resume_stage_id, func(next_value: Variant) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "resume_stage_id", str(next_value), true):
 			_render_all()
 	))
@@ -401,12 +429,6 @@ func _render_reactive_stage_editor(parent: VBoxContainer, stage_data: EnemyReact
 		var variant: EnemyIntentVariantData = stage_data.intents[variant_index]
 		variants_section.add_child(_build_variant_panel(stage_data.object_id, variant_index, variant, true))
 
-	var actions_section := _add_section(parent, "Extra Actions")
-	_render_action_entries(actions_section, stage_data.extra_actions, BaseAction.EDITOR_CONTEXT_ENEMY_ACTIONS, func(next_entries: Array[Dictionary]) -> void:
-		if service.set_stage_property(current_session, stage_data.object_id, "extra_actions", next_entries, true):
-			_render_all()
-	)
-
 func _render_difficulty_editor(parent: VBoxContainer, override_index: int) -> void:
 	var override_data: EnemyDifficultyOverrideData = current_session.working_enemy_data.difficulty_overrides[override_index]
 	var section := _add_section(parent, "Difficulty Override")
@@ -430,6 +452,8 @@ func _render_difficulty_editor(parent: VBoxContainer, override_index: int) -> vo
 	for field_name: String in EnemyEditorSchema.get_top_level_field_definitions().keys():
 		var definition: Dictionary = EnemyEditorSchema.get_top_level_field_definitions()[field_name]
 		var value_type: String = str(definition.get("value_type", ""))
+		if field_name in ["enemy_health", "enemy_poise"]:
+			continue
 		if value_type in ["string", "int", "bool", "enum"]:
 			allowed_fields[field_name] = definition
 	for property_name: String in override_data.top_level_overrides.keys():
@@ -459,27 +483,28 @@ func _render_difficulty_editor(parent: VBoxContainer, override_index: int) -> vo
 func _render_preview_controls(parent: VBoxContainer) -> void:
 	var section := _add_section(parent, "Live Preview")
 	var state: EnemyEditorPreviewState = current_session.preview_state
-	section.add_child(_build_option_field("Planned Stage", _base_stage_options(), state.planned_stage_id, func(next_value: Variant) -> void:
+	var fields := _add_two_column_fields(section)
+	fields.add_child(_build_option_field("Planned Stage", _base_stage_options(), state.planned_stage_id, func(next_value: Variant) -> void:
 		state.planned_stage_id = str(next_value)
 		_render_all()
 	))
-	section.add_child(_build_option_field("Previous Executed Stage", _prepend_none(_stage_id_options(), "None"), state.previous_executed_stage_id, func(next_value: Variant) -> void:
+	fields.add_child(_build_option_field("Previous Executed Stage", _prepend_none(_stage_id_options(), "None"), state.previous_executed_stage_id, func(next_value: Variant) -> void:
 		state.previous_executed_stage_id = str(next_value)
 		_render_all()
 	))
-	section.add_child(_build_int_field("Turn Count", state.turn_count, 1, 99, func(next_value: int) -> void:
+	fields.add_child(_build_int_field("Turn Count", state.turn_count, 1, 99, func(next_value: int) -> void:
 		state.turn_count = next_value
 		_render_all()
 	))
-	section.add_child(_build_int_field("Stage Started Turn", state.planned_stage_started_turn_count, 1, 99, func(next_value: int) -> void:
+	fields.add_child(_build_int_field("Stage Started Turn", state.planned_stage_started_turn_count, 1, 99, func(next_value: int) -> void:
 		state.planned_stage_started_turn_count = next_value
 		_render_all()
 	))
-	section.add_child(_build_int_field("Player Energy", state.player_energy, 0, 20, func(next_value: int) -> void:
+	fields.add_child(_build_int_field("PC Energy", state.player_energy, 0, 20, func(next_value: int) -> void:
 		state.player_energy = next_value
 		_render_all()
 	))
-	section.add_child(_build_int_field("Preview Difficulty", state.difficulty_level, 0, 99, func(next_value: int) -> void:
+	fields.add_child(_build_int_field("Preview Difficulty", state.difficulty_level, 0, 99, func(next_value: int) -> void:
 		state.difficulty_level = next_value
 		_render_all()
 	))
@@ -489,29 +514,29 @@ func _render_preview_controls(parent: VBoxContainer) -> void:
 		_render_all()
 	)
 
-	var party_section := _add_section(parent, "Party State")
+	var party_section := _add_section(parent, "PC State")
+	var party_grid := _add_three_column_fields(party_section)
 	for party_index: int in range(state.player_party_members.size()):
 		var member: Dictionary = state.player_party_members[party_index]
 		var row := VBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_theme_constant_override("separation", 4)
-		row.add_child(_make_inline_title("Player %s" % party_index))
+		row.add_child(_make_inline_title("PC %s" % (party_index + 1)))
 		row.add_child(_build_int_field("Health", int(member.get("health", 0)), 0, 999, func(next_value: int) -> void:
-			state.player_party_members[party_index]["health"] = next_value
+			state.player_party_members[party_index]["health"] = clampi(next_value, 0, 100)
+			state.player_party_members[party_index]["health_max"] = 100
 			_render_all()
 		))
-		row.add_child(_build_int_field("Max Health", int(member.get("health_max", 1)), 1, 999, func(next_value: int) -> void:
-			state.player_party_members[party_index]["health_max"] = next_value
-			_render_all()
-		))
-		party_section.add_child(row)
+		party_grid.add_child(row)
 
 	var ally_section := _add_section(parent, "Allies And Minions")
+	var ally_grid := _add_two_column_fields(ally_section)
 	var counts: Dictionary = _ally_count_summary(state.living_ally_enemy_states)
-	ally_section.add_child(_build_int_field("Living Allies", int(counts.get("living_allies", 0)), 0, 6, func(next_value: int) -> void:
+	ally_grid.add_child(_build_int_field("Living Allies", int(counts.get("living_allies", 0)), 0, 6, func(next_value: int) -> void:
 		state.living_ally_enemy_states = _build_ally_state_array(next_value, int(counts.get("living_minions", 0)))
 		_render_all()
 	))
-	ally_section.add_child(_build_int_field("Living Minions", int(counts.get("living_minions", 0)), 0, 6, func(next_value: int) -> void:
+	ally_grid.add_child(_build_int_field("Living Minions", int(counts.get("living_minions", 0)), 0, 6, func(next_value: int) -> void:
 		state.living_ally_enemy_states = _build_ally_state_array(int(counts.get("living_allies", 0)), next_value)
 		_render_all()
 	))
@@ -613,6 +638,21 @@ func _build_reactive_nav_row(stage_data: EnemyReactiveStageData) -> Control:
 		selected_difficulty_index = -1
 		_render_all()
 	)
+	var reactive_index: int = current_session.working_enemy_data.reactive_stages.find(stage_data)
+	var up_button := Button.new()
+	up_button.text = "Up"
+	up_button.disabled = reactive_index <= 0
+	up_button.button_up.connect(func() -> void:
+		if service.move_reactive_stage(current_session, reactive_index, reactive_index - 1):
+			_render_all()
+	)
+	var down_button := Button.new()
+	down_button.text = "Down"
+	down_button.disabled = reactive_index < 0 or reactive_index >= current_session.working_enemy_data.reactive_stages.size() - 1
+	down_button.button_up.connect(func() -> void:
+		if service.move_reactive_stage(current_session, reactive_index, reactive_index + 1):
+			_render_all()
+	)
 	var remove_button := Button.new()
 	remove_button.text = "X"
 	remove_button.button_up.connect(func() -> void:
@@ -622,6 +662,8 @@ func _build_reactive_nav_row(stage_data: EnemyReactiveStageData) -> Control:
 			_render_all()
 	)
 	row.add_child(button)
+	row.add_child(up_button)
+	row.add_child(down_button)
 	row.add_child(remove_button)
 	return row
 
@@ -665,50 +707,96 @@ func _build_variant_panel(stage_id: String, variant_index: int, variant: EnemyIn
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var remove_button := Button.new()
 	remove_button.text = "Remove"
+	var move_up_button := Button.new()
+	move_up_button.text = "Up"
+	move_up_button.disabled = variant_index <= 0
+	move_up_button.button_up.connect(func() -> void:
+		if service.move_intent_variant(current_session, stage_id, variant_index, variant_index - 1, is_reactive):
+			_render_all()
+	)
+	var move_down_button := Button.new()
+	move_down_button.text = "Down"
+	var variant_count: int = 0
+	var stage_data: Variant = current_session.working_enemy_data.get_reactive_stage(stage_id) if is_reactive else current_session.working_enemy_data.get_stage(stage_id)
+	if stage_data != null:
+		variant_count = stage_data.intents.size()
+	move_down_button.disabled = variant_index >= variant_count - 1
+	move_down_button.button_up.connect(func() -> void:
+		if service.move_intent_variant(current_session, stage_id, variant_index, variant_index + 1, is_reactive):
+			_render_all()
+	)
 	remove_button.button_up.connect(func() -> void:
 		if service.remove_intent_variant(current_session, stage_id, variant_index, is_reactive):
 			_render_all()
 	)
 	header.add_child(label)
+	header.add_child(move_up_button)
+	header.add_child(move_down_button)
 	header.add_child(remove_button)
 	box.add_child(header)
-	box.add_child(_build_int_field("Priority", variant.priority, -999, 999, func(next_value: int) -> void:
-		if service.set_variant_field(current_session, stage_id, variant_index, "priority", next_value, is_reactive):
+	var variant_fields := _add_two_column_fields(box)
+	variant_fields.add_child(_build_bool_field("Priority Override", variant.priority_override_enabled, func(next_value: bool) -> void:
+		if service.set_variant_field(current_session, stage_id, variant_index, "priority_override_enabled", next_value, is_reactive):
 			_render_all()
 	))
+	var priority_field := _build_int_field("Priority", variant.priority, -999, 999, func(next_value: int) -> void:
+		if variant.priority_override_enabled and service.set_variant_field(current_session, stage_id, variant_index, "priority", next_value, is_reactive):
+			_render_all()
+	)
+	_set_controls_disabled(priority_field, not variant.priority_override_enabled)
+	variant_fields.add_child(priority_field)
+	if not variant.priority_override_enabled:
+		box.add_child(_make_note_label("Auto Priority: %s (derived from PC Energy condition)" % variant.priority))
 	var condition_section := _add_section(box, "Conditions")
 	_render_condition_entries(condition_section, variant.conditions, func(next_entries: Array[Dictionary]) -> void:
 		if service.patch_variant_conditions(current_session, stage_id, variant_index, next_entries, "overwrite", is_reactive):
 			_render_all()
 	)
+	var actions_section := _add_section(box, "Extra Actions")
+	_render_action_entries(actions_section, variant.extra_actions, BaseAction.EDITOR_CONTEXT_ENEMY_ACTIONS, func(next_entries: Array[Dictionary]) -> void:
+		if service.patch_variant_extra_actions(current_session, stage_id, variant_index, next_entries, "overwrite", is_reactive):
+			_render_all()
+	)
 	var intent_section := _add_section(box, "Intent")
-	intent_section.add_child(_build_int_field("Damage", variant.intent.damage, 0, 999, func(next_value: int) -> void:
+	var intent_fields := _add_two_column_fields(intent_section)
+	intent_fields.add_child(_build_int_field("Damage", variant.intent.damage, 0, 999, func(next_value: int) -> void:
 		if service.set_intent_field(current_session, stage_id, variant_index, "damage", next_value, is_reactive):
 			_render_all()
 	))
-	intent_section.add_child(_build_int_field("Attacks", variant.intent.number_of_attacks, 0, 20, func(next_value: int) -> void:
+	intent_fields.add_child(_build_int_field("Attacks", variant.intent.number_of_attacks, 0, 20, func(next_value: int) -> void:
 		if service.set_intent_field(current_session, stage_id, variant_index, "number_of_attacks", next_value, is_reactive):
 			_render_all()
 	))
-	intent_section.add_child(_build_int_field("Block", variant.intent.block, 0, 999, func(next_value: int) -> void:
+	intent_fields.add_child(_build_option_field("Targeting Rule", EnemyEditorSchema.targeting_rule_options(), variant.intent.targeting_rule, func(next_value: Variant) -> void:
+		if service.set_intent_field(current_session, stage_id, variant_index, "targeting_rule", str(next_value), is_reactive):
+			_render_all()
+		))
+	intent_fields.add_child(_build_int_field("Target Count", variant.intent.target_count, 1, 8, func(next_value: int) -> void:
+		if service.set_intent_field(current_session, stage_id, variant_index, "target_count", next_value, is_reactive):
+			_render_all()
+		))
+	intent_fields.add_child(_build_int_field("Block", variant.intent.block, 0, 999, func(next_value: int) -> void:
 		if service.set_intent_field(current_session, stage_id, variant_index, "block", next_value, is_reactive):
 			_render_all()
 	))
-	intent_section.add_child(_build_option_field("Targeting Rule", EnemyEditorSchema.targeting_rule_options(), variant.intent.targeting_rule, func(next_value: Variant) -> void:
-		if service.set_intent_field(current_session, stage_id, variant_index, "targeting_rule", str(next_value), is_reactive):
-			_render_all()
-	))
-	intent_section.add_child(_build_int_field("Target Count", variant.intent.target_count, 1, 8, func(next_value: int) -> void:
-		if service.set_intent_field(current_session, stage_id, variant_index, "target_count", next_value, is_reactive):
-			_render_all()
-	))
-	intent_section.add_child(_build_bool_field("Allow Repeat Targets", variant.intent.allow_repeat_targets, func(next_value: bool) -> void:
+	intent_fields.add_child(_build_bool_field("Allow Repeat Targets", variant.intent.allow_repeat_targets, func(next_value: bool) -> void:
 		if service.set_intent_field(current_session, stage_id, variant_index, "allow_repeat_targets", next_value, is_reactive):
 			_render_all()
 	))
 	return panel
 
 func _render_condition_entries(parent: VBoxContainer, entries: Array[Dictionary], on_set_entries: Callable) -> void:
+	var quick_conditions := _add_section(parent, "Common Conditions")
+	var quick_grid := _add_three_column_fields(quick_conditions)
+	quick_grid.add_child(_build_bool_field("Poise Broken", _has_quick_condition(entries, Scripts.VALIDATOR_SOURCE_BROKEN_POISE), func(enabled: bool) -> void:
+		on_set_entries.call(_set_quick_condition(entries, Scripts.VALIDATOR_SOURCE_BROKEN_POISE, {}, enabled))
+	))
+	quick_grid.add_child(_build_bool_field("50% HP Or Lower", _has_quick_condition(entries, Scripts.VALIDATOR_SOURCE_HEALTH_PERCENT, {"operator": "<=", "comparison_value": 0.5}), func(enabled: bool) -> void:
+		on_set_entries.call(_set_quick_condition(entries, Scripts.VALIDATOR_SOURCE_HEALTH_PERCENT, {"operator": "<=", "comparison_value": 0.5}, enabled))
+	))
+	quick_grid.add_child(_build_int_field("PC Energy At Least", _get_quick_pc_energy(entries), 0, 20, func(next_value: int) -> void:
+		on_set_entries.call(_set_quick_pc_energy(entries, next_value))
+	))
 	var validator_options: Array[Dictionary] = _supported_condition_options()
 	for entry_index: int in range(entries.size()):
 		var entry: Dictionary = entries[entry_index]
@@ -921,6 +1009,7 @@ func _build_metadata_parameter_editor(parameter_name: String, current_value: Var
 
 func _build_string_field(label_text: String, value: String, on_commit: Callable) -> Control:
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 4)
 	row.add_child(_make_inline_title(label_text))
 	var line_edit := LineEdit.new()
@@ -934,16 +1023,19 @@ func _build_string_field(label_text: String, value: String, on_commit: Callable)
 
 func _build_multiline_field(label_text: String, value: String, on_commit: Callable) -> Control:
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 4)
 	row.add_child(_make_inline_title(label_text))
 	var text_edit := TextEdit.new()
 	text_edit.custom_minimum_size = Vector2(0, 84)
+	text_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text_edit.text = value
 	row.add_child(text_edit)
 	return row
 
 func _build_int_field(label_text: String, value: int, min_value: int, max_value: int, on_change: Callable) -> Control:
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 4)
 	row.add_child(_make_inline_title(label_text))
 	var spin_box := SpinBox.new()
@@ -964,6 +1056,7 @@ func _build_int_field(label_text: String, value: int, min_value: int, max_value:
 
 func _build_float_field(label_text: String, value: float, min_value: float, max_value: float, on_change: Callable) -> Control:
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 4)
 	row.add_child(_make_inline_title(label_text))
 	var spin_box := SpinBox.new()
@@ -983,6 +1076,7 @@ func _build_float_field(label_text: String, value: float, min_value: float, max_
 
 func _build_bool_field(label_text: String, value: bool, on_change: Callable) -> Control:
 	var check_box := CheckBox.new()
+	check_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	check_box.text = label_text
 	check_box.button_pressed = value
 	check_box.toggled.connect(func(next_value: bool) -> void:
@@ -992,6 +1086,7 @@ func _build_bool_field(label_text: String, value: bool, on_change: Callable) -> 
 
 func _build_option_field(label_text: String, options: Array[Dictionary], current_value: Variant, on_change: Callable) -> Control:
 	var row := VBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 4)
 	row.add_child(_make_inline_title(label_text))
 	var option := OptionButton.new()
@@ -1084,6 +1179,24 @@ func _add_section(parent: VBoxContainer, title: String) -> VBoxContainer:
 	parent.add_child(section)
 	return section
 
+func _add_two_column_fields(parent: VBoxContainer) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = _resolved_form_columns(parent)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 8)
+	parent.add_child(grid)
+	return grid
+
+func _add_three_column_fields(parent: VBoxContainer) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 8)
+	parent.add_child(grid)
+	return grid
+
 func _make_inline_title(text_value: String) -> Label:
 	var label := Label.new()
 	label.text = text_value
@@ -1094,6 +1207,58 @@ func _make_note_label(text_value: String) -> Label:
 	label.text = text_value
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return label
+
+func _enemy_role_options() -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	for type_option: Dictionary in EnemyEditorSchema.enemy_type_options():
+		var type_value: int = int(type_option.get("value", EnemyData.ENEMY_TYPES.STANDARD))
+		var type_label: String = str(type_option.get("label", type_value))
+		options.append({"label": type_label, "value": _enemy_role_value(type_value, false)})
+		options.append({"label": "%s Minion" % type_label, "value": _enemy_role_value(type_value, true)})
+	return options
+
+func _enemy_role_value(enemy_type: int, enemy_is_minion: bool) -> String:
+	return "%s|%s" % [enemy_type, 1 if enemy_is_minion else 0]
+
+func _decode_enemy_role_value(value: Variant) -> Dictionary:
+	var raw_value: String = str(value)
+	var parts: PackedStringArray = raw_value.split("|")
+	return {
+		"enemy_type": int(parts[0]) if parts.size() > 0 else EnemyData.ENEMY_TYPES.STANDARD,
+		"enemy_is_minion": parts.size() > 1 and parts[1] == "1",
+	}
+
+func _load_library_entry_texture(resource_path: String) -> Texture2D:
+	if resource_path.strip_edges() == "":
+		return null
+	var enemy_resource: Resource = load(resource_path)
+	if not (enemy_resource is EnemyData):
+		return null
+	var texture_path: String = str((enemy_resource as EnemyData).enemy_texture_path)
+	if texture_path.strip_edges() == "":
+		return null
+	return FileLoader.load_texture(texture_path)
+
+func _resolved_form_columns(context: Control) -> int:
+	var is_preview_context: bool = preview_content != null and (context == preview_content or preview_content.is_ancestor_of(context))
+	var is_left_context: bool = navigator_content != null and (context == navigator_content or navigator_content.is_ancestor_of(context))
+	var width_source: Control = preview_content if is_preview_context else navigator_content if is_left_context else editor_content
+	if width_source == null:
+		width_source = context
+	var available_width: float = width_source.size.x
+	if available_width <= 0.0 and width_source.get_parent() is Control:
+		available_width = (width_source.get_parent() as Control).size.x
+	return 2 if available_width >= TWO_COLUMN_MIN_WIDTH else 1
+
+func _on_form_layout_resized() -> void:
+	if current_session == null:
+		return
+	var next_left_columns: int = _resolved_form_columns(navigator_content)
+	var next_editor_columns: int = _resolved_form_columns(editor_content)
+	var next_preview_columns: int = _resolved_form_columns(preview_content)
+	if next_left_columns == last_left_layout_columns and next_editor_columns == last_editor_layout_columns and next_preview_columns == last_preview_layout_columns:
+		return
+	_render_all()
 
 func _update_stats() -> void:
 	var diagnostics: Array = [] if current_session == null else current_session.diagnostics
@@ -1129,22 +1294,28 @@ func _ensure_preview_defaults() -> void:
 		return
 	var state: EnemyEditorPreviewState = current_session.preview_state
 	state.ensure_defaults(current_session.working_enemy_data)
+	state.enemy_health = state.enemy_health_max
+	state.enemy_poise = state.enemy_poise_max
 	if state.player_party_members.is_empty():
-		for party_index: int in range(DEFAULT_PARTY_SIZE):
+		for party_index: int in range(DEFAULT_PC_HEALTHS.size()):
 			state.player_party_members.append({
 				"party_member_index": party_index,
-				"health": 40,
-				"health_max": 40,
+				"health": DEFAULT_PC_HEALTHS[party_index],
+				"health_max": 100,
 			})
-	elif state.player_party_members.size() < DEFAULT_PARTY_SIZE:
-		for party_index: int in range(state.player_party_members.size(), DEFAULT_PARTY_SIZE):
+	elif state.player_party_members.size() < DEFAULT_PC_HEALTHS.size():
+		for party_index: int in range(state.player_party_members.size(), DEFAULT_PC_HEALTHS.size()):
 			state.player_party_members.append({
 				"party_member_index": party_index,
-				"health": 40,
-				"health_max": 40,
+				"health": DEFAULT_PC_HEALTHS[party_index],
+				"health_max": 100,
 			})
+	elif state.player_party_members.size() > DEFAULT_PC_HEALTHS.size():
+		state.player_party_members.resize(DEFAULT_PC_HEALTHS.size())
 	for party_index: int in range(state.player_party_members.size()):
 		state.player_party_members[party_index]["party_member_index"] = party_index
+		state.player_party_members[party_index]["health_max"] = 100
+		state.player_party_members[party_index]["health"] = clampi(int(state.player_party_members[party_index].get("health", DEFAULT_PC_HEALTHS[min(party_index, DEFAULT_PC_HEALTHS.size() - 1)])), 0, 100)
 
 func _select_default_navigation_targets() -> void:
 	if current_session == null or current_session.working_enemy_data == null:
@@ -1184,8 +1355,6 @@ func _stage_id_options() -> Array[Dictionary]:
 func _supported_condition_options() -> Array[Dictionary]:
 	var options: Array[Dictionary] = []
 	for metadata: Dictionary in service.list_validator_options():
-		if not SUPPORTED_CONDITION_CLASSES.has(str(metadata.get("script_global_name", ""))):
-			continue
 		options.append({
 			"label": str(metadata.get("display_name", metadata.get("resolved_token", ""))),
 			"value": str(metadata.get("resolved_token", metadata.get("token_or_path", ""))),
@@ -1266,6 +1435,70 @@ func _ally_count_summary(entries: Array[Dictionary]) -> Dictionary:
 		"living_minions": living_minions,
 	}
 
+func _find_quick_condition_index(entries: Array[Dictionary], token_or_path: String, expected_values: Dictionary = {}) -> int:
+	for entry_index: int in range(entries.size()):
+		var entry: Dictionary = entries[entry_index]
+		if len(entry.keys()) != 1:
+			continue
+		var token: String = str(entry.keys()[0])
+		if token != token_or_path:
+			continue
+		var values: Dictionary = entry[token]
+		var matches_expected: bool = true
+		for value_key: String in expected_values.keys():
+			var expected_value: Variant = expected_values[value_key]
+			var current_value: Variant = values.get(value_key, null)
+			if expected_value is float and current_value is float:
+				if not is_equal_approx(float(current_value), float(expected_value)):
+					matches_expected = false
+					break
+			elif current_value != expected_value:
+				matches_expected = false
+				break
+		if matches_expected:
+			return entry_index
+	return -1
+
+func _has_quick_condition(entries: Array[Dictionary], token_or_path: String, expected_values: Dictionary = {}) -> bool:
+	return _find_quick_condition_index(entries, token_or_path, expected_values) >= 0
+
+func _set_quick_condition(entries: Array[Dictionary], token_or_path: String, values: Dictionary, enabled: bool) -> Array[Dictionary]:
+	var next_entries: Array[Dictionary] = entries.duplicate(true)
+	var condition_index: int = _find_quick_condition_index(next_entries, token_or_path, values)
+	if enabled:
+		if condition_index < 0:
+			next_entries.append({token_or_path: values.duplicate(true)})
+	else:
+		if condition_index >= 0:
+			next_entries.remove_at(condition_index)
+	return next_entries
+
+func _get_quick_pc_energy(entries: Array[Dictionary]) -> int:
+	var condition_index: int = _find_quick_condition_index(entries, Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY, {"operator": ">="})
+	if condition_index < 0:
+		return 0
+	var values: Dictionary = entries[condition_index][Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY]
+	return int(values.get("comparison_value", 0))
+
+func _set_quick_pc_energy(entries: Array[Dictionary], required_energy: int) -> Array[Dictionary]:
+	var next_entries: Array[Dictionary] = entries.duplicate(true)
+	var condition_index: int = _find_quick_condition_index(next_entries, Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY, {"operator": ">="})
+	if required_energy <= 0:
+		if condition_index >= 0:
+			next_entries.remove_at(condition_index)
+		return next_entries
+	var next_entry := {
+		Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY: {
+			"operator": ">=",
+			"comparison_value": required_energy,
+		}
+	}
+	if condition_index >= 0:
+		next_entries[condition_index] = next_entry
+	else:
+		next_entries.append(next_entry)
+	return next_entries
+
 func _build_ally_state_array(living_allies: int, living_minions: int) -> Array[Dictionary]:
 	var ally_entries: Array[Dictionary] = []
 	var clamped_allies: int = max(0, living_allies)
@@ -1339,6 +1572,20 @@ func _get_option_value(option_button: OptionButton) -> Variant:
 func _clear_children(node: Node) -> void:
 	for child: Node in node.get_children():
 		child.queue_free()
+
+func _set_controls_disabled(root: Node, disabled: bool) -> void:
+	if root is BaseButton:
+		(root as BaseButton).disabled = disabled
+	elif root is SpinBox:
+		(root as SpinBox).editable = not disabled
+	elif root is LineEdit:
+		(root as LineEdit).editable = not disabled
+	elif root is OptionButton:
+		(root as OptionButton).disabled = disabled
+	elif root is TextEdit:
+		(root as TextEdit).editable = not disabled
+	for child: Node in root.get_children():
+		_set_controls_disabled(child, disabled)
 
 func _apply_compact_font_sizes(root: Node) -> void:
 	if root == null:

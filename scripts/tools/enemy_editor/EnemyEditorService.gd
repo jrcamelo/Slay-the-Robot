@@ -113,6 +113,8 @@ func create_blank_session(
 	opening_stage.intents.append(opening_variant)
 	enemy_data.opening_stage_id = opening_stage.object_id
 	enemy_data.stages.append(opening_stage)
+	_migrate_stage_extra_actions_to_variants(enemy_data)
+	_apply_auto_priorities(enemy_data)
 	var session := EnemyEditorSession.new(enemy_data, "", content_root, triage_root, save_policy)
 	session.refresh_diagnostics(self)
 	return session
@@ -131,6 +133,8 @@ func load_session(
 	if resolved_save_policy == "":
 		resolved_save_policy = EnemyEditorSession.SAVE_POLICY_MANAGED_TRIAGE if EnemyEditorPathUtils.path_is_within_root(resource_path, triage_root) else EnemyEditorSession.SAVE_POLICY_MANAGED_CONTENT
 	var session_enemy: EnemyData = (resource as EnemyData).duplicate(true)
+	_migrate_stage_extra_actions_to_variants(session_enemy)
+	_apply_auto_priorities(session_enemy)
 	var session := EnemyEditorSession.new(session_enemy, resource_path, content_root, triage_root, resolved_save_policy)
 	session.refresh_diagnostics(self)
 	return session
@@ -149,6 +153,8 @@ func duplicate_session(
 	if source_session == null or source_session.working_enemy_data == null:
 		return null
 	var duplicated_enemy: EnemyData = source_session.working_enemy_data.duplicate(true)
+	_migrate_stage_extra_actions_to_variants(duplicated_enemy)
+	_apply_auto_priorities(duplicated_enemy)
 	var session := EnemyEditorSession.new(duplicated_enemy, "", content_root, triage_root, save_policy)
 	session.set_preferred_relative_directory(source_session.preferred_relative_directory)
 	session.mark_dirty()
@@ -459,6 +465,14 @@ func patch_variant_conditions(session: EnemyEditorSession, stage_id: String, var
 	_after_enemy_mutation(session)
 	return true
 
+func patch_variant_extra_actions(session: EnemyEditorSession, stage_id: String, variant_index: int, action_payloads: Array[Dictionary], patch_strategy: String = "overwrite", is_reactive: bool = false) -> bool:
+	var intent_variant: EnemyIntentVariantData = _get_intent_variant(session, stage_id, variant_index, is_reactive)
+	if intent_variant == null:
+		return false
+	intent_variant.extra_actions = SerializableData.patch_array(intent_variant.extra_actions, action_payloads, patch_strategy)
+	_after_enemy_mutation(session)
+	return true
+
 func patch_stage_extra_actions(session: EnemyEditorSession, stage_id: String, action_payloads: Array[Dictionary], patch_strategy: String = "overwrite", is_reactive: bool = false) -> bool:
 	var stage_data: Variant = _get_stage_by_id(session, stage_id, is_reactive)
 	if stage_data == null:
@@ -758,6 +772,7 @@ func _validate_stage_collection(stages: Array[EnemyStageData], _is_reactive: boo
 		for variant_index: int in range(len(stage_data.intents)):
 			var intent_variant: EnemyIntentVariantData = stage_data.intents[variant_index]
 			_validate_condition_entries(intent_variant.conditions, "stage_conditions", diagnostics, {"stage_id": stage_data.object_id, "variant_index": variant_index})
+			_validate_action_entries(intent_variant.extra_actions, "stage_variant_extra_actions", diagnostics, {"stage_id": stage_data.object_id, "variant_index": variant_index})
 
 func _validate_reactive_stage_collection(stages: Array[EnemyReactiveStageData], diagnostics: Array[Dictionary]) -> void:
 	for stage_data: EnemyReactiveStageData in stages:
@@ -766,6 +781,7 @@ func _validate_reactive_stage_collection(stages: Array[EnemyReactiveStageData], 
 		for variant_index: int in range(len(stage_data.intents)):
 			var intent_variant: EnemyIntentVariantData = stage_data.intents[variant_index]
 			_validate_condition_entries(intent_variant.conditions, "reactive_stage_variant_conditions", diagnostics, {"reactive_stage_id": stage_data.object_id, "variant_index": variant_index})
+			_validate_action_entries(intent_variant.extra_actions, "reactive_stage_variant_extra_actions", diagnostics, {"reactive_stage_id": stage_data.object_id, "variant_index": variant_index})
 
 func _validate_difficulty_overrides(enemy_data: EnemyData, diagnostics: Array[Dictionary]) -> void:
 	for override_index: int in range(len(enemy_data.difficulty_overrides)):
@@ -1039,15 +1055,70 @@ func _assign_typed_array(target_array: Variant, next_values: Array) -> void:
 func _after_enemy_mutation(session: EnemyEditorSession) -> void:
 	if session == null:
 		return
+	_apply_auto_priorities(session.working_enemy_data)
 	session.recompute_managed_paths()
 	session.reset_preview_state()
 	session.mark_dirty()
 	session.refresh_diagnostics(self)
 
+func _apply_auto_priorities(enemy_data: EnemyData) -> void:
+	if enemy_data == null:
+		return
+	for stage_data: EnemyStageData in enemy_data.stages:
+		_apply_intent_variant_auto_priorities(stage_data.intents)
+	for reactive_stage: EnemyReactiveStageData in enemy_data.reactive_stages:
+		if not reactive_stage.priority_override_enabled:
+			reactive_stage.priority = _extract_pc_energy_priority(reactive_stage.conditions)
+		_apply_intent_variant_auto_priorities(reactive_stage.intents)
+
+func _apply_intent_variant_auto_priorities(intent_variants: Array[EnemyIntentVariantData]) -> void:
+	for intent_variant: EnemyIntentVariantData in intent_variants:
+		if intent_variant.priority_override_enabled:
+			continue
+		intent_variant.priority = _extract_pc_energy_priority(intent_variant.conditions)
+
+func _extract_pc_energy_priority(conditions: Array[Dictionary]) -> int:
+	var highest_energy_requirement: int = 0
+	for condition_entry: Dictionary in conditions:
+		if len(condition_entry.keys()) != 1:
+			continue
+		var token_or_path: String = str(condition_entry.keys()[0])
+		var validator_script: Script = Scripts.resolve_script(token_or_path)
+		if validator_script == null or validator_script.get_global_name() != "ValidatorPlayerCurrentEnergy":
+			continue
+		var validator_values: Dictionary = condition_entry[token_or_path]
+		var operator: String = str(validator_values.get("operator", ">="))
+		if operator not in [">=", ">", "=="]:
+			continue
+		highest_energy_requirement = max(highest_energy_requirement, int(validator_values.get("comparison_value", 0)))
+	return highest_energy_requirement
+
 func _normalize_enemy_resource(enemy_data: EnemyData) -> void:
 	if enemy_data == null:
 		return
+	_migrate_stage_extra_actions_to_variants(enemy_data)
 	ContentExporter._normalize_resource_script_references(enemy_data)
+
+func _migrate_stage_extra_actions_to_variants(enemy_data: EnemyData) -> void:
+	if enemy_data == null:
+		return
+	for stage_data: EnemyStageData in enemy_data.stages:
+		_migrate_single_stage_extra_actions(stage_data)
+	for reactive_stage_data: EnemyReactiveStageData in enemy_data.reactive_stages:
+		_migrate_single_stage_extra_actions(reactive_stage_data)
+
+func _migrate_single_stage_extra_actions(stage_data) -> void:
+	if stage_data == null or stage_data.intents.is_empty() or stage_data.extra_actions.is_empty():
+		return
+	var default_variant: EnemyIntentVariantData = null
+	for intent_variant: EnemyIntentVariantData in stage_data.intents:
+		if intent_variant.conditions.is_empty():
+			default_variant = intent_variant
+			break
+	if default_variant == null:
+		default_variant = stage_data.intents[0]
+	default_variant.extra_actions.append_array(stage_data.extra_actions.duplicate(true))
+	stage_data.extra_actions.clear()
 
 func _count_diagnostics(diagnostics: Array[Dictionary]) -> Dictionary:
 	var counts := {"errors": 0, "warnings": 0}

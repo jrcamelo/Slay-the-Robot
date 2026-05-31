@@ -147,6 +147,7 @@ const VALIDATOR_ENEMY_HALF_POISE: String = "res://scripts/validators/ValidatorEn
 const VALIDATOR_ENEMY_HALF_HEALTH: String = "res://scripts/validators/ValidatorEnemyHalfHealth.gd"
 const VALIDATOR_SOURCE_CURRENT_HEALTH: String = "res://scripts/validators/ValidatorSourceCurrentHealth.gd"
 const VALIDATOR_SOURCE_HEALTH_PERCENT: String = "res://scripts/validators/ValidatorSourceHealthPercent.gd"
+const VALIDATOR_SOURCE_BROKEN_POISE: String = "res://scripts/validators/ValidatorSourceBrokenPoise.gd"
 const VALIDATOR_PLAYER_CURRENT_ENERGY: String = "res://scripts/validators/ValidatorPlayerCurrentEnergy.gd"
 const VALIDATOR_CURRENT_PLANNED_STAGE_ID: String = "res://scripts/validators/ValidatorCurrentPlannedStageId.gd"
 const VALIDATOR_PREVIOUS_EXECUTED_STAGE_ID: String = "res://scripts/validators/ValidatorPreviousExecutedStageId.gd"

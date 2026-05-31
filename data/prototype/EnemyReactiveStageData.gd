@@ -12,6 +12,7 @@ const RESUME_MODES: Array[String] = [
 ]
 
 @export var label: String = ""
+@export var priority_override_enabled: bool = false
 @export var priority: int = 0
 @export var conditions: Array[Dictionary] = []
 @export var intents: Array[EnemyIntentVariantData] = []

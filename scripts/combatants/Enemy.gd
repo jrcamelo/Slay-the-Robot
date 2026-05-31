@@ -349,6 +349,8 @@ func _apply_active_stage_resolution(active_stage_resolution: Dictionary, intent_
 		enemy_active_reactive_stage_id = stage_data.object_id
 	if stage_data != null:
 		enemy_active_stage_extra_actions.assign(stage_data.extra_actions)
+	if intent_variant != null:
+		enemy_active_stage_extra_actions.append_array(intent_variant.extra_actions)
 
 	if intent_variant == null or len(targets) == 0:
 		return

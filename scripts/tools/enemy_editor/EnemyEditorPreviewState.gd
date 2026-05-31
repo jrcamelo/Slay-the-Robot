@@ -59,11 +59,11 @@ func ensure_defaults(enemy_data: EnemyData) -> void:
 	if planned_stage_id == "":
 		planned_stage_id = enemy_data.opening_stage_id
 	if enemy_health < 0:
-		enemy_health = enemy_data.enemy_health
+		enemy_health = enemy_data.enemy_health_max
 	if enemy_health_max < 0:
 		enemy_health_max = enemy_data.enemy_health_max
 	if enemy_poise < 0:
-		enemy_poise = enemy_data.enemy_poise
+		enemy_poise = enemy_data.enemy_poise_max
 	if enemy_poise_max < 0:
 		enemy_poise_max = enemy_data.enemy_poise_max
 	if enemy_type < 0:

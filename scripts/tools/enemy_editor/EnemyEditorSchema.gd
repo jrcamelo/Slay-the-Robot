@@ -43,6 +43,7 @@ static func get_intent_variant_field_definitions() -> Dictionary[String, Diction
 	return {
 		"priority": _field("Priority", "int", "Highest matching priority wins within a stage."),
 		"conditions": _field("Conditions", "array", "Validator payload dictionaries evaluated with AND semantics."),
+		"extra_actions": _field("Extra Actions", "array", "Generic action payloads run only when this variant resolves."),
 	}
 
 static func get_intent_field_definitions() -> Dictionary[String, Dictionary]:
@@ -50,8 +51,8 @@ static func get_intent_field_definitions() -> Dictionary[String, Dictionary]:
 		"damage": _field("Damage", "int", "Base attack damage of the native enemy intent."),
 		"block": _field("Block", "int", "Raw block granted during execution."),
 		"number_of_attacks": _field("Number Of Attacks", "int", "How many attacks the enemy performs."),
-		"targeting_rule": _field("Targeting Rule", "enum", "Rule used to resolve player targets.", {"options": targeting_rule_options()}),
-		"target_count": _field("Target Count", "int", "How many player targets the rule resolves."),
+		"targeting_rule": _field("Targeting Rule", "enum", "Rule used to resolve PC targets.", {"options": targeting_rule_options()}),
+		"target_count": _field("Target Count", "int", "How many PC targets the rule resolves."),
 		"allow_repeat_targets": _field("Allow Repeat Targets", "bool", "If true, sorted targeting may repeat the top target."),
 	}
 
@@ -103,7 +104,15 @@ static func enemy_type_options() -> Array[Dictionary]:
 	return _enum_options(EnemyData.ENEMY_TYPES)
 
 static func targeting_rule_options() -> Array[Dictionary]:
-	return _enum_options_from_strings(EnemyIntentData.TARGETING_RULES)
+	return [
+		{"label": "Random Living PC", "value": EnemyIntentData.TARGETING_RANDOM_LIVING_PLAYER},
+		{"label": "Lowest Current HP PC", "value": EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER},
+		{"label": "Highest Current HP PC", "value": EnemyIntentData.TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER},
+		{"label": "Lowest HP Percent PC", "value": EnemyIntentData.TARGETING_LOWEST_HEALTH_PERCENT_PLAYER},
+		{"label": "Highest HP Percent PC", "value": EnemyIntentData.TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER},
+		{"label": "All Living PCs", "value": EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS},
+		{"label": "Random Distinct PCs", "value": EnemyIntentData.TARGETING_RANDOM_DISTINCT_PLAYERS},
+	]
 
 static func resume_mode_options() -> Array[Dictionary]:
 	return _enum_options_from_strings(EnemyReactiveStageData.RESUME_MODES)
@@ -159,21 +168,21 @@ static func format_targeting_summary(intent_data: EnemyIntentData) -> String:
 		return "none"
 	match intent_data.targeting_rule:
 		EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS:
-			return "all living players"
+			return "all living PCs"
 		EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER:
-			return "lowest current health player"
+			return "lowest current HP PC"
 		EnemyIntentData.TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER:
-			return "highest current health player"
+			return "highest current HP PC"
 		EnemyIntentData.TARGETING_LOWEST_HEALTH_PERCENT_PLAYER:
-			return "lowest health percent player"
+			return "lowest HP percent PC"
 		EnemyIntentData.TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER:
-			return "highest health percent player"
+			return "highest HP percent PC"
 		EnemyIntentData.TARGETING_RANDOM_DISTINCT_PLAYERS:
-			return "%s random distinct player(s)" % max(1, intent_data.target_count)
+			return "%s random distinct PC(s)" % max(1, intent_data.target_count)
 		EnemyIntentData.TARGETING_RANDOM_LIVING_PLAYER, _:
 			if intent_data.allow_repeat_targets:
-				return "%s random player target(s), repeats allowed" % max(1, intent_data.target_count)
-			return "%s random living player(s)" % max(1, intent_data.target_count)
+				return "%s random PC target(s), repeats allowed" % max(1, intent_data.target_count)
+			return "%s random living PC(s)" % max(1, intent_data.target_count)
 
 static func format_resume_mode(resume_mode: String, resume_stage_id: String = "") -> String:
 	match resume_mode:
