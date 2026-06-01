@@ -8,8 +8,19 @@ const BODY_FONT_SIZE := 15
 const CONTROL_PAD_X := 12
 const CONTROL_PAD_Y := 7
 const TWO_COLUMN_MIN_WIDTH := 720.0
+const SIMULATION_TOP_MARGIN := 12.0
+const SIMULATION_SIDE_MARGIN := 18.0
+const SIMULATION_VERTICAL_GAP := 14.0
+const ENEMY_VERTICAL_OFFSET := -192.0
+const ENEMY_HORIZONTAL_RATIO := 0.62
+const ENEMY_CONTENT_VERTICAL_OFFSET := -52.0
+const ENEMY_CONTAINER_FALLBACK_SIZE := Vector2(608, 192)
+const PARTY_CONTAINER_FALLBACK_SIZE := Vector2(480, 160)
 
 @onready var title_screen: Control = get_parent() as Control
+@onready var header: Control = $MainMargin/RootVBox/Header
+@onready var body_split: Control = $MainMargin/RootVBox/BodySplit
+@onready var right_panel: Control = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel
 @onready var status_label: Label = $MainMargin/RootVBox/Header/StatusLabel
 @onready var stats_label: Label = $MainMargin/RootVBox/Header/StatsLabel
 @onready var back_button: Button = $MainMargin/RootVBox/Header/ButtonRow/BackButton
@@ -25,6 +36,11 @@ const TWO_COLUMN_MIN_WIDTH := 720.0
 @onready var navigator_content: VBoxContainer = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/NavigatorScroll/NavigatorContent
 @onready var editor_content: VBoxContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel/CenterMargin/CenterScroll/EditorContent
 @onready var preview_content: VBoxContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel/RightMargin/RightScroll/PreviewContent
+@onready var party_container: PlayerPartyContainer = $PartyContainer
+@onready var party_auto_container: HBoxContainer = $PartyContainer/AutomaticPartyContainer
+@onready var enemy_container: Control = $EnemyContainer
+@onready var auto_enemy_container: HBoxContainer = $EnemyContainer/AutomaticEnemyContainer
+@onready var positional_enemy_container: Control = $EnemyContainer/PositionalEnemyContainer
 
 var service := EnemyEditorService.new()
 var current_session: EnemyEditorSession = null
@@ -39,6 +55,10 @@ var editor_theme: Theme = null
 var last_left_layout_columns: int = 1
 var last_editor_layout_columns: int = 1
 var last_preview_layout_columns: int = 1
+var simulation_player_data: PlayerData = null
+var original_global_player_data: PlayerData = null
+var original_global_is_run: bool = false
+var simulation_context_active: bool = false
 
 func _ready() -> void:
 	visible = not _is_embedded_in_title_screen()
@@ -54,10 +74,21 @@ func _ready() -> void:
 	navigator_content.resized.connect(_on_form_layout_resized)
 	editor_content.resized.connect(_on_form_layout_resized)
 	preview_content.resized.connect(_on_form_layout_resized)
+	body_split.resized.connect(_layout_battle_simulation_containers)
+	right_panel.resized.connect(_layout_battle_simulation_containers)
 	_populate_filters()
 	_apply_compact_font_sizes(self)
 	if not _is_embedded_in_title_screen():
 		show_editor()
+
+func _exit_tree() -> void:
+	_end_simulation_context()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible:
+		_end_simulation_context()
+	elif what == NOTIFICATION_RESIZED:
+		_layout_battle_simulation_containers()
 
 func show_editor() -> void:
 	visible = true
@@ -112,6 +143,7 @@ func _render_all() -> void:
 	_render_navigator()
 	_render_editor()
 	_render_preview()
+	_refresh_battle_simulation()
 	_update_stats()
 	_apply_compact_font_sizes(self)
 	_apply_control_padding(self)
@@ -270,6 +302,199 @@ func _render_preview() -> void:
 	_render_preview_controls(preview_content)
 	_render_preview_results(preview_content)
 	_render_diagnostics(preview_content)
+
+func _refresh_battle_simulation() -> void:
+	if not visible or current_session == null or current_session.working_enemy_data == null:
+		_clear_battle_simulation()
+		return
+	_begin_simulation_context()
+	_sync_simulation_player_data()
+	_clear_battle_simulation()
+	party_container.populate_party_members()
+	var enemy: Enemy = _spawn_simulation_enemy()
+	if enemy == null:
+		return
+	for player: Player in party_container.get_party_players():
+		player.update_incoming_damage_amount(false)
+	_layout_battle_simulation_containers()
+
+func _begin_simulation_context() -> void:
+	if simulation_context_active:
+		Global.player_data = simulation_player_data
+		Global.is_run = true
+		return
+	original_global_player_data = Global.player_data
+	original_global_is_run = Global.is_run
+	if simulation_player_data == null:
+		simulation_player_data = _create_simulation_player_data()
+	Global.player_data = simulation_player_data
+	Global.is_run = true
+	simulation_context_active = true
+
+func _end_simulation_context() -> void:
+	if not simulation_context_active:
+		return
+	_clear_battle_simulation()
+	if simulation_player_data != null and simulation_player_data.player_current_combat_stats != null:
+		simulation_player_data.player_current_combat_stats._disconnect_signals()
+	Global.player_data = original_global_player_data
+	Global.is_run = original_global_is_run
+	original_global_player_data = null
+	simulation_context_active = false
+	simulation_player_data = null
+
+func _create_simulation_player_data() -> PlayerData:
+	var player_data: PlayerData = Global.get_player_data_from_prototype("player_red")
+	player_data.player_party_members.clear()
+	player_data.player_draw.clear()
+	player_data.player_discard.clear()
+	player_data.player_hand.clear()
+	player_data.player_exhaust.clear()
+	player_data.player_deck.clear()
+	player_data.player_run_modifier_object_ids.clear()
+	player_data.player_barrier = 0
+	player_data.player_block = 0
+	player_data.player_energy = 0
+	player_data.player_current_combat_stats = CombatStatsData.new("enemy_editor_preview")
+	return player_data
+
+func _sync_simulation_player_data() -> void:
+	var state: EnemyEditorPreviewState = current_session.preview_state
+	if simulation_player_data == null:
+		simulation_player_data = _create_simulation_player_data()
+	var player_data: PlayerData = simulation_player_data
+	player_data.player_run_seed = max(1, state.random_seed)
+	player_data.player_rng.clear()
+	player_data.player_energy = max(0, state.player_energy)
+	player_data.player_barrier = 0
+	player_data.player_block = 0
+	player_data.player_run_modifier_object_ids.clear()
+	player_data.location_id_to_location_data.clear()
+	var location_data := LocationData.new()
+	location_data.location_id = "enemy_editor_preview"
+	location_data.location_type = LocationData.LOCATION_TYPES.COMBAT
+	player_data.location_id_to_location_data[location_data.location_id] = location_data
+	player_data.player_location_id = location_data.location_id
+	if player_data.player_current_combat_stats == null:
+		player_data.player_current_combat_stats = CombatStatsData.new("enemy_editor_preview")
+	player_data.player_current_combat_stats.turn_count = max(1, state.turn_count)
+	player_data.player_current_combat_stats.is_player_turn = true
+	player_data.player_current_combat_stats.cards_played_this_turn.clear()
+	player_data.player_current_combat_stats.cards_played_this_combat.clear()
+	var character_ids: Array[String] = _simulation_character_ids()
+	player_data.player_party_members.clear()
+	for party_index: int in range(DEFAULT_PC_HEALTHS.size()):
+		var preview_member: Dictionary = state.player_party_members[party_index]
+		var party_member := PartyMemberData.new()
+		party_member.party_member_party_index = party_index
+		party_member.party_member_character_object_id = character_ids[party_index]
+		var character_data: CharacterData = Global.get_character_data(character_ids[party_index])
+		party_member.party_member_name = character_data.character_name if character_data != null else "PC %s" % str(party_index + 1)
+		party_member.party_member_health_max = 100
+		party_member.party_member_health = clampi(int(preview_member.get("health", DEFAULT_PC_HEALTHS[party_index])), 0, 100)
+		player_data.player_party_members.append(party_member)
+	player_data.generate_cache()
+	player_data.synchronize_legacy_primary_member_state()
+	Global.player_data = player_data
+
+func _simulation_character_ids() -> Array[String]:
+	var character_ids: Array[String] = ["character_red", "character_blue", "character_green"]
+	var source_player_data: PlayerData = original_global_player_data
+	if source_player_data == null:
+		return character_ids
+	var collected_ids: Array[String] = []
+	if source_player_data.has_party_members():
+		for party_member_data: PartyMemberData in source_player_data.player_party_members:
+			if party_member_data == null or not party_member_data.is_active():
+				continue
+			if party_member_data.party_member_character_object_id == "":
+				continue
+			collected_ids.append(party_member_data.party_member_character_object_id)
+			if collected_ids.size() >= DEFAULT_PC_HEALTHS.size():
+				break
+	elif source_player_data.player_character_object_id != "":
+		collected_ids.append(source_player_data.player_character_object_id)
+	while collected_ids.size() < DEFAULT_PC_HEALTHS.size():
+		collected_ids.append(character_ids[collected_ids.size()])
+	return collected_ids
+
+func _spawn_simulation_enemy() -> Enemy:
+	var enemy_data: EnemyData = current_session.working_enemy_data.duplicate(true)
+	var preview_state: EnemyEditorPreviewState = current_session.preview_state
+	enemy_data.apply_enemy_difficulty_modifiers_for_level(preview_state.difficulty_level)
+	enemy_data.enemy_health_max = max(1, preview_state.enemy_health_max)
+	enemy_data.enemy_health = clampi(preview_state.enemy_health, 0, enemy_data.enemy_health_max)
+	enemy_data.enemy_poise_max = max(0, preview_state.enemy_poise_max)
+	enemy_data.enemy_poise = clampi(preview_state.enemy_poise, 0, enemy_data.enemy_poise_max)
+	if preview_state.enemy_type >= 0:
+		enemy_data.enemy_type = preview_state.enemy_type
+	enemy_data.enemy_is_minion = preview_state.enemy_is_minion
+	var enemy: Enemy = Scenes.ENEMY.instantiate()
+	auto_enemy_container.add_child(enemy)
+	enemy.init(enemy_data)
+	enemy.planned_stage_id = preview_state.planned_stage_id if preview_state.planned_stage_id != "" else enemy_data.opening_stage_id
+	enemy.previous_executed_stage_id = preview_state.previous_executed_stage_id
+	enemy.planned_stage_started_turn_count = max(1, preview_state.planned_stage_started_turn_count)
+	enemy.stage_id_to_execution_count = preview_state.stage_id_to_execution_count.duplicate(true)
+	enemy.cached_random_target_signature = preview_state.cached_random_target_signature
+	enemy.cached_random_target_party_member_indices.assign(preview_state.cached_random_target_party_member_indices)
+	if not preview_state.enemy_status_effects.is_empty():
+		enemy.clear_all_status_effects()
+		for status_id: String in preview_state.enemy_status_effects.keys():
+			enemy.add_status_effect_charges(status_id, int(preview_state.enemy_status_effects[status_id]))
+	enemy.update_health_bar(false)
+	enemy.set_poise(enemy_data.enemy_poise, enemy_data.enemy_poise_max)
+	enemy.update_enemy_intent()
+	return enemy
+
+func _clear_battle_simulation() -> void:
+	if is_instance_valid(party_container):
+		party_container.base_player = null
+	if is_instance_valid(party_auto_container):
+		_free_children_immediately(party_auto_container)
+	if is_instance_valid(auto_enemy_container):
+		_free_children_immediately(auto_enemy_container)
+	if is_instance_valid(positional_enemy_container):
+		_free_children_immediately(positional_enemy_container)
+
+func _free_children_immediately(node: Node) -> void:
+	if node == null:
+		return
+	for child: Node in node.get_children():
+		child.free()
+
+func _layout_battle_simulation_containers() -> void:
+	if not is_instance_valid(enemy_container) or not is_instance_valid(party_container) or not visible:
+		return
+	var right_rect: Rect2 = right_panel.get_global_rect()
+	var header_rect: Rect2 = header.get_global_rect()
+	var body_rect: Rect2 = body_split.get_global_rect()
+	var enemy_size: Vector2 = enemy_container.size
+	if enemy_size == Vector2.ZERO:
+		enemy_size = ENEMY_CONTAINER_FALLBACK_SIZE
+	var enemy_scaled_size: Vector2 = enemy_size * enemy_container.scale
+	var party_size: Vector2 = party_container.size
+	if party_size == Vector2.ZERO:
+		party_size = PARTY_CONTAINER_FALLBACK_SIZE
+	var party_scaled_size: Vector2 = party_size * party_container.scale
+	var party_top_y: float = body_rect.position.y - party_scaled_size.y - SIMULATION_TOP_MARGIN
+	var enemy_top_y: float = party_top_y - enemy_scaled_size.y - SIMULATION_VERTICAL_GAP + ENEMY_VERTICAL_OFFSET
+	var minimum_enemy_top: float = header_rect.position.y + SIMULATION_TOP_MARGIN
+	if enemy_top_y < minimum_enemy_top:
+		enemy_top_y = minimum_enemy_top
+	var enemy_left_x: float = right_rect.position.x + (right_rect.size.x * ENEMY_HORIZONTAL_RATIO)
+	var enemy_global_position := Vector2(
+		enemy_left_x,
+		enemy_top_y
+	)
+	var party_global_position := Vector2(
+		right_rect.position.x + SIMULATION_SIDE_MARGIN,
+		party_top_y
+	)
+
+	enemy_container.global_position = enemy_global_position
+	party_container.global_position = party_global_position
+	auto_enemy_container.position.y = ENEMY_CONTENT_VERTICAL_OFFSET
 
 func _render_enemy_profile_section(parent: VBoxContainer) -> void:
 	var section := _add_section(parent, "")
@@ -1700,6 +1925,7 @@ func _on_apply_preview_execution_result() -> void:
 	_render_all()
 
 func _on_back_button_up() -> void:
+	_end_simulation_context()
 	if not _is_embedded_in_title_screen():
 		return
 	visible = false
