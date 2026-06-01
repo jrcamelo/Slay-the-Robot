@@ -97,7 +97,6 @@ static func get_library_filter_definitions() -> Array[Dictionary]:
 		{"id": "source_bucket", "label": "Source", "value_type": "enum", "options": [{"label": "Content", "value": "content"}, {"label": "Triage", "value": "triage"}]},
 		{"id": "owner_bucket", "label": "Group", "value_type": "string"},
 		{"id": "enemy_type", "label": "Type", "value_type": "enum", "options": enemy_type_options()},
-		{"id": "enemy_is_minion", "label": "Minion", "value_type": "bool"},
 	]
 
 static func enemy_type_options() -> Array[Dictionary]:
@@ -145,7 +144,7 @@ static func summarize_intent_variant(intent_variant: EnemyIntentVariantData) -> 
 static func summarize_stage(stage_data: EnemyStageData) -> String:
 	if stage_data == null:
 		return "Missing stage"
-	return "%s -> %s | %s variant(s)" % [stage_data.object_id, stage_data.next_stage_id, len(stage_data.intents)]
+	return "%s ⇒ %s | %s variant(s)" % [stage_data.object_id, stage_data.next_stage_id, len(stage_data.intents)]
 
 static func summarize_reactive_stage(stage_data: EnemyReactiveStageData) -> String:
 	if stage_data == null:

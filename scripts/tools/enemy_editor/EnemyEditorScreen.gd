@@ -51,7 +51,6 @@ func _ready() -> void:
 	search_input.text_changed.connect(_on_search_changed)
 	source_filter.item_selected.connect(_on_filter_changed)
 	type_filter.item_selected.connect(_on_filter_changed)
-	minion_filter.item_selected.connect(_on_filter_changed)
 	navigator_content.resized.connect(_on_form_layout_resized)
 	editor_content.resized.connect(_on_form_layout_resized)
 	preview_content.resized.connect(_on_form_layout_resized)
@@ -75,14 +74,14 @@ func _populate_filters() -> void:
 		{"label": "Content", "value": "content"},
 		{"label": "Triage", "value": "triage"},
 	])
-	var type_options: Array[Dictionary] = [{"label": "All Types", "value": -1}]
-	type_options.append_array(EnemyEditorSchema.enemy_type_options())
+	var type_options: Array[Dictionary] = [{"label": "All Types", "value": "all"}]
+	for type_option: Dictionary in EnemyEditorSchema.enemy_type_options():
+		var type_value: int = int(type_option.get("value", EnemyData.ENEMY_TYPES.STANDARD))
+		var type_label: String = str(type_option.get("label", type_value))
+		type_options.append({"label": type_label, "value": _enemy_role_value(type_value, false)})
+		type_options.append({"label": "%s Minion" % type_label, "value": _enemy_role_value(type_value, true)})
 	_populate_option_button(type_filter, type_options)
-	_populate_option_button(minion_filter, [
-		{"label": "Minions and Non-Minions", "value": -1},
-		{"label": "Non-Minion", "value": 0},
-		{"label": "Minion", "value": 1},
-	])
+	minion_filter.visible = false
 
 func _refresh_library() -> void:
 	library_entries = service.list_library_enemies()
@@ -94,11 +93,10 @@ func _apply_library_filters() -> void:
 	if source_value != null and source_value != "all":
 		filters["source_bucket"] = source_value
 	var type_value: Variant = _get_option_value(type_filter)
-	if type_value != null and int(type_value) >= 0:
-		filters["enemy_type"] = int(type_value)
-	var minion_value: Variant = _get_option_value(minion_filter)
-	if minion_value != null and int(minion_value) >= 0:
-		filters["enemy_is_minion"] = int(minion_value) == 1
+	if type_value != null and str(type_value) != "all":
+		var role_data: Dictionary = _decode_enemy_role_value(type_value)
+		filters["enemy_type"] = int(role_data.get("enemy_type", EnemyData.ENEMY_TYPES.STANDARD))
+		filters["enemy_is_minion"] = bool(role_data.get("enemy_is_minion", false))
 	filtered_entries = service.filter_library_enemies(library_entries, filters, search_input.text)
 	_render_library()
 	_update_stats()
@@ -151,7 +149,7 @@ func _render_library() -> void:
 		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_box.add_child(title)
 		var meta := Label.new()
-		meta.text = "%s | %s | %s reactive" % [
+		meta.text = "%s | %s | %s stage(s), %s reactive" % [
 			str(entry.get("object_id", "")),
 			str(entry.get("source_bucket", "")),
 			int(entry.get("stage_count", 0)),
@@ -208,13 +206,8 @@ func _render_editor() -> void:
 	editor_content.add_child(_make_note_label("Select a base stage, reactive stage, or difficulty override from the navigator."))
 
 func _render_stage_navigator(parent: VBoxContainer) -> void:
-	var root_section := _add_section(parent, "Stage Navigator")
-	var session_section := _add_section(root_section, "Session")
-	session_section.add_child(_make_note_label("%s\n%s" % [
-		current_session.working_enemy_data.enemy_name,
-		current_session.get_active_save_path(),
-	]))
-	session_section.add_child(_build_option_field("Opening Stage", _base_stage_options(), current_session.working_enemy_data.opening_stage_id, func(next_value: Variant) -> void:
+	var root_section := _add_section(parent, "Stage and Intent Editor")
+	root_section.add_child(_build_option_field("Opening Stage", _base_stage_options(), current_session.working_enemy_data.opening_stage_id, func(next_value: Variant) -> void:
 		if service.set_enemy_property(current_session, "opening_stage_id", str(next_value)):
 			selected_base_stage_id = str(next_value)
 			_render_all()
@@ -279,7 +272,7 @@ func _render_preview() -> void:
 	_render_diagnostics(preview_content)
 
 func _render_enemy_profile_section(parent: VBoxContainer) -> void:
-	var section := _add_section(parent, "Enemy Profile")
+	var section := _add_section(parent, "")
 	var enemy_data: EnemyData = current_session.working_enemy_data
 	var fields := _add_two_column_fields(section)
 	fields.add_child(_build_string_field("Enemy Name", enemy_data.enemy_name, func(next_value: String) -> void:
@@ -321,12 +314,6 @@ func _render_enemy_profile_section(parent: VBoxContainer) -> void:
 		if updated:
 			_render_all()
 	))
-	section.add_child(_make_note_label("Save policy: %s\nManaged triage: %s\nManaged content: %s" % [
-		current_session.save_policy,
-		current_session.managed_triage_save_path,
-		current_session.managed_save_path,
-	]))
-
 func _render_base_stage_editor(parent: VBoxContainer, stage_data: EnemyStageData) -> void:
 	var section := _add_section(parent, "Base Stage")
 	section.add_child(_make_note_label(EnemyEditorSchema.summarize_stage(stage_data)))
@@ -390,8 +377,6 @@ func _render_reactive_stage_editor(parent: VBoxContainer, stage_data: EnemyReact
 		if service.set_stage_property(current_session, stage_data.object_id, "priority_override_enabled", next_value, true):
 			_render_all()
 	))
-	if not stage_data.priority_override_enabled:
-		section.add_child(_make_note_label("Auto Priority: %s (derived from PC Energy condition)" % stage_data.priority))
 	fields.add_child(_build_option_field("Resume Mode", EnemyEditorSchema.resume_mode_options(), stage_data.resume_mode, func(next_value: Variant) -> void:
 		if service.set_stage_property(current_session, stage_data.object_id, "resume_mode", str(next_value), true):
 			_render_all()
@@ -602,7 +587,7 @@ func _build_stage_nav_row(stage_data: EnemyStageData) -> Control:
 	var button := Button.new()
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.text = "%s -> %s" % [stage_data.object_id, stage_data.next_stage_id]
+	button.text = "%s ⇒ %s" % [stage_data.object_id, stage_data.next_stage_id]
 	button.tooltip_text = EnemyEditorSchema.summarize_stage(stage_data)
 	button.disabled = stage_data.object_id == selected_base_stage_id
 	button.button_up.connect(func() -> void:
@@ -745,8 +730,6 @@ func _build_variant_panel(stage_id: String, variant_index: int, variant: EnemyIn
 	)
 	_set_controls_disabled(priority_field, not variant.priority_override_enabled)
 	variant_fields.add_child(priority_field)
-	if not variant.priority_override_enabled:
-		box.add_child(_make_note_label("Auto Priority: %s (derived from PC Energy condition)" % variant.priority))
 	var condition_section := _add_section(box, "Conditions")
 	_render_condition_entries(condition_section, variant.conditions, func(next_entries: Array[Dictionary]) -> void:
 		if service.patch_variant_conditions(current_session, stage_id, variant_index, next_entries, "overwrite", is_reactive):
@@ -786,8 +769,7 @@ func _build_variant_panel(stage_id: String, variant_index: int, variant: EnemyIn
 	return panel
 
 func _render_condition_entries(parent: VBoxContainer, entries: Array[Dictionary], on_set_entries: Callable) -> void:
-	var quick_conditions := _add_section(parent, "Common Conditions")
-	var quick_grid := _add_three_column_fields(quick_conditions)
+	var quick_grid := _add_three_column_fields(parent)
 	quick_grid.add_child(_build_bool_field("Poise Broken", _has_quick_condition(entries, Scripts.VALIDATOR_SOURCE_BROKEN_POISE), func(enabled: bool) -> void:
 		on_set_entries.call(_set_quick_condition(entries, Scripts.VALIDATOR_SOURCE_BROKEN_POISE, {}, enabled))
 	))
@@ -1172,10 +1154,11 @@ func _add_section(parent: VBoxContainer, title: String) -> VBoxContainer:
 	var section := VBoxContainer.new()
 	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	section.add_theme_constant_override("separation", 8)
-	var label := Label.new()
-	label.text = title
-	label.add_theme_font_size_override("font_size", SECTION_TITLE_SIZE)
-	section.add_child(label)
+	if title.strip_edges() != "":
+		var label := Label.new()
+		label.text = title
+		label.add_theme_font_size_override("font_size", SECTION_TITLE_SIZE)
+		section.add_child(label)
 	parent.add_child(section)
 	return section
 
