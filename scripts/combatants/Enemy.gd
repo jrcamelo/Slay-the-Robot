@@ -82,7 +82,7 @@ func _get_current_turn_count() -> int:
 ## Does damage to combatant and returns [unblocked damage dealt, damage to 0 (if enemy dies), overkill damage (if enemy dies)]
 ## eg 15 damage on 10 remaining health and 3 block will return [12, 10, 2].
 ## bypass_block = true will do damage directly to health.
-func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
+func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction = null) -> Array[int]:
 	var bypassed_damage: int = _damage
 	var bypassed_damage_capped: int = 0
 	var overkill_damage: int = 0
@@ -111,7 +111,7 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 
 	if enemy_data.enemy_health > 0:
 		enemy_data.enemy_health = max(0, enemy_data.enemy_health - bypassed_damage)
-		Signals.combatant_damaged.emit(self, bypassed_damage)
+		Signals.combatant_damaged.emit(self, bypassed_damage, source_action)
 		update_health_bar(true)
 		_handle_death_if_needed()
 
@@ -550,7 +550,7 @@ func _on_intent_relevant_state_changed(_value = null):
 func _on_intent_relevant_state_changed_card(_card_play_request: CardPlayRequest):
 	_on_intent_relevant_state_changed()
 
-func _on_combatant_damaged(base_combatant: BaseCombatant, _unblocked_damage: int):
+func _on_combatant_damaged(base_combatant: BaseCombatant, _unblocked_damage: int, _source_action: BaseAction = null):
 	if not Global.is_player_turn() or not is_alive():
 		return
 	if base_combatant is Enemy or base_combatant is Player:

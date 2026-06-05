@@ -11,6 +11,7 @@ var original_resource_path: String = ""
 var managed_save_path: String = ""
 var managed_triage_save_path: String = ""
 var manual_save_override_path: String = ""
+var managed_owner_bucket_hint: String = ""
 var dirty: bool = false
 var diagnostics: Array[Dictionary] = []
 var content_root: String = CardEditorPathUtils.DEFAULT_CONTENT_ROOT
@@ -31,6 +32,7 @@ func _init(
 	original_resource_path = resource_path
 	if save_policy == "":
 		save_policy = infer_save_policy_from_path(original_resource_path)
+	_refresh_owner_bucket_hint()
 	recompute_managed_paths()
 
 func mark_dirty(value: bool = true) -> void:
@@ -55,8 +57,18 @@ func recompute_managed_path() -> String:
 	return managed_save_path
 
 func recompute_managed_paths() -> void:
-	managed_save_path = CardEditorPathUtils.build_content_card_path(working_card_data, content_root)
-	managed_triage_save_path = CardEditorPathUtils.build_triage_card_path(working_card_data, triage_root)
+	managed_save_path = CardEditorPathUtils.build_content_card_path(working_card_data, content_root, managed_owner_bucket_hint)
+	managed_triage_save_path = CardEditorPathUtils.build_triage_card_path(working_card_data, triage_root, managed_owner_bucket_hint)
+
+func refresh_owner_bucket_hint_from_path(resource_path: String = original_resource_path) -> void:
+	var path_metadata: Dictionary = CardEditorPathUtils.analyze_card_resource_path(resource_path, content_root, triage_root)
+	var owner_bucket: String = str(path_metadata.get("owner_bucket", "")).strip_edges().to_lower()
+	if owner_bucket == "" or owner_bucket == "unknown":
+		return
+	managed_owner_bucket_hint = owner_bucket
+
+func _refresh_owner_bucket_hint() -> void:
+	refresh_owner_bucket_hint_from_path(original_resource_path)
 
 func set_manual_save_override_path(path: String) -> void:
 	manual_save_override_path = path.strip_edges()
@@ -102,6 +114,7 @@ func to_summary() -> Dictionary:
 			"resource_path": original_resource_path,
 			"managed_save_path": managed_save_path,
 			"managed_triage_save_path": managed_triage_save_path,
+			"managed_owner_bucket_hint": managed_owner_bucket_hint,
 			"active_save_path": get_active_save_path(),
 			"save_policy": save_policy,
 			"dirty": dirty,
@@ -114,6 +127,7 @@ func to_summary() -> Dictionary:
 		"resource_path": original_resource_path,
 		"managed_save_path": managed_save_path,
 		"managed_triage_save_path": managed_triage_save_path,
+		"managed_owner_bucket_hint": managed_owner_bucket_hint,
 		"active_save_path": get_active_save_path(),
 		"save_policy": save_policy,
 		"dirty": dirty,

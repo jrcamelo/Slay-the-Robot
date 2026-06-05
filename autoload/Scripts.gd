@@ -25,6 +25,7 @@ const ACTION_END_COMBAT: String = "res://scripts/actions/ActionEndCombat.gd"
 const ACTION_RUN_ON_VALIDATED_ENEMIES: String = "res://scripts/actions/enemy_actions/ActionRunOnValidatedEnemies.gd"
 const ACTION_END_TURN: String = "res://scripts/actions/ActionEndTurn.gd"
 const ACTION_RESHUFFLE: String = "res://scripts/actions/ActionReshuffle.gd"
+const ACTION_ATTACK_POISE: String = "res://scripts/actions/ActionAttackPoise.gd"
 
 # status actions, created by StatusEffect scripts
 const ACTION_CORROSION: String = "res://scripts/actions/status_actions/ActionCorrosion.gd"
@@ -135,6 +136,8 @@ const VALIDATOR_PILE_SIZE: String = "res://scripts/validators/deck/ValidatorPile
 # hand validators
 const VALIDATOR_CARD_TYPE_ADJACENT_IN_HAND: String = "res://scripts/validators/hand/ValidatorCardTypeAdjacentInHand.gd"
 const VALIDATOR_CARD_ID_ADJACENT_IN_HAND: String = "res://scripts/validators/hand/ValidatorCardIDAdjacentInHand.gd"
+const VALIDATOR_ALLY_INTRO_ATTACK_IN_HAND: String = "res://scripts/validators/hand/ValidatorAllyIntroAttackInHand.gd"
+const VALIDATOR_CARD_KIND_IN_HAND: String = "res://scripts/validators/hand/ValidatorCardKindInHand.gd"
 const VALIDATOR_CARD_POSITION_IN_HAND: String = "res://scripts/validators/hand/ValidatorCardPositionInHand.gd"
 const VALIDATOR_CARD_TYPE_IN_HAND: String = "res://scripts/validators/hand/ValidatorCardTypeInHand.gd"
 
@@ -163,6 +166,8 @@ const VALIDATOR_LIVING_ALLY_COUNT: String = "res://scripts/validators/ValidatorL
 const VALIDATOR_SOURCE_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorSourceHasStatusEffect.gd"
 const VALIDATOR_TARGET_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorTargetHasStatusEffect.gd"
 const VALIDATOR_ENEMY_NAME_CONTAINS: String = "res://scripts/validators/ValidatorEnemyNameContains.gd"
+const VALIDATOR_OWNER_INCOMING_ATTACK: String = "res://scripts/validators/ValidatorOwnerIncomingAttack.gd"
+const VALIDATOR_ALLY_INCOMING_ATTACK: String = "res://scripts/validators/ValidatorAllyIncomingAttack.gd"
 
 const VALIDATOR_HAS_RELIC: String = "res://scripts/validators/ValidatorHasRelic.gd"
 const VALIDATOR_LOCATION_TYPE: String = "res://scripts/validators/ValidatorLocationType.gd"
@@ -174,7 +179,11 @@ const VALIDATOR_RNG: String = "res://scripts/validators/ValidatorRNG.gd"
 
 #region Card Listeners
 const LISTENER_CARD_COST_MODIFIER: String = "res://scripts/card_listeners/ListenerCardCostModifier.gd"
+const LISTENER_CARD_COST_IF_KIND_PLAYED_THIS_TURN: String = "res://scripts/card_listeners/ListenerCardCostIfKindPlayedThisTurn.gd"
 const LISTENER_CARD_VALUE_MODIFIER = "res://scripts/card_listeners/ListenerCardValueModifier.gd"
+const LISTENER_QUICK_ALLY_START_ATTACK: String = "res://scripts/card_listeners/ListenerQuickAllyStartAttack.gd"
+const LISTENER_QUICK_ALLY_DAMAGED: String = "res://scripts/card_listeners/ListenerQuickAllyDamaged.gd"
+const LISTENER_QUICK_INCOMING_ATTACK: String = "res://scripts/card_listeners/ListenerQuickIncomingAttack.gd"
 #endregion
 
 #region Interceptors
@@ -189,6 +198,7 @@ const INTERCEPTOR_DUPLICATE_CARD_PLAYS: String = "res://scripts/action_intercept
 const INTERCEPTOR_DUPLICATE_ATTACKS: String = "res://scripts/action_interceptors/InterceptorDuplicateAttacks.gd"
 const INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS: String = "res://scripts/action_interceptors/InterceptorNextAttackDamageBonus.gd"
 const INTERCEPTOR_NEXT_ATTACK_PIERCING: String = "res://scripts/action_interceptors/InterceptorNextAttackPiercing.gd"
+const INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE: String = "res://scripts/action_interceptors/InterceptorNextAttackDoubleDamage.gd"
 #endregion
 
 var _token_to_script_path: Dictionary[String, String] = {}

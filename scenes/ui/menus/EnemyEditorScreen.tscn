@@ -339,7 +339,7 @@ text = "Promote To Content"
 [node name="StatsLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=1542279245]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Library: 10 | Visible: 10 | Base stages: 1 | Reactive: 0 | Errors: 0 | Warnings: 0"
+text = "Library: 12 | Visible: 12 | Base stages: 1 | Reactive: 0 | Errors: 0 | Warnings: 0"
 autowrap_mode = 2
 
 [node name="BodySplit" type="HSplitContainer" parent="MainMargin/RootVBox" unique_id=1502138836]

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Closed Path"
+card_description = "Trigger: When I would take damage.
+I receive 0 damage from the triggering attack."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "JAZZ"
+card_energy_cost = 2
+card_type = 1
+card_is_playable = false
+card_requires_target = false
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_OWNER_INCOMING_ATTACK": {}
+}])
+card_listeners = Array[Dictionary]([{
+"LISTENER_QUICK_INCOMING_ATTACK": {}
+}])
+object_id = "card_samurai_closed_path"

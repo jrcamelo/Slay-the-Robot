@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Heaven Shatter"
+card_description = "Attack (AoE): [damage] Damage"
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "OUTRO"
+card_energy_cost = 3
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"damage": 24,
+"number_of_attacks": 1,
+"target_override": 4
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
+}
+}])
+object_id = "card_samurai_heaven_shatter"

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Stillwater Form"
+card_description = "Trigger: When an Ally takes damage.
+Attack: [poise_amount] Poise."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "JAZZ"
+card_energy_cost = 2
+card_rarity = 3
+card_is_playable = false
+card_requires_target = false
+card_values = {
+"damage": 0,
+"poise_amount": 16
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_ALLY_INCOMING_ATTACK": {}
+}])
+card_listeners = Array[Dictionary]([{
+"LISTENER_QUICK_ALLY_DAMAGED": {}
+}])
+object_id = "card_samurai_stillwater_form"

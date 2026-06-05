@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Silent Draw"
+card_description = "Attack: [damage] Damage and [poise_amount] Poise.
+This card does not increase Intensity if you have not played a Start card."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"damage": 3,
+"poise_amount": 6
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}])
+card_listeners = Array[Dictionary]([{
+"LISTENER_CARD_COST_IF_KIND_PLAYED_THIS_TURN": {
+"inactive_cost": 0,
+"required_kind": "INTRO"
+}
+}])
+object_id = "card_samurai_silent_draw"

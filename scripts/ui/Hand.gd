@@ -399,6 +399,10 @@ func add_card_to_play_queue(card_play_request: CardPlayRequest, require_energy: 
 	# cards can be made to play next with front_of_queue 
 	
 	var card_data: CardData = card_play_request.card_data
+	var owner_combatant: BaseCombatant = _get_card_owner_combatant(card_data)
+	if owner_combatant != null and card_data.card_type == CardData.CARD_TYPES.ATTACK:
+		if owner_combatant.get_status_charges("status_effect_no_attack") > 0:
+			return
 	# insufficient energy, don't add to queue
 	if require_energy:
 		if card_data.get_card_energy_cost() > Global.player_data.get_remaining_energy_capacity():

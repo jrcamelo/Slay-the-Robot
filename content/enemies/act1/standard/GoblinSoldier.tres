@@ -32,10 +32,10 @@ number_of_attacks = 1
 script = ExtResource("3_variant")
 intent = SubResource("Resource_5wd6e")
 
-[sub_resource type="Resource" id="Resource_f3n8x"]
+[sub_resource type="Resource" id="Resource_58pm6"]
 script = ExtResource("5_intent")
 
-[sub_resource type="Resource" id="Resource_wt4qf"]
+[sub_resource type="Resource" id="Resource_qo352"]
 script = ExtResource("3_variant")
 conditions = Array[Dictionary]([{
 "VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
@@ -44,8 +44,6 @@ conditions = Array[Dictionary]([{
 "status_effect_object_id": "status_effect_next_attack_piercing"
 }
 }])
-priority = 10
-intent = SubResource("Resource_f3n8x")
 extra_actions = Array[Dictionary]([{
 "ACTION_ATTACK_GENERATOR": {
 "bypass_block": true,
@@ -60,11 +58,13 @@ extra_actions = Array[Dictionary]([{
 "target_override": 1
 }
 }])
+intent = SubResource("Resource_58pm6")
+priority = 10
 
-[sub_resource type="Resource" id="Resource_58pm6"]
+[sub_resource type="Resource" id="Resource_rcdfn"]
 script = ExtResource("2_stage")
 label = "WAK"
-intents = Array[ExtResource("3_variant")]([SubResource("Resource_7026y"), SubResource("Resource_wt4qf")])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_7026y"), SubResource("Resource_qo352")])
 next_stage_id = "stage_wak"
 object_id = "stage_wak"
 
@@ -77,6 +77,6 @@ enemy_health_max = 30
 enemy_poise = 20
 enemy_poise_max = 20
 opening_stage_id = "stage_wak"
-stages = Array[ExtResource("2_stage")]([SubResource("Resource_58pm6")])
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_rcdfn")])
 reactive_stages = Array[ExtResource("4_reactive")]([SubResource("Resource_fjogm")])
 object_id = "enemy_goblin_soldier"

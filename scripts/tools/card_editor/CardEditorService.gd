@@ -193,6 +193,7 @@ func duplicate_session(
 	var duplicated_card: CardData = source_session.working_card_data.duplicate(true)
 	_migrate_nested_action_references(duplicated_card)
 	var session := CardEditorSession.new(duplicated_card, "", content_root, triage_root, save_policy)
+	session.managed_owner_bucket_hint = source_session.managed_owner_bucket_hint
 	session.recompute_managed_paths()
 	session.mark_dirty()
 	session.refresh_diagnostics(self)
@@ -794,6 +795,8 @@ func _save_session_internal(session: CardEditorSession, save_as_path: String) ->
 		}
 
 	session.original_resource_path = save_path
+	session.refresh_owner_bucket_hint_from_path(save_path)
+	session.recompute_managed_paths()
 	if save_path == session.managed_save_path:
 		session.save_policy = CardEditorSession.SAVE_POLICY_MANAGED_CONTENT
 	elif save_path == session.managed_triage_save_path:

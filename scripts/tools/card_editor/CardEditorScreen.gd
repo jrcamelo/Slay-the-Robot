@@ -68,6 +68,8 @@ const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_C
 @onready var behavior_container: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox/BehaviorScroll/BehaviorContent
 @onready var preview_mount: Control = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/PreviewMount
 @onready var preview_vbox: VBoxContainer = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox
+@onready var save_triage_button: Button = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions/SaveTriageButton
+@onready var promote_button: Button = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions/PromoteButton
 @onready var session_label: Label = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/SessionLabel
 @onready var diagnostics_text: RichTextLabel = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary/DiagnosticsText
 @onready var save_status_label: Label = $MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveStatusLabel
@@ -99,8 +101,6 @@ var new_button: Button = null
 var duplicate_button: Button = null
 var preset_option: OptionButton = null
 var apply_preset_button: Button = null
-var save_triage_button: Button = null
-var promote_button: Button = null
 var target_filter: OptionButton = null
 var library_panel_collapsed: bool = false
 var inspector_panel_collapsed: bool = false
@@ -166,8 +166,6 @@ func _bind_optional_header_nodes() -> void:
 	duplicate_button = get_node_or_null("MainContainer/Header/ButtonRow/DuplicateButton") as Button
 	preset_option = get_node_or_null("MainContainer/Header/ButtonRow/PresetOption") as OptionButton
 	apply_preset_button = get_node_or_null("MainContainer/Header/ButtonRow/ApplyPresetButton") as Button
-	save_triage_button = get_node_or_null("MainContainer/Header/ButtonRow/SaveTriageButton") as Button
-	promote_button = get_node_or_null("MainContainer/Header/ButtonRow/PromoteButton") as Button
 	target_filter = get_node_or_null("MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/TargetFilter") as OptionButton
 
 func show_editor() -> void:
@@ -177,7 +175,9 @@ func show_editor() -> void:
 	populate_editor()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or current_session == null:
+	if not visible:
+		return
+	if current_session == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key_event: InputEventKey = event
@@ -233,10 +233,7 @@ func _refresh_editor_panels() -> void:
 	_refresh_overview()
 	if duplicate_button != null:
 		duplicate_button.disabled = current_session == null
-	if save_triage_button != null:
-		save_triage_button.disabled = current_session == null
-	if promote_button != null:
-		promote_button.disabled = current_session == null
+	_update_save_buttons()
 
 func _request_editor_panels_refresh() -> void:
 	if editor_panels_refresh_queued:
@@ -271,21 +268,12 @@ func _compact_header_layout() -> void:
 			if control.get_parent() != null:
 				control.get_parent().remove_child(control)
 			library_actions.add_child(control)
-	var preview_vbox: VBoxContainer = preview_mount.get_parent() as VBoxContainer
-	if preview_vbox != null:
-		var render_actions := HBoxContainer.new()
-		render_actions.name = "RenderActions"
-		render_actions.add_theme_constant_override("separation", 8)
-		if save_triage_button != null and save_triage_button.get_parent() != null:
-			save_triage_button.get_parent().remove_child(save_triage_button)
-		if promote_button != null and promote_button.get_parent() != null:
-			promote_button.get_parent().remove_child(promote_button)
-		if save_triage_button != null:
-			render_actions.add_child(save_triage_button)
-		if promote_button != null:
-			render_actions.add_child(promote_button)
-		preview_vbox.add_child(render_actions)
-		preview_vbox.move_child(render_actions, preview_mount.get_index() + 1)
+	if save_triage_button != null:
+		save_triage_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		save_triage_button.custom_minimum_size = Vector2(0, 42)
+	if promote_button != null:
+		promote_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		promote_button.custom_minimum_size = Vector2(0, 42)
 
 func _install_panel_headers() -> void:
 	if collapsed_panel_row == null and is_instance_valid(header_container):
@@ -1024,3 +1012,29 @@ func _handle_save_result(result: Dictionary, success_prefix: String) -> void:
 		if str(diagnostic.get("severity", "")) == "error":
 			error_count += 1
 	_set_status_message("Save blocked by %s error(s). Review the diagnostics list before trying again." % error_count, "error")
+
+func _update_save_buttons() -> void:
+	if save_triage_button == null or promote_button == null:
+		return
+	if current_session == null:
+		save_triage_button.disabled = true
+		promote_button.disabled = true
+		save_triage_button.text = "Save To Triage"
+		promote_button.text = "Promote To Content"
+		return
+	var is_dirty: bool = current_session.dirty
+	var active_path: String = current_session.original_resource_path
+	var is_triage_resource: bool = CardEditorPathUtils.path_is_within_root(active_path, current_session.triage_root)
+	var is_content_resource: bool = CardEditorPathUtils.path_is_within_root(active_path, current_session.content_root)
+	if is_triage_resource:
+		save_triage_button.text = "Save"
+		save_triage_button.disabled = not is_dirty
+	else:
+		save_triage_button.text = "Move To Triage" if is_content_resource else "Save To Triage"
+		save_triage_button.disabled = false
+	if is_content_resource:
+		promote_button.text = "Save"
+		promote_button.disabled = not is_dirty
+	else:
+		promote_button.text = "Promote To Content"
+		promote_button.disabled = false

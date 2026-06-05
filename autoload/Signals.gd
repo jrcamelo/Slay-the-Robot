@@ -123,7 +123,8 @@ signal custom_ui_requested
 signal combatant_block_added(base_combatant: BaseCombatant)
 signal combatant_block_broken(base_combatant: BaseCombatant)	# the combatant has had their block broken through. Not emitted if bypassed damage
 signal combatant_blocked(base_combatant: BaseCombatant, damage_blocked: int)	# combatant fully blocked an attack
-signal combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int)	# a combatant has taken health damage. Cannot be 0
+signal combatant_targeted_by_attack(base_combatant: BaseCombatant, attack_action: BaseAction)	# emitted before an attack action is intercepted, for reaction effects
+signal combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int, source_action: BaseAction)	# a combatant has taken health damage. Cannot be 0
 
 signal energy_added(energy_amount: int)	# when the player gains energy not at start of turn
 

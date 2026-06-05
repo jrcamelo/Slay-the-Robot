@@ -646,7 +646,7 @@ func add_test_action_interceptors() -> void:
 	interceptor_damage_increase.action_interceptor_priority = 10000
 	interceptor_damage_increase.action_interceptor_modifies_parent = true
 	interceptor_damage_increase.action_interceptor_script = load(Scripts.INTERCEPTOR_DAMAGE_INCREASE)
-	interceptor_damage_increase.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+	interceptor_damage_increase.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 	
 	register_rod(interceptor_damage_increase)
 	
@@ -655,7 +655,7 @@ func add_test_action_interceptors() -> void:
 	interceptor_weaken.action_interceptor_priority = 9500
 	interceptor_weaken.action_interceptor_modifies_parent = true
 	interceptor_weaken.action_interceptor_script = load(Scripts.INTERCEPTOR_WEAKEN)
-	interceptor_weaken.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+	interceptor_weaken.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 	
 	register_rod(interceptor_weaken)
 	
@@ -664,7 +664,7 @@ func add_test_action_interceptors() -> void:
 	interceptor_vulnerable.action_interceptor_priority = 9000
 	interceptor_vulnerable.action_interceptor_modifies_parent = false
 	interceptor_vulnerable.action_interceptor_script = load(Scripts.INTERCEPTOR_VULNERABLE)
-	interceptor_vulnerable.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+	interceptor_vulnerable.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 	
 	register_rod(interceptor_vulnerable)
 	
@@ -673,7 +673,7 @@ func add_test_action_interceptors() -> void:
 	interceptor_negate_damage.action_interceptor_priority = -10000
 	interceptor_negate_damage.action_interceptor_modifies_parent = false
 	interceptor_negate_damage.action_interceptor_script = load(Scripts.INTERCEPTOR_NEGATE_DAMAGE)
-	interceptor_negate_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_DIRECT_DAMAGE]
+	interceptor_negate_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE, Scripts.ACTION_DIRECT_DAMAGE]
 	
 	register_rod(interceptor_negate_damage)
 	
@@ -718,7 +718,7 @@ func add_test_action_interceptors() -> void:
 	interceptor_next_attack_piercing.action_interceptor_priority = 10000
 	interceptor_next_attack_piercing.action_interceptor_modifies_parent = true
 	interceptor_next_attack_piercing.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_PIERCING)
-	interceptor_next_attack_piercing.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+	interceptor_next_attack_piercing.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
 	register_rod(interceptor_next_attack_piercing)
 
@@ -727,9 +727,17 @@ func add_test_action_interceptors() -> void:
 	interceptor_next_attack_damage_bonus.action_interceptor_priority = 10050
 	interceptor_next_attack_damage_bonus.action_interceptor_modifies_parent = true
 	interceptor_next_attack_damage_bonus.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS)
-	interceptor_next_attack_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+	interceptor_next_attack_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
 	register_rod(interceptor_next_attack_damage_bonus)
+
+	var interceptor_next_attack_double_damage: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_attack_double_damage")
+	interceptor_next_attack_double_damage.action_interceptor_priority = 10060
+	interceptor_next_attack_double_damage.action_interceptor_modifies_parent = true
+	interceptor_next_attack_double_damage.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE)
+	interceptor_next_attack_double_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
+
+	register_rod(interceptor_next_attack_double_damage)
 	
 
 func get_action_interceptor_data(action_interceptor_object_id: String) -> ActionInterceptorData:

@@ -75,7 +75,7 @@ func is_alive() -> bool:
 	return true
 
 ## Does damage to combatant and returns [unblocked damage dealt, overkill damage (if combatant dies)]
-func damage(_damage: int, _bypass_block: bool = false) -> Array[int]:
+func damage(_damage: int, _bypass_block: bool = false, _source_action: BaseAction = null) -> Array[int]:
 	breakpoint
 	return [0,0,0]
 #endregion

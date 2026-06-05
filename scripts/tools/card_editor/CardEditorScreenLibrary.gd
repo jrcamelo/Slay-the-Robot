@@ -135,11 +135,8 @@ static func build_library_card_tile(screen, entry: Dictionary) -> Control:
 	tile.add_child(tile_padding)
 	tile_padding.add_child(tile_row)
 	var cost_badge := Label.new()
-	var is_variable_cost: bool = false
 	var loaded_card: Resource = load(entry_path)
-	if loaded_card is CardData:
-		is_variable_cost = (loaded_card as CardData).card_energy_cost_is_variable
-	cost_badge.text = "X" if is_variable_cost else str(load_library_entry_cost(entry_path))
+	cost_badge.text = load_library_entry_cost_label(loaded_card)
 	cost_badge.custom_minimum_size = Vector2(32, 0)
 	cost_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tile_row.add_child(cost_badge)
@@ -209,6 +206,19 @@ static func load_library_entry_cost(entry_path: String) -> int:
 	if card_resource is CardData:
 		return (card_resource as CardData).card_energy_cost
 	return 0
+
+static func load_library_entry_cost_label(card_resource: Resource) -> String:
+	if not (card_resource is CardData):
+		return "0"
+	var card_data: CardData = card_resource
+	if card_data.card_energy_cost_is_variable:
+		var cost_label: String = "X"
+		if card_data.card_energy_cost_variable_upper_bound >= 1:
+			cost_label = "X-" + str(card_data.card_energy_cost_variable_upper_bound)
+		return cost_label
+	if card_data.card_values.has("display_energy_cost_override"):
+		return str(card_data.card_values["display_energy_cost_override"])
+	return str(card_data.card_energy_cost)
 
 static func load_library_entry_texture(entry_path: String) -> Texture2D:
 	var card_resource: Resource = load(entry_path)

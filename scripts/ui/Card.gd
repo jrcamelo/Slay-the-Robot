@@ -98,7 +98,10 @@ func update_card_display(selected_target: BaseCombatant = null) -> void:
 		if card_data.card_energy_cost_variable_upper_bound >= 1:
 			card_energy_cost.text = "X-" + str(card_data.card_energy_cost_variable_upper_bound)
 	else:
-		card_energy_cost.text = str(card_data.get_card_energy_cost())
+		if card_data.card_values.has("display_energy_cost_override"):
+			card_energy_cost.text = str(card_data.card_values["display_energy_cost_override"])
+		else:
+			card_energy_cost.text = str(card_data.get_card_energy_cost())
 
 func set_card_glow(_visible: bool) -> void:
 	card_glow.visible = _visible
@@ -111,6 +114,10 @@ func can_play_card() -> bool:
 		return false
 	if Global.player_data.player_energy + card_data.get_card_energy_cost() > Global.player_data.player_energy_max:
 		return false
+	var owner_player: Player = Global.get_card_owner_player(card_data)
+	if owner_player != null and card_data.card_type == CardData.CARD_TYPES.ATTACK:
+		if owner_player.get_status_charges("status_effect_no_attack") > 0:
+			return false
 	
 	if not _validate_card():
 		return false

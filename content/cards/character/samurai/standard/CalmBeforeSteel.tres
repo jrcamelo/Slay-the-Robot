@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Calm Before Steel"
+card_description = "Additional Cost: Discard a Start card.
+Attack: [damage] Damage and [poise_amount] Poise."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_values = {
+"damage": 12,
+"poise_amount": 12
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}, {
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_DISCARD_CARDS": {}
+}],
+"card_pick_text": "Choose {0} Start card to discard. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": true,
+"random_selection": false,
+"validator_data": [{
+"VALIDATOR_CARD_PROPERTIES": {
+"card_property_name": "card_kind",
+"comparison_value": "INTRO",
+"operator": "=="
+}
+}]
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_KIND_IN_HAND": {
+"card_kind_maximum": 10,
+"card_kind_minimum": 1,
+"card_kinds": ["INTRO"]
+}
+}])
+object_id = "card_samurai_calm_before_steel"

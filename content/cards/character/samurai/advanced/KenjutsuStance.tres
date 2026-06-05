@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Kenjutsu Stance"
+card_description = "Draw a card. Add one of my Attack cards from your discard to your hand."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_play_actions = Array[Dictionary]([{
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_HAND": {}
+}],
+"card_pick_text": "Choose {0} card(s) to return. {1} cards selected",
+"card_pick_type": 4,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": false,
+"random_selection": false,
+"validator_data": [{
+"VALIDATOR_CARD_TYPE": {
+"card_types": [0]
+}
+}]
+}
+}, {
+"ACTION_DRAW_GENERATOR": {}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_samurai_kenjutsu_stance"

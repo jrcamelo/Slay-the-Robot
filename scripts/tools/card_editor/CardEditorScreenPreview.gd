@@ -222,4 +222,7 @@ static func render_preview_card(screen, card: Card, card_data: CardData) -> void
 		if preview_data.card_energy_cost_variable_upper_bound >= 1:
 			card_energy_cost.text = "X-" + str(preview_data.card_energy_cost_variable_upper_bound)
 	else:
-		card_energy_cost.text = str(preview_data.card_energy_cost)
+		if preview_data.card_values.has("display_energy_cost_override"):
+			card_energy_cost.text = str(preview_data.card_values["display_energy_cost_override"])
+		else:
+			card_energy_cost.text = str(preview_data.card_energy_cost)

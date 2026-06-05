@@ -20,6 +20,9 @@ func _get_editor_parameter_definitions() -> Array[Dictionary]:
 	]
 
 func perform_action():
+	for target in get_adjusted_action_targets():
+		if target != null:
+			Signals.combatant_targeted_by_attack.emit(target, self)
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	
 	for action_interceptor_processor in action_interceptor_processors:
@@ -31,7 +34,7 @@ func perform_action():
 		var damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
 		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BYPASS_BLOCK, false)
 		
-		var damages: Array[int] = target.damage(damage, bypass_block)
+		var damages: Array[int] = target.damage(damage, bypass_block, self)
 		var unblocked_damage: int = damages[0]
 		var unblocked_damage_capped: int = damages[1] # damage done that does not factor overkill
 		var overkill_damage: int = damages[2] # damage done beyond killing target

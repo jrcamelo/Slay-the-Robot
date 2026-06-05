@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_status"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_script"]
+
+[resource]
+script = ExtResource("1_status")
+status_effect_name = "Perfect Form"
+status_effect_script = ExtResource("2_script")
+status_effect_texture_path = "external/sprites/characters/character_red/character_red_icon.png"
+status_effect_player_actions = Array[Dictionary]([{
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_HAND": {}
+}],
+"card_pick_text": "Choose {0} card(s) to return. {1} cards selected",
+"card_pick_type": 4,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": false,
+"random_selection": false,
+"validator_data": [{
+"VALIDATOR_CARD_PROPERTIES": {
+"card_property_name": "card_kind",
+"comparison_value": "INTRO",
+"operator": "=="
+}
+}]
+}
+}])
+status_effect_action_process_times = Array[int]([0])
+status_effect_decay_rate = -1
+object_id = "status_effect_return_stance_next_turn"

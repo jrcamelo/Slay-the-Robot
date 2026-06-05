@@ -213,7 +213,7 @@ func _on_combatant_blocked(base_combatant: BaseCombatant, amount_blocked: int):
 	if base_combatant.is_in_group("players"):
 		add_to_enum_stat(STATS.PLAYER_BLOCKED_AMOUNT, amount_blocked)
 		add_to_enum_stat(STATS.PLAYER_BLOCKED_AMOUNT, 1)
-func _on_combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int):
+func _on_combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int, _source_action: BaseAction = null):
 	if base_combatant.is_in_group("enemies"):
 		add_to_enum_stat(STATS.ENEMY_DAMAGED_AMOUNT, unblocked_damage)
 		add_to_enum_stat(STATS.ENEMY_DAMAGED_COUNT, 1)

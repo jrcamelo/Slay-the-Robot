@@ -62,12 +62,12 @@ theme_override_constants/separation = 12
 [node name="LibraryCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Library: 67"
+text = "Library: 95"
 
 [node name="FilterCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100007]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Visible: 67"
+text = "Visible: 95"
 
 [node name="SelectionCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100008]
 layout_mode = 2
@@ -94,8 +94,8 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(-303, 1248, 620)
-split_offset = -303
+split_offsets = PackedInt32Array(-522, 1248, 620)
+split_offset = -522
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
 custom_minimum_size = Vector2(200, 0)
@@ -220,8 +220,8 @@ theme_override_constants/separation = 10
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(152, 620)
-split_offset = 152
+split_offsets = PackedInt32Array(261, 620)
+split_offset = 261
 
 [node name="EditorHostPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=100100016]
 layout_mode = 2
@@ -322,6 +322,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
+
+[node name="SaveActions" type="HBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=190001001]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SaveTriageButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001002]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save To Triage"
+
+[node name="PromoteButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001003]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Promote To Content"
 
 [node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
 custom_minimum_size = Vector2(280, 320)

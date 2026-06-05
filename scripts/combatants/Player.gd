@@ -37,7 +37,7 @@ func _on_mouse_exited():
 ## Does damage to combatant and returns [unblocked damage dealt, damage to 0 (if player dies), overkill damage (if player dies)].
 ## eg 15 damage on 10 remaining health and 3 block will return [12, 10, 2].
 ## bypass_block = true will do damage directly to health.
-func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
+func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction = null) -> Array[int]:
 	var player_data: PlayerData = Global.player_data
 	var party_member_data: PartyMemberData = get_party_member_data()
 	
@@ -83,7 +83,7 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 			Signals.player_health_changed.emit()
 		else:
 			player_data.add_health(-bypassed_damage)
-		Signals.combatant_damaged.emit(self, bypassed_damage)
+		Signals.combatant_damaged.emit(self, bypassed_damage, source_action)
 		
 	return [bypassed_damage, bypassed_damage_capped, overkill_damage]
 
