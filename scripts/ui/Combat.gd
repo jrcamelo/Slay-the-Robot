@@ -333,7 +333,13 @@ func _on_player_turn_started():
 	# perform pre draw actions
 	for player_combatant: Player in Global.get_players():
 		player_combatant.update_incoming_damage_amount(true)
-	Global.player_data.reset_barrier()
+	# Old behavior: barrier was fully cleared at the start of the player turn.
+	# Global.player_data.reset_barrier()
+	Global.player_data.set_barrier(int(floor(float(Global.player_data.player_barrier) / 2.0)))
+	for player_combatant: Player in Global.get_living_players():
+		# Old behavior if block should be fully cleared instead of decayed.
+		# player_combatant.reset_block()
+		player_combatant.set_block(int(floor(float(player_combatant.get_block()) / 2.0)))
 	for player_combatant: Player in Global.get_living_players():
 		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
 	if ActionHandler.actions_being_performed:
