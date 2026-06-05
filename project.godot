@@ -43,6 +43,11 @@ window/size/viewport_width=1200
 window/size/viewport_height=700
 window/size/resizable=false
 
+[editor]
+
+version_control/plugin_name="GitPlugin"
+version_control/autoload_on_startup=true
+
 [input]
 
 left_click={
