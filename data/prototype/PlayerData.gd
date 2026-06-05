@@ -12,7 +12,7 @@ class_name PlayerData
 @export var player_money: int = 0
 
 var player_energy: int = 0 # current filled energy. Not saved.
-@export var player_energy_max: int = 7
+@export var player_energy_max: int = 10
 const PLAYER_TURN_ENERGY_DECAY: int = 3
 
 var player_block: int = 0 # in combat block. Not saved.

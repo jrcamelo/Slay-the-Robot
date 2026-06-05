@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_qojra"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_2jcd2"]
+
+[resource]
+script = ExtResource("1_qojra")
+status_effect_name = "Reform"
+status_effect_is_visible = false
+status_effect_type = 2
+object_id = "status_effect_dungeon_slime_reform"

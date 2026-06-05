@@ -26,8 +26,8 @@ const PARTY_CONTAINER_FALLBACK_SIZE := Vector2(480, 160)
 @onready var back_button: Button = $MainMargin/RootVBox/Header/ButtonRow/BackButton
 @onready var new_button: Button = $MainMargin/RootVBox/Header/ButtonRow/NewButton
 @onready var duplicate_button: Button = $MainMargin/RootVBox/Header/ButtonRow/DuplicateButton
-@onready var save_triage_button: Button = $MainMargin/RootVBox/Header/ButtonRow/SaveTriageButton
-@onready var promote_button: Button = $MainMargin/RootVBox/Header/ButtonRow/PromoteButton
+@onready var save_triage_button: Button = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/SaveButtonColumn/PanelSaveTriageButton
+@onready var promote_button: Button = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/SaveButtonColumn/PanelPromoteButton
 @onready var search_input: LineEdit = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/SearchInput
 @onready var source_filter: OptionButton = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow/SourceFilter
 @onready var type_filter: OptionButton = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow/TypeFilter
@@ -55,6 +55,7 @@ var editor_theme: Theme = null
 var last_left_layout_columns: int = 1
 var last_editor_layout_columns: int = 1
 var last_preview_layout_columns: int = 1
+var draft_sessions_by_resource_path: Dictionary[String, EnemyEditorSession] = {}
 var simulation_player_data: PlayerData = null
 var original_global_player_data: PlayerData = null
 var original_global_is_run: bool = false
@@ -89,6 +90,19 @@ func _notification(what: int) -> void:
 		_end_simulation_context()
 	elif what == NOTIFICATION_RESIZED:
 		_layout_battle_simulation_containers()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mouse_event: InputEventMouseButton = event
+	if not mouse_event.pressed or mouse_event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	var focus_owner: Control = get_viewport().gui_get_focus_owner()
+	if focus_owner == null:
+		return
+	if focus_owner.get_global_rect().has_point(mouse_event.global_position):
+		return
+	focus_owner.release_focus()
 
 func show_editor() -> void:
 	visible = true
@@ -135,6 +149,7 @@ func _apply_library_filters() -> void:
 func _render_all() -> void:
 	_ensure_preview_defaults()
 	_select_default_navigation_targets()
+	_cache_current_session_if_needed()
 	last_preview_result = service.resolve_preview(current_session)
 	last_left_layout_columns = _resolved_form_columns(navigator_content)
 	last_editor_layout_columns = _resolved_form_columns(editor_content)
@@ -148,8 +163,7 @@ func _render_all() -> void:
 	_apply_compact_font_sizes(self)
 	_apply_control_padding(self)
 	duplicate_button.disabled = current_session == null
-	save_triage_button.disabled = current_session == null
-	promote_button.disabled = current_session == null
+	_update_save_buttons()
 
 func _render_library() -> void:
 	_clear_children(library_list)
@@ -508,12 +522,12 @@ func _render_enemy_profile_section(parent: VBoxContainer) -> void:
 		if service.set_enemy_property(current_session, "object_id", next_value):
 			_render_all()
 	))
-	fields.add_child(_build_string_field("Legacy Enemy ID", enemy_data.enemy_object_id, func(next_value: String) -> void:
-		if service.set_enemy_property(current_session, "enemy_object_id", next_value):
+	fields.add_child(_build_option_field("Texture Path", _enemy_texture_options(false, enemy_data.enemy_texture_path), enemy_data.enemy_texture_path, func(next_value: Variant) -> void:
+		if service.set_enemy_property(current_session, "enemy_texture_path", str(next_value)):
 			_render_all()
 	))
-	fields.add_child(_build_string_field("Texture Path", enemy_data.enemy_texture_path, func(next_value: String) -> void:
-		if service.set_enemy_property(current_session, "enemy_texture_path", next_value):
+	fields.add_child(_build_option_field("Texture Path When Broken", _enemy_texture_options(true, enemy_data.enemy_texture_path_when_broken), enemy_data.enemy_texture_path_when_broken, func(next_value: Variant) -> void:
+		if service.set_enemy_property(current_session, "enemy_texture_path_when_broken", str(next_value)):
 			_render_all()
 	))
 	fields.add_child(_build_int_field("Max Health", enemy_data.enemy_health_max, 0, 9999, func(next_value: int) -> void:
@@ -815,7 +829,7 @@ func _build_stage_nav_row(stage_data: EnemyStageData) -> Control:
 	button.text = "%s ⇒ %s" % [stage_data.object_id, stage_data.next_stage_id]
 	button.tooltip_text = EnemyEditorSchema.summarize_stage(stage_data)
 	button.disabled = stage_data.object_id == selected_base_stage_id
-	button.button_up.connect(func() -> void:
+	button.button_down.connect(func() -> void:
 		selected_base_stage_id = stage_data.object_id
 		selected_reactive_stage_id = ""
 		selected_difficulty_index = -1
@@ -842,7 +856,7 @@ func _build_reactive_nav_row(stage_data: EnemyReactiveStageData) -> Control:
 	button.text = "P%s | %s" % [stage_data.priority, stage_data.object_id]
 	button.tooltip_text = EnemyEditorSchema.summarize_reactive_stage(stage_data)
 	button.disabled = stage_data.object_id == selected_reactive_stage_id
-	button.button_up.connect(func() -> void:
+	button.button_down.connect(func() -> void:
 		selected_reactive_stage_id = stage_data.object_id
 		selected_base_stage_id = ""
 		selected_difficulty_index = -1
@@ -886,7 +900,7 @@ func _build_difficulty_nav_row(override_data: EnemyDifficultyOverrideData, overr
 	button.text = "Difficulty %s" % override_data.difficulty_level
 	button.tooltip_text = EnemyEditorSchema.summarize_difficulty_override(override_data)
 	button.disabled = override_index == selected_difficulty_index
-	button.button_up.connect(func() -> void:
+	button.button_down.connect(func() -> void:
 		selected_difficulty_index = override_index
 		selected_base_stage_id = ""
 		selected_reactive_stage_id = ""
@@ -1222,8 +1236,17 @@ func _build_string_field(label_text: String, value: String, on_commit: Callable)
 	var line_edit := LineEdit.new()
 	line_edit.text = value
 	line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	line_edit.text_submitted.connect(func(next_text: String) -> void:
+	var last_committed_text: String = value
+	var commit_text := func(next_text: String) -> void:
+		if next_text == last_committed_text:
+			return
+		last_committed_text = next_text
 		on_commit.call(next_text)
+	line_edit.text_submitted.connect(func(next_text: String) -> void:
+		commit_text.call(next_text)
+	)
+	line_edit.focus_exited.connect(func() -> void:
+		commit_text.call(line_edit.text)
 	)
 	row.add_child(line_edit)
 	return row
@@ -1237,6 +1260,13 @@ func _build_multiline_field(label_text: String, value: String, on_commit: Callab
 	text_edit.custom_minimum_size = Vector2(0, 84)
 	text_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text_edit.text = value
+	var last_committed_text: String = value
+	text_edit.focus_exited.connect(func() -> void:
+		if text_edit.text == last_committed_text:
+			return
+		last_committed_text = text_edit.text
+		on_commit.call(text_edit.text)
+	)
 	row.add_child(text_edit)
 	return row
 
@@ -1491,7 +1521,13 @@ func _open_library_entry(entry: Dictionary) -> void:
 	var resource_path: String = str(entry.get("resource_path", ""))
 	if resource_path == "":
 		return
-	current_session = service.load_session(resource_path)
+	_cache_current_session_if_needed()
+	if draft_sessions_by_resource_path.has(resource_path):
+		current_session = draft_sessions_by_resource_path[resource_path]
+	else:
+		current_session = service.load_session(resource_path)
+		if current_session != null:
+			draft_sessions_by_resource_path[resource_path] = current_session
 	selected_library_path = resource_path
 	_select_default_navigation_targets()
 	_set_status("Loaded %s." % str(entry.get("enemy_name", entry.get("object_id", "enemy"))), "success")
@@ -1558,6 +1594,39 @@ func _stage_id_options() -> Array[Dictionary]:
 		return options
 	for stage_data: EnemyReactiveStageData in current_session.working_enemy_data.reactive_stages:
 		options.append({"label": "%s (%s)" % [stage_data.object_id, stage_data.label], "value": stage_data.object_id})
+	return options
+
+func _enemy_texture_options(include_empty: bool = false, current_value: String = "") -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	if include_empty:
+		options.append({"label": "None", "value": ""})
+	var directory: DirAccess = DirAccess.open("res://external/sprites/enemies")
+	if directory != null:
+		directory.list_dir_begin()
+		while true:
+			var file_name: String = directory.get_next()
+			if file_name == "":
+				break
+			if directory.current_is_dir():
+				continue
+			var resource_path: String = "external/sprites/enemies/%s" % file_name
+			options.append({"label": file_name, "value": resource_path})
+		directory.list_dir_end()
+	options.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		if str(left.get("value", "")) == "":
+			return true
+		if str(right.get("value", "")) == "":
+			return false
+		return str(left.get("label", "")) < str(right.get("label", ""))
+	)
+	if current_value.strip_edges() != "":
+		var has_current: bool = false
+		for option: Dictionary in options:
+			if str(option.get("value", "")) == current_value:
+				has_current = true
+				break
+		if not has_current:
+			options.append({"label": current_value.get_file(), "value": current_value})
 	return options
 
 func _supported_condition_options() -> Array[Dictionary]:
@@ -1644,12 +1713,13 @@ func _ally_count_summary(entries: Array[Dictionary]) -> Dictionary:
 	}
 
 func _find_quick_condition_index(entries: Array[Dictionary], token_or_path: String, expected_values: Dictionary = {}) -> int:
+	var normalized_target: String = Scripts.normalize_script_reference(token_or_path)
 	for entry_index: int in range(entries.size()):
 		var entry: Dictionary = entries[entry_index]
 		if len(entry.keys()) != 1:
 			continue
 		var token: String = str(entry.keys()[0])
-		if token != token_or_path:
+		if Scripts.normalize_script_reference(token) != normalized_target:
 			continue
 		var values: Dictionary = entry[token]
 		var matches_expected: bool = true
@@ -1675,7 +1745,14 @@ func _set_quick_condition(entries: Array[Dictionary], token_or_path: String, val
 	var condition_index: int = _find_quick_condition_index(next_entries, token_or_path, values)
 	if enabled:
 		if condition_index < 0:
-			next_entries.append({token_or_path: values.duplicate(true)})
+			var entry: Dictionary = service.create_validator_entry(token_or_path)
+			if entry.is_empty():
+				entry = {Scripts.normalize_script_reference(token_or_path): {}}
+			var entry_token: String = str(entry.keys()[0])
+			var next_values: Dictionary = {}
+			next_values.assign(entry[entry_token])
+			next_values.merge(values.duplicate(true), true)
+			next_entries.append({entry_token: next_values})
 	else:
 		if condition_index >= 0:
 			next_entries.remove_at(condition_index)
@@ -1685,7 +1762,8 @@ func _get_quick_pc_energy(entries: Array[Dictionary]) -> int:
 	var condition_index: int = _find_quick_condition_index(entries, Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY, {"operator": ">="})
 	if condition_index < 0:
 		return 0
-	var values: Dictionary = entries[condition_index][Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY]
+	var token: String = str(entries[condition_index].keys()[0])
+	var values: Dictionary = entries[condition_index][token]
 	return int(values.get("comparison_value", 0))
 
 func _set_quick_pc_energy(entries: Array[Dictionary], required_energy: int) -> Array[Dictionary]:
@@ -1695,12 +1773,15 @@ func _set_quick_pc_energy(entries: Array[Dictionary], required_energy: int) -> A
 		if condition_index >= 0:
 			next_entries.remove_at(condition_index)
 		return next_entries
-	var next_entry := {
-		Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY: {
-			"operator": ">=",
-			"comparison_value": required_energy,
-		}
-	}
+	var next_entry: Dictionary = service.create_validator_entry(Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY)
+	if next_entry.is_empty():
+		next_entry = {Scripts.normalize_script_reference(Scripts.VALIDATOR_PLAYER_CURRENT_ENERGY): {}}
+	var token: String = str(next_entry.keys()[0])
+	var next_values: Dictionary = {}
+	next_values.assign(next_entry[token])
+	next_values["operator"] = ">="
+	next_values["comparison_value"] = required_energy
+	next_entry = {token: next_values}
 	if condition_index >= 0:
 		next_entries[condition_index] = next_entry
 	else:
@@ -1754,8 +1835,44 @@ func _mark_session_dirty_only() -> void:
 		return
 	current_session.recompute_managed_paths()
 	current_session.mark_dirty()
+	_cache_current_session_if_needed()
 	current_session.refresh_diagnostics(service)
 	_render_all()
+
+func _cache_current_session_if_needed() -> void:
+	if current_session == null:
+		return
+	var cache_key: String = selected_library_path
+	if cache_key == "":
+		cache_key = current_session.original_resource_path
+	if cache_key == "":
+		return
+	draft_sessions_by_resource_path[cache_key] = current_session
+
+func _update_save_buttons() -> void:
+	var has_session: bool = current_session != null
+	if not has_session:
+		save_triage_button.disabled = true
+		promote_button.disabled = true
+		save_triage_button.text = "Save To Triage"
+		promote_button.text = "Promote To Content"
+		return
+	var is_dirty: bool = current_session.dirty
+	var active_path: String = current_session.original_resource_path
+	var is_triage_resource: bool = EnemyEditorPathUtils.path_is_within_root(active_path, current_session.triage_root)
+	var is_content_resource: bool = EnemyEditorPathUtils.path_is_within_root(active_path, current_session.content_root)
+	if is_triage_resource:
+		save_triage_button.text = "Save"
+		save_triage_button.disabled = not is_dirty
+	else:
+		save_triage_button.text = "Move To Triage" if is_content_resource else "Save To Triage"
+		save_triage_button.disabled = false
+	if is_content_resource:
+		promote_button.text = "Save"
+		promote_button.disabled = not is_dirty
+	else:
+		promote_button.text = "Promote To Content"
+		promote_button.disabled = false
 
 func _populate_option_button(option_button: OptionButton, options: Array[Dictionary], preferred_value: Variant = null) -> void:
 	var current_value: Variant = preferred_value if preferred_value != null else _get_option_value(option_button)
@@ -1962,6 +2079,8 @@ func _on_promote_button_up() -> void:
 func _handle_save_result(result: Dictionary, success_prefix: String) -> void:
 	if bool(result.get("success", false)):
 		selected_library_path = str(result.get("path", ""))
+		if current_session != null and selected_library_path != "":
+			draft_sessions_by_resource_path[selected_library_path] = current_session
 		_set_status("%s at %s" % [success_prefix, selected_library_path], "success")
 		_refresh_library()
 		_render_all()

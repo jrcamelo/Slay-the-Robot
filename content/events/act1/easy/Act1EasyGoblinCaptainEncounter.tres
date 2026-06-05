@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/EventData.gd" id="1_bpth0"]
+
+[resource]
+script = ExtResource("1_bpth0")
+event_weighted_enemy_object_ids = Array[Dictionary]([{
+"enemy_goblin_captain": 1
+}, {
+"enemy_goblin_soldier": 1
+}, {
+"enemy_goblin_soldier": 1
+}])
+object_id = "event_act_1_easy_goblin_captain_encounter"

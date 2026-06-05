@@ -3,7 +3,7 @@
 extends BaseAction
 
 func _get_editor_relevant_value_names() -> Array[String]:
-	return [ActionValueRegistry.DAMAGE, ActionValueRegistry.DAMAGE_RANDOM, ActionValueRegistry.MERGE_ATTACKS, ActionValueRegistry.NUMBER_OF_ATTACKS]
+	return [ActionValueRegistry.BYPASS_BLOCK, ActionValueRegistry.DAMAGE, ActionValueRegistry.DAMAGE_RANDOM, ActionValueRegistry.MERGE_ATTACKS, ActionValueRegistry.NUMBER_OF_ATTACKS]
 
 func _get_editor_description() -> String:
 	return "Builds one or more attack actions from a shared damage payload, including random variance and lethal children."
@@ -35,6 +35,7 @@ func perform_action():
 		var delay: float = action_interceptor_processor.get_shadowed_action_values("time_delay", 0.25)
 		var number_of_attacks: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.NUMBER_OF_ATTACKS, 1)
 		var merge_attacks: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.MERGE_ATTACKS, false)	# this will take all attacks and merge them into a single attack with combined damage
+		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BYPASS_BLOCK, false)
 		var target_override: int = action_interceptor_processor.get_shadowed_action_values("target_override", BaseAction.TARGET_OVERRIDES.SELECTED_TARGETS)
 		
 		var actions_on_lethal: Array[Dictionary] = []
@@ -55,7 +56,7 @@ func perform_action():
 		# generate the individual attack actions
 		var generated_attack_actions: Array[BaseAction] = []
 		for i in number_of_attacks:
-			var action_data: Array[Dictionary] = [{Scripts.ACTION_ATTACK: {ActionValueRegistry.DAMAGE: damage, "time_delay": delay, "target_override": target_override, "actions_on_lethal": actions_on_lethal}}]
+			var action_data: Array[Dictionary] = [{Scripts.ACTION_ATTACK: {ActionValueRegistry.BYPASS_BLOCK: bypass_block, ActionValueRegistry.DAMAGE: damage, "time_delay": delay, "target_override": target_override, "actions_on_lethal": actions_on_lethal}}]
 			var attack_action: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, targets, action_data, self)
 			generated_attack_actions += attack_action
 		

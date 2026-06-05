@@ -21,6 +21,8 @@ const ACTION_ADD_ENERGY: String = "res://scripts/actions/ActionAddEnergy.gd"
 const ACTION_APPLY_STATUS: String = "res://scripts/actions/status_actions/ActionApplyStatus.gd"
 const ACTION_DECAY_STATUS: String = "res://scripts/actions/status_actions/ActionDecayStatus.gd"
 const ACTION_SUMMON_ENEMIES: String = "res://scripts/actions/ActionSummonEnemies.gd"
+const ACTION_END_COMBAT: String = "res://scripts/actions/ActionEndCombat.gd"
+const ACTION_RUN_ON_VALIDATED_ENEMIES: String = "res://scripts/actions/enemy_actions/ActionRunOnValidatedEnemies.gd"
 const ACTION_END_TURN: String = "res://scripts/actions/ActionEndTurn.gd"
 const ACTION_RESHUFFLE: String = "res://scripts/actions/ActionReshuffle.gd"
 
@@ -72,6 +74,9 @@ const ACTION_SHOP_POPULATE_ITEMS: String = "res://scripts/actions/shop_actions/A
 
 # enemy actions
 const ACTION_CYCLE_ENEMY_INTENT: String = "res://scripts/actions/enemy_actions/ActionCycleEnemyIntent.gd"
+const ACTION_ADD_ENEMY_HEALTH: String = "res://scripts/actions/enemy_actions/ActionAddEnemyHealth.gd"
+const ACTION_RESTORE_ENEMY_POISE: String = "res://scripts/actions/enemy_actions/ActionRestoreEnemyPoise.gd"
+const ACTION_REDUCE_ENEMY_MAX_HEALTH: String = "res://scripts/actions/enemy_actions/ActionReduceEnemyMaxHealth.gd"
 
 # artifact actions
 const ACTION_INCREASE_ARTIFACT_CHARGE: String = "res://scripts/actions/artifact_actions/ActionIncreaseArtifactCharge.gd"
@@ -154,8 +159,10 @@ const VALIDATOR_PREVIOUS_EXECUTED_STAGE_ID: String = "res://scripts/validators/V
 const VALIDATOR_TURNS_SINCE_CURRENT_STAGE_STARTED: String = "res://scripts/validators/ValidatorTurnsSinceCurrentStageStarted.gd"
 const VALIDATOR_STAGE_EXECUTION_COUNT: String = "res://scripts/validators/ValidatorStageExecutionCount.gd"
 const VALIDATOR_LIVING_ALLY_MINION_COUNT: String = "res://scripts/validators/ValidatorLivingAllyMinionCount.gd"
+const VALIDATOR_LIVING_ALLY_COUNT: String = "res://scripts/validators/ValidatorLivingAllyCount.gd"
 const VALIDATOR_SOURCE_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorSourceHasStatusEffect.gd"
 const VALIDATOR_TARGET_HAS_STATUS_EFFECT: String = "res://scripts/validators/ValidatorTargetHasStatusEffect.gd"
+const VALIDATOR_ENEMY_NAME_CONTAINS: String = "res://scripts/validators/ValidatorEnemyNameContains.gd"
 
 const VALIDATOR_HAS_RELIC: String = "res://scripts/validators/ValidatorHasRelic.gd"
 const VALIDATOR_LOCATION_TYPE: String = "res://scripts/validators/ValidatorLocationType.gd"
@@ -180,6 +187,8 @@ const INTERCEPTOR_NEGATE_DEBUFF: String = "res://scripts/action_interceptors/Int
 # duplicating
 const INTERCEPTOR_DUPLICATE_CARD_PLAYS: String = "res://scripts/action_interceptors/InterceptorDuplicateCardPlays.gd"
 const INTERCEPTOR_DUPLICATE_ATTACKS: String = "res://scripts/action_interceptors/InterceptorDuplicateAttacks.gd"
+const INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS: String = "res://scripts/action_interceptors/InterceptorNextAttackDamageBonus.gd"
+const INTERCEPTOR_NEXT_ATTACK_PIERCING: String = "res://scripts/action_interceptors/InterceptorNextAttackPiercing.gd"
 #endregion
 
 var _token_to_script_path: Dictionary[String, String] = {}

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_be2jw"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_pc0vy"]
+
+[resource]
+script = ExtResource("1_be2jw")
+status_effect_name = "Piercing"
+status_effect_interceptor_ids = Array[String](["interceptor_next_attack_piercing"])
+object_id = "status_effect_next_attack_piercing"

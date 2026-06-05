@@ -1,0 +1,253 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="1_rnu2m"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_reactive"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="5_intent"]
+
+[sub_resource type="Resource" id="Resource_rnu2m"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_xq7d2"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_DISCARD_CARDS": {}
+}],
+"card_pick_text": "",
+"card_pick_type": 0,
+"max_card_amount": 1,
+"min_card_amount": 1,
+"min_cards_are_required_for_action": false,
+"random_selection": true
+}
+}, {
+"ACTION_DECAY_STATUS": {
+"status_charge_amount": -1,
+"status_effect_object_id": "status_effect_dungeon_slime_splash_ready",
+"target_override": 1
+}
+}, {
+"ACTION_ADD_ENEMY_HEALTH": {
+"health_amount": 5,
+"multiply_health_amount_by_player_current_energy": true,
+"target_override": 1
+}
+}])
+intent = SubResource("Resource_rnu2m")
+
+[sub_resource type="Resource" id="Resource_m56qg"]
+script = ExtResource("4_reactive")
+label = "Splash"
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
+"comparison_value": 0,
+"operator": ">",
+"status_effect_object_id": "status_effect_dungeon_slime_splash_ready"
+}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_xq7d2")])
+object_id = "reactive_splash"
+
+[sub_resource type="Resource" id="Resource_rdopy"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_ft6jb"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_REDUCE_ENEMY_MAX_HEALTH": {
+"health_max_amount": 10,
+"target_override": 1
+}
+}, {
+"ACTION_SUMMON_ENEMIES": {
+"action_data": [{
+"ACTION_REDUCE_ENEMY_MAX_HEALTH": {
+"copy_parent_current_health_max": true
+}
+}],
+"number_of_spawns": 1,
+"random_enemy_object_ids": ["enemy_dungeon_slime"],
+"spawn_slots": [0, 1, 2, 3, 4]
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_dungeon_slime_reform",
+"target_override": 1
+}
+}, {
+"ACTION_RESTORE_ENEMY_POISE": {
+"fill_to_max": true,
+"target_override": 1
+}
+}, {
+"ACTION_DECAY_STATUS": {
+"status_charge_amount": -3,
+"status_effect_object_id": "status_effect_dungeon_slime_reform",
+"target_override": 1
+}
+}, {
+"ACTION_REDUCE_ENEMY_MAX_HEALTH": {
+"health_max_amount": 10,
+"target_override": 1
+}
+}, {
+"ACTION_SUMMON_ENEMIES": {
+"action_data": [{
+"ACTION_REDUCE_ENEMY_MAX_HEALTH": {
+"copy_parent_current_health_max": true
+}
+}],
+"number_of_spawns": 1,
+"random_enemy_object_ids": ["enemy_dungeon_slime"],
+"spawn_slots": [0, 1, 2, 3, 4]
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_dungeon_slime_reform",
+"target_override": 1
+}
+}])
+intent = SubResource("Resource_rdopy")
+
+[sub_resource type="Resource" id="Resource_8h7a7"]
+script = ExtResource("4_reactive")
+label = "Glorb Reform"
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_BROKEN_POISE": {}
+}, {
+"VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
+"comparison_value": 2,
+"operator": ">=",
+"status_effect_object_id": "status_effect_dungeon_slime_reform"
+}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_ft6jb")])
+resume_mode = "jump_to_stage"
+resume_stage_id = "stage_slurp"
+object_id = "reactive_glorb_reform"
+
+[sub_resource type="Resource" id="Resource_gqgnc"]
+script = ExtResource("4_reactive")
+label = "Glorb Grow"
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_BROKEN_POISE": {}
+}, {
+"VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
+"comparison_value": 2,
+"operator": "<",
+"status_effect_object_id": "status_effect_dungeon_slime_reform"
+}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_ft6jb")])
+object_id = "reactive_glorb_grow"
+
+[sub_resource type="Resource" id="Resource_m0k1j"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_62vcd"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_ADD_ENEMY_HEALTH": {
+"health_amount": 5,
+"multiply_health_amount_by_player_current_energy": true,
+"target_override": 1
+}
+}])
+intent = SubResource("Resource_m0k1j")
+
+[sub_resource type="Resource" id="Resource_t2a6j"]
+script = ExtResource("2_stage")
+label = "Slurp"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_62vcd")])
+next_stage_id = "stage_gloop"
+object_id = "stage_slurp"
+
+[sub_resource type="Resource" id="Resource_ee0f0"]
+script = ExtResource("5_intent")
+damage = 10
+number_of_attacks = 1
+
+[sub_resource type="Resource" id="Resource_npe12"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_ee0f0")
+
+[sub_resource type="Resource" id="Resource_sbusp"]
+script = ExtResource("5_intent")
+damage = 10
+number_of_attacks = 1
+targeting_rule = "random_distinct_players"
+target_count = 3
+
+[sub_resource type="Resource" id="Resource_ddpkf"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 3,
+"operator": ">="
+}
+}])
+intent = SubResource("Resource_sbusp")
+
+[sub_resource type="Resource" id="Resource_je7he"]
+script = ExtResource("5_intent")
+damage = 15
+number_of_attacks = 1
+targeting_rule = "random_distinct_players"
+target_count = 3
+
+[sub_resource type="Resource" id="Resource_kx2ed"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 6,
+"operator": ">="
+}
+}])
+intent = SubResource("Resource_je7he")
+
+[sub_resource type="Resource" id="Resource_a8u7c"]
+script = ExtResource("5_intent")
+damage = 15
+number_of_attacks = 1
+targeting_rule = "all_living_players"
+
+[sub_resource type="Resource" id="Resource_f1o8m"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 9,
+"operator": ">="
+}
+}])
+intent = SubResource("Resource_a8u7c")
+
+[sub_resource type="Resource" id="Resource_ffuil"]
+script = ExtResource("2_stage")
+label = "Gloop"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_npe12"), SubResource("Resource_ddpkf"), SubResource("Resource_kx2ed"), SubResource("Resource_f1o8m")])
+next_stage_id = "stage_slurp"
+object_id = "stage_gloop"
+
+[resource]
+script = ExtResource("1_enemy")
+enemy_object_id = "enemy_dungeon_slime"
+enemy_name = "Dungeon Slime"
+enemy_texture_path_when_broken = "external/sprites/enemies/dungeon_slime_broken.png"
+enemy_texture_path = "external/sprites/enemies/dungeon_slime.png"
+enemy_health = 60
+enemy_health_max = 60
+enemy_poise = 20
+enemy_poise_max = 20
+opening_stage_id = "stage_slurp"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_t2a6j"), SubResource("Resource_ffuil")])
+reactive_stages = Array[ExtResource("4_reactive")]([SubResource("Resource_m56qg"), SubResource("Resource_8h7a7"), SubResource("Resource_gqgnc")])
+enemy_initial_status_effects = Dictionary[String, int]({
+"status_effect_dungeon_slime_splash_ready": 1
+})
+object_id = "enemy_dungeon_slime"

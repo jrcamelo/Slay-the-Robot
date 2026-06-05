@@ -712,6 +712,24 @@ func add_test_action_interceptors() -> void:
 	interceptor_duplicate_attacks.action_intercepted_action_paths = [Scripts.ACTION_CARD_PLAY]
 	
 	register_rod(interceptor_duplicate_attacks)
+
+	# grants bypass_block to the next generated attack
+	var interceptor_next_attack_piercing: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_attack_piercing")
+	interceptor_next_attack_piercing.action_interceptor_priority = 10000
+	interceptor_next_attack_piercing.action_interceptor_modifies_parent = true
+	interceptor_next_attack_piercing.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_PIERCING)
+	interceptor_next_attack_piercing.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+
+	register_rod(interceptor_next_attack_piercing)
+
+	# adds flat damage to the next generated attack
+	var interceptor_next_attack_damage_bonus: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_attack_damage_bonus")
+	interceptor_next_attack_damage_bonus.action_interceptor_priority = 10050
+	interceptor_next_attack_damage_bonus.action_interceptor_modifies_parent = true
+	interceptor_next_attack_damage_bonus.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS)
+	interceptor_next_attack_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK]
+
+	register_rod(interceptor_next_attack_damage_bonus)
 	
 
 func get_action_interceptor_data(action_interceptor_object_id: String) -> ActionInterceptorData:

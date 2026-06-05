@@ -46,7 +46,7 @@ func init(_enemy_data: EnemyData):
 	selection_button.mouse_entered.connect(_on_mouse_entered)
 	selection_button.mouse_exited.connect(_on_mouse_exited)
 
-	sprite.texture = FileLoader.load_texture(enemy_data.enemy_texture_path)
+	_refresh_enemy_texture()
 
 	for status_effect_object_id in enemy_data.enemy_initial_status_effects.keys():
 		var charge_amount: int = enemy_data.enemy_initial_status_effects[status_effect_object_id]
@@ -113,13 +113,24 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 		enemy_data.enemy_health = max(0, enemy_data.enemy_health - bypassed_damage)
 		Signals.combatant_damaged.emit(self, bypassed_damage)
 		update_health_bar(true)
-		if enemy_data.enemy_health <= 0:
-			if not animation_player.is_playing():
-				animation_player.play("death")
-				remove_from_group("enemies")
-				Signals.enemy_killed.emit(self)
+		_handle_death_if_needed()
 
 	return [bypassed_damage, bypassed_damage_capped, overkill_damage]
+
+func set_health(health_amount: int, health_max_amount: int = enemy_data.enemy_health_max) -> void:
+	enemy_data.enemy_health_max = max(0, health_max_amount)
+	enemy_data.enemy_health = clamp(health_amount, 0, enemy_data.enemy_health_max)
+	update_health_bar(false)
+	_handle_death_if_needed()
+
+func add_health(health_amount: int, health_max_amount: int = 0) -> void:
+	set_health(enemy_data.enemy_health + health_amount, enemy_data.enemy_health_max + health_max_amount)
+
+func get_health() -> int:
+	return enemy_data.enemy_health
+
+func get_health_max() -> int:
+	return enemy_data.enemy_health_max
 
 func set_block(amount: int) -> void:
 	enemy_data.enemy_block = max(0, amount)
@@ -136,9 +147,11 @@ func add_block(amount: int) -> void:
 
 func set_poise(poise_amount: int, poise_max_amount: int = enemy_data.enemy_poise_max) -> void:
 	enemy_data.set_poise(poise_amount, poise_max_amount)
+	_refresh_enemy_texture()
 
 func add_poise(poise_amount: int, poise_max_amount: int = 0) -> void:
 	enemy_data.add_poise(poise_amount, poise_max_amount)
+	_refresh_enemy_texture()
 
 func get_poise() -> int:
 	return enemy_data.enemy_poise
@@ -157,6 +170,12 @@ func update_health_bar(as_damage: bool = false) -> void:
 		layered_health_bar.apply_damage(enemy_data.enemy_health, enemy_data.enemy_health_max, status_id_to_status_effects)
 	else:
 		layered_health_bar.update_health_layers(enemy_data.enemy_health, enemy_data.enemy_health_max, status_id_to_status_effects)
+
+func _refresh_enemy_texture() -> void:
+	var texture_path: String = enemy_data.enemy_texture_path
+	if enemy_data.is_poise_depleted() and enemy_data.enemy_texture_path_when_broken.strip_edges() != "":
+		texture_path = enemy_data.enemy_texture_path_when_broken
+	sprite.texture = FileLoader.load_texture(texture_path)
 
 func update_enemy_intent() -> void:
 	var active_stage_resolution: Dictionary = _resolve_active_stage()
@@ -483,6 +502,14 @@ func advance_planned_stage_after_execution() -> void:
 	planned_stage_started_turn_count = _get_current_turn_count() + 1
 	cached_random_target_signature = ""
 	cached_random_target_party_member_indices.clear()
+
+func _handle_death_if_needed() -> void:
+	if enemy_data.enemy_health > 0:
+		return
+	if not animation_player.is_playing():
+		animation_player.play("death")
+		remove_from_group("enemies")
+		Signals.enemy_killed.emit(self)
 
 func is_alive() -> bool:
 	return enemy_data.enemy_health > 0

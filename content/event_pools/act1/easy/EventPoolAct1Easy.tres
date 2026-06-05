@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1_1")
-event_pool_event_object_ids = Array[String](["event_act_1_easy_combat_1", "event_act_1_easy_combat_2", "event_act_1_easy_combat_3", "event_act_1_easy_combat_4"])
+event_pool_event_object_ids = Array[String](["event_act_1_easy_combat_1", "event_act_1_easy_combat_2", "event_act_1_easy_combat_3", "event_act_1_easy_combat_4", "event_act_1_easy_goblin_captain_encounter", "event_act_1_easy_dungeon_slime_encounter"])
 object_id = "event_pool_act_1_easy"

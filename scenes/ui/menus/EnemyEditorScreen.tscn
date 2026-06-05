@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cmmpity26foo3" path="res://scripts/ui/PlayerPartyContainer.gd" id="2_e1ftq"]
 [ext_resource type="Script" uid="uid://p4ouiuival0e" path="res://scripts/ui/EnemyContainer.gd" id="2_xto7d"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orb0t"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e1ftq"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -18,7 +18,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xto7d"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6cp1y"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -32,7 +32,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e1ftq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_to0mj"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -53,36 +53,12 @@ expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6cp1y"]
-content_margin_left = 12.0
-content_margin_top = 7.0
-content_margin_right = 12.0
-content_margin_bottom = 7.0
-bg_color = Color(0.1, 0.1, 0.1, 0.6)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_to0mj"]
-content_margin_left = 12.0
-content_margin_top = 7.0
-content_margin_right = 12.0
-content_margin_bottom = 7.0
-bg_color = Color(0, 0, 0, 0.6)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s335w"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0.225, 0.225, 0.225, 0.6)
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -94,7 +70,7 @@ content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0.1, 0.1, 0.1, 0.3)
+bg_color = Color(0, 0, 0, 0.6)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -106,28 +82,19 @@ content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0.75)
-draw_center = false
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
-expand_margin_left = 2.0
-expand_margin_top = 2.0
-expand_margin_right = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_23tob"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0.1, 0.1, 0.1, 0.6)
+bg_color = Color(0.1, 0.1, 0.1, 0.3)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -139,19 +106,28 @@ content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0, 0, 0, 0.6)
+bg_color = Color(1, 1, 1, 0.75)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_835oc"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0.225, 0.225, 0.225, 0.6)
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -163,7 +139,7 @@ content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 7.0
-bg_color = Color(0.1, 0.1, 0.1, 0.3)
+bg_color = Color(0, 0, 0, 0.6)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -171,6 +147,30 @@ corner_radius_bottom_left = 3
 corner_detail = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a4pai"]
+content_margin_left = 12.0
+content_margin_top = 7.0
+content_margin_right = 12.0
+content_margin_bottom = 7.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e37cw"]
+content_margin_left = 12.0
+content_margin_top = 7.0
+content_margin_right = 12.0
+content_margin_bottom = 7.0
+bg_color = Color(0.1, 0.1, 0.1, 0.3)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_us5d0"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -191,7 +191,7 @@ expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e37cw"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exi1f"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -203,7 +203,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_us5d0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_83438"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -215,7 +215,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exi1f"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lx6u"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -227,7 +227,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_83438"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_58ohi"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -239,7 +239,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2lx6u"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jqgpm"]
 content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
@@ -339,7 +339,7 @@ text = "Promote To Content"
 [node name="StatsLabel" type="Label" parent="MainMargin/RootVBox/Header" unique_id=1542279245]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Library: 9 | Visible: 9 | Base stages: 1 | Reactive: 0 | Errors: 0 | Warnings: 0"
+text = "Library: 10 | Visible: 10 | Base stages: 1 | Reactive: 0 | Errors: 0 | Warnings: 0"
 autowrap_mode = 2
 
 [node name="BodySplit" type="HSplitContainer" parent="MainMargin/RootVBox" unique_id=1502138836]
@@ -378,9 +378,9 @@ text = "Library"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_orb0t")
-theme_override_styles/read_only = SubResource("StyleBoxFlat_xto7d")
-theme_override_styles/focus = SubResource("StyleBoxFlat_e1ftq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_e1ftq")
+theme_override_styles/read_only = SubResource("StyleBoxFlat_6cp1y")
+theme_override_styles/focus = SubResource("StyleBoxFlat_to0mj")
 placeholder_text = "Search by enemy name, id, stage, or path"
 
 [node name="FilterRow" type="HBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=1130753772]
@@ -391,11 +391,11 @@ theme_override_constants/separation = 6
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_6cp1y")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_to0mj")
-theme_override_styles/hover = SubResource("StyleBoxFlat_s335w")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_wu2n1")
-theme_override_styles/focus = SubResource("StyleBoxFlat_2t0vk")
+theme_override_styles/normal = SubResource("StyleBoxFlat_s335w")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_wu2n1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2t0vk")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_23tob")
+theme_override_styles/focus = SubResource("StyleBoxFlat_vtejj")
 selected = 0
 item_count = 3
 popup/item_0/text = "All Sources"
@@ -409,31 +409,38 @@ popup/item_2/id = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_23tob")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_vtejj")
-theme_override_styles/hover = SubResource("StyleBoxFlat_835oc")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_83sn5")
-theme_override_styles/focus = SubResource("StyleBoxFlat_a4pai")
+theme_override_styles/normal = SubResource("StyleBoxFlat_835oc")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_83sn5")
+theme_override_styles/hover = SubResource("StyleBoxFlat_a4pai")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_e37cw")
+theme_override_styles/focus = SubResource("StyleBoxFlat_us5d0")
 selected = 0
-item_count = 4
+item_count = 7
 popup/item_0/text = "All Types"
 popup/item_0/id = 0
 popup/item_1/text = "Standard"
 popup/item_1/id = 1
-popup/item_2/text = "Miniboss"
+popup/item_2/text = "Standard Minion"
 popup/item_2/id = 2
-popup/item_3/text = "Boss"
+popup/item_3/text = "Miniboss"
 popup/item_3/id = 3
+popup/item_4/text = "Miniboss Minion"
+popup/item_4/id = 4
+popup/item_5/text = "Boss"
+popup/item_5/id = 5
+popup/item_6/text = "Boss Minion"
+popup/item_6/id = 6
 
 [node name="MinionFilter" type="OptionButton" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/FilterRow" unique_id=1488939185]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_e37cw")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_us5d0")
-theme_override_styles/hover = SubResource("StyleBoxFlat_exi1f")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_83438")
-theme_override_styles/focus = SubResource("StyleBoxFlat_2lx6u")
+theme_override_styles/normal = SubResource("StyleBoxFlat_exi1f")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_83438")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2lx6u")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_58ohi")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jqgpm")
 selected = 0
 item_count = 3
 popup/item_0/text = "Minions and Non-Minions"
@@ -459,7 +466,7 @@ theme_override_constants/separation = 6
 [node name="NavigatorLabel" type="Label" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=463430981]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Navigator"
+text = "Enemy Profile"
 
 [node name="NavigatorScroll" type="ScrollContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=236941668]
 layout_mode = 2
@@ -472,6 +479,25 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
+
+[node name="SaveButtonColumn" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox" unique_id=948412001]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PanelSaveTriageButton" type="Button" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/SaveButtonColumn" unique_id=141002119]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Save To Triage"
+
+[node name="PanelPromoteButton" type="Button" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/SaveButtonColumn" unique_id=677514208]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Promote To Content"
 
 [node name="WorkspaceSplit" type="HSplitContainer" parent="MainMargin/RootVBox/BodySplit" unique_id=348245593]
 layout_mode = 2
@@ -537,10 +563,10 @@ anchor_left = 0.022000002
 anchor_top = 0.42100003
 anchor_right = 0.022000002
 anchor_bottom = 0.42100003
-offset_left = 481.6
-offset_top = -310.7
-offset_right = 481.6
-offset_bottom = -310.7
+offset_left = 789.6
+offset_top = -282.5
+offset_right = 789.6
+offset_bottom = -282.5
 scale = Vector2(0.48, 0.48)
 script = ExtResource("2_e1ftq")
 
@@ -549,10 +575,10 @@ layout_mode = 0
 
 [node name="EnemyContainer" type="Control" parent="." unique_id=1347043953]
 anchors_preset = 0
-offset_left = 937.0
-offset_top = -18.000008
-offset_right = 1545.0
-offset_bottom = 174.0
+offset_left = 1085.68
+offset_top = -9.0
+offset_right = 1693.68
+offset_bottom = 183.0
 scale = Vector2(0.6, 0.6)
 mouse_filter = 2
 script = ExtResource("2_xto7d")
@@ -560,8 +586,9 @@ metadata/_edit_group_ = true
 
 [node name="AutomaticEnemyContainer" type="HBoxContainer" parent="EnemyContainer" unique_id=956483295]
 layout_mode = 0
+offset_top = -52.0
 offset_right = 608.0
-offset_bottom = 192.0
+offset_bottom = 140.0
 mouse_filter = 2
 
 [node name="PositionalEnemyContainer" type="Control" parent="EnemyContainer" unique_id=1862909055]

@@ -7,6 +7,7 @@ static func get_top_level_field_definitions() -> Dictionary[String, Dictionary]:
 		"object_id": _field("Object ID", "string", "Stable enemy identifier used by content references and exports."),
 		"enemy_object_id": _field("Legacy Enemy Object ID", "string", "Legacy prototype id field. Prefer object_id for new content."),
 		"enemy_name": _field("Enemy Name", "string", "Display name shown in combat."),
+		"enemy_texture_path_when_broken": _field("Texture Path When Broken", "resource_path", "Optional texture path used when the enemy is broken."),
 		"enemy_texture_path": _field("Texture Path", "resource_path", "Texture path used by the enemy sprite."),
 		"enemy_health": _field("Health", "int", "Current health value for the prototype."),
 		"enemy_health_max": _field("Max Health", "int", "Maximum health value."),

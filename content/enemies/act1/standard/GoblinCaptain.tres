@@ -1,0 +1,270 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="1_pva1x"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_reactive"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="5_intent"]
+
+[sub_resource type="Resource" id="Resource_pva1x"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_w1dyy"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_DIRECT_DAMAGE": {
+"damage": 10
+}
+}],
+"exclude_parent": true,
+"max_target_amount": 1,
+"random_selection": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}, {
+"ACTION_RESTORE_ENEMY_POISE": {
+"fill_to_max": true,
+"target_override": 1
+}
+}])
+intent = SubResource("Resource_pva1x")
+
+[sub_resource type="Resource" id="Resource_wfmpk"]
+script = ExtResource("4_reactive")
+label = "Urgle..."
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_BROKEN_POISE": {}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_w1dyy")])
+resume_mode = "jump_to_stage"
+resume_stage_id = "stage_command"
+object_id = "reactive_broken"
+
+[sub_resource type="Resource" id="Resource_mk7rm"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_sa2ki"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_DIRECT_DAMAGE": {
+"damage": 5
+}
+}, {
+"ACTION_RESTORE_ENEMY_POISE": {
+"fill_to_max": true
+}
+}],
+"exclude_parent": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}, {
+"VALIDATOR_ENEMY_BROKEN_POISE": {}
+}]
+}
+}])
+intent = SubResource("Resource_mk7rm")
+
+[sub_resource type="Resource" id="Resource_4oq42"]
+script = ExtResource("4_reactive")
+label = "Clabbo!"
+conditions = Array[Dictionary]([{
+"VALIDATOR_LIVING_ALLY_COUNT": {
+"comparison_value": 0,
+"exclude_source": true,
+"operator": ">",
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}, {
+"VALIDATOR_ENEMY_BROKEN_POISE": {}
+}]
+}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_sa2ki")])
+object_id = "reactive_clabbo"
+
+[sub_resource type="Resource" id="Resource_2uiw5"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_rd5o6"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_fleeing",
+"target_override": 1
+}
+}, {
+"ACTION_VALIDATOR": {
+"passed_action_data": [{
+"ACTION_END_COMBAT": {}
+}],
+"validator_data": [{
+"VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
+"comparison_value": 3,
+"operator": ">=",
+"status_effect_object_id": "status_effect_fleeing"
+}
+}]
+}
+}])
+intent = SubResource("Resource_2uiw5")
+
+[sub_resource type="Resource" id="Resource_kr8ng"]
+script = ExtResource("4_reactive")
+label = "Vaaah!"
+conditions = Array[Dictionary]([{
+"VALIDATOR_LIVING_ALLY_COUNT": {
+"comparison_value": 0,
+"exclude_source": true,
+"operator": "==",
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_rd5o6")])
+object_id = "reactive_flee"
+
+[sub_resource type="Resource" id="Resource_b0pbw"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_8o0lm"]
+script = ExtResource("3_variant")
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_ADD_ENEMY_HEALTH": {
+"health_amount": 5
+}
+}],
+"exclude_parent": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}])
+intent = SubResource("Resource_b0pbw")
+
+[sub_resource type="Resource" id="Resource_mk3mp"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 3,
+"operator": ">="
+}
+}])
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_ADD_ENEMY_HEALTH": {
+"health_amount": 10
+}
+}],
+"exclude_parent": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}])
+intent = SubResource("Resource_b0pbw")
+
+[sub_resource type="Resource" id="Resource_wcalq"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 6,
+"operator": ">="
+}
+}])
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_ADD_ENEMY_HEALTH": {
+"health_amount": 10
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_next_attack_piercing"
+}
+}],
+"exclude_parent": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}])
+intent = SubResource("Resource_b0pbw")
+
+[sub_resource type="Resource" id="Resource_a3vo0"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_PLAYER_CURRENT_ENERGY": {
+"comparison_value": 9,
+"operator": ">="
+}
+}])
+extra_actions = Array[Dictionary]([{
+"ACTION_RUN_ON_VALIDATED_ENEMIES": {
+"action_data": [{
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_next_attack_piercing"
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_next_attack_damage_bonus",
+"status_secondary_charge_amount": 10
+}
+}],
+"exclude_parent": true,
+"validator_data": [{
+"VALIDATOR_ENEMY_NAME_CONTAINS": {
+"search_text": "Goblin"
+}
+}]
+}
+}])
+intent = SubResource("Resource_b0pbw")
+
+[sub_resource type="Resource" id="Resource_hlnwy"]
+script = ExtResource("2_stage")
+label = "Command"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_8o0lm"), SubResource("Resource_mk3mp"), SubResource("Resource_wcalq"), SubResource("Resource_a3vo0")])
+next_stage_id = "stage_command"
+object_id = "stage_command"
+
+[resource]
+script = ExtResource("1_enemy")
+enemy_name = "Goblin Captain"
+enemy_texture_path = "external/sprites/enemies/goblin_captain.png"
+enemy_health = 40
+enemy_health_max = 40
+enemy_poise = 20
+enemy_poise_max = 20
+opening_stage_id = "stage_command"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_hlnwy")])
+reactive_stages = Array[ExtResource("4_reactive")]([SubResource("Resource_wfmpk"), SubResource("Resource_4oq42"), SubResource("Resource_kr8ng")])
+object_id = "enemy_goblin_captain"

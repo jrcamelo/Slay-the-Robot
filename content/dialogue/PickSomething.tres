@@ -26,7 +26,7 @@ object_id = "dialogue_pick_something_option_1"
 
 [sub_resource type="Resource" id="Resource_headl"]
 script = ExtResource("2_1")
-dialogue_option_bbcode = "[color=red]Lose 50 Money[/color] and [color=green]Gain Random Rare Card[/color]"
+dialogue_option_bbcode = "[color=red]Lose 100 Money[/color] and [color=green]Gain Random Rare Card[/color]"
 dialogue_option_failed_validator_bbcode = "[color=grey][Locked]: Insufficient Money[/color]"
 dialogue_option_actions = Array[Dictionary]([{
 "ACTION_PICK_CARDS": {
@@ -54,12 +54,12 @@ dialogue_option_actions = Array[Dictionary]([{
 }
 }, {
 "ACTION_ADD_MONEY": {
-"money_amount": -50
+"money_amount": -100
 }
 }])
 dialogue_option_validators = Array[Dictionary]([{
 "VALIDATOR_MONEY": {
-"money_amount": 50
+"money_amount": 100
 }
 }])
 object_id = "dialogue_pick_something_option_2"

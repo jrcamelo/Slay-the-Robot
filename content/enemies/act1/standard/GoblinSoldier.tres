@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/EnemyData.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://data/prototype/EnemyDifficultyOverrideData.gd" id="1_pg6yt"]
+[ext_resource type="Script" path="res://data/prototype/EnemyStageData.gd" id="2_stage"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentVariantData.gd" id="3_variant"]
+[ext_resource type="Script" path="res://data/prototype/EnemyReactiveStageData.gd" id="4_reactive"]
+[ext_resource type="Script" path="res://data/prototype/EnemyIntentData.gd" id="5_intent"]
+
+[sub_resource type="Resource" id="Resource_pg6yt"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_tes7m"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_pg6yt")
+
+[sub_resource type="Resource" id="Resource_fjogm"]
+script = ExtResource("4_reactive")
+label = "WAH"
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_BROKEN_POISE": {}
+}])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_tes7m")])
+object_id = "reactive_wah"
+
+[sub_resource type="Resource" id="Resource_5wd6e"]
+script = ExtResource("5_intent")
+damage = 10
+number_of_attacks = 1
+
+[sub_resource type="Resource" id="Resource_7026y"]
+script = ExtResource("3_variant")
+intent = SubResource("Resource_5wd6e")
+
+[sub_resource type="Resource" id="Resource_58pm6"]
+script = ExtResource("2_stage")
+label = "WAK"
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_7026y")])
+next_stage_id = "stage_wak"
+object_id = "stage_wak"
+
+[resource]
+script = ExtResource("1_enemy")
+enemy_name = "Goblin Soldier"
+enemy_texture_path = "external/sprites/enemies/goblin_soldier.png"
+enemy_health = 30
+enemy_health_max = 30
+enemy_poise = 20
+enemy_poise_max = 20
+opening_stage_id = "stage_wak"
+stages = Array[ExtResource("2_stage")]([SubResource("Resource_58pm6")])
+reactive_stages = Array[ExtResource("4_reactive")]([SubResource("Resource_fjogm")])
+object_id = "enemy_goblin_soldier"

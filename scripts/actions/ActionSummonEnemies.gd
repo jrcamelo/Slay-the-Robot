@@ -16,6 +16,11 @@ func _get_editor_contexts() -> Array[String]:
 		EDITOR_CONTEXT_ENEMY_ACTIONS,
 	]
 
+func _get_editor_parameter_definitions() -> Array[Dictionary]:
+	var parameter_definitions: Array[Dictionary] = super()
+	parameter_definitions.append(_editor_param("action_data", "Action Data", "array", [], "Additional actions generated for each successfully summoned enemy, targeted at that enemy."))
+	return parameter_definitions
+
 func perform_action():
 	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
 	
@@ -35,14 +40,15 @@ func perform_action():
 		var enemies: Array[Enemy] = []
 		enemies.assign(Global.get_tree().get_nodes_in_group("enemies_alive_or_dead"))
 		var populated_enemy_slots: Dictionary = {}
+		var action_data: Array[Dictionary] = []
+		action_data.assign(action_interceptor_processor.get_shadowed_action_values("action_data", []))
 		for enemy in enemies:
 			if populated_enemy_slots.has(enemy.enemy_slot):
 				push_error("Multiple enemies in slot " + str(enemy.enemy_slot))
 			else:
-				populated_enemy_slots[enemy.enemy_slot] = enemy.enemy_slot
+				populated_enemy_slots[enemy.enemy_slot] = enemy
 
 		# spawn enemies
-		var player_location_data: LocationData = Global.get_player_location_data()
 		var remaining_spawns: int = number_of_spawns
 		
 		for slot_id in spawn_slots:
@@ -64,6 +70,18 @@ func perform_action():
 			# spawn enemy
 			Signals.enemy_spawn_requested.emit(enemy_object_id, slot_id)
 			remaining_spawns -= 1
+			var summoned_enemy: Enemy = _get_enemy_in_slot(slot_id)
+			if summoned_enemy != null and len(action_data) > 0:
+				var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [summoned_enemy], action_data, self)
+				ActionHandler.add_actions(generated_actions)
+
+func _get_enemy_in_slot(slot_id: int) -> Enemy:
+	var enemies: Array[Node] = Global.get_tree().get_nodes_in_group("enemies_alive_or_dead")
+	for node: Node in enemies:
+		var enemy: Enemy = node
+		if enemy.enemy_slot == slot_id and enemy.is_alive():
+			return enemy
+	return null
 		
 func _to_string():
 	return "Summon Enemy Action"
