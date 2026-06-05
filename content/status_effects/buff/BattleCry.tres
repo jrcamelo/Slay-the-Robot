@@ -6,5 +6,6 @@
 [resource]
 script = ExtResource("1_npx5d")
 status_effect_name = "Battle Cry"
+status_effect_texture_path = "external/sprites/characters/character_orange/character_orange_icon.png"
 status_effect_interceptor_ids = Array[String](["interceptor_next_attack_damage_bonus"])
 object_id = "status_effect_next_attack_damage_bonus"

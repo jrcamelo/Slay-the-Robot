@@ -32,10 +32,39 @@ number_of_attacks = 1
 script = ExtResource("3_variant")
 intent = SubResource("Resource_5wd6e")
 
+[sub_resource type="Resource" id="Resource_f3n8x"]
+script = ExtResource("5_intent")
+
+[sub_resource type="Resource" id="Resource_wt4qf"]
+script = ExtResource("3_variant")
+conditions = Array[Dictionary]([{
+"VALIDATOR_SOURCE_HAS_STATUS_EFFECT": {
+"comparison_value": 0,
+"operator": ">",
+"status_effect_object_id": "status_effect_next_attack_piercing"
+}
+}])
+priority = 10
+intent = SubResource("Resource_f3n8x")
+extra_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {
+"bypass_block": true,
+"damage": 10,
+"number_of_attacks": 1,
+"time_delay": 0.5
+}
+}, {
+"ACTION_DECAY_STATUS": {
+"status_charge_amount": -1,
+"status_effect_object_id": "status_effect_next_attack_piercing",
+"target_override": 1
+}
+}])
+
 [sub_resource type="Resource" id="Resource_58pm6"]
 script = ExtResource("2_stage")
 label = "WAK"
-intents = Array[ExtResource("3_variant")]([SubResource("Resource_7026y")])
+intents = Array[ExtResource("3_variant")]([SubResource("Resource_7026y"), SubResource("Resource_wt4qf")])
 next_stage_id = "stage_wak"
 object_id = "stage_wak"
 
