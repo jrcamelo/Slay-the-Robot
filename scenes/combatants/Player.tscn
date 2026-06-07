@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bu5jx208ipx8i" path="res://scripts/combatants/Player.gd" id="1_hkgmy"]
 [ext_resource type="Texture2D" uid="uid://nh32y87hcke5" path="res://icon.svg" id="2_snepv"]
 [ext_resource type="PackedScene" uid="uid://b0qk0vn81d0kp" path="res://scenes/combatants/LayeredHealthBar.tscn" id="3_ef7si"]
+[ext_resource type="PackedScene" uid="uid://gifr2vbns40l" path="res://monk.tscn" id="4_6d0fj"]
 
 [sub_resource type="Animation" id="Animation_0d3kb"]
 resource_name = "attack"
@@ -111,6 +112,10 @@ offset_left = -67.0
 offset_top = -64.0
 offset_right = 69.0
 offset_bottom = 64.0
+
+[node name="Monk" parent="Visible/Sprite" unique_id=859657890 instance=ExtResource("4_6d0fj")]
+position = Vector2(21.000002, 66.00006)
+scale = Vector2(0.2, 0.2)
 
 [node name="IncomingDamage" type="Control" parent="Visible" unique_id=546075441]
 visible = false
