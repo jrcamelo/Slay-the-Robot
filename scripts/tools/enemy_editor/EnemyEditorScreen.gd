@@ -16,11 +16,16 @@ const ENEMY_HORIZONTAL_RATIO := 0.62
 const ENEMY_CONTENT_VERTICAL_OFFSET := -52.0
 const ENEMY_CONTAINER_FALLBACK_SIZE := Vector2(608, 192)
 const PARTY_CONTAINER_FALLBACK_SIZE := Vector2(480, 160)
+const ENEMY_EDITOR_FIT_WIDTH := 1550.0
 
 @onready var title_screen: Control = get_parent() as Control
+@onready var main_margin: MarginContainer = $MainMargin
 @onready var header: Control = $MainMargin/RootVBox/Header
-@onready var body_split: Control = $MainMargin/RootVBox/BodySplit
-@onready var right_panel: Control = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel
+@onready var body_split: HSplitContainer = $MainMargin/RootVBox/BodySplit
+@onready var workspace_split: HSplitContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit
+@onready var left_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/LeftPanel
+@onready var center_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel
+@onready var right_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel
 @onready var status_label: Label = $MainMargin/RootVBox/Header/StatusLabel
 @onready var stats_label: Label = $MainMargin/RootVBox/Header/StatsLabel
 @onready var back_button: Button = $MainMargin/RootVBox/Header/ButtonRow/BackButton
@@ -79,6 +84,8 @@ func _ready() -> void:
 	right_panel.resized.connect(_layout_battle_simulation_containers)
 	_populate_filters()
 	_apply_compact_font_sizes(self)
+	_apply_responsive_density()
+	_apply_screen_fit_scale()
 	if not _is_embedded_in_title_screen():
 		show_editor()
 
@@ -89,6 +96,8 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible:
 		_end_simulation_context()
 	elif what == NOTIFICATION_RESIZED:
+		_apply_screen_fit_scale()
+		_apply_responsive_density()
 		_layout_battle_simulation_containers()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -111,7 +120,20 @@ func show_editor() -> void:
 		current_session = service.create_blank_session()
 		_select_default_navigation_targets()
 	_set_status("Started a new enemy triage draft. Use the library or shape the stages directly.", "info")
+	_apply_screen_fit_scale()
+	_apply_responsive_density()
 	_render_all()
+
+func _apply_screen_fit_scale() -> void:
+	if main_margin == null:
+		return
+	var viewport_size: Vector2 = get_viewport_rect().size
+	if viewport_size.x <= 0.0:
+		return
+	var content_width: float = maxf(main_margin.size.x, ENEMY_EDITOR_FIT_WIDTH)
+	var fit_scale: float = minf(1.0, viewport_size.x / content_width)
+	main_margin.scale = Vector2.ONE * fit_scale
+	main_margin.position = Vector2((viewport_size.x - (main_margin.size.x * fit_scale)) * 0.5, 0.0)
 
 func _populate_filters() -> void:
 	_populate_option_button(source_filter, [
@@ -151,6 +173,7 @@ func _render_all() -> void:
 	_select_default_navigation_targets()
 	_cache_current_session_if_needed()
 	last_preview_result = service.resolve_preview(current_session)
+	_apply_responsive_density()
 	last_left_layout_columns = _resolved_form_columns(navigator_content)
 	last_editor_layout_columns = _resolved_form_columns(editor_content)
 	last_preview_layout_columns = _resolved_form_columns(preview_content)
@@ -483,6 +506,10 @@ func _layout_battle_simulation_containers() -> void:
 	var right_rect: Rect2 = right_panel.get_global_rect()
 	var header_rect: Rect2 = header.get_global_rect()
 	var body_rect: Rect2 = body_split.get_global_rect()
+	var scale_factor: float = _get_responsive_scale()
+	var simulation_scale: float = clampf(scale_factor * 0.95, 0.68, 1.0)
+	enemy_container.scale = Vector2(0.6, 0.6) * simulation_scale
+	party_container.scale = Vector2(0.48, 0.48) * simulation_scale
 	var enemy_size: Vector2 = enemy_container.size
 	if enemy_size == Vector2.ZERO:
 		enemy_size = ENEMY_CONTAINER_FALLBACK_SIZE
@@ -1897,6 +1924,54 @@ func _get_option_value(option_button: OptionButton) -> Variant:
 func _clear_children(node: Node) -> void:
 	for child: Node in node.get_children():
 		child.queue_free()
+
+func _get_responsive_scale() -> float:
+	if body_split == null:
+		return 1.0
+	var width: float = maxf(size.x, body_split.size.x)
+	if width <= 0.0:
+		return 1.0
+	return clampf(width / 2548.0, 0.70, 1.0)
+
+func _get_responsive_font_size(base_size: int) -> int:
+	return max(11, int(round(float(base_size) * _get_responsive_scale())))
+
+func _get_responsive_panel_min_width(base_width: int, minimum_width: int) -> int:
+	return max(minimum_width, int(round(float(base_width) * _get_responsive_scale())))
+
+func _apply_responsive_density() -> void:
+	if left_panel == null or center_panel == null or right_panel == null:
+		return
+	var scale_factor: float = _get_responsive_scale()
+	var is_compact: bool = scale_factor < 0.82
+	var is_tight: bool = scale_factor < 0.9
+	left_panel.custom_minimum_size.x = _get_responsive_panel_min_width(300, 220)
+	center_panel.custom_minimum_size.x = _get_responsive_panel_min_width(360, 300)
+	right_panel.custom_minimum_size.x = _get_responsive_panel_min_width(320, 220)
+	if editor_theme != null:
+		var body_font_size: int = _get_responsive_font_size(BODY_FONT_SIZE)
+		editor_theme.set_font_size("font_size", "Label", body_font_size)
+		editor_theme.set_font_size("font_size", "TooltipLabel", body_font_size)
+		editor_theme.set_font_size("font_size", "PopupMenu", body_font_size)
+		editor_theme.set_font_size("normal_font_size", "RichTextLabel", body_font_size)
+		editor_theme.set_font_size("bold_font_size", "RichTextLabel", body_font_size)
+		editor_theme.set_font_size("italic_font_size", "RichTextLabel", body_font_size)
+		editor_theme.set_font_size("mono_font_size", "RichTextLabel", body_font_size)
+	back_button.add_theme_font_size_override("font_size", _get_responsive_font_size(15))
+	new_button.add_theme_font_size_override("font_size", _get_responsive_font_size(15))
+	duplicate_button.add_theme_font_size_override("font_size", _get_responsive_font_size(15))
+	save_triage_button.add_theme_font_size_override("font_size", _get_responsive_font_size(18))
+	promote_button.add_theme_font_size_override("font_size", _get_responsive_font_size(18))
+	save_triage_button.custom_minimum_size.y = 36.0 if is_compact else 40.0 if is_tight else 44.0
+	promote_button.custom_minimum_size.y = 36.0 if is_compact else 40.0 if is_tight else 44.0
+	if body_split.size.x > 0.0:
+		var body_usable_width: float = maxf(body_split.size.x - float(body_split.get_theme_constant("separation")), 0.0)
+		var left_width: float = clampf(body_usable_width * (0.27 if is_compact else 0.29), float(left_panel.custom_minimum_size.x), 340.0)
+		body_split.split_offset = int(round(left_width - (body_usable_width * 0.5)))
+	if workspace_split.size.x > 0.0:
+		var workspace_usable_width: float = maxf(workspace_split.size.x - float(workspace_split.get_theme_constant("separation")), 0.0)
+		var center_width: float = clampf(workspace_usable_width * (0.56 if is_compact else 0.54), float(center_panel.custom_minimum_size.x), maxf(workspace_usable_width - float(right_panel.custom_minimum_size.x), float(center_panel.custom_minimum_size.x)))
+		workspace_split.split_offset = int(round(center_width - (workspace_usable_width * 0.5)))
 
 func _set_controls_disabled(root: Node, disabled: bool) -> void:
 	if root is BaseButton:

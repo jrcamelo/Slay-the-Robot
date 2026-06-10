@@ -17,12 +17,12 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = -12.0
+offset_left = 0.99851525
+offset_right = 596.99854
+offset_bottom = 4374.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.001484781, 0.001484781)
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
@@ -38,20 +38,20 @@ theme_override_constants/separation = 4
 
 [node name="ScreenTitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100002]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 12
 text = "Card Workshop"
 
 [node name="ScreenSubtitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100003]
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 10
 autowrap_mode = 2
 
 [node name="StatusBanner" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100004]
 visible = false
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 10
 text = "Started a new triage session. Use a preset or open a library card to begin."
 autowrap_mode = 2
 
@@ -61,28 +61,29 @@ theme_override_constants/separation = 12
 
 [node name="LibraryCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100006]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Library: 95"
+theme_override_font_sizes/font_size = 10
+text = "Library: 81"
 
 [node name="FilterCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Visible: 95"
+theme_override_font_sizes/font_size = 10
+text = "Visible: 81"
 
 [node name="SelectionCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100008]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 10
 text = "Selection: "
 
 [node name="DiagnosticsCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100009]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 10
 text = "Diagnostics: 2 error(s), 1 warning(s)"
 
 [node name="BackButton" type="Button" parent="MainContainer/Header" unique_id=645530600]
 visible = false
 layout_mode = 2
 theme = ExtResource("2")
+theme_override_font_sizes/font_size = 10
 text = "Back"
 
 [node name="ButtonRow" type="HBoxContainer" parent="MainContainer/Header" unique_id=632544242]
@@ -94,11 +95,11 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(-522, 1248, 620)
-split_offset = -522
+split_offsets = PackedInt32Array(-303, 1248, 620)
+split_offset = -303
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -123,18 +124,20 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
 placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
 
 [node name="ClearFiltersButton" type="Button" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow" unique_id=100100010]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 text = "Clear"
 
 [node name="FilterGrid" type="GridContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=70704918]
 layout_mode = 2
-columns = 2
 
 [node name="SourceFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=188047745]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 3
 popup/item_0/text = "All Sources"
@@ -146,6 +149,7 @@ popup/item_2/id = 2
 
 [node name="OwnerFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=1406252232]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 1
 popup/item_0/text = "All Owners"
@@ -153,6 +157,7 @@ popup/item_0/id = 0
 
 [node name="ColorFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=857215671]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 1
 popup/item_0/text = "All Colors"
@@ -160,6 +165,7 @@ popup/item_0/id = 0
 
 [node name="TypeFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=803598134]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 6
 popup/item_0/text = "All Types"
@@ -177,6 +183,7 @@ popup/item_5/id = 5
 
 [node name="RarityFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=1074329757]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 6
 popup/item_0/text = "All Rarities"
@@ -194,6 +201,7 @@ popup/item_5/id = 5
 
 [node name="KindFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=409261280]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 5
 popup/item_0/text = "All Kinds"
@@ -220,8 +228,8 @@ theme_override_constants/separation = 10
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(261, 620)
-split_offset = 261
+split_offsets = PackedInt32Array(152, 620)
+split_offset = 152
 
 [node name="EditorHostPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=100100016]
 layout_mode = 2
@@ -242,7 +250,7 @@ size_flags_vertical = 3
 split_offsets = PackedInt32Array(0, 620)
 
 [node name="InspectorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=828682295]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -273,7 +281,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="BehaviorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=100100012]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -305,7 +313,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=415001899]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -328,19 +336,21 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="SaveTriageButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001002]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
 text = "Save To Triage"
 
 [node name="PromoteButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001003]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
 text = "Promote To Content"
 
 [node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
-custom_minimum_size = Vector2(280, 320)
+custom_minimum_size = Vector2(160, 220)
 layout_mode = 2
 
 [node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1017348166]
@@ -350,11 +360,12 @@ theme_override_constants/separation = 4
 [node name="SessionLabel" type="Label" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=1297326160]
 layout_mode = 2
 tooltip_text = "State: Saved"
+theme_override_font_sizes/font_size = 10
 text = " ()
 Triage save | Saved"
 
 [node name="DiagnosticsText" type="RichTextLabel" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SessionSummary" unique_id=968705889]
-custom_minimum_size = Vector2(0, 140)
+custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
 bbcode_enabled = true
 text = "[color=#f5a1a1ff][ERROR][/color] [i](object_id)[/i] Card object_id cannot be empty.
@@ -365,7 +376,7 @@ fit_content = true
 [node name="SaveStatusLabel" type="Label" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=100100011]
 modulate = Color(0.82, 0.87, 0.95, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 10
 text = "Started a new triage session. Use a preset or open a library card to begin."
 autowrap_mode = 2
 
@@ -378,6 +389,7 @@ layout_mode = 2
 
 [node name="ActionGroupOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=874360833]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 11
 popup/item_0/text = "Play Actions"
@@ -405,9 +417,11 @@ popup/item_10/id = 10
 
 [node name="ActionOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1307683061]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 
 [node name="AddActionButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ActionAddPanel" unique_id=1805703847]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 text = "Add Action"
 
 [node name="ValidatorAddPanel" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions" unique_id=863022373]
@@ -415,6 +429,7 @@ layout_mode = 2
 
 [node name="ValidatorGroupOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=586731295]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 selected = 0
 item_count = 2
 popup/item_0/text = "Play Validators"
@@ -424,7 +439,9 @@ popup/item_1/id = 1
 
 [node name="ValidatorOption" type="OptionButton" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=326868515]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 
 [node name="AddValidatorButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/QuickActions/ValidatorAddPanel" unique_id=1397110396]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 text = "Add Validator"

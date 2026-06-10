@@ -31,8 +31,10 @@ const RESPONSIVE_TWO_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_TWO_
 const RESPONSIVE_FOUR_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_FOUR_COLUMN_BREAKPOINT
 const RESPONSIVE_PANEL_GAP := CardEditorScreenConfig.RESPONSIVE_PANEL_GAP
 const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_CHARACTER_ID
+const CARD_EDITOR_FIT_WIDTH := 1347.0
 
 @onready var title_screen: Control = get_parent() as Control
+@onready var main_container: MarginContainer = $MainContainer
 @onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
 @onready var status_banner: Label = $MainContainer/Header/ScreenSummary/StatusBanner
 @onready var header_container: VBoxContainer = $MainContainer/Header
@@ -51,6 +53,7 @@ const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_C
 @onready var button_row: HBoxContainer = $MainContainer/Header/ButtonRow
 @onready var library_search: LineEdit = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/SearchInput
 @onready var clear_filters_button: Button = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/SearchRow/ClearFiltersButton
+@onready var filter_grid: GridContainer = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid
 @onready var source_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/SourceFilter
 @onready var owner_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/OwnerFilter
 @onready var color_filter: OptionButton = $MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid/ColorFilter
@@ -154,6 +157,7 @@ func _ready() -> void:
 	_populate_group_options()
 	_populate_preset_options()
 	_refresh_status_banner()
+	_apply_screen_fit_scale()
 	call_deferred("_apply_split_layout")
 	if _is_embedded_in_title_screen():
 		back_button.visible = true
@@ -171,8 +175,20 @@ func _bind_optional_header_nodes() -> void:
 func show_editor() -> void:
 	visible = true
 	initial_split_widths_pending = true
+	_apply_screen_fit_scale()
 	call_deferred("_apply_split_layout")
 	populate_editor()
+
+func _apply_screen_fit_scale() -> void:
+	if main_container == null:
+		return
+	var viewport_size: Vector2 = get_viewport_rect().size
+	if viewport_size.x <= 0.0:
+		return
+	var content_width: float = maxf(main_container.size.x, CARD_EDITOR_FIT_WIDTH)
+	var fit_scale: float = minf(1.0, viewport_size.x / content_width)
+	main_container.scale = Vector2.ONE * fit_scale
+	main_container.position = Vector2((viewport_size.x - (main_container.size.x * fit_scale)) * 0.5, 0.0)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
@@ -274,6 +290,61 @@ func _compact_header_layout() -> void:
 	if promote_button != null:
 		promote_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		promote_button.custom_minimum_size = Vector2(0, 42)
+	_apply_responsive_density()
+
+func _get_responsive_scale() -> float:
+	if body_split == null:
+		return 1.0
+	var width: float = maxf(size.x, body_split.size.x)
+	if width <= 0.0:
+		return 1.0
+	return clampf(width / 2548.0, 0.50, 1.0)
+
+func _get_responsive_panel_min_width(base_width: int) -> int:
+	return max(96, int(round(float(base_width) * _get_responsive_scale())))
+
+func _get_responsive_font_size(base_size: int) -> int:
+	return max(10, int(round(float(base_size) * _get_responsive_scale())))
+
+func _apply_responsive_density() -> void:
+	if library_panel == null or inspector_panel == null or behavior_panel == null or preview_panel == null:
+		return
+	var scale_factor: float = _get_responsive_scale()
+	var is_compact: bool = scale_factor < 0.82
+	screen_title.add_theme_font_size_override("font_size", _get_responsive_font_size(24))
+	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if library_panel_collapsed else _get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH)
+	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if inspector_panel_collapsed else _get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH)
+	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if behavior_panel_collapsed else _get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH)
+	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if preview_panel_collapsed else _get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
+	preview_mount.custom_minimum_size = Vector2(160, 220) if is_compact else Vector2(280, 320)
+	diagnostics_text.custom_minimum_size.y = 84.0 if is_compact else 140.0
+	if save_triage_button != null:
+		save_triage_button.custom_minimum_size.y = 32.0 if is_compact else 42.0
+	if promote_button != null:
+		promote_button.custom_minimum_size.y = 32.0 if is_compact else 42.0
+	_apply_responsive_control_density(self, scale_factor)
+
+func _apply_responsive_control_density(root: Node, scale_factor: float) -> void:
+	if root == null:
+		return
+	for child: Node in root.get_children():
+		_apply_responsive_control_density(child, scale_factor)
+	if not (root is Control):
+		return
+	var control: Control = root as Control
+	if control is Label and control != screen_title:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(14))
+	elif control is Button:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(14))
+	elif control is OptionButton:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(13))
+	elif control is LineEdit:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(13))
+	elif control is TextEdit:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(13))
+		control.custom_minimum_size.y = 56.0 if scale_factor < 0.82 else 72.0
+	elif control is SpinBox:
+		control.add_theme_font_size_override("font_size", _get_responsive_font_size(13))
 
 func _install_panel_headers() -> void:
 	if collapsed_panel_row == null and is_instance_valid(header_container):
@@ -530,6 +601,8 @@ func _status_color_hex(severity: String) -> String:
 	return CardEditorScreenPreview.status_color_hex(self, severity)
 
 func _apply_split_layout() -> void:
+	_apply_screen_fit_scale()
+	_apply_responsive_density()
 	CardEditorScreenPreview.apply_split_layout(self)
 	call_deferred("_rebalance_split_widths")
 
@@ -544,7 +617,13 @@ func _rebalance_split_widths() -> void:
 	var editor_separation: float = float(editor_split.get_theme_constant("separation"))
 	var available_width: float = maxf(total_width - body_separation - workspace_separation - editor_separation, 0.0)
 	var panel_width: int = int(round(available_width / 4.0))
-	panel_width = max(panel_width, LIBRARY_PANEL_MIN_WIDTH, INSPECTOR_PANEL_MIN_WIDTH, BEHAVIOR_PANEL_MIN_WIDTH, PREVIEW_PANEL_MIN_WIDTH)
+	panel_width = max(
+		panel_width,
+		_get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH),
+		_get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH),
+		_get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH),
+		_get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
+	)
 	var body_usable_width: float = maxf(total_width - body_separation, 0.0)
 	body_split.split_offset = int(round(float(panel_width) - (body_usable_width * 0.5)))
 	var workspace_total_width: float = maxf(body_usable_width - float(panel_width), 0.0)

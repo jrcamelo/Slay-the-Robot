@@ -14,7 +14,7 @@ static func render_preview(screen) -> void:
 	screen.preview_card = Scenes.CARD.instantiate()
 	screen.preview_mount.add_child(screen.preview_card)
 	var preview_width: float = maxf(screen.preview_panel.size.x, screen.preview_panel.custom_minimum_size.x)
-	var preview_scale: float = clampf((preview_width - 48.0) / 260.0, 0.9, 1.35)
+	var preview_scale: float = clampf((preview_width - 24.0) / 260.0, 0.5, 1.15)
 	screen.preview_card.scale = Vector2.ONE * preview_scale
 	screen.preview_card.position = Vector2.ZERO
 	render_preview_card(screen, screen.preview_card, screen.current_session.working_card_data)
