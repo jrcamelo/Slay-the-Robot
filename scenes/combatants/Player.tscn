@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bu5jx208ipx8i" path="res://scripts/combatants/Player.gd" id="1_hkgmy"]
 [ext_resource type="Texture2D" uid="uid://nh32y87hcke5" path="res://icon.svg" id="2_snepv"]
 [ext_resource type="PackedScene" uid="uid://b0qk0vn81d0kp" path="res://scenes/combatants/LayeredHealthBar.tscn" id="3_ef7si"]
-[ext_resource type="PackedScene" uid="uid://gifr2vbns40l" path="res://monk.tscn" id="4_6d0fj"]
+[ext_resource type="PackedScene" path="res://monk.tscn" id="4_6d0fj"]
 
 [sub_resource type="Animation" id="Animation_0d3kb"]
 resource_name = "attack"
