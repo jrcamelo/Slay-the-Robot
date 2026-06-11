@@ -31,10 +31,7 @@ const RESPONSIVE_TWO_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_TWO_
 const RESPONSIVE_FOUR_COLUMN_BREAKPOINT := CardEditorScreenConfig.RESPONSIVE_FOUR_COLUMN_BREAKPOINT
 const RESPONSIVE_PANEL_GAP := CardEditorScreenConfig.RESPONSIVE_PANEL_GAP
 const PREVIEW_FALLBACK_CHARACTER_ID := CardEditorScreenConfig.PREVIEW_FALLBACK_CHARACTER_ID
-const CARD_EDITOR_FIT_WIDTH := 1347.0
-
 @onready var title_screen: Control = get_parent() as Control
-@onready var main_container: MarginContainer = $MainContainer
 @onready var screen_title: Label = $MainContainer/Header/ScreenSummary/ScreenTitle
 @onready var status_banner: Label = $MainContainer/Header/ScreenSummary/StatusBanner
 @onready var header_container: VBoxContainer = $MainContainer/Header
@@ -109,11 +106,16 @@ var library_panel_collapsed: bool = false
 var inspector_panel_collapsed: bool = false
 var behavior_panel_collapsed: bool = false
 var preview_panel_collapsed: bool = false
+var library_panel_auto_collapsed: bool = false
+var inspector_panel_auto_collapsed: bool = false
+var behavior_panel_auto_collapsed: bool = false
+var preview_panel_auto_collapsed: bool = false
 var collapsed_panel_row: HBoxContainer = null
 var library_panel_toggle: Button = null
 var inspector_panel_toggle: Button = null
 var behavior_panel_toggle: Button = null
 var preview_panel_toggle: Button = null
+var preview_scroll: ScrollContainer = null
 var behavior_render_queued: bool = false
 var editor_panels_refresh_queued: bool = false
 var status_message: String = "Open a card to inspect it, or start a new triage draft."
@@ -123,14 +125,17 @@ var layout_initialized: bool = false
 var last_layout_width: int = 0
 var last_layout_band: String = ""
 
+const MIN_RESPONSIVE_PANEL_WIDTH := 72
+const RESPONSIVE_DESIGN_WIDTH := 2548.0
+
 func _ready() -> void:
 	_bind_optional_header_nodes()
 	visible = not _is_embedded_in_title_screen()
 	screen_title.text = "Card Workshop"
 	diagnostics_text.bbcode_enabled = true
 	diagnostics_text.fit_content = true
-	inspector_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	behavior_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_ensure_preview_scroll()
+	_configure_panel_scrolls()
 	library_search.placeholder_text = "Search names, descriptions, tags, keywords, or file paths"
 	back_button.button_up.connect(_on_back_button_up)
 	if new_button != null:
@@ -157,7 +162,6 @@ func _ready() -> void:
 	_populate_group_options()
 	_populate_preset_options()
 	_refresh_status_banner()
-	_apply_screen_fit_scale()
 	call_deferred("_apply_split_layout")
 	if _is_embedded_in_title_screen():
 		back_button.visible = true
@@ -175,20 +179,8 @@ func _bind_optional_header_nodes() -> void:
 func show_editor() -> void:
 	visible = true
 	initial_split_widths_pending = true
-	_apply_screen_fit_scale()
 	call_deferred("_apply_split_layout")
 	populate_editor()
-
-func _apply_screen_fit_scale() -> void:
-	if main_container == null:
-		return
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0:
-		return
-	var content_width: float = maxf(main_container.size.x, CARD_EDITOR_FIT_WIDTH)
-	var fit_scale: float = minf(1.0, viewport_size.x / content_width)
-	main_container.scale = Vector2.ONE * fit_scale
-	main_container.position = Vector2((viewport_size.x - (main_container.size.x * fit_scale)) * 0.5, 0.0)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
@@ -295,37 +287,57 @@ func _compact_header_layout() -> void:
 func _get_responsive_scale() -> float:
 	if body_split == null:
 		return 1.0
-	var width: float = maxf(size.x, body_split.size.x)
+	var width: float = get_viewport_rect().size.x
+	if width <= 0.0:
+		width = size.x
 	if width <= 0.0:
 		return 1.0
-	return clampf(width / 2548.0, 0.50, 1.0)
+	return clampf(width / RESPONSIVE_DESIGN_WIDTH, 0.50, 1.0)
 
 func _get_responsive_panel_min_width(base_width: int) -> int:
-	return max(96, int(round(float(base_width) * _get_responsive_scale())))
+	return maxi(MIN_RESPONSIVE_PANEL_WIDTH, int(round(float(base_width) * _get_responsive_scale())))
 
 func _get_responsive_font_size(base_size: int) -> int:
-	return max(10, int(round(float(base_size) * _get_responsive_scale())))
+	return maxi(10, int(round(float(base_size) * _get_responsive_scale())))
 
 func _apply_responsive_density() -> void:
+	if Engine.is_editor_hint():
+		return
 	if library_panel == null or inspector_panel == null or behavior_panel == null or preview_panel == null:
 		return
 	var scale_factor: float = _get_responsive_scale()
 	var is_compact: bool = scale_factor < 0.82
+	library_panel_auto_collapsed = false
+	inspector_panel_auto_collapsed = false
+	behavior_panel_auto_collapsed = false
+	preview_panel_auto_collapsed = false
+	body_split.custom_minimum_size.x = 0.0
+	body_split.custom_minimum_size.y = 0.0
+	_relax_horizontal_sizing(library_vbox)
+	_relax_horizontal_sizing(inspector_container)
+	_relax_horizontal_sizing(behavior_container)
+	_relax_horizontal_sizing(preview_vbox)
+	_restore_library_preview_sizes()
+	_configure_panel_scrolls()
+	filter_grid.columns = _get_library_filter_columns()
 	screen_title.add_theme_font_size_override("font_size", _get_responsive_font_size(24))
-	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if library_panel_collapsed else _get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH)
-	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if inspector_panel_collapsed else _get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH)
-	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if behavior_panel_collapsed else _get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH)
-	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if preview_panel_collapsed else _get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
+	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_library_panel_collapsed() else _get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH)
+	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_inspector_panel_collapsed() else _get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH)
+	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_behavior_panel_collapsed() else _get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH)
+	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_preview_panel_collapsed() else _get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
 	preview_mount.custom_minimum_size = Vector2(160, 220) if is_compact else Vector2(280, 320)
 	diagnostics_text.custom_minimum_size.y = 84.0 if is_compact else 140.0
 	if save_triage_button != null:
 		save_triage_button.custom_minimum_size.y = 32.0 if is_compact else 42.0
 	if promote_button != null:
 		promote_button.custom_minimum_size.y = 32.0 if is_compact else 42.0
+	_apply_panel_collapse_state(false)
 	_apply_responsive_control_density(self, scale_factor)
 
 func _apply_responsive_control_density(root: Node, scale_factor: float) -> void:
 	if root == null:
+		return
+	if root == preview_mount:
 		return
 	for child: Node in root.get_children():
 		_apply_responsive_control_density(child, scale_factor)
@@ -345,6 +357,40 @@ func _apply_responsive_control_density(root: Node, scale_factor: float) -> void:
 		control.custom_minimum_size.y = 56.0 if scale_factor < 0.82 else 72.0
 	elif control is SpinBox:
 		control.add_theme_font_size_override("font_size", _get_responsive_font_size(13))
+
+func _ensure_preview_scroll() -> void:
+	if Engine.is_editor_hint():
+		return
+	if preview_vbox == null or preview_vbox.get_parent() is ScrollContainer:
+		return
+	var parent := preview_vbox.get_parent()
+	if not (parent is Container):
+		return
+	var parent_container: Container = parent as Container
+	var insertion_index: int = preview_vbox.get_index()
+	parent_container.remove_child(preview_vbox)
+	preview_scroll = ScrollContainer.new()
+	preview_scroll.name = "PreviewScroll"
+	preview_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	preview_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	preview_scroll.follow_focus = true
+	preview_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent_container.add_child(preview_scroll)
+	parent_container.move_child(preview_scroll, insertion_index)
+	preview_scroll.add_child(preview_vbox)
+	preview_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	preview_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_configure_panel_scrolls()
+
+func _configure_panel_scrolls() -> void:
+	for scroll_node: Variant in [library_scroll, inspector_scroll, behavior_scroll, preview_scroll]:
+		var scroll: ScrollContainer = scroll_node as ScrollContainer
+		if scroll == null:
+			continue
+		scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		scroll.follow_focus = true
 
 func _install_panel_headers() -> void:
 	if collapsed_panel_row == null and is_instance_valid(header_container):
@@ -377,33 +423,50 @@ func _create_panel_toggle_row(parent: Control, title_text: String, method_name: 
 	parent.move_child(row, 0)
 	return button
 
-func _apply_panel_collapse_state() -> void:
-	library_panel.visible = not library_panel_collapsed
-	inspector_panel.visible = not inspector_panel_collapsed
-	behavior_panel.visible = not behavior_panel_collapsed
-	preview_panel.visible = not preview_panel_collapsed
+func _is_library_panel_collapsed() -> bool:
+	return library_panel_collapsed or library_panel_auto_collapsed
+
+func _is_inspector_panel_collapsed() -> bool:
+	return inspector_panel_collapsed or inspector_panel_auto_collapsed
+
+func _is_behavior_panel_collapsed() -> bool:
+	return behavior_panel_collapsed or behavior_panel_auto_collapsed
+
+func _is_preview_panel_collapsed() -> bool:
+	return preview_panel_collapsed or preview_panel_auto_collapsed
+
+func _apply_panel_collapse_state(request_relayout: bool = true) -> void:
+	library_panel.visible = not _is_library_panel_collapsed()
+	inspector_panel.visible = not _is_inspector_panel_collapsed()
+	behavior_panel.visible = not _is_behavior_panel_collapsed()
+	preview_panel.visible = not _is_preview_panel_collapsed()
 	if library_panel_toggle != null:
-		library_panel_toggle.text = "Show" if library_panel_collapsed else "Hide"
-		library_panel_toggle.tooltip_text = "Expand library" if library_panel_collapsed else "Collapse library"
+		library_panel_toggle.disabled = library_panel_auto_collapsed
+		library_panel_toggle.text = "Auto" if library_panel_auto_collapsed else "Show" if library_panel_collapsed else "Hide"
+		library_panel_toggle.tooltip_text = "Library is hidden at this width" if library_panel_auto_collapsed else "Expand library" if library_panel_collapsed else "Collapse library"
 	if inspector_panel_toggle != null:
-		inspector_panel_toggle.text = "Show" if inspector_panel_collapsed else "Hide"
-		inspector_panel_toggle.tooltip_text = "Expand card panel" if inspector_panel_collapsed else "Collapse card panel"
+		inspector_panel_toggle.disabled = inspector_panel_auto_collapsed
+		inspector_panel_toggle.text = "Auto" if inspector_panel_auto_collapsed else "Show" if inspector_panel_collapsed else "Hide"
+		inspector_panel_toggle.tooltip_text = "Card panel is hidden at this width" if inspector_panel_auto_collapsed else "Expand card panel" if inspector_panel_collapsed else "Collapse card panel"
 	if behavior_panel_toggle != null:
-		behavior_panel_toggle.text = "Show" if behavior_panel_collapsed else "Hide"
-		behavior_panel_toggle.tooltip_text = "Expand actions panel" if behavior_panel_collapsed else "Collapse actions panel"
+		behavior_panel_toggle.disabled = behavior_panel_auto_collapsed
+		behavior_panel_toggle.text = "Auto" if behavior_panel_auto_collapsed else "Show" if behavior_panel_collapsed else "Hide"
+		behavior_panel_toggle.tooltip_text = "Actions panel is hidden at this width" if behavior_panel_auto_collapsed else "Expand actions panel" if behavior_panel_collapsed else "Collapse actions panel"
 	if preview_panel_toggle != null:
-		preview_panel_toggle.text = "Show" if preview_panel_collapsed else "Hide"
-		preview_panel_toggle.tooltip_text = "Expand preview" if preview_panel_collapsed else "Collapse preview"
+		preview_panel_toggle.disabled = preview_panel_auto_collapsed
+		preview_panel_toggle.text = "Auto" if preview_panel_auto_collapsed else "Show" if preview_panel_collapsed else "Hide"
+		preview_panel_toggle.tooltip_text = "Preview is hidden at this width" if preview_panel_auto_collapsed else "Expand preview" if preview_panel_collapsed else "Collapse preview"
 	_refresh_collapsed_panel_buttons()
-	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if library_panel_collapsed else LIBRARY_PANEL_MIN_WIDTH
-	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if inspector_panel_collapsed else INSPECTOR_PANEL_MIN_WIDTH
-	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if behavior_panel_collapsed else BEHAVIOR_PANEL_MIN_WIDTH
-	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if preview_panel_collapsed else PREVIEW_PANEL_MIN_WIDTH
-	library_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if library_panel_collapsed else Control.SIZE_EXPAND_FILL
-	inspector_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if inspector_panel_collapsed else Control.SIZE_EXPAND_FILL
-	behavior_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if behavior_panel_collapsed else Control.SIZE_EXPAND_FILL
-	preview_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if preview_panel_collapsed else Control.SIZE_EXPAND_FILL
-	call_deferred("_apply_split_layout")
+	library_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_library_panel_collapsed() else _get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH)
+	inspector_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_inspector_panel_collapsed() else _get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH)
+	behavior_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_behavior_panel_collapsed() else _get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH)
+	preview_panel.custom_minimum_size.x = COLLAPSED_PANEL_WIDTH if _is_preview_panel_collapsed() else _get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
+	library_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if _is_library_panel_collapsed() else Control.SIZE_EXPAND_FILL
+	inspector_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if _is_inspector_panel_collapsed() else Control.SIZE_EXPAND_FILL
+	behavior_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if _is_behavior_panel_collapsed() else Control.SIZE_EXPAND_FILL
+	preview_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if _is_preview_panel_collapsed() else Control.SIZE_EXPAND_FILL
+	if request_relayout:
+		call_deferred("_apply_split_layout")
 
 func _refresh_collapsed_panel_buttons() -> void:
 	if collapsed_panel_row == null:
@@ -601,36 +664,79 @@ func _status_color_hex(severity: String) -> String:
 	return CardEditorScreenPreview.status_color_hex(self, severity)
 
 func _apply_split_layout() -> void:
-	_apply_screen_fit_scale()
 	_apply_responsive_density()
 	CardEditorScreenPreview.apply_split_layout(self)
 	call_deferred("_rebalance_split_widths")
 
 func _rebalance_split_widths() -> void:
+	if Engine.is_editor_hint():
+		return
 	if not is_instance_valid(body_split) or not is_instance_valid(workspace_split) or not is_instance_valid(editor_split):
 		return
-	var total_width: float = maxf(body_split.size.x, size.x)
+	var total_width: float = _get_available_body_width()
 	if total_width <= 0.0:
 		return
 	var body_separation: float = float(body_split.get_theme_constant("separation"))
 	var workspace_separation: float = float(workspace_split.get_theme_constant("separation"))
 	var editor_separation: float = float(editor_split.get_theme_constant("separation"))
-	var available_width: float = maxf(total_width - body_separation - workspace_separation - editor_separation, 0.0)
-	var panel_width: int = int(round(available_width / 4.0))
-	panel_width = max(
-		panel_width,
-		_get_responsive_panel_min_width(LIBRARY_PANEL_MIN_WIDTH),
-		_get_responsive_panel_min_width(INSPECTOR_PANEL_MIN_WIDTH),
-		_get_responsive_panel_min_width(BEHAVIOR_PANEL_MIN_WIDTH),
-		_get_responsive_panel_min_width(PREVIEW_PANEL_MIN_WIDTH)
-	)
+
 	var body_usable_width: float = maxf(total_width - body_separation, 0.0)
-	body_split.split_offset = int(round(float(panel_width) - (body_usable_width * 0.5)))
-	var workspace_total_width: float = maxf(body_usable_width - float(panel_width), 0.0)
+	var workspace_min_width: float = _visible_min_width(inspector_panel, INSPECTOR_PANEL_MIN_WIDTH) + _visible_min_width(behavior_panel, BEHAVIOR_PANEL_MIN_WIDTH) + _visible_min_width(preview_panel, PREVIEW_PANEL_MIN_WIDTH) + workspace_separation + editor_separation
+	var max_library_width: float = maxf(body_usable_width - workspace_min_width, 0.0)
+	var library_target_width: float = _fit_panel_width(
+		body_usable_width * 0.22,
+		_visible_min_width(library_panel, LIBRARY_PANEL_MIN_WIDTH),
+		max_library_width,
+		_is_library_panel_collapsed()
+	)
+	body_split.split_offset = int(round(library_target_width - (body_usable_width * 0.5)))
+
+	var workspace_total_width: float = maxf(body_usable_width - library_target_width, 0.0)
 	var workspace_usable_width: float = maxf(workspace_total_width - workspace_separation, 0.0)
-	var editor_target_width: float = maxf(workspace_usable_width - float(panel_width), 0.0)
+	var editor_min_width: float = _visible_min_width(inspector_panel, INSPECTOR_PANEL_MIN_WIDTH) + _visible_min_width(behavior_panel, BEHAVIOR_PANEL_MIN_WIDTH) + editor_separation
+	var max_preview_width: float = maxf(workspace_usable_width - editor_min_width, 0.0)
+	var preview_target_width: float = _fit_panel_width(
+		workspace_usable_width * 0.24,
+		_visible_min_width(preview_panel, PREVIEW_PANEL_MIN_WIDTH),
+		max_preview_width,
+		_is_preview_panel_collapsed()
+	)
+	var editor_target_width: float = maxf(workspace_usable_width - preview_target_width, 0.0)
 	workspace_split.split_offset = int(round(editor_target_width - (workspace_usable_width * 0.5)))
-	editor_split.split_offset = 0
+
+	var editor_usable_width: float = maxf(editor_target_width - editor_separation, 0.0)
+	var behavior_min_width: float = _visible_min_width(behavior_panel, BEHAVIOR_PANEL_MIN_WIDTH)
+	var max_inspector_width: float = maxf(editor_usable_width - behavior_min_width, 0.0)
+	var inspector_target_width: float = _fit_panel_width(
+		editor_usable_width * 0.46,
+		_visible_min_width(inspector_panel, INSPECTOR_PANEL_MIN_WIDTH),
+		max_inspector_width,
+		_is_inspector_panel_collapsed()
+	)
+	editor_split.split_offset = int(round(inspector_target_width - (editor_usable_width * 0.5)))
+
+func _get_available_body_width() -> float:
+	var viewport_width: float = get_viewport_rect().size.x
+	if viewport_width <= 0.0:
+		viewport_width = size.x
+	var body_width: float = body_split.size.x
+	if body_width <= 0.0:
+		body_width = viewport_width - 48.0
+	if viewport_width > 0.0:
+		body_width = minf(body_width, maxf(viewport_width - 48.0, 0.0))
+	return body_width
+
+func _visible_min_width(panel: Control, base_width: int) -> float:
+	if panel == null or not panel.visible:
+		return 0.0
+	return float(_get_responsive_panel_min_width(base_width))
+
+func _fit_panel_width(target_width: float, minimum_width: float, maximum_width: float, collapsed: bool) -> float:
+	if collapsed:
+		return 0.0
+	if maximum_width <= 0.0:
+		return maxf(minimum_width, target_width)
+	return clampf(target_width, minimum_width, maxf(maximum_width, minimum_width))
 
 func _apply_initial_split_widths() -> void:
 	if not initial_split_widths_pending:
@@ -931,6 +1037,9 @@ func _get_option_button_value(option_button: OptionButton) -> Variant:
 func _get_inspector_section_columns(preferred_columns: int = 1) -> int:
 	if preferred_columns <= 1:
 		return 1
+	var panel_width: float = maxf(inspector_panel.size.x, inspector_panel.custom_minimum_size.x)
+	if panel_width < 520.0:
+		return 1
 	return preferred_columns
 
 func _get_behavior_parameter_columns() -> int:
@@ -939,21 +1048,38 @@ func _get_behavior_parameter_columns() -> int:
 		return 2
 	return 1
 
+func _get_library_filter_columns() -> int:
+	var panel_width: float = maxf(library_panel.size.x, library_panel.custom_minimum_size.x)
+	if panel_width >= 360.0:
+		return 3
+	return 2
+
 func _use_compact_inspector_controls() -> bool:
 	return false
 
 func _relax_horizontal_sizing(root: Node) -> void:
 	if root == null:
 		return
+	if root == preview_mount:
+		return
 	for child: Node in root.get_children():
 		_relax_horizontal_sizing(child)
 	if not (root is Control):
 		return
 	var control: Control = root as Control
-	if not (control is Label):
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if control is Label:
+		var label: Label = control as Label
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.clip_text = false
+	elif _should_relax_control_width(control):
 		control.custom_minimum_size.x = 0.0
 	if control is PanelContainer or control is MarginContainer or control is VBoxContainer or control is GridContainer:
 		control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if control is Button:
+		var button: Button = control as Button
+		button.clip_text = false
+		button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	if control is OptionButton:
 		var option_button: OptionButton = control as OptionButton
 		option_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -963,6 +1089,34 @@ func _relax_horizontal_sizing(root: Node) -> void:
 	elif control is SpinBox:
 		var spin_box: SpinBox = control as SpinBox
 		spin_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+func _should_relax_control_width(control: Control) -> bool:
+	return control is PanelContainer \
+		or control is MarginContainer \
+		or control is VBoxContainer \
+		or control is HBoxContainer \
+		or control is GridContainer \
+		or control is ScrollContainer \
+		or control is OptionButton \
+		or control is LineEdit \
+		or control is TextEdit \
+		or control is SpinBox
+
+func _restore_library_preview_sizes() -> void:
+	if library_sections == null:
+		return
+	_restore_library_preview_sizes_recursive(library_sections)
+
+func _restore_library_preview_sizes_recursive(root: Node) -> void:
+	for child: Node in root.get_children():
+		_restore_library_preview_sizes_recursive(child)
+	if root is TextureRect:
+		(root as TextureRect).custom_minimum_size = Vector2(64, 64)
+	elif root is CenterContainer:
+		for child: Node in root.get_children():
+			if child is TextureRect:
+				(root as CenterContainer).custom_minimum_size = Vector2(72, 72)
+				return
 
 func _parse_csv_strings(raw_text: String) -> Array[String]:
 	var values: Array[String] = []

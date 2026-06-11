@@ -168,11 +168,13 @@ static func build_library_card_tile(screen, entry: Dictionary) -> Control:
 	submeta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	text_column.add_child(submeta_label)
 	var art_mount := CenterContainer.new()
+	art_mount.name = "LibraryArtMount"
 	art_mount.custom_minimum_size = Vector2(72, 72)
 	art_mount.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var art_texture := load_library_entry_texture(entry_path)
 	if art_texture != null:
 		var art_preview := TextureRect.new()
+		art_preview.name = "LibraryArtPreview"
 		art_preview.texture = art_texture
 		art_preview.custom_minimum_size = Vector2(64, 64)
 		art_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

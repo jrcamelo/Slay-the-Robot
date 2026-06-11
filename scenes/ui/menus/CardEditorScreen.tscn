@@ -17,12 +17,12 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.99851525
-offset_right = 596.99854
-offset_bottom = 4374.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(0.001484781, 0.001484781)
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
@@ -38,7 +38,7 @@ theme_override_constants/separation = 4
 
 [node name="ScreenTitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100002]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 24
 text = "Card Workshop"
 
 [node name="ScreenSubtitle" type="Label" parent="MainContainer/Header/ScreenSummary" unique_id=100100003]
@@ -62,12 +62,12 @@ theme_override_constants/separation = 12
 [node name="LibraryCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Library: 81"
+text = "Library: 82"
 
 [node name="FilterCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100007]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Visible: 81"
+text = "Visible: 82"
 
 [node name="SelectionCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100008]
 layout_mode = 2
@@ -92,14 +92,13 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="Body" type="HSplitContainer" parent="MainContainer/Header" unique_id=1455812041]
-custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(-303, 1248, 620)
-split_offset = -303
+split_offsets = PackedInt32Array(-465, 1248, 620)
+split_offset = -465
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(162, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -134,6 +133,7 @@ text = "Clear"
 
 [node name="FilterGrid" type="GridContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=70704918]
 layout_mode = 2
+columns = 2
 
 [node name="SourceFilter" type="OptionButton" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/FilterGrid" unique_id=188047745]
 layout_mode = 2
@@ -217,7 +217,9 @@ popup/item_4/id = 4
 
 [node name="LibraryScroll" type="ScrollContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox" unique_id=1396609044]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
+follow_focus = true
 
 [node name="LibrarySections" type="VBoxContainer" parent="MainContainer/Header/Body/LibraryPanel/LibraryPadding/LibraryVBox/LibraryScroll" unique_id=408163944]
 layout_mode = 2
@@ -228,8 +230,8 @@ theme_override_constants/separation = 10
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-split_offsets = PackedInt32Array(152, 620)
-split_offset = 152
+split_offsets = PackedInt32Array(232, 620)
+split_offset = 232
 
 [node name="EditorHostPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=100100016]
 layout_mode = 2
@@ -250,7 +252,7 @@ size_flags_vertical = 3
 split_offsets = PackedInt32Array(0, 620)
 
 [node name="InspectorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=828682295]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(162, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -273,7 +275,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="InspectorContent" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/InspectorPanel/InspectorPadding/InspectorVBox/InspectorScroll" unique_id=701180321]
 layout_mode = 2
@@ -281,7 +282,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="BehaviorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=100100012]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(162, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -304,7 +305,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="BehaviorContent" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit/BehaviorPanel/BehaviorPadding/BehaviorVBox/BehaviorScroll" unique_id=1979327880]
 layout_mode = 2
@@ -313,7 +313,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=415001899]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(162, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -336,21 +336,21 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="SaveTriageButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001002]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 10
 text = "Save To Triage"
 
 [node name="PromoteButton" type="Button" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox/SaveActions" unique_id=190001003]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 10
 text = "Promote To Content"
 
 [node name="PreviewMount" type="CenterContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=839440947]
-custom_minimum_size = Vector2(160, 220)
+custom_minimum_size = Vector2(280, 320)
 layout_mode = 2
 
 [node name="SessionSummary" type="VBoxContainer" parent="MainContainer/Header/Body/WorkspaceSplit/PreviewPanel/PreviewPadding/PreviewVBox" unique_id=1017348166]

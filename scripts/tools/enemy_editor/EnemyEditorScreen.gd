@@ -16,16 +16,23 @@ const ENEMY_HORIZONTAL_RATIO := 0.62
 const ENEMY_CONTENT_VERTICAL_OFFSET := -52.0
 const ENEMY_CONTAINER_FALLBACK_SIZE := Vector2(608, 192)
 const PARTY_CONTAINER_FALLBACK_SIZE := Vector2(480, 160)
-const ENEMY_EDITOR_FIT_WIDTH := 1550.0
-
+const RESPONSIVE_DESIGN_WIDTH := 2548.0
+const RESPONSIVE_SCREEN_MARGIN := 48.0
+const MIN_LEFT_PANEL_WIDTH := 150
+const MIN_CENTER_PANEL_WIDTH := 180
+const MIN_RIGHT_PANEL_WIDTH := 160
 @onready var title_screen: Control = get_parent() as Control
-@onready var main_margin: MarginContainer = $MainMargin
 @onready var header: Control = $MainMargin/RootVBox/Header
 @onready var body_split: HSplitContainer = $MainMargin/RootVBox/BodySplit
 @onready var workspace_split: HSplitContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit
 @onready var left_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/LeftPanel
 @onready var center_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel
 @onready var right_panel: PanelContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel
+@onready var left_vbox: VBoxContainer = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox
+@onready var library_scroll: ScrollContainer = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/LibraryScroll
+@onready var navigator_scroll: ScrollContainer = $MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/NavigatorScroll
+@onready var center_scroll: ScrollContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel/CenterMargin/CenterScroll
+@onready var right_scroll: ScrollContainer = $MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel/RightMargin/RightScroll
 @onready var status_label: Label = $MainMargin/RootVBox/Header/StatusLabel
 @onready var stats_label: Label = $MainMargin/RootVBox/Header/StatsLabel
 @onready var back_button: Button = $MainMargin/RootVBox/Header/ButtonRow/BackButton
@@ -84,8 +91,8 @@ func _ready() -> void:
 	right_panel.resized.connect(_layout_battle_simulation_containers)
 	_populate_filters()
 	_apply_compact_font_sizes(self)
+	_configure_panel_scrolls()
 	_apply_responsive_density()
-	_apply_screen_fit_scale()
 	if not _is_embedded_in_title_screen():
 		show_editor()
 
@@ -96,7 +103,6 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible:
 		_end_simulation_context()
 	elif what == NOTIFICATION_RESIZED:
-		_apply_screen_fit_scale()
 		_apply_responsive_density()
 		_layout_battle_simulation_containers()
 
@@ -120,20 +126,8 @@ func show_editor() -> void:
 		current_session = service.create_blank_session()
 		_select_default_navigation_targets()
 	_set_status("Started a new enemy triage draft. Use the library or shape the stages directly.", "info")
-	_apply_screen_fit_scale()
 	_apply_responsive_density()
 	_render_all()
-
-func _apply_screen_fit_scale() -> void:
-	if main_margin == null:
-		return
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0:
-		return
-	var content_width: float = maxf(main_margin.size.x, ENEMY_EDITOR_FIT_WIDTH)
-	var fit_scale: float = minf(1.0, viewport_size.x / content_width)
-	main_margin.scale = Vector2.ONE * fit_scale
-	main_margin.position = Vector2((viewport_size.x - (main_margin.size.x * fit_scale)) * 0.5, 0.0)
 
 func _populate_filters() -> void:
 	_populate_option_button(source_filter, [
@@ -187,6 +181,8 @@ func _render_all() -> void:
 	_apply_control_padding(self)
 	duplicate_button.disabled = current_session == null
 	_update_save_buttons()
+	_apply_responsive_density()
+	call_deferred("_layout_battle_simulation_containers")
 
 func _render_library() -> void:
 	_clear_children(library_list)
@@ -501,13 +497,26 @@ func _free_children_immediately(node: Node) -> void:
 		child.free()
 
 func _layout_battle_simulation_containers() -> void:
+	if Engine.is_editor_hint():
+		return
 	if not is_instance_valid(enemy_container) or not is_instance_valid(party_container) or not visible:
 		return
+	if right_panel == null:
+		enemy_container.visible = false
+		party_container.visible = false
+		return
 	var right_rect: Rect2 = right_panel.get_global_rect()
+	if right_rect.size.x <= 0.0 or right_rect.size.y <= 0.0:
+		enemy_container.visible = false
+		party_container.visible = false
+		return
+	enemy_container.visible = true
+	party_container.visible = true
 	var header_rect: Rect2 = header.get_global_rect()
 	var body_rect: Rect2 = body_split.get_global_rect()
 	var scale_factor: float = _get_responsive_scale()
-	var simulation_scale: float = clampf(scale_factor * 0.95, 0.68, 1.0)
+	var width_scale: float = clampf(right_rect.size.x / 360.0, 0.35, 1.0)
+	var simulation_scale: float = clampf(minf(scale_factor * 0.95, width_scale), 0.35, 1.0)
 	enemy_container.scale = Vector2(0.6, 0.6) * simulation_scale
 	party_container.scale = Vector2(0.48, 0.48) * simulation_scale
 	var enemy_size: Vector2 = enemy_container.size
@@ -523,13 +532,27 @@ func _layout_battle_simulation_containers() -> void:
 	var minimum_enemy_top: float = header_rect.position.y + SIMULATION_TOP_MARGIN
 	if enemy_top_y < minimum_enemy_top:
 		enemy_top_y = minimum_enemy_top
-	var enemy_left_x: float = right_rect.position.x + (right_rect.size.x * ENEMY_HORIZONTAL_RATIO)
+	var viewport_width: float = get_viewport_rect().size.x
+	if viewport_width <= 0.0:
+		viewport_width = right_rect.end.x
+	var safe_left: float = right_rect.position.x + 4.0
+	var safe_right: float = maxf(safe_left, viewport_width - SIMULATION_SIDE_MARGIN)
+	var enemy_left_x: float = clampf(
+		right_rect.position.x + (right_rect.size.x * ENEMY_HORIZONTAL_RATIO),
+		safe_left,
+		maxf(safe_left, safe_right - enemy_scaled_size.x)
+	)
 	var enemy_global_position := Vector2(
 		enemy_left_x,
 		enemy_top_y
 	)
-	var party_global_position := Vector2(
+	var party_left_x: float = clampf(
 		right_rect.position.x + SIMULATION_SIDE_MARGIN,
+		safe_left,
+		maxf(safe_left, safe_right - party_scaled_size.x)
+	)
+	var party_global_position := Vector2(
+		party_left_x,
 		party_top_y
 	)
 
@@ -1455,7 +1478,7 @@ func _add_two_column_fields(parent: VBoxContainer) -> GridContainer:
 
 func _add_three_column_fields(parent: VBoxContainer) -> GridContainer:
 	var grid := GridContainer.new()
-	grid.columns = 3
+	grid.columns = _resolved_multi_column_count(parent, 3)
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 8)
@@ -1505,6 +1528,9 @@ func _load_library_entry_texture(resource_path: String) -> Texture2D:
 	return FileLoader.load_texture(texture_path)
 
 func _resolved_form_columns(context: Control) -> int:
+	return _resolved_multi_column_count(context, 2)
+
+func _resolved_multi_column_count(context: Control, preferred_columns: int) -> int:
 	var is_preview_context: bool = preview_content != null and (context == preview_content or preview_content.is_ancestor_of(context))
 	var is_left_context: bool = navigator_content != null and (context == navigator_content or navigator_content.is_ancestor_of(context))
 	var width_source: Control = preview_content if is_preview_context else navigator_content if is_left_context else editor_content
@@ -1513,7 +1539,11 @@ func _resolved_form_columns(context: Control) -> int:
 	var available_width: float = width_source.size.x
 	if available_width <= 0.0 and width_source.get_parent() is Control:
 		available_width = (width_source.get_parent() as Control).size.x
-	return 2 if available_width >= TWO_COLUMN_MIN_WIDTH else 1
+	if preferred_columns >= 3 and available_width >= TWO_COLUMN_MIN_WIDTH * 1.4:
+		return 3
+	if preferred_columns >= 2 and available_width >= TWO_COLUMN_MIN_WIDTH:
+		return 2
+	return 1
 
 func _on_form_layout_resized() -> void:
 	if current_session == null:
@@ -1928,26 +1958,42 @@ func _clear_children(node: Node) -> void:
 func _get_responsive_scale() -> float:
 	if body_split == null:
 		return 1.0
-	var width: float = maxf(size.x, body_split.size.x)
+	var width: float = get_viewport_rect().size.x
+	if width <= 0.0:
+		width = size.x
 	if width <= 0.0:
 		return 1.0
-	return clampf(width / 2548.0, 0.70, 1.0)
+	return clampf(width / RESPONSIVE_DESIGN_WIDTH, 0.50, 1.0)
 
 func _get_responsive_font_size(base_size: int) -> int:
-	return max(11, int(round(float(base_size) * _get_responsive_scale())))
+	return maxi(10, int(round(float(base_size) * _get_responsive_scale())))
 
 func _get_responsive_panel_min_width(base_width: int, minimum_width: int) -> int:
-	return max(minimum_width, int(round(float(base_width) * _get_responsive_scale())))
+	return maxi(minimum_width, int(round(float(base_width) * _get_responsive_scale())))
 
 func _apply_responsive_density() -> void:
+	if Engine.is_editor_hint():
+		return
 	if left_panel == null or center_panel == null or right_panel == null:
 		return
 	var scale_factor: float = _get_responsive_scale()
 	var is_compact: bool = scale_factor < 0.82
 	var is_tight: bool = scale_factor < 0.9
-	left_panel.custom_minimum_size.x = _get_responsive_panel_min_width(300, 220)
-	center_panel.custom_minimum_size.x = _get_responsive_panel_min_width(360, 300)
-	right_panel.custom_minimum_size.x = _get_responsive_panel_min_width(320, 220)
+	body_split.custom_minimum_size.x = 0.0
+	body_split.custom_minimum_size.y = 0.0
+	workspace_split.custom_minimum_size.x = 0.0
+	right_panel.visible = true
+	_relax_horizontal_sizing(left_panel)
+	_relax_horizontal_sizing(center_panel)
+	_relax_horizontal_sizing(right_panel)
+	left_panel.custom_minimum_size.x = _get_responsive_panel_min_width(300, MIN_LEFT_PANEL_WIDTH)
+	center_panel.custom_minimum_size.x = _get_responsive_panel_min_width(360, MIN_CENTER_PANEL_WIDTH)
+	right_panel.custom_minimum_size.x = _get_responsive_panel_min_width(320, MIN_RIGHT_PANEL_WIDTH)
+	_relax_horizontal_sizing(navigator_content)
+	_relax_horizontal_sizing(editor_content)
+	_relax_horizontal_sizing(preview_content)
+	_configure_panel_scrolls()
+	_apply_responsive_control_density(self, scale_factor)
 	if editor_theme != null:
 		var body_font_size: int = _get_responsive_font_size(BODY_FONT_SIZE)
 		editor_theme.set_font_size("font_size", "Label", body_font_size)
@@ -1964,14 +2010,111 @@ func _apply_responsive_density() -> void:
 	promote_button.add_theme_font_size_override("font_size", _get_responsive_font_size(18))
 	save_triage_button.custom_minimum_size.y = 36.0 if is_compact else 40.0 if is_tight else 44.0
 	promote_button.custom_minimum_size.y = 36.0 if is_compact else 40.0 if is_tight else 44.0
-	if body_split.size.x > 0.0:
-		var body_usable_width: float = maxf(body_split.size.x - float(body_split.get_theme_constant("separation")), 0.0)
-		var left_width: float = clampf(body_usable_width * (0.27 if is_compact else 0.29), float(left_panel.custom_minimum_size.x), 340.0)
-		body_split.split_offset = int(round(left_width - (body_usable_width * 0.5)))
-	if workspace_split.size.x > 0.0:
-		var workspace_usable_width: float = maxf(workspace_split.size.x - float(workspace_split.get_theme_constant("separation")), 0.0)
-		var center_width: float = clampf(workspace_usable_width * (0.56 if is_compact else 0.54), float(center_panel.custom_minimum_size.x), maxf(workspace_usable_width - float(right_panel.custom_minimum_size.x), float(center_panel.custom_minimum_size.x)))
-		workspace_split.split_offset = int(round(center_width - (workspace_usable_width * 0.5)))
+	_apply_enemy_split_widths()
+
+func _apply_responsive_control_density(root: Node, scale_factor: float) -> void:
+	if root == null:
+		return
+	if root == enemy_container or root == party_container:
+		return
+	for child: Node in root.get_children():
+		_apply_responsive_control_density(child, scale_factor)
+	if not (root is Control):
+		return
+	var control: Control = root as Control
+	var body_font_size: int = maxi(10, int(round(float(BODY_FONT_SIZE) * scale_factor)))
+	if control is Label:
+		var label: Label = control as Label
+		label.add_theme_font_size_override("font_size", body_font_size)
+	elif control is Button:
+		var button: Button = control as Button
+		button.add_theme_font_size_override("font_size", body_font_size)
+	elif control is OptionButton:
+		(control as OptionButton).add_theme_font_size_override("font_size", body_font_size)
+	elif control is LineEdit:
+		(control as LineEdit).add_theme_font_size_override("font_size", body_font_size)
+	elif control is TextEdit:
+		(control as TextEdit).add_theme_font_size_override("font_size", body_font_size)
+	elif control is SpinBox:
+		(control as SpinBox).add_theme_font_size_override("font_size", body_font_size)
+
+func _configure_panel_scrolls() -> void:
+	for scroll_node: Variant in [library_scroll, navigator_scroll, center_scroll, right_scroll]:
+		var scroll: ScrollContainer = scroll_node as ScrollContainer
+		if scroll == null:
+			continue
+		scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		scroll.follow_focus = true
+
+func _apply_enemy_split_widths() -> void:
+	if body_split == null or workspace_split == null:
+		return
+	var viewport_width: float = get_viewport_rect().size.x
+	if viewport_width <= 0.0:
+		viewport_width = size.x
+	var body_width: float = body_split.size.x
+	if body_width <= 0.0:
+		body_width = viewport_width - RESPONSIVE_SCREEN_MARGIN
+	if viewport_width > 0.0:
+		body_width = minf(body_width, maxf(viewport_width - RESPONSIVE_SCREEN_MARGIN, 0.0))
+	if body_width <= 0.0:
+		return
+	var body_separation: float = float(body_split.get_theme_constant("separation"))
+	var workspace_separation: float = float(workspace_split.get_theme_constant("separation"))
+	var body_usable_width: float = maxf(body_width - body_separation, 0.0)
+	var workspace_min_width: float = float(center_panel.custom_minimum_size.x + right_panel.custom_minimum_size.x) + workspace_separation
+	var left_max_width: float = maxf(body_usable_width - workspace_min_width, float(left_panel.custom_minimum_size.x))
+	var left_width: float = clampf(body_usable_width * 0.24, float(left_panel.custom_minimum_size.x), left_max_width)
+	body_split.split_offset = int(round(left_width - (body_usable_width * 0.5)))
+
+	var workspace_width: float = maxf(body_usable_width - left_width, 0.0)
+	var workspace_usable_width: float = maxf(workspace_width - workspace_separation, 0.0)
+	var right_min_width: float = float(right_panel.custom_minimum_size.x)
+	var center_max_width: float = maxf(workspace_usable_width - right_min_width, float(center_panel.custom_minimum_size.x))
+	var center_width: float = clampf(workspace_usable_width * 0.58, float(center_panel.custom_minimum_size.x), center_max_width)
+	workspace_split.split_offset = int(round(center_width - (workspace_usable_width * 0.5)))
+
+func _relax_horizontal_sizing(root: Node) -> void:
+	if root == null:
+		return
+	for child: Node in root.get_children():
+		_relax_horizontal_sizing(child)
+	if not (root is Control):
+		return
+	var control: Control = root as Control
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if control is Label:
+		var label: Label = control as Label
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.clip_text = false
+	elif _should_relax_control_width(control):
+		control.custom_minimum_size.x = 0.0
+	if control is PanelContainer or control is MarginContainer or control is VBoxContainer or control is GridContainer:
+		control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if control is Button:
+		var button: Button = control as Button
+		button.clip_text = false
+		button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	if control is OptionButton:
+		(control as OptionButton).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	elif control is LineEdit:
+		(control as LineEdit).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	elif control is SpinBox:
+		(control as SpinBox).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+func _should_relax_control_width(control: Control) -> bool:
+	return control is PanelContainer \
+		or control is MarginContainer \
+		or control is VBoxContainer \
+		or control is HBoxContainer \
+		or control is GridContainer \
+		or control is ScrollContainer \
+		or control is OptionButton \
+		or control is LineEdit \
+		or control is TextEdit \
+		or control is SpinBox
 
 func _set_controls_disabled(root: Node, disabled: bool) -> void:
 	if root is BaseButton:

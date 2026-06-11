@@ -274,12 +274,12 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.9987097
-offset_right = -23.001343
-offset_bottom = 676.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(0.0012903226, 0.0012903226)
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -343,7 +343,6 @@ text = "Library: 12 | Visible: 12 | Base stages: 1 | Reactive: 0 | Errors: 0 | W
 autowrap_mode = 2
 
 [node name="BodySplit" type="HSplitContainer" parent="MainMargin/RootVBox" unique_id=1502138836]
-custom_minimum_size = Vector2(0, 620)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -563,11 +562,11 @@ anchor_left = 0.022000002
 anchor_top = 0.42100003
 anchor_right = 0.022000002
 anchor_bottom = 0.42100003
-offset_left = -77.30193
-offset_top = -358.7537
-offset_right = -77.30193
-offset_bottom = -358.7537
-scale = Vector2(0.32639998, 0.32639998)
+offset_left = 789.6
+offset_top = -282.5
+offset_right = 789.6
+offset_bottom = -282.5
+scale = Vector2(0.48, 0.48)
 script = ExtResource("2_e1ftq")
 
 [node name="AutomaticPartyContainer" type="HBoxContainer" parent="PartyContainer" unique_id=513761134]
@@ -575,11 +574,11 @@ layout_mode = 0
 
 [node name="EnemyContainer" type="Control" parent="." unique_id=1347043953]
 anchors_preset = 0
-offset_left = -68.53713
-offset_top = 12.012903
-offset_right = 539.4629
-offset_bottom = 204.01291
-scale = Vector2(0.40800002, 0.40800002)
+offset_left = 1085.68
+offset_top = -9.0
+offset_right = 1693.68
+offset_bottom = 183.0
+scale = Vector2(0.6, 0.6)
 mouse_filter = 2
 script = ExtResource("2_xto7d")
 metadata/_edit_group_ = true
