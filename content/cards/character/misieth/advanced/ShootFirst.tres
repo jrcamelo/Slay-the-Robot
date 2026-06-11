@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dxnc2m7o5ul3u"]
+
+[ext_resource type="Script" uid="uid://dltjjucvc8hxe" path="res://data/prototype/CardData.gd" id="1_sk86o"]
+
+[resource]
+script = ExtResource("1_sk86o")
+card_name = "Shoot First"
+card_description = "Attack for [damage]."
+card_texture_path = "external/sprites/cards/red/card_purple.png"
+card_color_id = "color_red"
+card_rarity = 0
+card_appears_in_card_packs = false
+card_values = {
+"damage": 12,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5
+})
+object_id = "attack_with_conditional_draw_card"

@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cort4748dpv2"
-path="res://.godot/imported/halfblink.png-97e45ace988218113ccafd3c098bd7a3.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/halfblink.png"
-dest_files=["res://.godot/imported/halfblink.png-97e45ace988218113ccafd3c098bd7a3.ctex"]
 
 [params]
 

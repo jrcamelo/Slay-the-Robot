@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://docwjwq0pry47"
-path="res://.godot/imported/head.PNG-7ec51d6e7d2be277c40130ec7f0d9ce0.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/head.PNG"
-dest_files=["res://.godot/imported/head.PNG-7ec51d6e7d2be277c40130ec7f0d9ce0.ctex"]
 
 [params]
 

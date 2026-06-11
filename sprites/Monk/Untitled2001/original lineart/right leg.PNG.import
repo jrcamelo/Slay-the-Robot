@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dhwj57tui7ocb"
-path="res://.godot/imported/right leg.PNG-8a1f1b63ccafda2e5762b9e79821bf87.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/right leg.PNG"
-dest_files=["res://.godot/imported/right leg.PNG-8a1f1b63ccafda2e5762b9e79821bf87.ctex"]
 
 [params]
 

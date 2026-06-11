@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b3hf8panbn7we"
-path="res://.godot/imported/hairtail.PNG-96e43511926b227824e3acf33ed1c171.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/hairtail.PNG"
-dest_files=["res://.godot/imported/hairtail.PNG-96e43511926b227824e3acf33ed1c171.ctex"]
 
 [params]
 

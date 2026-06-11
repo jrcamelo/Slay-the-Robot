@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dohs16o3hd7lu"
-path="res://.godot/imported/right thigh.PNG-2bcfaee8b8e1fc727a3ed8aa74f6ab5f.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/right thigh.PNG"
-dest_files=["res://.godot/imported/right thigh.PNG-2bcfaee8b8e1fc727a3ed8aa74f6ab5f.ctex"]
 
 [params]
 

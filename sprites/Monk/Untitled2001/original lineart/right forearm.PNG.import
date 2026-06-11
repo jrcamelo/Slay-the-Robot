@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6a2p2l80r2te"
-path="res://.godot/imported/right forearm.PNG-57316a25eb1678b0b404137bdf9c9437.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/right forearm.PNG"
-dest_files=["res://.godot/imported/right forearm.PNG-57316a25eb1678b0b404137bdf9c9437.ctex"]
 
 [params]
 

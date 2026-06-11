@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dkicly82pl4ba"
-path="res://.godot/imported/left foot.PNG-334d577300aff4072156f869e514adad.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/left foot.PNG"
-dest_files=["res://.godot/imported/left foot.PNG-334d577300aff4072156f869e514adad.ctex"]
 
 [params]
 

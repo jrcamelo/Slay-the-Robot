@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dfex12846lsxc"
-path="res://.godot/imported/hips.PNG-6d3fdc14f2993c9bebe71c21c8522ff9.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/hips.PNG"
-dest_files=["res://.godot/imported/hips.PNG-6d3fdc14f2993c9bebe71c21c8522ff9.ctex"]
 
 [params]
 

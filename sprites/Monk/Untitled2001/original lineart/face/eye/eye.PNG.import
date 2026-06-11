@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bns6fgkrw0oso"
-path="res://.godot/imported/eye.PNG-0d887bda4b454f08920d120c63aa744f.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/face/eye/eye.PNG"
-dest_files=["res://.godot/imported/eye.PNG-0d887bda4b454f08920d120c63aa744f.ctex"]
 
 [params]
 

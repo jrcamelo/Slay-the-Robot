@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://omc1bmdy4f75"
-path="res://.godot/imported/openeye.png-25aecfde461ca72b159741c6e2593088.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/openeye.png"
-dest_files=["res://.godot/imported/openeye.png-25aecfde461ca72b159741c6e2593088.ctex"]
 
 [params]
 

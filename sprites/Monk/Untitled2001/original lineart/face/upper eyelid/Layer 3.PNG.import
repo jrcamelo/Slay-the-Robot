@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bualu7o2d4ghc"
-path="res://.godot/imported/Layer 3.PNG-ad594bdf11e56d4a62bfa32da2f972b9.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/face/upper eyelid/Layer 3.PNG"
-dest_files=["res://.godot/imported/Layer 3.PNG-ad594bdf11e56d4a62bfa32da2f972b9.ctex"]
 
 [params]
 

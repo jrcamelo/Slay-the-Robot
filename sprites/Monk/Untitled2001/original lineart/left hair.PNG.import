@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d1oyj81x0yl0t"
-path="res://.godot/imported/left hair.PNG-8f780b0dd553d52103a45db97b330ea0.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/left hair.PNG"
-dest_files=["res://.godot/imported/left hair.PNG-8f780b0dd553d52103a45db97b330ea0.ctex"]
 
 [params]
 

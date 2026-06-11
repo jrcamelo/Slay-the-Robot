@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwuygn6ohasgd"
-path="res://.godot/imported/right upper arm.PNG-678c005ad2cf6f57aa1c7af1d5edf72c.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/right upper arm.PNG"
-dest_files=["res://.godot/imported/right upper arm.PNG-678c005ad2cf6f57aa1c7af1d5edf72c.ctex"]
 
 [params]
 

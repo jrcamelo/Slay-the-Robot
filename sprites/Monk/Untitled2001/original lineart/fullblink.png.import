@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ccp12hhtyi1vm"
-path="res://.godot/imported/fullblink.png-76929521a334166b8f1d877806a3403e.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/fullblink.png"
-dest_files=["res://.godot/imported/fullblink.png-76929521a334166b8f1d877806a3403e.ctex"]
 
 [params]
 

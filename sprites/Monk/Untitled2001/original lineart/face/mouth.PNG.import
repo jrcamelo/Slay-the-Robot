@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cdhvxqlv02006"
-path="res://.godot/imported/mouth.PNG-f350024067cabb37ad12442c9358bf74.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://sprites/Monk/Untitled2001/original lineart/face/mouth.PNG"
-dest_files=["res://.godot/imported/mouth.PNG-f350024067cabb37ad12442c9358bf74.ctex"]
 
 [params]
 
