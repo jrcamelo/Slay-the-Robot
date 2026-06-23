@@ -21,3 +21,8 @@ external/mods/*
 *.exe
 *.rar
 *.lnk
+
+# Card editor web tool
+tools/card-editor-web/node_modules/
+tools/card-editor-web/dist/
+tools/card-editor-web/*.log
