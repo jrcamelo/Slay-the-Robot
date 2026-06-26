@@ -303,7 +303,91 @@ func unpause_game() -> void:
 
 ## Gets the BaseCombatant representing the player character
 func get_player() -> Player:
-	return Global.get_tree().get_first_node_in_group("players")
+	var players: Array[Player] = get_players()
+	if len(players) == 0:
+		return null
+	return players[0]
+
+func get_players() -> Array[Player]:
+	var players: Array[Player] = []
+	for node in Global.get_tree().get_nodes_in_group("players"):
+		if node is Player:
+			players.append(node)
+	return players
+
+func get_living_players() -> Array[Player]:
+	var living_players: Array[Player] = []
+	for player: Player in get_players():
+		if player.is_alive():
+			living_players.append(player)
+	return living_players
+
+func get_enemies() -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	for node in Global.get_tree().get_nodes_in_group("enemies"):
+		if node is Enemy:
+			enemies.append(node)
+	return enemies
+
+func get_living_enemies() -> Array[Enemy]:
+	var living_enemies: Array[Enemy] = []
+	for enemy: Enemy in get_enemies():
+		if enemy.is_alive():
+			living_enemies.append(enemy)
+	return living_enemies
+
+func get_primary_living_player() -> Player:
+	var living_players: Array[Player] = get_living_players()
+	if len(living_players) == 0:
+		return null
+	return living_players[0]
+
+func get_default_player_combatant(allow_dead_fallback: bool = true) -> Player:
+	var player: Player = get_primary_living_player()
+	if player != null:
+		return player
+	if allow_dead_fallback:
+		return get_player()
+	return null
+
+func get_player_by_party_index(party_index: int) -> Player:
+	for player: Player in get_players():
+		if player.has_method("get_party_member_index") and player.get_party_member_index() == party_index:
+			return player
+	# TODO: Once combat instantiates one Player node per ally, remove this fallback.
+	if party_index == 0:
+		return get_player()
+	return null
+
+func get_card_owner_player(card_data: CardData) -> Player:
+	if card_data != null and card_data.card_owner_party_index >= 0:
+		var owner_player: Player = get_player_by_party_index(card_data.card_owner_party_index)
+		if owner_player != null:
+			return owner_player
+	return get_player()
+
+func get_party_member_for_combatant(combatant: BaseCombatant) -> PartyMemberData:
+	if not player_data.has_party_members():
+		return null
+	if combatant is Player:
+		return combatant.get_party_member_data()
+	return null
+
+func get_context_party_member(card_data: CardData = null, combatant: BaseCombatant = null, action: BaseAction = null) -> PartyMemberData:
+	if not player_data.has_party_members():
+		return null
+	if action != null:
+		var action_party_member: PartyMemberData = get_party_member_for_combatant(action.parent_combatant)
+		if action_party_member != null:
+			return action_party_member
+		if action.card_play_request != null and action.card_play_request.card_data != null:
+			return player_data.get_party_member_for_card(action.card_play_request.card_data)
+	var combatant_party_member: PartyMemberData = get_party_member_for_combatant(combatant)
+	if combatant_party_member != null:
+		return combatant_party_member
+	if card_data != null:
+		return player_data.get_party_member_for_card(card_data)
+	return player_data.get_primary_party_member()
 
 #region Combat Stats
 func get_combat_stats() -> CombatStatsData:
@@ -1287,6 +1371,30 @@ func add_test_action_interceptors() -> void:
 	interceptor_negate_debuff.action_intercepted_action_paths = [Scripts.ACTION_APPLY_STATUS]
 	
 	register_rod(interceptor_negate_debuff)
+
+	var interceptor_evasion: ActionInterceptorData = ActionInterceptorData.new("interceptor_evasion")
+	interceptor_evasion.action_interceptor_priority = 11000
+	interceptor_evasion.action_interceptor_modifies_parent = false
+	interceptor_evasion.action_interceptor_script = load(Scripts.INTERCEPTOR_EVASION)
+	interceptor_evasion.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
+
+	register_rod(interceptor_evasion)
+
+	var interceptor_burn_shield_half: ActionInterceptorData = ActionInterceptorData.new("interceptor_burn_shield_half")
+	interceptor_burn_shield_half.action_interceptor_priority = 10000
+	interceptor_burn_shield_half.action_interceptor_modifies_parent = false
+	interceptor_burn_shield_half.action_interceptor_script = load(Scripts.INTERCEPTOR_BURN_SHIELD_HALF)
+	interceptor_burn_shield_half.action_intercepted_action_paths = [Scripts.ACTION_BLOCK]
+
+	register_rod(interceptor_burn_shield_half)
+
+	var interceptor_burn_poise_restore: ActionInterceptorData = ActionInterceptorData.new("interceptor_burn_poise_restore")
+	interceptor_burn_poise_restore.action_interceptor_priority = 10000
+	interceptor_burn_poise_restore.action_interceptor_modifies_parent = false
+	interceptor_burn_poise_restore.action_interceptor_script = load(Scripts.INTERCEPTOR_BURN_POISE_RESTORE)
+	interceptor_burn_poise_restore.action_intercepted_action_paths = [Scripts.ACTION_RESTORE_ENEMY_POISE]
+
+	register_rod(interceptor_burn_poise_restore)
 	
 	# duplicates incoming card plays
 	var interceptor_duplicate_card_plays: ActionInterceptorData = ActionInterceptorData.new("interceptor_duplicate_card_plays")

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_cyeql"]
+[ext_resource type="Resource" path="res://content/cards/character/purple/standard/RetainBlock.tres" id="2_cyeql"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/RandomizeCardCost.tres" id="3_hp1i7"]
+[ext_resource type="Resource" path="res://content/cards/character/green/standard/Corrosion.tres" id="4_bytl1"]
+[ext_resource type="Resource" path="res://content/cards/generic/advanced/EndTurn.tres" id="5_h5rlf"]
+[ext_resource type="Resource" path="res://content/cards/generic/advanced/AddHealth.tres" id="6_04vkq"]
+[ext_resource type="Resource" path="res://content/cards/character/red/advanced/TransformHand.tres" id="7_i7bd0"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/ReshuffleAndDraw.tres" id="8_2qsde"]
+[ext_resource type="Resource" path="res://content/cards/character/red/standard/DuplicateAtttacks.tres" id="9_er4p8"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/HealingAttack.tres" id="10_dhbr8"]
+[ext_resource type="Resource" path="res://content/cards/character/blue/standard/RngAttack.tres" id="11_i4e7g"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="12_pbxe7"]
+
+[resource]
+script = ExtResource("12_pbxe7")
+cards = Array[ExtResource("1_cyeql")]([ExtResource("2_cyeql"), ExtResource("3_hp1i7"), ExtResource("4_bytl1"), ExtResource("5_h5rlf"), ExtResource("6_04vkq"), ExtResource("7_i7bd0"), ExtResource("8_2qsde"), ExtResource("9_er4p8"), ExtResource("10_dhbr8"), ExtResource("11_i4e7g")])

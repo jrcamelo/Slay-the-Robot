@@ -2,6 +2,8 @@
 extends BaseCombatant
 class_name Player
 
+const STATUS_BARRIER: String = "status_effect_barrier"
+
 @onready var incoming_damage: Control = $Visible/IncomingDamage
 @onready var incoming_damage_amount_text: Label = $Visible/IncomingDamage/IncomingDamageAmount
 
@@ -26,6 +28,16 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 	var bypassed_damage: int = _damage # raw unblocked damage
 	var bypassed_damage_capped: int = 0 # damage done that does not factor in overkill damage
 	var overkill_damage: int = 0 # damage done past 0
+	var blocked_by_barrier: int = 0
+	var current_barrier: int = get_shared_status_total(STATUS_BARRIER)
+	if current_barrier > 0 and _damage > 0:
+		blocked_by_barrier = min(current_barrier, _damage)
+		if blocked_by_barrier > 0:
+			Signals.combatant_blocked.emit(self, blocked_by_barrier)
+			create_block_text()
+	var remaining_damage: int = _damage - blocked_by_barrier
+	var current_block: int = get_block()
+	var current_health: int = _get_health()
 
 	if player_data.player_block > 0 and not bypass_block:
 		if player_data.player_block > _damage:
@@ -45,6 +57,10 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 	
 	if bypassed_damage <= 0:
 		return [0,0,0]
+
+	if current_health > 0 and bypassed_damage >= current_health and get_status_charges("status_effect_grit") > 0:
+		bypassed_damage = max(0, current_health - 1)
+		remove_status("status_effect_grit", 1)
 	
 	create_damage_text(bypassed_damage)
 	overkill_damage = max(0, bypassed_damage - player_data.player_health)
@@ -57,11 +73,22 @@ func damage(_damage: int, bypass_block: bool = false) -> Array[int]:
 	return [bypassed_damage, bypassed_damage_capped, overkill_damage]
 
 func set_block(amount: int) -> void:
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		party_member_data.party_member_block = max(0, amount)
+		_sync_primary_member_state_if_needed()
+		block.visible = party_member_data.party_member_block > 0
+		block_amount.text = str(party_member_data.party_member_block)
+		if not _is_syncing_status_state:
+			sync_shield_status_from_block()
+		return
 	Global.player_data.player_block = amount
 	Global.player_data.player_block = max(0, Global.player_data.player_block)
 	
 	block.visible = Global.player_data.player_block > 0
 	block_amount.text = str(Global.player_data.player_block)
+	if not _is_syncing_status_state:
+		sync_shield_status_from_block()
 
 func get_block() -> int:
 	return 	Global.player_data.player_block
@@ -112,6 +139,11 @@ func create_artifact_fade(artifact_id: String) -> void:
 	var artifact_fade: ArtifactFade = Scenes.ARTIFACT_FADE.instantiate()
 	fade_container.add_child(artifact_fade)
 	artifact_fade.init(artifact_id)
+
+func _update_barrier_display() -> void:
+	var held_barrier: int = max(0, get_status_charges(STATUS_BARRIER))
+	barrier.visible = held_barrier > 0
+	barrier_amount.text = str(held_barrier)
 
 ### Run Modifiers
 
@@ -169,7 +201,13 @@ func _on_enemy_death_animation_finished(_enemy: Enemy):
 
 func _on_player_health_changed():
 	update_health_bar(true)
-	if Global.player_data.player_health <= 0:
+	if is_alive():
+		_death_reported = false
+		return
+	if not _death_reported:
+		_death_reported = true
+		if get_status_charges(STATUS_BARRIER) > 0:
+			remove_status(STATUS_BARRIER, -1)
 		if not animation_player.is_playing():
 			animation_player.play("death")
 			Signals.player_killed.emit(self)

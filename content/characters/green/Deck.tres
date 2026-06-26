@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_an6kr"]
+[ext_resource type="Resource" path="res://content/cards/generic/standard/BasicAttack.tres" id="2_an6kr"]
+[ext_resource type="Resource" path="res://content/cards/generic/standard/CustomBlock.tres" id="3_2xc3h"]
+[ext_resource type="Resource" path="res://content/cards/character/red/standard/LoweringEnergyAttack.tres" id="4_qkwyf"]
+[ext_resource type="Resource" path="res://content/cards/character/green/advanced/PreserveBlock.tres" id="5_dh5lx"]
+[ext_resource type="Resource" path="res://content/cards/character/green/advanced/DuplicatePlays.tres" id="6_sldp0"]
+[ext_resource type="Resource" path="res://content/cards/character/green/standard/DraftAttackCard.tres" id="7_xn3i4"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="8_4mncb"]
+
+[resource]
+script = ExtResource("8_4mncb")
+cards = Array[ExtResource("1_an6kr")]([ExtResource("2_an6kr"), ExtResource("2_an6kr"), ExtResource("2_an6kr"), ExtResource("3_2xc3h"), ExtResource("4_qkwyf"), ExtResource("5_dh5lx"), ExtResource("6_sldp0"), ExtResource("7_xn3i4")])

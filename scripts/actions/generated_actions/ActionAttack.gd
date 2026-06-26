@@ -1,7 +1,16 @@
 extends BaseAction
 
 func perform_action():
-	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action()
+	var resolved_targets: Array[BaseCombatant] = get_adjusted_action_targets()
+	if parent_combatant != null and parent_combatant.get_status_charges("status_effect_daze") > 0:
+		var dazed_target: BaseCombatant = _get_daze_target(resolved_targets)
+		if dazed_target != null:
+			resolved_targets = [dazed_target]
+		parent_combatant.consume_flag_status("status_effect_daze")
+	for target in resolved_targets:
+		if target != null:
+			Signals.combatant_targeted_by_attack.emit(target, self)
+	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action(resolved_targets)
 	
 	for action_interceptor_processor in action_interceptor_processors:
 		var target: BaseCombatant = action_interceptor_processor.target
@@ -46,3 +55,20 @@ func is_action_short_circuited():
 func _to_string():
 	var damage: int = get_action_value("damage", 0)
 	return "Attack Action: " + str(damage)
+
+func _get_daze_target(resolved_targets: Array[BaseCombatant]) -> BaseCombatant:
+	if parent_combatant == null:
+		return null
+	if parent_combatant is Enemy and len(resolved_targets) > 0:
+		return resolved_targets[0]
+	var possible_targets: Array[BaseCombatant] = []
+	if parent_combatant.is_in_group("players"):
+		for enemy in Global.get_tree().get_nodes_in_group("enemies"):
+			if enemy != null and enemy.is_alive():
+				possible_targets.append(enemy)
+	else:
+		possible_targets.assign(Global.get_living_players())
+	if possible_targets.is_empty():
+		return null
+	var rng_targeting: RandomNumberGenerator = Global.player_data.get_player_rng("rng_targeting")
+	return possible_targets[rng_targeting.randi_range(0, possible_targets.size() - 1)]

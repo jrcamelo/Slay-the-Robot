@@ -206,11 +206,15 @@ func _on_combat_started(event_id: String):
 	enemy_container.populate_enemies(current_event)
 	start_turn_animation()
 	
-	Global.player_data.player_energy = Global.player_data.player_energy_max
+	Global.player_data.player_energy = 0
+	# Old behavior: reset the legacy shared barrier field at combat start.
+	# Global.player_data.reset_barrier()
 	set_combat_display_visibility(true)
 	update_combat_display()
 	
 func _on_combat_ended():
+	# Old behavior: reset the legacy shared barrier field at combat end.
+	# Global.player_data.reset_barrier()
 	set_combat_display_visibility(false)
 	
 
@@ -236,44 +240,18 @@ func perform_enemy_turn():
 		### perform intent
 		# NOTE: remember these go in reverse order on the stack
 		if enemy.is_alive():
-			# add custom actions
-			var enemy_actions_data: Array[Dictionary] = []
-			enemy_actions_data.assign(enemy.enemy_data.get_current_attack_custom_actions())
-			
-			# add attacks
-			var enemy_attack: Array = enemy.enemy_data.get_current_attack_damages()
-			if enemy_attack[1] > 0:
-				enemy_actions_data.append(
-				{
-				Scripts.ACTION_ATTACK_GENERATOR: {"damage": enemy_attack[0], "number_of_attacks": enemy_attack[1], "time_delay": EnemyData.ENEMY_ATTACK_DELAY}
-				}
-				)
-			
-			# add block
-			var enemy_block: int = enemy.enemy_data.get_current_attack_block()
-			if enemy_block > 0:
-				enemy_actions_data.append(
-					{
-					Scripts.ACTION_BLOCK: {
-						"block": enemy_block,
-						"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-						"time_delay": 0.0,
-						}
-					}
-			)
-			
-			# add reset block action
-			enemy_actions_data.append(
-			{
-			Scripts.ACTION_RESET_BLOCK:  {
-				"target_override": BaseAction.TARGET_OVERRIDES.PARENT,
-				"time_delay": 0.0
-				}
-			}
-			)
-			
-			# perform them and wait
-			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, [player], enemy_actions_data, null)
+			if enemy.consume_flag_status("status_effect_paralyze") or enemy.consume_flag_status("status_effect_sleep"):
+				enemy.advance_planned_stage_after_execution()
+				continue
+			enemy.hide_intent_preview()
+			enemy.update_enemy_intent()
+			var enemy_targets: Array[Player] = enemy.get_intent_target_players()
+			if len(enemy_targets) == 0 and enemy.is_attacking():
+				continue
+			var enemy_actions_data: Array[Dictionary] = enemy.build_enemy_turn_actions_data()
+			var enemy_action_targets: Array[BaseCombatant] = []
+			enemy_action_targets.assign(enemy_targets)
+			var enemy_attack_actions: Array = ActionGenerator.create_actions(enemy, null, enemy_action_targets, enemy_actions_data, null)
 			ActionHandler.add_actions(enemy_attack_actions)
 			if ActionHandler.actions_being_performed:
 				await ActionHandler.actions_ended
@@ -344,9 +322,14 @@ func _on_player_turn_started():
 			await ActionHandler.actions_ended
 	
 	# perform pre draw actions
-	player.update_incoming_damage_amount(true)
-	player.generate_reset_block_action()
-	player.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
+	for player_combatant: Player in Global.get_players():
+		player_combatant.update_incoming_damage_amount(true)
+	for player_combatant: Player in Global.get_living_players():
+		# Old behavior: barrier was fully cleared at the start of the player turn.
+		# Global.player_data.reset_barrier()
+		# Old behavior if block should be fully cleared instead of decayed.
+		# player_combatant.reset_block()
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
@@ -356,7 +339,20 @@ func _on_player_turn_started():
 		await ActionHandler.actions_ended
 	
 	# perform post draw actions
-	player.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
+	for player_combatant: Player in Global.get_living_players():
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
+
+	if Global.get_primary_living_player() != null:
+		var primary_player: Player = Global.get_primary_living_player()
+		var skip_player_turn: bool = false
+		for player_combatant: Player in Global.get_living_players():
+			var skip_status_consumed: bool = player_combatant.consume_flag_status("status_effect_paralyze") or player_combatant.consume_flag_status("status_effect_sleep")
+			if skip_status_consumed and player_combatant == primary_player:
+				skip_player_turn = true
+		if skip_player_turn:
+			hand.hand_disabled = true
+			queue_end_turn(CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.IMMEDIATE)
+			return
 	
 	# unlock and update hand
 	hand.hand_disabled = false

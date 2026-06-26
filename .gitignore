@@ -17,3 +17,7 @@ mono_crash.*.json
 
 *.exe
 *.rar
+
+**/dist/
+**/node_modules/
+**/*.log

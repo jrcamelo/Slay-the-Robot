@@ -16,6 +16,20 @@ class_name StatusEffectData
 enum STATUS_EFFECT_TYPES {BUFF, DEBUFF, NEUTRAL}
 @export var status_effect_type: int = STATUS_EFFECT_TYPES.BUFF	# if the game considers this status positive, negative, or neutral
 
+enum STATUS_DISPOSITIONS {POSITIVE, NEGATIVE, NEUTRAL}
+@export var status_effect_disposition: int = STATUS_DISPOSITIONS.NEUTRAL
+
+enum STATUS_DECAY_TYPES_V2 {
+	PER_TICK,
+	PER_TURN,
+	PERSISTENT,
+	FLAG,
+}
+@export var status_effect_decay_type_v2: int = STATUS_DECAY_TYPES_V2.PERSISTENT
+@export var status_effect_is_flag: bool = false
+@export var status_effect_use_legacy_process_decay: bool = true
+@export var status_effect_is_party_shared: bool = false
+
 #endregion
 
 #region Status Actions

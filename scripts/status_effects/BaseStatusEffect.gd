@@ -9,6 +9,7 @@ var parent_combatant: BaseCombatant
 var status_charges: int = 0 : set = set_status_charges
 var status_secondary_charges: int = 0 # typically denotes intensity of the status, when status_charges is used as a timer
 var status_custom_values: Dictionary = {} # any unique values the status uses
+var current_process_time: int = -1
 
 func init(_status_effect_data, _parent_combatant: BaseCombatant):
 	status_effect_data = _status_effect_data
@@ -18,6 +19,9 @@ func init(_status_effect_data, _parent_combatant: BaseCombatant):
 ## Override this to provide connections to other signals for statuses with custom events
 ## NOTE: Do not connect to start and end turn signals
 func _connect_signals() -> void:
+	pass
+
+func _disconnect_signals() -> void:
 	pass
 
 ## Status action logic
@@ -36,6 +40,33 @@ func perform_status_effect_actions() -> void:
 		var card_play_request: CardPlayRequest = _generate_status_effect_card_play_request() # generate a fake request
 		var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [parent_combatant], action_data, null)
 		ActionHandler.add_actions(generated_actions)
+
+func get_amount() -> int:
+	return status_charges
+
+func set_amount(value: int) -> void:
+	status_charges = value
+
+func is_flag_status() -> bool:
+	return status_effect_data.status_effect_is_flag \
+		or status_effect_data.status_effect_decay_type_v2 == StatusEffectData.STATUS_DECAY_TYPES_V2.FLAG
+
+func consume_one() -> void:
+	if is_flag_status():
+		remove_self()
+		return
+	parent_combatant.remove_status(status_effect_data.object_id, 1)
+
+func remove_self() -> void:
+	parent_combatant.remove_status(status_effect_data.object_id, -1)
+
+func decay_turn() -> void:
+	if status_effect_data.status_effect_decay_type_v2 == StatusEffectData.STATUS_DECAY_TYPES_V2.PER_TURN:
+		parent_combatant.remove_status(status_effect_data.object_id, 1)
+
+func tick_status() -> void:
+	if status_effect_data.status_effect_decay_type_v2 == StatusEffectData.STATUS_DECAY_TYPES_V2.PER_TICK:
+		parent_combatant.remove_status(status_effect_data.object_id, 1)
 
 ## Factory method to make a fake card play request and pass in status effect related data into it
 ## Actions can then alias these with the custom_key_names parameter of BaseAction to pass them as parameters
@@ -58,6 +89,8 @@ func set_status_charges(value: int):
 	# provides setter validation of a status's charge bounds
 	var lower_bound: int = 0
 	var upper_bound: int = 1
+	if is_flag_status():
+		upper_bound = 1
 	if status_effect_data.status_effect_can_be_negative:
 		lower_bound = -999
 	if status_effect_data.status_effect_stacks:

@@ -1,7 +1,8 @@
 # Modifies the damage output of attack actions by strength amount
 extends BaseActionInterceptor
 
-const WEAKEN_DAMAGE_MULTIPLIER: float = 0.75
+const STATUS_EFFECT_ID: String = "status_effect_weaken"
+const LEGACY_STATUS_EFFECT_ID: String = "status_effect_weaken_old"
 
 func process_action_interception(action_interceptor_processor: ActionInterceptorProcessor, _preview_mode: bool = false) -> int:
 	var parent_combatant: BaseCombatant = action_interceptor_processor.parent_action.parent_combatant
@@ -10,8 +11,10 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	if not parent_combatant.is_alive():
 		return ACTION_ACCEPTENCES.REJECTED
 	
+	var weaken_amount: int = parent_combatant.get_status_charges(STATUS_EFFECT_ID)
+	if weaken_amount <= 0:
+		weaken_amount = parent_combatant.get_status_charges(LEGACY_STATUS_EFFECT_ID)
 	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	damage = int(damage * WEAKEN_DAMAGE_MULTIPLIER)
-	action_interceptor_processor.shadowed_action_values["damage"] = damage
+	action_interceptor_processor.shadowed_action_values["damage"] = max(0, damage - weaken_amount)
 	
 	return ACTION_ACCEPTENCES.CONTINUE
