@@ -9,4 +9,4 @@ status_effect_name = "vulnerable"
 status_effect_type = 1
 status_effect_decay_rate = -1
 status_effect_interceptor_ids = Array[String](["interceptor_vulnerable"])
-object_id = "status_effect_vulnerable"
+object_id = "status_effect_vulnerable_old"

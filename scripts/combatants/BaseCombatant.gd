@@ -2,6 +2,13 @@
 extends Control
 class_name BaseCombatant
 
+const STATUS_BARRIER: String = "status_effect_barrier"
+const STATUS_SHIELD: String = "status_effect_shield"
+const STATUS_BURN: String = "status_effect_burn"
+const STATUS_POISON: String = "status_effect_poison"
+const STATUS_SLEEP: String = "status_effect_sleep"
+const STATUS_PARALYZE: String = "status_effect_paralyze"
+
 @onready var block: Sprite2D = $Visible/Block
 @onready var block_amount: Label = $Visible/Block/BlockAmount
 
@@ -18,6 +25,7 @@ class_name BaseCombatant
 
 var status_id_to_status_effects: Dictionary = {}	# maps status id to the array of ui element(s) it matches
 var custom_ui_object_id_to_custom_ui: Dictionary = {} # maps a custom ui id to the ui component it matches. Duplicate registrations will be ignored
+var _is_syncing_status_state: bool = false
 
 func _ready():
 	Signals.combat_started.connect(_on_combat_started)
@@ -64,6 +72,99 @@ func generate_reset_block_action() -> void:
 func reset_block() -> void:
 	set_block(0)
 #endregion
+
+func _is_shared_status(status_effect_object_id: String) -> bool:
+	var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+	return status_effect_data != null and status_effect_data.status_effect_is_party_shared
+
+func get_living_allies() -> Array[BaseCombatant]:
+	var allies: Array[BaseCombatant] = []
+	if is_in_group("players"):
+		allies.assign(Global.get_living_players())
+	elif is_in_group("enemies"):
+		allies.assign(Global.get_living_enemies())
+	return allies
+
+func get_shared_status_members(status_effect_object_id: String) -> Array[BaseCombatant]:
+	if not _is_shared_status(status_effect_object_id):
+		return [self]
+	var living_allies: Array[BaseCombatant] = get_living_allies()
+	if living_allies.is_empty():
+		return [self]
+	return living_allies
+
+func get_shared_status_amount(status_effect_object_id: String) -> int:
+	if not _is_shared_status(status_effect_object_id):
+		return max(0, get_status_charges(status_effect_object_id))
+	var authority: BaseCombatant = get_shared_status_authority(status_effect_object_id)
+	return max(0, authority.get_status_charges(status_effect_object_id))
+
+func get_shared_status_authority(status_effect_object_id: String) -> BaseCombatant:
+	if not _is_shared_status(status_effect_object_id):
+		return self
+	return get_shared_status_members(status_effect_object_id)[0]
+
+func _sync_shared_status_amount(status_effect_object_id: String, target_amount: int, secondary_amount: int = 0, custom_values: Dictionary = {}) -> void:
+	for ally: BaseCombatant in get_shared_status_members(status_effect_object_id):
+		var current_amount: int = max(0, ally.get_status_charges(status_effect_object_id))
+		if target_amount <= 0:
+			if current_amount > 0:
+				ally._remove_status_local(status_effect_object_id, -1)
+			continue
+		if current_amount <= 0:
+			ally._apply_status_internal(status_effect_object_id, target_amount, secondary_amount, false, custom_values, false)
+			continue
+		var amount_delta: int = target_amount - current_amount
+		if amount_delta != 0 or secondary_amount != 0 or not custom_values.is_empty():
+			ally._apply_status_internal(status_effect_object_id, amount_delta, secondary_amount, false, custom_values, false)
+
+func is_shared_status_authority(status_effect_object_id: String) -> bool:
+	return get_shared_status_authority(status_effect_object_id) == self
+
+func apply_shared_status(status_effect_object_id: String, amount: int, source_combatant: BaseCombatant = null, secondary_amount: int = 0, custom_values: Dictionary = {}) -> void:
+	var authority: BaseCombatant = get_shared_status_authority(status_effect_object_id)
+	if authority != self:
+		authority.apply_shared_status(status_effect_object_id, amount, source_combatant, secondary_amount, custom_values)
+		return
+	var shared_amount: int = get_shared_status_amount(status_effect_object_id)
+	_sync_shared_status_amount(status_effect_object_id, max(0, shared_amount + amount), secondary_amount, custom_values)
+	if source_combatant != null:
+		for ally: BaseCombatant in get_shared_status_members(status_effect_object_id):
+			ally._set_status_source(status_effect_object_id, source_combatant)
+
+func remove_shared_status(status_effect_object_id: String, amount: int = -1) -> void:
+	var authority: BaseCombatant = get_shared_status_authority(status_effect_object_id)
+	if authority != self:
+		authority.remove_shared_status(status_effect_object_id, amount)
+		return
+	var shared_amount: int = get_shared_status_amount(status_effect_object_id)
+	if amount < 0:
+		_sync_shared_status_amount(status_effect_object_id, 0)
+	else:
+		_sync_shared_status_amount(status_effect_object_id, max(0, shared_amount - amount))
+
+func sync_shield_status_from_block() -> void:
+	if _is_syncing_status_state:
+		return
+	_is_syncing_status_state = true
+	var current_block: int = max(0, get_block())
+	var current_shield: int = max(0, get_status_charges(STATUS_SHIELD))
+	if current_block <= 0:
+		_remove_status_local(STATUS_SHIELD, -1)
+	else:
+		var shield_delta: int = current_block - current_shield
+		if shield_delta > 0:
+			_apply_status_internal(STATUS_SHIELD, shield_delta, 0, false, {}, false)
+		elif shield_delta < 0:
+			_remove_status_local(STATUS_SHIELD, -shield_delta)
+	_is_syncing_status_state = false
+
+func sync_block_from_shield_status() -> void:
+	if _is_syncing_status_state:
+		return
+	_is_syncing_status_state = true
+	set_block(max(0, get_status_charges(STATUS_SHIELD)))
+	_is_syncing_status_state = false
 
 #region Health
 func update_health_bar(as_damage: bool = false) -> void:
@@ -120,13 +221,68 @@ func create_damage_text(damage_amount: int) -> void:
 
 #region Statuses
 
+func apply_status(status_effect_object_id: String, amount: int, source_combatant: BaseCombatant = null, secondary_amount: int = 0, force_new_effect: bool = false, custom_values: Dictionary = {}) -> void:
+	if _is_shared_status(status_effect_object_id):
+		apply_shared_status(status_effect_object_id, amount, source_combatant, secondary_amount, custom_values)
+		return
+	_apply_status_internal(status_effect_object_id, amount, secondary_amount, force_new_effect, custom_values)
+	if source_combatant != null:
+		_set_status_source(status_effect_object_id, source_combatant)
+
+func remove_status(status_effect_object_id: String, amount: int = -1) -> void:
+	if _is_shared_status(status_effect_object_id):
+		remove_shared_status(status_effect_object_id, amount)
+		return
+	_remove_status_local(status_effect_object_id, amount)
+
+func remove_by_disposition(status_disposition: int) -> void:
+	for status_effect_object_id: String in status_id_to_status_effects.keys().duplicate():
+		var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+		if status_effect_data == null:
+			continue
+		if status_effect_data.status_effect_disposition == status_disposition:
+			remove_status(status_effect_object_id, -1)
+
+func cleanse() -> void:
+	remove_by_disposition(StatusEffectData.STATUS_DISPOSITIONS.NEGATIVE)
+
+func dispel() -> void:
+	remove_by_disposition(StatusEffectData.STATUS_DISPOSITIONS.POSITIVE)
+
+func consume_flag_status(status_effect_object_id: String) -> bool:
+	if get_status_charges(status_effect_object_id) <= 0:
+		return false
+	remove_status(status_effect_object_id, 1)
+	return true
+
+func tick_status(status_effect_object_id: String) -> void:
+	var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+	if status_effect_data == null:
+		return
+	if status_effect_data.status_effect_decay_type_v2 == StatusEffectData.STATUS_DECAY_TYPES_V2.PER_TICK:
+		remove_status(status_effect_object_id, 1)
+
+func turn_decay_statuses(status_effect_process_time: int) -> void:
+	for status_effect_object_id: String in _get_status_effects_with_process_time(status_id_to_status_effects.keys(), status_effect_process_time):
+		var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+		if status_effect_data == null:
+			continue
+		if status_effect_data.status_effect_decay_type_v2 == StatusEffectData.STATUS_DECAY_TYPES_V2.PER_TURN:
+			remove_status(status_effect_object_id, 1)
+
 func add_status_effect_charges(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0) -> void:
+	if _is_shared_status(status_effect_object_id):
+		apply_shared_status(status_effect_object_id, charge_amount, null, secondary_charge_amount)
+		return
+	_apply_status_internal(status_effect_object_id, charge_amount, secondary_charge_amount, false, {})
+
+func _apply_status_internal(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, force_new_effect: bool = false, custom_values: Dictionary = {}, emit_source_update: bool = true) -> void:
 	# general method for adding status effects and charge amounts
 	# adds charges and secondary charges to ALL instances of a given status
 	# if no status exists, create one and apply charges
 	# will remove statuses that become zero'd out
 	
-	if charge_amount == 0 and secondary_charge_amount == 0:
+	if charge_amount == 0 and secondary_charge_amount == 0 and custom_values.is_empty():
 		return # charge applications of zero have no effect
 	
 	# get status data
@@ -142,10 +298,15 @@ func add_status_effect_charges(status_effect_object_id: String, charge_amount: i
 		status_effects = status_id_to_status_effects[status_effect_object_id]
 	
 	# create a new status if none exists
-	if len(status_effects) == 0:
+	if len(status_effects) == 0 and not (force_new_effect and status_effect_data.status_effect_allows_multiples):
 		var _status_effect: StatusEffect = _create_status_effect(status_effect_object_id)
 		status_effects = status_id_to_status_effects[status_effect_object_id]
 	
+	if force_new_effect and status_effect_data.status_effect_allows_multiples:
+		var forced_status_effect: StatusEffect = _create_status_effect(status_effect_object_id)
+		if forced_status_effect != null:
+			status_effects = [forced_status_effect]
+
 	# iterate over all statuses and apply charges
 	for status_effect in status_effects.duplicate():
 		var status_effect_script: BaseStatusEffect = status_effect.status_effect_script
@@ -153,6 +314,10 @@ func add_status_effect_charges(status_effect_object_id: String, charge_amount: i
 		# apply charges and secondary charges
 		status_effect_script.add_status_charges(charge_amount)
 		status_effect_script.status_secondary_charges += secondary_charge_amount
+		for key: Variant in custom_values.keys():
+			status_effect_script.status_custom_values[key] = custom_values[key]
+		if status_effect_object_id == STATUS_POISON and emit_source_update:
+			status_effect_script.status_custom_values["last_applied_turn"] = Global.get_combat_stats().turn_count if Global.get_combat_stats() != null else 1
 		
 		# delete the effect if zero charges
 		if (status_effect_script.status_charges == 0):
@@ -160,43 +325,18 @@ func add_status_effect_charges(status_effect_object_id: String, charge_amount: i
 		else:
 			# update ui with charge count
 			status_effect.update_status_charge_display()
+	
+	if status_effect_object_id == STATUS_SHIELD:
+		sync_block_from_shield_status()
+	if self is Player and status_effect_object_id == STATUS_BARRIER:
+		self._update_barrier_display()
 	
 	update_health_bar(false)
 	
 	Signals.enemy_intent_changed.emit()	# update enemy intent in case statuses affect them
 
 func add_new_status_effect(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, custom_values: Dictionary = {}) -> void:
-	# attempts to add an entirely new status effect with given charges
-	# this is mainly useful for statuses that allow multiples
-	# will fail if status does not allow multiples and one already exists
-	# see add_status_effect_charges()
-	var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
-	if charge_amount == 0:
-		return # charges of zero have no effect
-	elif status_effect_data.status_effect_can_be_negative and charge_amount < 0:
-		return
-	
-	var status_effect: StatusEffect = _create_status_effect(status_effect_object_id)
-	if status_effect != null:
-		var status_effect_script: BaseStatusEffect = status_effect.status_effect_script
-		
-		# apply charges and secondary charges
-		status_effect_script.add_status_charges(charge_amount)
-		status_effect_script.status_secondary_charges += secondary_charge_amount
-		
-		# apply unique values beyond charges
-		status_effect_script.status_custom_values = custom_values
-		
-		# delete the effect if zero charges
-		if (status_effect_script.status_charges == 0):
-			_remove_status_effect(status_effect)
-		else:
-			# update ui with charge count
-			status_effect.update_status_charge_display()
-	
-	update_health_bar(false)
-	
-	Signals.enemy_intent_changed.emit()	# update enemy intent in case statuses affect them
+	apply_status(status_effect_object_id, charge_amount, null, secondary_charge_amount, true, custom_values)
 
 func clear_all_status_effects():
 	for status_effect_object_id in status_id_to_status_effects.keys().duplicate():
@@ -242,9 +382,43 @@ func get_status_charges(status_effect_object_id: String) -> int:
 			absolute_maximum = status_effect.status_effect_script.status_charges
 	return absolute_maximum
 
+func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> void:
+	var status_effects: Array[StatusEffect] = status_id_to_status_effects.get(status_effect_object_id, [])
+	if status_effects.is_empty():
+		if status_effect_object_id == STATUS_SHIELD:
+			sync_block_from_shield_status()
+		return
+	for status_effect: StatusEffect in status_effects.duplicate():
+		if amount < 0:
+			_remove_status_effect(status_effect)
+			continue
+		status_effect.status_effect_script.add_status_charges(-amount)
+		if status_effect.status_effect_script.status_charges <= 0:
+			_remove_status_effect(status_effect)
+		else:
+			status_effect.update_status_charge_display()
+	if status_effect_object_id == STATUS_SHIELD:
+		sync_block_from_shield_status()
+	if self is Player and status_effect_object_id == STATUS_BARRIER:
+		self._update_barrier_display()
+	update_health_bar(false)
+	Signals.enemy_intent_changed.emit()
+
+func _set_status_source(status_effect_object_id: String, source_combatant: BaseCombatant) -> void:
+	if source_combatant == null:
+		return
+	var source_party_member_index: int = -1
+	if source_combatant is Player:
+		source_party_member_index = source_combatant.get_party_member_index()
+	for status_effect: StatusEffect in status_id_to_status_effects.get(status_effect_object_id, []):
+		status_effect.status_effect_script.status_custom_values["source_instance_id"] = source_combatant.get_instance_id()
+		status_effect.status_effect_script.status_custom_values["source_party_member_index"] = source_party_member_index
+		status_effect.status_effect_script.status_custom_values["source_turn_count"] = Global.get_combat_stats().turn_count if Global.get_combat_stats() != null else 1
+
 func _remove_status_effect(status_effect: StatusEffect) -> void:
 	var status_effect_data: StatusEffectData = status_effect.status_effect_script.status_effect_data
 	var status_effect_object_id: String = status_effect_data.object_id
+	status_effect.status_effect_script._disconnect_signals()
 	
 	# get status list
 	var status_effects: Array[StatusEffect] = status_id_to_status_effects[status_effect_object_id]
@@ -321,6 +495,7 @@ func perform_status_effect_actions(status_effect_process_time: int = StatusEffec
 		# perform the status effect
 		var status_effects: Array[StatusEffect] = status_id_to_status_effects[status_effect_object_id]
 		for status_effect in status_effects:
+			status_effect.status_effect_script.current_process_time = status_effect_process_time
 			status_effect.status_effect_script.perform_status_effect_actions()
 		
 		# NOTE: Uncommenting this will make status related code more stable by forcing
@@ -330,7 +505,8 @@ func perform_status_effect_actions(status_effect_process_time: int = StatusEffec
 			#await ActionHandler.actions_ended
 		
 		# decay all status effects of given type
-		_decay_status_effect(status_effect_object_id)
+		if status_effect_data.status_effect_use_legacy_process_decay:
+			_decay_status_effect(status_effect_object_id)
 
 
 ## Helper method. Gets all status effects with a given status_effect_process_time.

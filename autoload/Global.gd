@@ -400,6 +400,20 @@ func get_living_players() -> Array[Player]:
 			living_players.append(player)
 	return living_players
 
+func get_enemies() -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	for node in Global.get_tree().get_nodes_in_group("enemies"):
+		if node is Enemy:
+			enemies.append(node)
+	return enemies
+
+func get_living_enemies() -> Array[Enemy]:
+	var living_enemies: Array[Enemy] = []
+	for enemy: Enemy in get_enemies():
+		if enemy.is_alive():
+			living_enemies.append(enemy)
+	return living_enemies
+
 func get_primary_living_player() -> Player:
 	var living_players: Array[Player] = get_living_players()
 	if len(living_players) == 0:
@@ -694,6 +708,30 @@ func add_test_action_interceptors() -> void:
 	interceptor_negate_debuff.action_intercepted_action_paths = [Scripts.ACTION_APPLY_STATUS]
 	
 	register_rod(interceptor_negate_debuff)
+
+	var interceptor_evasion: ActionInterceptorData = ActionInterceptorData.new("interceptor_evasion")
+	interceptor_evasion.action_interceptor_priority = 11000
+	interceptor_evasion.action_interceptor_modifies_parent = false
+	interceptor_evasion.action_interceptor_script = load(Scripts.INTERCEPTOR_EVASION)
+	interceptor_evasion.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
+
+	register_rod(interceptor_evasion)
+
+	var interceptor_burn_shield_half: ActionInterceptorData = ActionInterceptorData.new("interceptor_burn_shield_half")
+	interceptor_burn_shield_half.action_interceptor_priority = 10000
+	interceptor_burn_shield_half.action_interceptor_modifies_parent = false
+	interceptor_burn_shield_half.action_interceptor_script = load(Scripts.INTERCEPTOR_BURN_SHIELD_HALF)
+	interceptor_burn_shield_half.action_intercepted_action_paths = [Scripts.ACTION_BLOCK]
+
+	register_rod(interceptor_burn_shield_half)
+
+	var interceptor_burn_poise_restore: ActionInterceptorData = ActionInterceptorData.new("interceptor_burn_poise_restore")
+	interceptor_burn_poise_restore.action_interceptor_priority = 10000
+	interceptor_burn_poise_restore.action_interceptor_modifies_parent = false
+	interceptor_burn_poise_restore.action_interceptor_script = load(Scripts.INTERCEPTOR_BURN_POISE_RESTORE)
+	interceptor_burn_poise_restore.action_intercepted_action_paths = [Scripts.ACTION_RESTORE_ENEMY_POISE]
+
+	register_rod(interceptor_burn_poise_restore)
 	
 	# duplicates incoming card plays
 	var interceptor_duplicate_card_plays: ActionInterceptorData = ActionInterceptorData.new("interceptor_duplicate_card_plays")

@@ -85,7 +85,7 @@ enemy_poise_max = 20
 enemy_actions_on_death = Array[Dictionary]([{
 "ACTION_APPLY_STATUS": {
 "status_charge_amount": 5,
-"status_effect_object_id": "status_effect_corrosion",
+"status_effect_object_id": "status_effect_poison",
 "target_override": 3,
 "time_delay": 0.5
 }

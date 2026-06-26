@@ -23,7 +23,7 @@ artifact_first_turn_actions = Array[Dictionary]([{
 "custom_key_names": {
 "status_charge_amount": "artifact_counter"
 },
-"status_effect_object_id": "status_effect_damage_increase",
+"status_effect_object_id": "status_effect_might",
 "target_override": 2
 }
 }])

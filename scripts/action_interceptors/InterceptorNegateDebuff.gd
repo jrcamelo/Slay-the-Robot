@@ -3,6 +3,7 @@
 extends BaseActionInterceptor
 
 const NEGATE_DEBUFF_STATUS_EFFECT_ID: String = "status_effect_negate_debuff"
+const WARD_STATUS_EFFECT_ID: String = "status_effect_ward"
 
 func process_action_interception(action_interceptor_processor: ActionInterceptorProcessor, preview_mode: bool = false) -> int:
 	if preview_mode:
@@ -22,18 +23,19 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 		push_error("Status effect \"", status_effect_object_id,"\" does not exist")
 		return ACTION_ACCEPTENCES.REJECTED
 	
-	# determine if the status is a debuff or a buff with negative charges
-	var status_effect_is_debuff: bool = false
-	if status_effect_data.status_effect_type == StatusEffectData.STATUS_EFFECT_TYPES.BUFF:
-		if status_charge_amount < 0:
-			status_effect_is_debuff = true
-	elif status_effect_data.status_effect_type == StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF:
-		if status_charge_amount > 0:
-			status_effect_is_debuff = true
+	var status_effect_is_debuff: bool = status_effect_data.status_effect_disposition == StatusEffectData.STATUS_DISPOSITIONS.NEGATIVE
+	if not status_effect_is_debuff:
+		if status_effect_data.status_effect_type == StatusEffectData.STATUS_EFFECT_TYPES.BUFF:
+			status_effect_is_debuff = status_charge_amount < 0
+		elif status_effect_data.status_effect_type == StatusEffectData.STATUS_EFFECT_TYPES.DEBUFF:
+			status_effect_is_debuff = status_charge_amount > 0
 	
 	if status_effect_is_debuff:
-		# reduce the charges of the negater status by 1
-		target_combatant.add_status_effect_charges(NEGATE_DEBUFF_STATUS_EFFECT_ID, -1)
-		return ACTION_ACCEPTENCES.REJECTED # prevent the debuff from processing
+		if target_combatant.get_status_charges(WARD_STATUS_EFFECT_ID) > 0:
+			target_combatant.consume_flag_status(WARD_STATUS_EFFECT_ID)
+			return ACTION_ACCEPTENCES.REJECTED # prevent the debuff from processing
+		if target_combatant.get_status_charges(NEGATE_DEBUFF_STATUS_EFFECT_ID) > 0:
+			target_combatant.add_status_effect_charges(NEGATE_DEBUFF_STATUS_EFFECT_ID, -1)
+			return ACTION_ACCEPTENCES.REJECTED # prevent the debuff from processing
 	
 	return ACTION_ACCEPTENCES.CONTINUE

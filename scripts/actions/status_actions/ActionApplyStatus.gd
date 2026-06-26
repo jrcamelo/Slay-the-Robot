@@ -26,11 +26,7 @@ func perform_action():
 		var status_secondary_charge_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.STATUS_SECONDARY_CHARGE_AMOUNT, 0)
 		var status_effect_object_id: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.STATUS_EFFECT_OBJECT_ID, "")
 		var status_force_apply_new_effect: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.STATUS_FORCE_APPLY_NEW_EFFECT, false)
-		# determine whether to apply charges or to force the application of an entirely new status effect
-		if status_force_apply_new_effect:
-			target.add_new_status_effect(status_effect_object_id, status_charge_amount, status_secondary_charge_amount)
-		else:
-			target.add_status_effect_charges(status_effect_object_id, status_charge_amount, status_secondary_charge_amount)
+		target.apply_status(status_effect_object_id, status_charge_amount, parent_combatant, status_secondary_charge_amount, status_force_apply_new_effect)
 
 func is_action_short_circuited() -> bool:
 	return get_action_value("action_short_circuits", true)

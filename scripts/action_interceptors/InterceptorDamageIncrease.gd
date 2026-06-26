@@ -1,7 +1,8 @@
 # Modifies the damage output of attack actions by strength amount
 extends BaseActionInterceptor
 
-const DAMAGE_INCREASE_STATUS_EFFECT_ID: String = "status_effect_damage_increase"
+const LEGACY_DAMAGE_INCREASE_STATUS_EFFECT_ID: String = "status_effect_damage_increase"
+const MIGHT_STATUS_EFFECT_ID: String = "status_effect_might"
 
 func process_action_interception(action_interceptor_processor: ActionInterceptorProcessor, _preview_mode: bool = false) -> int:
 	var parent_combatant: BaseCombatant = action_interceptor_processor.parent_action.parent_combatant
@@ -10,8 +11,10 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	if not parent_combatant.is_alive():
 		return ACTION_ACCEPTENCES.REJECTED
 	
-	var damage_increase_charges: int = parent_combatant.get_status_charges("status_effect_damage_increase")
+	var damage_increase_charges: int = parent_combatant.get_status_charges(MIGHT_STATUS_EFFECT_ID)
+	if damage_increase_charges <= 0:
+		damage_increase_charges = parent_combatant.get_status_charges(LEGACY_DAMAGE_INCREASE_STATUS_EFFECT_ID)
 	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	action_interceptor_processor.shadowed_action_values["damage"] = damage + damage_increase_charges
+	action_interceptor_processor.shadowed_action_values["damage"] = max(0, damage + damage_increase_charges)
 	
 	return ACTION_ACCEPTENCES.CONTINUE

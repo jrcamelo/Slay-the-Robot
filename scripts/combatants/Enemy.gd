@@ -1,6 +1,8 @@
 extends BaseCombatant
 class_name Enemy
 
+const STATUS_BARRIER: String = "status_effect_barrier"
+
 @onready var enemy_intent: Control = $Visible/Intent
 @onready var enemy_intent_amount_text: Label = $Visible/Intent/IntentAmount
 @onready var enemy_intent_texture: TextureRect = $Visible/Intent/IntentTexture
@@ -86,23 +88,36 @@ func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction 
 	var bypassed_damage: int = _damage
 	var bypassed_damage_capped: int = 0
 	var overkill_damage: int = 0
+	var blocked_by_barrier: int = 0
+	var current_barrier: int = get_shared_status_amount(STATUS_BARRIER)
+	if current_barrier > 0 and _damage > 0:
+		blocked_by_barrier = min(current_barrier, _damage)
+		if blocked_by_barrier > 0:
+			Signals.combatant_blocked.emit(self, blocked_by_barrier)
+			create_block_text()
+	var remaining_damage: int = _damage - blocked_by_barrier
+	if remaining_damage <= 0:
+		return [0,0,0]
 
 	if enemy_data.enemy_block > 0 and not bypass_block:
-		if enemy_data.enemy_block > _damage:
-			enemy_data.enemy_block -= _damage
+		if enemy_data.enemy_block > remaining_damage:
+			set_block(enemy_data.enemy_block - remaining_damage)
 			bypassed_damage = 0
 			create_block_text()
-			Signals.combatant_blocked.emit(self, _damage)
+			Signals.combatant_blocked.emit(self, remaining_damage)
 		else:
-			bypassed_damage = _damage - enemy_data.enemy_block
-			enemy_data.enemy_block = 0
+			bypassed_damage = remaining_damage - enemy_data.enemy_block
+			set_block(0)
 			Signals.combatant_block_broken.emit(self)
-
-	block.visible = enemy_data.enemy_block > 0
-	block_amount.text = str(enemy_data.enemy_block)
+	else:
+		bypassed_damage = remaining_damage
 
 	if bypassed_damage <= 0:
 		return [0,0,0]
+
+	if enemy_data.enemy_health > 0 and bypassed_damage >= enemy_data.enemy_health and get_status_charges("status_effect_grit") > 0:
+		bypassed_damage = max(0, enemy_data.enemy_health - 1)
+		remove_status("status_effect_grit", 1)
 
 	create_damage_text(bypassed_damage)
 
@@ -136,6 +151,8 @@ func set_block(amount: int) -> void:
 	enemy_data.enemy_block = max(0, amount)
 	block.visible = enemy_data.enemy_block > 0
 	block_amount.text = str(enemy_data.enemy_block)
+	if not _is_syncing_status_state:
+		sync_shield_status_from_block()
 
 func get_block() -> int:
 	return enemy_data.enemy_block
@@ -284,6 +301,8 @@ func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 			returned_targets = _resolve_random_targets(living_players, target_count, false, target_signature)
 		EnemyIntentData.TARGETING_RANDOM_LIVING_PLAYER, _:
 			returned_targets = _resolve_random_targets(living_players, target_count, not intent_data.allow_repeat_targets, target_signature)
+	if get_status_charges("status_effect_daze") > 0:
+		returned_targets = _resolve_random_targets(living_players, 1, false, target_signature + "|daze")
 	return returned_targets
 
 func _resolve_sorted_targets(players: Array[Player], target_count: int, allow_repeat_targets: bool, ascending: bool, use_percent: bool) -> Array[Player]:

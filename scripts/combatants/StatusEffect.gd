@@ -10,7 +10,9 @@ var status_effect_script: BaseStatusEffect
 func update_status_charge_display() -> void:
 	visible = status_effect_script.status_effect_data.status_effect_is_visible
 	
-	if status_effect_script.status_charges == 1 and not status_effect_script.status_effect_data.status_effect_stacks:
+	if status_effect_script.is_flag_status():
+		status_charge_label.text = ""
+	elif status_effect_script.status_charges == 1 and not status_effect_script.status_effect_data.status_effect_stacks:
 		status_charge_label.text = ""
 	else:
 		status_charge_label.text = str(status_effect_script.status_charges)

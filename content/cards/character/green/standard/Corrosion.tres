@@ -12,7 +12,7 @@ card_values = {
 "damage": 5,
 "number_of_attacks": 1,
 "status_charge_amount": 5,
-"status_effect_object_id": "status_effect_corrosion"
+"status_effect_object_id": "status_effect_poison"
 }
 card_play_actions = Array[Dictionary]([{
 "ACTION_APPLY_STATUS": {

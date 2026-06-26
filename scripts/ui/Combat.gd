@@ -215,12 +215,14 @@ func _on_combat_started(event_id: String):
 	start_turn_animation()
 	
 	Global.player_data.player_energy = 0
-	Global.player_data.reset_barrier()
+	# Old behavior: reset the legacy shared barrier field at combat start.
+	# Global.player_data.reset_barrier()
 	set_combat_display_visibility(true)
 	update_combat_display()
 	
 func _on_combat_ended():
-	Global.player_data.reset_barrier()
+	# Old behavior: reset the legacy shared barrier field at combat end.
+	# Global.player_data.reset_barrier()
 	set_combat_display_visibility(false)
 	
 
@@ -246,6 +248,9 @@ func perform_enemy_turn():
 		### perform intent
 		# NOTE: remember these go in reverse order on the stack
 		if enemy.is_alive():
+			if enemy.consume_flag_status("status_effect_paralyze") or enemy.consume_flag_status("status_effect_sleep"):
+				enemy.advance_planned_stage_after_execution()
+				continue
 			enemy.hide_intent_preview()
 			enemy.update_enemy_intent()
 			var enemy_targets: Array[Player] = enemy.get_intent_target_players()
@@ -333,15 +338,12 @@ func _on_player_turn_started():
 	# perform pre draw actions
 	for player_combatant: Player in Global.get_players():
 		player_combatant.update_incoming_damage_amount(true)
-	# Old behavior: barrier was fully cleared at the start of the player turn.
-	# Global.player_data.reset_barrier()
-	Global.player_data.set_barrier(int(floor(float(Global.player_data.player_barrier) / 2.0)))
 	for player_combatant: Player in Global.get_living_players():
+		# Old behavior: barrier was fully cleared at the start of the player turn.
+		# Global.player_data.reset_barrier()
 		# Old behavior if block should be fully cleared instead of decayed.
 		# player_combatant.reset_block()
-		player_combatant.set_block(int(floor(float(player_combatant.get_block()) / 2.0)))
-	for player_combatant: Player in Global.get_living_players():
-		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
 	if ActionHandler.actions_being_performed:
 		await ActionHandler.actions_ended
 	
@@ -352,7 +354,19 @@ func _on_player_turn_started():
 	
 	# perform post draw actions
 	for player_combatant: Player in Global.get_living_players():
-		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.PRE_DRAW_PLAYER_START_TURN)
+		player_combatant.perform_status_effect_actions(StatusEffectData.STATUS_EFFECT_PROCESS_TIMES.POST_DRAW_PLAYER_START_TURN)
+
+	if Global.get_primary_living_player() != null:
+		var primary_player: Player = Global.get_primary_living_player()
+		var skip_player_turn: bool = false
+		for player_combatant: Player in Global.get_living_players():
+			var skip_status_consumed: bool = player_combatant.consume_flag_status("status_effect_paralyze") or player_combatant.consume_flag_status("status_effect_sleep")
+			if skip_status_consumed and player_combatant == primary_player:
+				skip_player_turn = true
+		if skip_player_turn:
+			hand.hand_disabled = true
+			queue_end_turn(CombatEndTurn.END_TURN_QUEUE_IMMEDIACY.IMMEDIATE)
+			return
 	
 	# unlock and update hand
 	hand.hand_disabled = false

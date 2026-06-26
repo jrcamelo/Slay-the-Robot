@@ -2,6 +2,8 @@
 extends BaseCombatant
 class_name Player
 
+const STATUS_BARRIER: String = "status_effect_barrier"
+
 @onready var incoming_damage: Control = $Visible/IncomingDamage
 @onready var incoming_damage_amount_text: Label = $Visible/IncomingDamage/IncomingDamageAmount
 @onready var barrier: Sprite2D = $Visible/Barrier
@@ -45,16 +47,19 @@ func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction 
 	var bypassed_damage_capped: int = 0 # damage done that does not factor in overkill damage
 	var overkill_damage: int = 0 # damage done past 0
 	var blocked_by_barrier: int = 0
-	if not bypass_block:
-		blocked_by_barrier = Global.player_data.consume_barrier(_damage)
+	var current_barrier: int = get_shared_status_amount(STATUS_BARRIER)
+	if current_barrier > 0 and _damage > 0:
+		blocked_by_barrier = min(current_barrier, _damage)
 		if blocked_by_barrier > 0:
 			Signals.combatant_blocked.emit(self, blocked_by_barrier)
 			create_block_text()
 	var remaining_damage: int = _damage - blocked_by_barrier
+	if remaining_damage <= 0:
+		return [0,0,0]
 	var current_block: int = get_block()
 	var current_health: int = _get_health()
 
-	if current_block > 0 and not bypass_block and remaining_damage > 0:
+	if current_block > 0 and not bypass_block:
 		if current_block > remaining_damage:
 			# damage less than block
 			set_block(current_block - remaining_damage)
@@ -66,11 +71,15 @@ func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction 
 			bypassed_damage = remaining_damage - current_block
 			set_block(0)
 			Signals.combatant_block_broken.emit(self)
-	elif not bypass_block:
+	else:
 		bypassed_damage = remaining_damage
 	
 	if bypassed_damage <= 0:
 		return [0,0,0]
+
+	if current_health > 0 and bypassed_damage >= current_health and get_status_charges("status_effect_grit") > 0:
+		bypassed_damage = max(0, current_health - 1)
+		remove_status("status_effect_grit", 1)
 	
 	create_damage_text(bypassed_damage)
 	overkill_damage = max(0, bypassed_damage - current_health)
@@ -94,12 +103,16 @@ func set_block(amount: int) -> void:
 		_sync_primary_member_state_if_needed()
 		block.visible = party_member_data.party_member_block > 0
 		block_amount.text = str(party_member_data.party_member_block)
+		if not _is_syncing_status_state:
+			sync_shield_status_from_block()
 		return
 	Global.player_data.player_block = amount
 	Global.player_data.player_block = max(0, Global.player_data.player_block)
 	
 	block.visible = Global.player_data.player_block > 0
 	block_amount.text = str(Global.player_data.player_block)
+	if not _is_syncing_status_state:
+		sync_shield_status_from_block()
 
 func get_block() -> int:
 	var party_member_data: PartyMemberData = get_party_member_data()
@@ -191,8 +204,9 @@ func create_artifact_fade(artifact_id: String) -> void:
 	artifact_fade.init(artifact_id)
 
 func _update_barrier_display() -> void:
-	barrier.visible = Global.player_data.player_barrier > 0
-	barrier_amount.text = str(Global.player_data.player_barrier)
+	var held_barrier: int = max(0, get_status_charges(STATUS_BARRIER))
+	barrier.visible = held_barrier > 0
+	barrier_amount.text = str(held_barrier)
 
 ### Run Modifiers
 
