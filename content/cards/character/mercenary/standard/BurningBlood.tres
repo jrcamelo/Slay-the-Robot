@@ -18,6 +18,12 @@ card_values = {
 }
 card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
 card_play_actions = Array[Dictionary]([{
+"ACTION_WRITE_OWNER_MISSING_HEALTH": {
+"write_value_names": Array[String](["damage", "poise_amount"])
+}
+}, {
+"ACTION_ATTACK_POISE": {}
+}, {
 "ACTION_VALIDATOR": {
 "passed_action_data": [{
 "ACTION_ADD_HEALTH": {
@@ -32,12 +38,6 @@ card_play_actions = Array[Dictionary]([{
 "value_name": "unblocked_damage_capped"
 }
 }]
-}
-}, {
-"ACTION_ATTACK_POISE": {}
-}, {
-"ACTION_WRITE_OWNER_MISSING_HEALTH": {
-"write_value_names": Array[String](["damage", "poise_amount"])
 }
 }])
 card_listeners = Array[Dictionary]([{

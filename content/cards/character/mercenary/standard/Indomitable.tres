@@ -20,17 +20,17 @@ card_values = {
 "status_effect_object_id": "status_effect_grit"
 }
 card_play_actions = Array[Dictionary]([{
-"ACTION_END_TURN": {
-"kind_rule": true,
-"time_delay": 0.05
+"ACTION_LOSE_HEALTH": {
+"target_override": 1
 }
 }, {
 "ACTION_APPLY_STATUS": {
 "target_override": 1
 }
 }, {
-"ACTION_LOSE_HEALTH": {
-"target_override": 1
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
 }
 }])
 object_id = "card_mercenary_indomitable"

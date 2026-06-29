@@ -17,13 +17,12 @@ card_values = {
 "health_amount": 10
 }
 card_play_actions = Array[Dictionary]([{
-"ACTION_ADD_HEALTH": {
-"health_amount": 5,
-"target_override": 3
-}
-}, {
 "ACTION_LOSE_HEALTH": {
 "target_override": 1
+}
+}, {
+"ACTION_ADD_HEALTH_TO_ALLIES": {
+"health_amount": 5
 }
 }])
 card_play_validators = Array[Dictionary]([{

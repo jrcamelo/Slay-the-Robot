@@ -19,11 +19,11 @@ card_values = {
 }
 card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
 card_play_actions = Array[Dictionary]([{
-"ACTION_ATTACK_POISE": {}
-}, {
 "ACTION_LOSE_HEALTH": {
 "target_override": 1
 }
+}, {
+"ACTION_ATTACK_POISE": {}
 }])
 card_play_validators = Array[Dictionary]([{
 "VALIDATOR_CARD_PLAY_INTRO": {

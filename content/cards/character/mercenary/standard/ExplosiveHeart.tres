@@ -20,21 +20,21 @@ card_values = {
 }
 card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
 card_play_actions = Array[Dictionary]([{
-"ACTION_END_TURN": {
-"kind_rule": true,
-"time_delay": 0.05
-}
-}, {
-"ACTION_ATTACK_POISE": {
-"target_override": 4
-}
-}, {
 "ACTION_SPEND_STATUS": {
 "spend_all": true,
 "status_effect_object_id": "status_effect_grit",
 "target_override": 1,
 "value_per_status_charge": 10,
 "write_value_names": Array[String](["damage", "poise_amount"])
+}
+}, {
+"ACTION_ATTACK_POISE": {
+"target_override": 4
+}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
 }
 }])
 card_listeners = Array[Dictionary]([{
