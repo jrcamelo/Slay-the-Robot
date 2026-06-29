@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_status"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_script"]
+
+[resource]
+script = ExtResource("1_status")
+status_effect_name = "Sway"
+status_effect_script = ExtResource("2_script")
+status_effect_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+status_effect_type = 0
+status_effect_disposition = 0
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+status_effect_player_actions = Array[Dictionary]([{
+"ACTION_CREATE_CARDS_FROM_VALUE": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_HAND": {}
+}],
+"count_value_name": "invoking_status_effect_charges",
+"created_card_object_id": "card_monk_jab"
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_monk_sway",
+"target_override": 1
+}
+}])
+status_effect_action_process_times = Array[int]([0])
+object_id = "status_effect_monk_sway"

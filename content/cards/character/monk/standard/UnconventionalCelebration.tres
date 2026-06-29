@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Unconventional Celebration"
+card_description = "I and all allies gain +[status_charge_amount] Might."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "OUTRO"
+card_energy_cost = 1
+card_type = 1
+card_requires_target = false
+card_values = {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_might"
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_APPLY_STATUS_TO_ALLIES": {}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
+}
+}])
+object_id = "card_monk_unconventional_celebration"

@@ -273,7 +273,13 @@ func _conditions_pass(conditions: Array[Dictionary]) -> bool:
 
 func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 	var living_players: Array[Player] = Global.get_living_players()
+	var targetable_players: Array[Player] = []
+	for player: Player in living_players:
+		if player.get_status_charges("status_effect_untargetable") <= 0:
+			targetable_players.append(player)
 	if len(living_players) == 0:
+		return []
+	if len(targetable_players) == 0:
 		return []
 
 	var target_count: int = max(1, intent_data.target_count)
@@ -287,22 +293,22 @@ func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 	]
 	match intent_data.targeting_rule:
 		EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS:
-			returned_targets.assign(living_players)
+			returned_targets.assign(targetable_players)
 			return returned_targets
 		EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER:
-			returned_targets = _resolve_sorted_targets(living_players, target_count, intent_data.allow_repeat_targets, true, false)
+			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, true, false)
 		EnemyIntentData.TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER:
-			returned_targets = _resolve_sorted_targets(living_players, target_count, intent_data.allow_repeat_targets, false, false)
+			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, false, false)
 		EnemyIntentData.TARGETING_LOWEST_HEALTH_PERCENT_PLAYER:
-			returned_targets = _resolve_sorted_targets(living_players, target_count, intent_data.allow_repeat_targets, true, true)
+			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, true, true)
 		EnemyIntentData.TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER:
-			returned_targets = _resolve_sorted_targets(living_players, target_count, intent_data.allow_repeat_targets, false, true)
+			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, false, true)
 		EnemyIntentData.TARGETING_RANDOM_DISTINCT_PLAYERS:
-			returned_targets = _resolve_random_targets(living_players, target_count, false, target_signature)
+			returned_targets = _resolve_random_targets(targetable_players, target_count, false, target_signature)
 		EnemyIntentData.TARGETING_RANDOM_LIVING_PLAYER, _:
-			returned_targets = _resolve_random_targets(living_players, target_count, not intent_data.allow_repeat_targets, target_signature)
+			returned_targets = _resolve_random_targets(targetable_players, target_count, not intent_data.allow_repeat_targets, target_signature)
 	if get_status_charges("status_effect_daze") > 0:
-		returned_targets = _resolve_random_targets(living_players, 1, false, target_signature + "|daze")
+		returned_targets = _resolve_random_targets(targetable_players, 1, false, target_signature + "|daze")
 	return returned_targets
 
 func _resolve_sorted_targets(players: Array[Player], target_count: int, allow_repeat_targets: bool, ascending: bool, use_percent: bool) -> Array[Player]:

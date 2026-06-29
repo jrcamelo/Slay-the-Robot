@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Haymaker"
+card_description = "Discard all of your Jabs.
+Attack: [damage] Damage."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 2
+card_rarity = 3
+card_values = {
+"damage": 0
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_DISCARD_HAND_BY_FILTER": {
+"card_object_ids": ["card_monk_jab"],
+"write_multiplier": 4,
+"write_value_names": Array[String](["damage"])
+}
+}, {
+"ACTION_ATTACK": {}
+}])
+object_id = "card_monk_haymaker"

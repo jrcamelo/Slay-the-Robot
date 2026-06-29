@@ -9,4 +9,6 @@ func _get_editor_description() -> String:
 
 func perform_action() -> void:
 	var picked_cards: Array[CardData] = _get_picked_cards()
+	if card_play_request != null and picked_cards.has(card_play_request.card_data):
+		card_play_request.destination = CardPlayRequest.CARD_PLAY_DESTINATIONS.BANISH
 	Signals.card_banish_requested.emit(picked_cards, false)

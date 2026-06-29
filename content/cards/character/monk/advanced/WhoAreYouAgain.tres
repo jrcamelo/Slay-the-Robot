@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Who Are You Again?"
+card_description = "Discard all of my cards from your hand, then draw that many. I cannot play cards for the remainder of the turn, and I cannot be targeted by enemies until the start of your next turn."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 0
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_play_actions = Array[Dictionary]([{
+"ACTION_DISCARD_HAND_AND_DRAW_SAME": {
+"owner_only": true
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_no_cards",
+"target_override": 1
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_untargetable",
+"target_override": 1
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_monk_who_are_you_again"

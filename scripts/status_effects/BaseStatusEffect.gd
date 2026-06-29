@@ -39,6 +39,7 @@ func perform_status_effect_actions() -> void:
 	if len(action_data) > 0:
 		var card_play_request: CardPlayRequest = _generate_status_effect_card_play_request() # generate a fake request
 		var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [parent_combatant], action_data, null)
+		generated_actions.reverse()
 		ActionHandler.add_actions(generated_actions)
 
 func get_amount() -> int:

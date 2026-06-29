@@ -360,6 +360,7 @@ func _play_card(card_play_request: CardPlayRequest) -> void:
 	### generate and perform play card actions
 	# generate the card actions
 	var card_play_actions: Array[BaseAction] = ActionGenerator.create_actions(owner_combatant, card_play_request, targets, card_play_request.card_data.card_play_actions, null)
+	card_play_actions.reverse()
 	# generate a special action which signifies the end of the card play, to be done after all the other card actions
 	var card_played_finished_action: Array[BaseAction] = [ActionGenerator.generate_card_play_finished(card_play_request)]
 	
@@ -374,7 +375,9 @@ func _play_card(card_play_request: CardPlayRequest) -> void:
 		await ActionHandler.actions_ended
 	
 	# determine where to move card to after being played
-	if CardData.NON_REUSABLE_CARD_TYPES.has(card_play_request.card_data.card_type):
+	if card_play_request.destination == CardPlayRequest.CARD_PLAY_DESTINATIONS.BANISH:
+		pass
+	elif CardData.NON_REUSABLE_CARD_TYPES.has(card_play_request.card_data.card_type):
 		pass
 	else:
 		# transfer card from hand to discard/exhaust pile

@@ -115,6 +115,8 @@ func can_play_card() -> bool:
 	if Global.player_data.player_energy + card_data.get_card_energy_cost() > Global.player_data.player_energy_max:
 		return false
 	var owner_player: Player = Global.get_card_owner_player(card_data)
+	if owner_player != null and owner_player.get_status_charges("status_effect_no_cards") > 0:
+		return false
 	if owner_player != null and card_data.card_type == CardData.CARD_TYPES.ATTACK:
 		if owner_player.get_status_charges("status_effect_no_attack") > 0:
 			return false

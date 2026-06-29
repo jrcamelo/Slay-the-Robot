@@ -62,6 +62,13 @@ const ACTION_ADD_HEALTH: String = "res://scripts/actions/ActionAddHealth.gd"
 const ACTION_HEAL_PERCENT: String =  "res://scripts/actions/ActionHealPercent.gd"
 const ACTION_LOSE_HEALTH: String = "res://scripts/actions/ActionLoseHealth.gd"
 const ACTION_WRITE_OWNER_MISSING_HEALTH: String = "res://scripts/actions/ActionWriteOwnerMissingHealth.gd"
+const ACTION_CREATE_CARDS_FROM_VALUE: String = "res://scripts/actions/ActionCreateCardsFromValue.gd"
+const ACTION_DISCARD_HAND_AND_DRAW_SAME: String = "res://scripts/actions/ActionDiscardHandAndDrawSame.gd"
+const ACTION_DISCARD_HAND_BY_FILTER: String = "res://scripts/actions/ActionDiscardHandByFilter.gd"
+const ACTION_WRITE_PLAYED_CARD_COUNT: String = "res://scripts/actions/ActionWritePlayedCardCount.gd"
+const ACTION_APPLY_STATUS_TO_ALLIES: String = "res://scripts/actions/ActionApplyStatusToAllies.gd"
+const ACTION_ADD_HEALTH_TO_ALLIES: String = "res://scripts/actions/ActionAddHealthToAllies.gd"
+const ACTION_PLAY_ATTACK_AND_STORE_NEXT_JAB_BONUS: String = "res://scripts/actions/ActionPlayAttackAndStoreNextJabBonus.gd"
 
 const ACTION_ADD_ARTIFACT: String = "res://scripts/actions/player_actions/ActionAddArtifact.gd"
 const ACTION_SWAP_BOSS_ARTIFACT: String = "res://scripts/actions/player_actions/ActionSwapBossArtifact.gd"
@@ -176,6 +183,7 @@ const VALIDATOR_ENEMY_NAME_CONTAINS: String = "res://scripts/validators/Validato
 const VALIDATOR_OWNER_INCOMING_ATTACK: String = "res://scripts/validators/ValidatorOwnerIncomingAttack.gd"
 const VALIDATOR_ALLY_INCOMING_ATTACK: String = "res://scripts/validators/ValidatorAllyIncomingAttack.gd"
 const VALIDATOR_OWNER_DAMAGED_BY_ATTACK_LAST_TURN: String = "res://scripts/validators/ValidatorOwnerDamagedByAttackLastTurn.gd"
+const VALIDATOR_OWNER_DAMAGED_LAST_TURN: String = "res://scripts/validators/ValidatorOwnerDamagedLastTurn.gd"
 const VALIDATOR_SELECTED_TARGET_NOT_OWNER: String = "res://scripts/validators/ValidatorSelectedTargetNotOwner.gd"
 
 const VALIDATOR_HAS_RELIC: String = "res://scripts/validators/ValidatorHasRelic.gd"
@@ -198,6 +206,8 @@ const LISTENER_QUICK_ENEMY_KILLED: String = "res://scripts/card_listeners/Listen
 const LISTENER_QUICK_INCOMING_ATTACK: String = "res://scripts/card_listeners/ListenerQuickIncomingAttack.gd"
 const LISTENER_QUICK_INCOMING_ATTACK_REDIRECT: String = "res://scripts/card_listeners/ListenerQuickIncomingAttackRedirect.gd"
 const LISTENER_QUICK_SELF_START_ATTACK: String = "res://scripts/card_listeners/ListenerQuickSelfStartAttack.gd"
+const LISTENER_QUICK_ALLY_ATTACK_CREATE_JAB_LOOP: String = "res://scripts/card_listeners/ListenerQuickAllyAttackCreateJabLoop.gd"
+const LISTENER_QUICK_OWNER_DISCARDED_CARD: String = "res://scripts/card_listeners/ListenerQuickOwnerDiscardedCard.gd"
 #endregion
 
 #region Interceptors
@@ -216,6 +226,7 @@ const INTERCEPTOR_DUPLICATE_ATTACKS: String = "res://scripts/action_interceptors
 const INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS: String = "res://scripts/action_interceptors/InterceptorNextAttackDamageBonus.gd"
 const INTERCEPTOR_NEXT_ATTACK_PIERCING: String = "res://scripts/action_interceptors/InterceptorNextAttackPiercing.gd"
 const INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE: String = "res://scripts/action_interceptors/InterceptorNextAttackDoubleDamage.gd"
+const INTERCEPTOR_NEXT_JAB_DAMAGE_BONUS: String = "res://scripts/action_interceptors/InterceptorNextJabDamageBonus.gd"
 #endregion
 
 var _token_to_script_path: Dictionary[String, String] = {}

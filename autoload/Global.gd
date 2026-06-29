@@ -776,6 +776,14 @@ func add_test_action_interceptors() -> void:
 	interceptor_next_attack_double_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
 	register_rod(interceptor_next_attack_double_damage)
+
+	var interceptor_next_jab_damage_bonus: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_jab_damage_bonus")
+	interceptor_next_jab_damage_bonus.action_interceptor_priority = 10055
+	interceptor_next_jab_damage_bonus.action_interceptor_modifies_parent = true
+	interceptor_next_jab_damage_bonus.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_JAB_DAMAGE_BONUS)
+	interceptor_next_jab_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
+
+	register_rod(interceptor_next_jab_damage_bonus)
 	
 
 func get_action_interceptor_data(action_interceptor_object_id: String) -> ActionInterceptorData:
@@ -1190,6 +1198,26 @@ func add_test_player_data() -> void:
 	player_orange.player_character_object_id = "character_orange"
 	
 	register_rod(player_orange)
+
+	var player_ranger: PlayerData = PlayerData.new("player_ranger")
+	player_ranger.player_character_object_id = "character_ranger"
+	
+	register_rod(player_ranger)
+
+	var player_mercenary: PlayerData = PlayerData.new("player_mercenary")
+	player_mercenary.player_character_object_id = "character_mercenary"
+	
+	register_rod(player_mercenary)
+
+	var player_samurai: PlayerData = PlayerData.new("player_samurai")
+	player_samurai.player_character_object_id = "character_samurai"
+	
+	register_rod(player_samurai)
+
+	var player_monk: PlayerData = PlayerData.new("player_monk")
+	player_monk.player_character_object_id = "character_monk"
+	
+	register_rod(player_monk)
 
 func get_player_data_from_prototype(player_id: String) -> PlayerData:
 	var _player_data: PlayerData = _id_to_player_data[player_id]

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "One, Two, Three, Floor"
+card_description = "Create 3 Jabs. The next time a Jab reduces an enemy's Poise to 0 this turn, create 3 more Jabs."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 3
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"created_card_object_id": "card_monk_jab",
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_monk_one_two_three_floor"
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_CREATE_CARDS": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_HAND": {}
+}],
+"number_of_cards": 3
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"target_override": 1
+}
+}])
+object_id = "card_monk_one_two_three_floor"

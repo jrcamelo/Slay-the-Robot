@@ -49,6 +49,8 @@ func perform_action() -> void:
 			var target_enemy: Enemy = target
 			var current_poise: int = target_enemy.get_poise()
 			target_enemy.add_poise(-poise_amount)
+			if current_poise > 0 and target_enemy.is_poise_depleted():
+				Signals.combatant_poise_depleted.emit(target_enemy, self)
 			if overwhelming and poise_amount > current_poise:
 				total_damage += poise_amount - current_poise
 
@@ -70,6 +72,7 @@ func perform_action() -> void:
 			actions_on_lethal.assign(get_action_value("actions_on_lethal", []))
 			if len(actions_on_lethal) > 0:
 				var generated_on_lethal_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [target], actions_on_lethal, self)
+				generated_on_lethal_actions.reverse()
 				ActionHandler.add_actions(generated_on_lethal_actions)
 
 func is_action_short_circuited() -> bool:

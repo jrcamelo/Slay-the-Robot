@@ -124,6 +124,7 @@ signal combatant_block_added(base_combatant: BaseCombatant)
 signal combatant_block_broken(base_combatant: BaseCombatant)	# the combatant has had their block broken through. Not emitted if bypassed damage
 signal combatant_blocked(base_combatant: BaseCombatant, damage_blocked: int)	# combatant fully blocked an attack
 signal combatant_targeted_by_attack(base_combatant: BaseCombatant, attack_action: BaseAction)	# emitted before an attack action is intercepted, for reaction effects
+signal combatant_poise_depleted(base_combatant: BaseCombatant, attack_action: BaseAction)	# emitted when an attack drops an enemy's poise to 0
 signal combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int, source_action: BaseAction)	# a combatant has taken health damage. Cannot be 0
 signal combatant_status_changed(base_combatant: BaseCombatant, status_effect_object_id: String)
 

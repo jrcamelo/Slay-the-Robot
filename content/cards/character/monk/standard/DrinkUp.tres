@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Drink Up"
+card_description = "Discard up to 3 cards, then create a Jab for each card discarded."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 2
+card_type = 1
+card_requires_target = false
+card_values = {
+"created_card_object_id": "card_monk_jab"
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_PICK_CARDS": {
+"action_data": [{
+"ACTION_DISCARD_CARDS": {}
+}, {
+"ACTION_CREATE_CARDS_FROM_VALUE": {
+"action_data": [{
+"ACTION_ADD_CARDS_TO_HAND": {}
+}],
+"count_value_name": "picked_card_count"
+}
+}],
+"card_pick_text": "Choose up to 3 cards to discard. {1} cards selected",
+"card_pick_type": 0,
+"max_card_amount": 3,
+"min_card_amount": 0,
+"min_cards_are_required_for_action": false,
+"quick_pick": false,
+"random_selection": false
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_monk_drink_up"

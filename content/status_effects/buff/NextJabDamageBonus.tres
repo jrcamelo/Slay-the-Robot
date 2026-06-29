@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_status"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_script"]
+
+[resource]
+script = ExtResource("1_status")
+status_effect_name = "Next Jab Damage Bonus"
+status_effect_script = ExtResource("2_script")
+status_effect_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+status_effect_type = 0
+status_effect_disposition = 0
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+status_effect_interceptor_ids = Array[String](["interceptor_next_jab_damage_bonus"])
+object_id = "status_effect_next_jab_damage_bonus"

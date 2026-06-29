@@ -34,6 +34,7 @@ func perform_action():
 			action_data.append(failed_action)
 	
 	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, targets, action_data, self)
+	generated_actions.reverse()
 	ActionHandler.add_actions(generated_actions)
 
 func _validate() -> bool:

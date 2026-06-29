@@ -66,6 +66,7 @@ func perform_action():
 			actions_on_lethal.assign(get_action_value("actions_on_lethal", []))
 			if len(actions_on_lethal) > 0:
 				var generated_on_lethal_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [target], actions_on_lethal, self)
+				generated_on_lethal_actions.reverse()
 				ActionHandler.add_actions(generated_on_lethal_actions)
 
 func is_action_short_circuited():
