@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Resource" path="res://content/characters/samurai/StartingArtifacts.tres" id="1_artifacts"]
+[ext_resource type="Resource" path="res://content/characters/samurai/Deck.tres" id="2_deck"]
+[ext_resource type="Script" path="res://data/readonly/CharacterData.gd" id="3_character"]
+
+[resource]
+script = ExtResource("3_character")
+character_name = "Samurai"
+character_description = "Uses stances, disciplined attacks, and defensive reactions."
+character_color_id = "color_red"
+character_texture_path = "external/sprites/characters/character_red/character_red.png"
+character_icon_texture_path = "external/sprites/characters/character_red/character_red_icon.png"
+character_text_energy_texture_path = "external/sprites/characters/character_red/character_red_text_energy.png"
+character_player_id = "player_samurai"
+character_starting_artifact_resource = ExtResource("1_artifacts")
+character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_red"])
+character_starting_card_object_ids = Array[String](["card_samurai_silent_draw", "card_samurai_silent_draw", "card_samurai_calm_before_steel", "card_samurai_calm_before_steel", "card_samurai_one_stroke", "card_samurai_one_stroke"])
+character_starting_deck_resource = ExtResource("2_deck")
+character_starting_health = 75
+character_starting_card_draft_card_pack_ids = Array[String](["card_pack_samurai"])
+object_id = "character_samurai"

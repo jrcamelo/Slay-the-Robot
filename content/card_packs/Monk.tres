@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardPackData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/CardPackData.gd" id="1_card_pack"]
+
+[resource]
+script = ExtResource("1_card_pack")
+card_pack_card_ids = Array[String](["card_monk_drink_up", "card_monk_empty_eyes", "card_monk_jab", "card_monk_fake_out", "card_monk_whos_next", "card_monk_cross_counter", "card_monk_that_looks_fun", "card_monk_sway_sway_sway", "card_monk_unconventional_celebration", "card_monk_who_are_you_again", "card_monk_one_two_three_floor", "card_monk_haymaker", "card_monk_unrelenting", "card_monk_hidden_dragon_of_winding_river"])
+card_pack_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_ID": {
+"card_object_ids": Array[String](["card_monk_drink_up", "card_monk_empty_eyes", "card_monk_jab", "card_monk_fake_out", "card_monk_whos_next", "card_monk_cross_counter", "card_monk_that_looks_fun", "card_monk_sway_sway_sway", "card_monk_unconventional_celebration", "card_monk_who_are_you_again", "card_monk_one_two_three_floor", "card_monk_haymaker", "card_monk_unrelenting", "card_monk_hidden_dragon_of_winding_river"])
+}
+}])
+object_id = "card_pack_monk"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardPackData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/CardPackData.gd" id="1_card_pack"]
+
+[resource]
+script = ExtResource("1_card_pack")
+card_pack_card_ids = Array[String](["card_mercenary_flames_of_life", "card_mercenary_blazing_entry", "card_mercenary_burning_blood", "card_mercenary_fiendish_pact", "card_mercenary_your_life_for_mine", "card_mercenary_bloodthief", "card_mercenary_violent_backlash", "card_mercenary_explosive_heart", "card_mercenary_indomitable"])
+card_pack_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_ID": {
+"card_object_ids": Array[String](["card_mercenary_flames_of_life", "card_mercenary_blazing_entry", "card_mercenary_burning_blood", "card_mercenary_fiendish_pact", "card_mercenary_your_life_for_mine", "card_mercenary_bloodthief", "card_mercenary_violent_backlash", "card_mercenary_explosive_heart", "card_mercenary_indomitable"])
+}
+}])
+object_id = "card_pack_mercenary"

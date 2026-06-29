@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Resource" path="res://content/characters/ranger/StartingArtifacts.tres" id="1_artifacts"]
+[ext_resource type="Resource" path="res://content/characters/ranger/Deck.tres" id="2_deck"]
+[ext_resource type="Script" path="res://data/readonly/CharacterData.gd" id="3_character"]
+
+[resource]
+script = ExtResource("3_character")
+character_name = "Ranger"
+character_description = "Controls fights with precise shots, reactions, and finishing attacks."
+character_color_id = "color_green"
+character_texture_path = "external/sprites/characters/character_green/character_green.png"
+character_icon_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+character_text_energy_texture_path = "external/sprites/characters/character_green/character_green_text_energy.png"
+character_player_id = "player_ranger"
+character_starting_artifact_resource = ExtResource("1_artifacts")
+character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_green"])
+character_starting_card_object_ids = Array[String](["card_ranger_headshot", "card_ranger_headshot", "card_ranger_legshot", "card_ranger_legshot", "card_ranger_bodyshot", "card_ranger_bodyshot"])
+character_starting_deck_resource = ExtResource("2_deck")
+character_starting_health = 65
+character_starting_card_draft_card_pack_ids = Array[String](["card_pack_ranger"])
+object_id = "character_ranger"

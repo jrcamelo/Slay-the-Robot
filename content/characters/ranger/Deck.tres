@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/ShootFirst.tres" id="2_shoot_first"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/WarningShot.tres" id="3_warning_shot"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/Headshot.tres" id="4_headshot"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/Legshot.tres" id="5_legshot"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/Bodyshot.tres" id="6_bodyshot"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/Doubleshot.tres" id="7_doubleshot"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/Kickback.tres" id="8_kickback"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/RainOfArrows.tres" id="9_rain_arrows"]
+[ext_resource type="Resource" path="res://content/cards/character/ranger/standard/MountainPiercer.tres" id="10_mountain"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="11_deck"]
+
+[resource]
+script = ExtResource("11_deck")
+cards = Array[ExtResource("1_card")]([ExtResource("4_headshot"), ExtResource("4_headshot"), ExtResource("5_legshot"), ExtResource("5_legshot"), ExtResource("6_bodyshot"), ExtResource("6_bodyshot")])

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/DrinkUp.tres" id="2_drink"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/EmptyEyes.tres" id="3_empty"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/Jab.tres" id="4_jab"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/FakeOut.tres" id="5_fake"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/WhosNext.tres" id="6_next"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/CrossCounter.tres" id="7_counter"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/ThatLooksFun.tres" id="8_fun"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/SwaySwaySway.tres" id="9_sway"]
+[ext_resource type="Resource" path="res://content/cards/character/monk/standard/UnconventionalCelebration.tres" id="10_celebration"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="11_deck"]
+
+[resource]
+script = ExtResource("11_deck")
+cards = Array[ExtResource("1_card")]([ExtResource("4_jab"), ExtResource("4_jab"), ExtResource("5_fake"), ExtResource("5_fake"), ExtResource("6_next"), ExtResource("6_next")])

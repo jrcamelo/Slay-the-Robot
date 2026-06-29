@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardPackData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/CardPackData.gd" id="1_card_pack"]
+
+[resource]
+script = ExtResource("1_card_pack")
+card_pack_card_ids = Array[String](["card_ranger_shoot_first", "card_ranger_warning_shot", "card_ranger_headshot", "card_ranger_legshot", "card_ranger_bodyshot", "card_ranger_doubleshot", "card_ranger_kickback", "card_ranger_rain_of_arrows", "card_ranger_mountain_piercer"])
+card_pack_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_ID": {
+"card_object_ids": Array[String](["card_ranger_shoot_first", "card_ranger_warning_shot", "card_ranger_headshot", "card_ranger_legshot", "card_ranger_bodyshot", "card_ranger_doubleshot", "card_ranger_kickback", "card_ranger_rain_of_arrows", "card_ranger_mountain_piercer"])
+}
+}])
+object_id = "card_pack_ranger"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/FlamesOfLife.tres" id="2_flames"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/BlazingEntry.tres" id="3_blazing"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/BurningBlood.tres" id="4_burning"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/FiendishPact.tres" id="5_pact"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/YourLifeForMine.tres" id="6_life"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/Bloodthief.tres" id="7_bloodthief"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/ViolentBacklash.tres" id="8_backlash"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/ExplosiveHeart.tres" id="9_heart"]
+[ext_resource type="Resource" path="res://content/cards/character/mercenary/standard/Indomitable.tres" id="10_indomitable"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="11_deck"]
+
+[resource]
+script = ExtResource("11_deck")
+cards = Array[ExtResource("1_card")]([ExtResource("4_burning"), ExtResource("4_burning"), ExtResource("5_pact"), ExtResource("5_pact"), ExtResource("6_life"), ExtResource("6_life")])

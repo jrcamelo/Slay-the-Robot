@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DeckListResource" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/AikidoStance.tres" id="2_aikido"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/IaidoStance.tres" id="3_iaido"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/OneStroke.tres" id="4_one"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/SilentDraw.tres" id="5_silent"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/CalmBeforeSteel.tres" id="6_calm"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/ClosedPath.tres" id="7_closed"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/StolenMoment.tres" id="8_stolen"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/PerfectForm.tres" id="9_perfect"]
+[ext_resource type="Resource" path="res://content/cards/character/samurai/standard/RestTheBlade.tres" id="10_rest"]
+[ext_resource type="Script" path="res://data/content/DeckListResource.gd" id="11_deck"]
+
+[resource]
+script = ExtResource("11_deck")
+cards = Array[ExtResource("1_card")]([ExtResource("5_silent"), ExtResource("5_silent"), ExtResource("6_calm"), ExtResource("6_calm"), ExtResource("4_one"), ExtResource("4_one")])
