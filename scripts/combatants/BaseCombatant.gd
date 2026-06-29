@@ -334,6 +334,7 @@ func _apply_status_internal(status_effect_object_id: String, charge_amount: int,
 	update_health_bar(false)
 	
 	Signals.enemy_intent_changed.emit()	# update enemy intent in case statuses affect them
+	Signals.combatant_status_changed.emit(self, status_effect_object_id)
 
 func add_new_status_effect(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, custom_values: Dictionary = {}) -> void:
 	apply_status(status_effect_object_id, charge_amount, null, secondary_charge_amount, true, custom_values)
@@ -403,6 +404,7 @@ func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> 
 		self._update_barrier_display()
 	update_health_bar(false)
 	Signals.enemy_intent_changed.emit()
+	Signals.combatant_status_changed.emit(self, status_effect_object_id)
 
 func _set_status_source(status_effect_object_id: String, source_combatant: BaseCombatant) -> void:
 	if source_combatant == null:

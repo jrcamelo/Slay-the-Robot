@@ -15,12 +15,10 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 		return ACTION_ACCEPTENCES.REJECTED
 	
 	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	var target_block: int = target_combatant.get_block()
-	if damage > target_block:
-		# reduce the status by 1
+	if damage > 0:
+		# consume the negate effect on the next incoming attack damage instance
 		target_combatant.add_status_effect_charges(NEGATE_DAMAGE_STATUS_EFFECT_ID, -1)
-	
-		action_interceptor_processor.shadowed_action_values["damage"] = target_block
+		action_interceptor_processor.shadowed_action_values["damage"] = 0
 		return ACTION_ACCEPTENCES.STOPPED
 	
 	return ACTION_ACCEPTENCES.CONTINUE

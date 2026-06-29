@@ -267,6 +267,8 @@ func _queue_selected_target_card(target: BaseCombatant) -> void:
 		return
 	if not _can_card_target_combatant(current_selected_card.card_data, target):
 		return
+	if not Global.validate(current_selected_card.card_data.card_play_validators, current_selected_card.card_data, null, {"_selected_target": target}):
+		return
 	_unprompt_target()
 	var card_play_request: CardPlayRequest = CardPlayRequest.new()
 	card_play_request.card_data = current_selected_card.card_data

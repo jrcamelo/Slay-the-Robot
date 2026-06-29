@@ -7,6 +7,8 @@ class_name CombatStatsData
 
 var cards_played_this_turn: Array[CardPlayRequest] = []
 var cards_played_this_combat: Array[Array] = []
+var enemy_attackers_this_enemy_turn_by_player_index: Dictionary[int, Array] = {}
+var enemy_attackers_last_turn_by_player_index: Dictionary[int, Array] = {}
 @export var turn_count: int = 1
 
 ## Tracks whether it is currently the player's turn in a central location.
@@ -104,6 +106,10 @@ func _on_player_turn_ended():
 	is_player_turn = false
 
 func _on_enemy_turn_ended():
+	enemy_attackers_last_turn_by_player_index = {}
+	for player_index: int in enemy_attackers_this_enemy_turn_by_player_index.keys():
+		enemy_attackers_last_turn_by_player_index[player_index] = enemy_attackers_this_enemy_turn_by_player_index[player_index].duplicate()
+	enemy_attackers_this_enemy_turn_by_player_index.clear()
 	turn_count += 1
 	_reset_turn_stats()
 	# move cards played over and reset it
@@ -114,6 +120,8 @@ func _on_combat_ended():
 	# remove these to save card plays after they're not needed for run history
 	cards_played_this_combat.clear()
 	cards_played_this_turn.clear()
+	enemy_attackers_this_enemy_turn_by_player_index.clear()
+	enemy_attackers_last_turn_by_player_index.clear()
 	
 	# keep this to prevent stat tracks after combat
 	_disconnect_signals()
@@ -162,6 +170,11 @@ func get_card_data_played_last_turn(include_duplicates: bool = false) -> Array[C
 			if not cards_played.has(card_play_request.card_data):
 				cards_played.append(card_play_request.card_data)
 	return cards_played
+
+func get_last_turn_attackers_for_player(party_member_index: int) -> Array[int]:
+	var attacker_ids: Array[int] = []
+	attacker_ids.assign(enemy_attackers_last_turn_by_player_index.get(party_member_index, []))
+	return attacker_ids
 #endregion
 
 #region Stat Tracking
@@ -220,6 +233,16 @@ func _on_combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int,
 	if base_combatant.is_in_group("players"):
 		add_to_enum_stat(STATS.PLAYER_DAMAGED_AMOUNT, unblocked_damage)
 		add_to_enum_stat(STATS.PLAYER_DAMAGED_COUNT, 1)
+		var source_action: BaseAction = _source_action
+		if source_action != null and source_action.parent_combatant is Enemy and base_combatant is Player:
+			var action_path: String = source_action.get_script().resource_path
+			if action_path in [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]:
+				var damaged_player: Player = base_combatant
+				var attacker_ids: Array = enemy_attackers_this_enemy_turn_by_player_index.get(damaged_player.get_party_member_index(), [])
+				var attacker_id: int = source_action.parent_combatant.get_instance_id()
+				if not attacker_ids.has(attacker_id):
+					attacker_ids.append(attacker_id)
+				enemy_attackers_this_enemy_turn_by_player_index[damaged_player.get_party_member_index()] = attacker_ids
 
 func _on_enemy_killed(_enemy: Enemy):
 	add_to_enum_stat(STATS.ENEMIES_KILLED, 1)

@@ -8,25 +8,48 @@ func _get_editor_description() -> String:
 	return "Heals the relevant player or party member and can also increase max health."
 
 func perform_action():
-	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action([])
-	var party_member_data: PartyMemberData = null
-	if Global.player_data.has_party_members():
-		if parent_combatant is Player:
-			party_member_data = parent_combatant.get_party_member_data()
-		if party_member_data == null and card_play_request != null and card_play_request.card_data != null:
-			party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
-	# TODO: Generalize health actions to target specific allies once ally-targeting UI exists.
+	var resolved_targets: Array[BaseCombatant] = get_adjusted_action_targets()
+	if resolved_targets.is_empty():
+		var fallback_target: BaseCombatant = parent_combatant
+		if fallback_target == null and card_play_request != null and card_play_request.card_data != null:
+			fallback_target = Global.get_card_owner_player(card_play_request.card_data)
+		if fallback_target != null:
+			resolved_targets = [fallback_target]
+	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action(resolved_targets)
 	
 	for action_interceptor_processor in action_interceptor_processors:
 		var health_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_AMOUNT, 0)
 		var health_max_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_MAX_AMOUNT, 0)
-		if party_member_data != null:
-			party_member_data.add_health(health_amount, health_max_amount)
-			if party_member_data.party_member_party_index == 0:
-				Global.player_data.synchronize_legacy_primary_member_state()
-			Signals.player_health_changed.emit()
-		else:
-			Global.player_data.add_health(health_amount, health_max_amount)
+		var target: BaseCombatant = action_interceptor_processor.target
+		if target is Player:
+			var party_member_data: PartyMemberData = (target as Player).get_party_member_data()
+			if party_member_data != null:
+				party_member_data.add_health(health_amount, health_max_amount)
+				if party_member_data.party_member_party_index == 0:
+					Global.player_data.synchronize_legacy_primary_member_state()
+				Signals.player_health_changed.emit()
+			else:
+				Global.player_data.add_health(health_amount, health_max_amount)
+		elif target == null and parent_combatant is Player:
+			var parent_party_member_data: PartyMemberData = (parent_combatant as Player).get_party_member_data()
+			if parent_party_member_data != null:
+				parent_party_member_data.add_health(health_amount, health_max_amount)
+				if parent_party_member_data.party_member_party_index == 0:
+					Global.player_data.synchronize_legacy_primary_member_state()
+				Signals.player_health_changed.emit()
+			else:
+				Global.player_data.add_health(health_amount, health_max_amount)
+		elif target == null:
+			var owner_party_member_data: PartyMemberData = null
+			if Global.player_data.has_party_members() and card_play_request != null and card_play_request.card_data != null:
+				owner_party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
+			if owner_party_member_data != null:
+				owner_party_member_data.add_health(health_amount, health_max_amount)
+				if owner_party_member_data.party_member_party_index == 0:
+					Global.player_data.synchronize_legacy_primary_member_state()
+				Signals.player_health_changed.emit()
+			else:
+				Global.player_data.add_health(health_amount, health_max_amount)
 	
 
 func _to_string():
