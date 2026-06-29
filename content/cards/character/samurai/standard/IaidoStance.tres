@@ -17,11 +17,11 @@ card_values = {
 "status_effect_object_id": "status_effect_next_attack_double_damage"
 }
 card_play_actions = Array[Dictionary]([{
+"ACTION_DRAW_GENERATOR": {}
+}, {
 "ACTION_APPLY_STATUS": {
 "target_override": 1
 }
-}, {
-"ACTION_DRAW_GENERATOR": {}
 }])
 card_play_validators = Array[Dictionary]([{
 "VALIDATOR_CARD_PLAY_INTRO": {

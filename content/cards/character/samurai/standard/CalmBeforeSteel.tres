@@ -15,8 +15,6 @@ card_values = {
 }
 card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
 card_play_actions = Array[Dictionary]([{
-"ACTION_ATTACK_POISE": {}
-}, {
 "ACTION_PICK_CARDS": {
 "action_data": [{
 "ACTION_DISCARD_CARDS": {}
@@ -35,6 +33,8 @@ card_play_actions = Array[Dictionary]([{
 }
 }]
 }
+}, {
+"ACTION_ATTACK_POISE": {}
 }])
 card_play_validators = Array[Dictionary]([{
 "VALIDATOR_CARD_KIND_IN_HAND": {

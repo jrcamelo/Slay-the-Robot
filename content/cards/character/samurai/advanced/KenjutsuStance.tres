@@ -13,6 +13,8 @@ card_type = 1
 card_rarity = 3
 card_requires_target = false
 card_play_actions = Array[Dictionary]([{
+"ACTION_DRAW_GENERATOR": {}
+}, {
 "ACTION_PICK_CARDS": {
 "action_data": [{
 "ACTION_ADD_CARDS_TO_HAND": {}
@@ -29,8 +31,6 @@ card_play_actions = Array[Dictionary]([{
 }
 }]
 }
-}, {
-"ACTION_DRAW_GENERATOR": {}
 }])
 card_play_validators = Array[Dictionary]([{
 "VALIDATOR_CARD_PLAY_INTRO": {
