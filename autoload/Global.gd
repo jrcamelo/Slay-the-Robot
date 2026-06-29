@@ -1307,7 +1307,7 @@ func get_cached_artifact_filter(artifact_filter_cache_id: String) -> ArtifactFil
 #region General Utility
 
 ## Returns if all given validators pass. This is used all across framework.
-func validate(validators: Array[Dictionary], card_data: CardData = null, action: BaseAction = null) -> bool:
+func validate(validators: Array[Dictionary], card_data: CardData = null, action: BaseAction = null, context_values: Dictionary[String, Variant] = {}) -> bool:
 	for validator_data: Dictionary in validators:
 		for validator_token: String in validator_data:
 			var validator_script_asset: Script = Scripts.resolve_script(validator_token)
@@ -1318,6 +1318,8 @@ func validate(validators: Array[Dictionary], card_data: CardData = null, action:
 			
 			var validator_values: Dictionary[String, Variant] = {}
 			validator_values.assign(validator_data[validator_token]) # assign to force typed dict
+			for key: Variant in context_values.keys():
+				validator_values[key] = context_values[key]
 			
 			if not validator.validate(card_data, action, validator_values):
 				return false

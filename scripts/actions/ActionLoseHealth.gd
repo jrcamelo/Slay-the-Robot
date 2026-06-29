@@ -17,14 +17,12 @@ func perform_action() -> void:
 		if fallback_target != null:
 			resolved_targets = [fallback_target]
 
-	var action_interceptor_processors: Array[ActionInterceptorProcessor] = _intercept_action(resolved_targets)
-	for action_interceptor_processor in action_interceptor_processors:
-		var target: BaseCombatant = action_interceptor_processor.target
-		if target == null or not target.is_alive():
-			continue
+	var health_loss_amount: int = max(0, get_action_value(ActionValueRegistry.HEALTH_AMOUNT, 0))
+	if health_loss_amount <= 0:
+		return
 
-		var health_loss_amount: int = max(0, action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_AMOUNT, 0))
-		if health_loss_amount <= 0:
+	for target: BaseCombatant in resolved_targets:
+		if target == null or not target.is_alive():
 			continue
 
 		if target is Player:

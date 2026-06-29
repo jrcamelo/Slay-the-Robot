@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Blazing Entry"
+card_description = "Additional Cost: Lose 5 Hit Points.
+Attack: [damage] Damage and [poise_amount] Poise."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 2
+card_rarity = 3
+card_values = {
+"damage": 10,
+"health_amount": 5,
+"poise_amount": 10
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}, {
+"ACTION_LOSE_HEALTH": {
+"target_override": 1
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_mercenary_blazing_entry"

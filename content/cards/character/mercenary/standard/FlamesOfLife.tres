@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+card_name = "Flames of Life"
+card_description = "Additional Cost: Lose 10 Hit Points.
+All Allies recover 5 Hit Points."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"health_amount": 10
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ADD_HEALTH": {
+"health_amount": 5,
+"target_override": 3
+}
+}, {
+"ACTION_LOSE_HEALTH": {
+"target_override": 1
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_mercenary_flames_of_life"
