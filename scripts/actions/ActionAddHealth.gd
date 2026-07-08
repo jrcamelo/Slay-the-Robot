@@ -22,34 +22,21 @@ func perform_action():
 		var health_max_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_MAX_AMOUNT, 0)
 		var target: BaseCombatant = action_interceptor_processor.target
 		if target is Player:
-			var party_member_data: PartyMemberData = (target as Player).get_party_member_data()
-			if party_member_data != null:
-				party_member_data.add_health(health_amount, health_max_amount)
-				if party_member_data.party_member_party_index == 0:
-					Global.player_data.synchronize_legacy_primary_member_state()
-				Signals.player_health_changed.emit()
-			else:
-				Global.player_data.add_health(health_amount, health_max_amount)
+			(target as Player).add_health(health_amount, health_max_amount)
 		elif target == null and parent_combatant is Player:
-			var parent_party_member_data: PartyMemberData = (parent_combatant as Player).get_party_member_data()
-			if parent_party_member_data != null:
-				parent_party_member_data.add_health(health_amount, health_max_amount)
-				if parent_party_member_data.party_member_party_index == 0:
-					Global.player_data.synchronize_legacy_primary_member_state()
-				Signals.player_health_changed.emit()
-			else:
-				Global.player_data.add_health(health_amount, health_max_amount)
+			(parent_combatant as Player).add_health(health_amount, health_max_amount)
 		elif target == null:
-			var owner_party_member_data: PartyMemberData = null
+			var owner_player: Player = null
 			if Global.player_data.has_party_members() and card_play_request != null and card_play_request.card_data != null:
-				owner_party_member_data = Global.player_data.get_party_member_for_card(card_play_request.card_data)
-			if owner_party_member_data != null:
-				owner_party_member_data.add_health(health_amount, health_max_amount)
-				if owner_party_member_data.party_member_party_index == 0:
-					Global.player_data.synchronize_legacy_primary_member_state()
-				Signals.player_health_changed.emit()
+				owner_player = Global.get_card_owner_player(card_play_request.card_data)
+			if owner_player != null:
+				owner_player.add_health(health_amount, health_max_amount)
 			else:
-				Global.player_data.add_health(health_amount, health_max_amount)
+				var default_player: Player = Global.get_default_player_combatant(false)
+				if default_player != null:
+					default_player.add_health(health_amount, health_max_amount)
+				else:
+					Global.player_data.add_health(health_amount, health_max_amount)
 	
 
 func _to_string():

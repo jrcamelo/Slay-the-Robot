@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/status_effects/BaseStatusEffect.gd" id="2_script"]
+
+[resource]
+script = ExtResource("1_data")
+status_effect_name = "Orange Passive"
+status_effect_description = "Placeholder character passive."
+status_effect_script = ExtResource("2_script")
+status_effect_stacks = false
+status_effect_texture_path = "external/sprites/characters/character_orange/character_orange_icon.png"
+status_effect_type = 0
+status_effect_disposition = 0
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+status_effect_action_process_times = Array[int]([])
+object_id = "status_effect_character_passive_orange_placeholder"

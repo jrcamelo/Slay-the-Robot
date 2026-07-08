@@ -20,13 +20,23 @@ func perform_action():
 	for action_interceptor_processor in action_interceptor_processors:
 		var percentage_heal_amount: float = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.PERCENTAGE_HEAL_AMOUNT, 1.0)
 		if party_member_data != null:
-			var percentage_health: int = int(ceil(float(party_member_data.party_member_health_max) * percentage_heal_amount))
-			party_member_data.add_health(percentage_health, 0)
-			if party_member_data.party_member_party_index == 0:
-				Global.player_data.synchronize_legacy_primary_member_state()
-			Signals.player_health_changed.emit()
+			var player: Player = Global.get_player_by_party_index(party_member_data.party_member_party_index)
+			if player != null:
+				var percentage_health: int = int(ceil(float(player.get_health_max()) * percentage_heal_amount))
+				player.add_health(percentage_health, 0)
+			else:
+				var percentage_health: int = int(ceil(float(party_member_data.party_member_health_max) * percentage_heal_amount))
+				party_member_data.add_health(percentage_health, 0)
+				if party_member_data.party_member_party_index == 0:
+					Global.player_data.synchronize_legacy_primary_member_state()
+				Signals.player_health_changed.emit()
 		else:
-			Global.player_data.heal_percentage(percentage_heal_amount)
+			var default_player: Player = Global.get_default_player_combatant(false)
+			if default_player != null:
+				var percentage_health: int = int(ceil(float(default_player.get_health_max()) * percentage_heal_amount))
+				default_player.add_health(percentage_health, 0)
+			else:
+				Global.player_data.heal_percentage(percentage_heal_amount)
 	
 
 func _to_string():

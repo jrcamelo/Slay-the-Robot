@@ -16,8 +16,7 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	if status_script.status_charges <= 0:
 		return ACTION_ACCEPTENCES.CONTINUE
 
-	var current_damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	action_interceptor_processor.shadowed_action_values["damage"] = current_damage * 2
+	action_interceptor_processor.multiply_damage(2.0)
 	if not preview_mode:
 		parent_combatant.add_status_effect_charges(STATUS_EFFECT_ID, -1, 0)
 

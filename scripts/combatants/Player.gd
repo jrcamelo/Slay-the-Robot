@@ -3,6 +3,7 @@ extends BaseCombatant
 class_name Player
 
 const STATUS_BARRIER: String = "status_effect_barrier"
+const STATUS_UNTARGETABLE: String = "status_effect_untargetable"
 
 @onready var incoming_damage: Control = $Visible/IncomingDamage
 @onready var incoming_damage_amount_text: Label = $Visible/IncomingDamage/IncomingDamageAmount
@@ -46,14 +47,24 @@ func damage(_damage: int, bypass_block: bool = false, source_action: BaseAction 
 	var bypassed_damage: int = _damage # raw unblocked damage
 	var bypassed_damage_capped: int = 0 # damage done that does not factor in overkill damage
 	var overkill_damage: int = 0 # damage done past 0
+	var blocked_by_kyr: int = 0
+	if _damage > 0 and has_active_ranger_kyr():
+		blocked_by_kyr = min(get_ranger_kyr_health(), _damage)
+		if blocked_by_kyr > 0:
+			add_ranger_kyr_health(-blocked_by_kyr)
+			Signals.combatant_blocked.emit(self, blocked_by_kyr)
+			create_block_text()
+	var damage_after_kyr: int = _damage - blocked_by_kyr
+	if damage_after_kyr <= 0:
+		return [0,0,0]
 	var blocked_by_barrier: int = 0
 	var current_barrier: int = get_shared_status_amount(STATUS_BARRIER)
-	if current_barrier > 0 and _damage > 0:
-		blocked_by_barrier = min(current_barrier, _damage)
+	if current_barrier > 0 and damage_after_kyr > 0:
+		blocked_by_barrier = min(current_barrier, damage_after_kyr)
 		if blocked_by_barrier > 0:
 			Signals.combatant_blocked.emit(self, blocked_by_barrier)
 			create_block_text()
-	var remaining_damage: int = _damage - blocked_by_barrier
+	var remaining_damage: int = damage_after_kyr - blocked_by_barrier
 	if remaining_damage <= 0:
 		return [0,0,0]
 	var current_block: int = get_block()
@@ -194,6 +205,21 @@ func get_health() -> int:
 func get_health_max() -> int:
 	return _get_health_max()
 
+func add_health(health_amount: int, health_max_amount: int = 0) -> void:
+	var remaining_health_amount: int = health_amount
+	if health_amount > 0 and is_alive() and get_ranger_kyr_status() != null:
+		remaining_health_amount -= add_ranger_kyr_health(health_amount)
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		party_member_data.add_health(remaining_health_amount, health_max_amount)
+		_sync_primary_member_state_if_needed()
+		Signals.player_health_changed.emit()
+		return
+	Global.player_data.add_health(remaining_health_amount, health_max_amount)
+
+func is_targetable_by_enemy() -> bool:
+	return is_alive() and get_status_charges(STATUS_UNTARGETABLE) <= 0
+
 func _sync_primary_member_state_if_needed() -> void:
 	if Global.player_data.has_party_members() and party_member_index == 0:
 		Global.player_data.synchronize_legacy_primary_member_state()
@@ -258,6 +284,7 @@ func _on_run_ended():
 
 func _on_combat_started(_event_id: String):
 	clear_all_status_effects()
+	_apply_character_passive_status_effects()
 	_death_reported = false
 	_update_barrier_display()
 	
@@ -294,3 +321,20 @@ func _on_player_barrier_changed():
 func _on_death_animtation_finished():
 	# called from animation player
 	Signals.player_death_animation_finished.emit(self)
+
+func _apply_character_passive_status_effects() -> void:
+	for passive_status_id: String in _get_character_passive_status_effect_ids():
+		apply_status(passive_status_id, 1, self)
+
+func _get_character_passive_status_effect_ids() -> Array[String]:
+	var character_data: CharacterData = Global.get_player_character_data()
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		character_data = Global.get_character_data(party_member_data.party_member_character_object_id)
+	if character_data == null:
+		return []
+	var passive_status_ids: Array[String] = character_data.character_passive_status_effect_ids.duplicate()
+	if party_member_data != null:
+		for disabled_status_id: String in party_member_data.party_member_disabled_character_passive_status_effect_ids:
+			passive_status_ids.erase(disabled_status_id)
+	return passive_status_ids

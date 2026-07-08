@@ -13,6 +13,7 @@ character_texture_path = "external/sprites/characters/character_orange/character
 character_icon_texture_path = "external/sprites/characters/character_orange/character_orange_icon.png"
 character_text_energy_texture_path = "external/sprites/characters/character_orange/character_orange_text_energy.png"
 character_player_id = "player_mercenary"
+character_passive_status_effect_ids = Array[String](["status_effect_character_passive_mercenary_grit"])
 character_starting_artifact_resource = ExtResource("1_artifacts")
 character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_orange"])
 character_starting_card_object_ids = Array[String](["card_mercenary_burning_blood", "card_mercenary_burning_blood", "card_mercenary_fiendish_pact", "card_mercenary_fiendish_pact", "card_mercenary_your_life_for_mine", "card_mercenary_your_life_for_mine"])

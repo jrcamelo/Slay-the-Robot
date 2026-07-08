@@ -40,6 +40,8 @@ func perform_action() -> void:
 			continue
 
 		var damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
+		if parent_combatant != null:
+			damage = parent_combatant.get_outgoing_damage_after_passive_filters(action_interceptor_processor)
 		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BYPASS_BLOCK, false)
 		var poise_amount: int = max(0, action_interceptor_processor.get_shadowed_action_values("poise_amount", 0))
 		var overwhelming: bool = action_interceptor_processor.get_shadowed_action_values("overwhelming", false)

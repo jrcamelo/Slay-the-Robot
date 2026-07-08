@@ -14,7 +14,6 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	var weaken_amount: int = parent_combatant.get_status_charges(STATUS_EFFECT_ID)
 	if weaken_amount <= 0:
 		weaken_amount = parent_combatant.get_status_charges(LEGACY_STATUS_EFFECT_ID)
-	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	action_interceptor_processor.shadowed_action_values["damage"] = max(0, damage - weaken_amount)
+	action_interceptor_processor.add_damage(-weaken_amount)
 	
 	return ACTION_ACCEPTENCES.CONTINUE

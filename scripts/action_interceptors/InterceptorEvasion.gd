@@ -8,7 +8,7 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 		return ACTION_ACCEPTENCES.REJECTED
 	if target_combatant.get_status_charges(STATUS_EFFECT_ID) <= 0:
 		return ACTION_ACCEPTENCES.CONTINUE
-	action_interceptor_processor.shadowed_action_values["damage"] = 0
+	action_interceptor_processor.set_damage(0)
 	action_interceptor_processor.shadowed_action_values["poise_amount"] = 0
 	if not preview_mode:
 		target_combatant.consume_flag_status(STATUS_EFFECT_ID)

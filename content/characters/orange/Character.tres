@@ -1,11 +1,10 @@
 [gd_resource type="Resource" script_class="CharacterData" format=3]
 
-[ext_resource type="Resource" path="res://content/characters/orange/StartingArtifacts.tres" id="1_u3c4r"]
-[ext_resource type="Resource" path="res://content/characters/orange/Deck.tres" id="2_tjb14"]
-[ext_resource type="Script" path="res://data/readonly/CharacterData.gd" id="3_cnsev"]
+[ext_resource type="Resource" path="res://content/characters/orange/Deck.tres" id="1_tjb14"]
+[ext_resource type="Script" path="res://data/readonly/CharacterData.gd" id="2_cnsev"]
 
 [resource]
-script = ExtResource("3_cnsev")
+script = ExtResource("2_cnsev")
 character_name = "Orange Guy"
 character_description = "Has a tragic backstory"
 character_color_id = "color_orange"
@@ -13,11 +12,10 @@ character_texture_path = "external/sprites/characters/character_orange/character
 character_icon_texture_path = "external/sprites/characters/character_orange/character_orange_icon.png"
 character_text_energy_texture_path = "external/sprites/characters/character_orange/character_orange_text_energy.png"
 character_player_id = "player_orange"
-character_starting_artifact_ids = Array[String](["artifact_increase_attack_on_rest", "artifact_see_top_of_draw_pile"])
-character_starting_artifact_resource = ExtResource("1_u3c4r")
+character_passive_status_effect_ids = Array[String](["status_effect_character_passive_orange_placeholder"])
 character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_orange"])
 character_starting_card_object_ids = Array[String](["card_attack_basic", "card_attack_basic", "card_attack_basic", "card_restart_combat", "card_block_basic", "card_block_basic", "card_block_basic", "retain_hand_card", "card_play_from_discard", "card_draw", "card_energy_on_draw", "card_improving_block", "card_improving_attack", "card_play_random_from_hand", "card_bomb", "add_to_draw_from_discard_card", "add_to_draw_from_discard_card", "card_banish_attack"])
-character_starting_deck_resource = ExtResource("2_tjb14")
+character_starting_deck_resource = ExtResource("1_tjb14")
 character_starting_health = 70
 character_starting_card_draft_card_pack_ids = Array[String](["card_pack_orange"])
 object_id = "character_orange"

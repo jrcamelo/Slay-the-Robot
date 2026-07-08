@@ -18,7 +18,7 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	if damage > 0:
 		# consume the negate effect on the next incoming attack damage instance
 		target_combatant.add_status_effect_charges(NEGATE_DAMAGE_STATUS_EFFECT_ID, -1)
-		action_interceptor_processor.shadowed_action_values["damage"] = 0
+		action_interceptor_processor.set_damage(0)
 		return ACTION_ACCEPTENCES.STOPPED
 	
 	return ACTION_ACCEPTENCES.CONTINUE

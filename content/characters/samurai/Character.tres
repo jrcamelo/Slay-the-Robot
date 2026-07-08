@@ -13,6 +13,7 @@ character_texture_path = "external/sprites/characters/character_red/character_re
 character_icon_texture_path = "external/sprites/characters/character_red/character_red_icon.png"
 character_text_energy_texture_path = "external/sprites/characters/character_red/character_red_text_energy.png"
 character_player_id = "player_samurai"
+character_passive_status_effect_ids = Array[String](["status_effect_character_passive_samurai_closed_cultivation"])
 character_starting_artifact_resource = ExtResource("1_artifacts")
 character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_red"])
 character_starting_card_object_ids = Array[String](["card_samurai_silent_draw", "card_samurai_silent_draw", "card_samurai_calm_before_steel", "card_samurai_calm_before_steel", "card_samurai_one_stroke", "card_samurai_one_stroke"])

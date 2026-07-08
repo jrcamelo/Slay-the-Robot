@@ -12,11 +12,4 @@ func perform_action() -> void:
 		var health_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_AMOUNT, 0)
 		var health_max_amount: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.HEALTH_MAX_AMOUNT, 0)
 		for player: Player in Global.get_living_players():
-			var party_member_data: PartyMemberData = player.get_party_member_data()
-			if party_member_data != null:
-				party_member_data.add_health(health_amount, health_max_amount)
-				if party_member_data.party_member_party_index == 0:
-					Global.player_data.synchronize_legacy_primary_member_state()
-			else:
-				Global.player_data.add_health(health_amount, health_max_amount)
-		Signals.player_health_changed.emit()
+			player.add_health(health_amount, health_max_amount)

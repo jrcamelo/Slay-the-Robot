@@ -11,6 +11,9 @@ var parent_action: BaseAction = null	# the action tied to this processor
 var target: BaseCombatant = null	# the sub target to use for interception processing. Can be null
 
 var shadowed_action_values: Dictionary = {}	# this will contain any modified values for the parent action after processing has taken place. Use get_shadowed_action_values()
+var damage_history: Array[Dictionary] = []
+var _current_action_interceptor_data: ActionInterceptorData = null
+var _current_action_interceptor_object_id: String = ""
 
 func _init(_parent_action: BaseAction, _target: BaseCombatant):
 	parent_action = _parent_action
@@ -20,9 +23,19 @@ func _init(_parent_action: BaseAction, _target: BaseCombatant):
 ## iterates over all interceptors, returning if the chain was accepted or rejected for further processing the action
 ## preview_mode flag is used for things like displaying cards in hand after modifiers or hovering cards over enemies. This tells interceptors to not create actual side effects
 func process_interceptor_chain(preview_mode: bool = false) -> bool:
-	var action_interceptors: Array[BaseActionInterceptor] = _get_action_interceptors_modifying_pair(parent_action, parent_action.parent_combatant, target)
-	for action_interceptor in action_interceptors:
+	var action_interceptor_data_list: Array[ActionInterceptorData] = _get_action_interceptors_modifying_pair(parent_action, parent_action.parent_combatant, target)
+	for action_interceptor_data: ActionInterceptorData in action_interceptor_data_list:
+		var action_interceptor: BaseActionInterceptor = action_interceptor_data.action_interceptor_script.new()
+		var previous_damage: int = int(get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+		var previous_damage_history_count: int = damage_history.size()
+		_current_action_interceptor_data = action_interceptor_data
+		_current_action_interceptor_object_id = action_interceptor_data.object_id
 		var result: int = action_interceptor.process_action_interception(self, preview_mode)
+		_current_action_interceptor_data = null
+		_current_action_interceptor_object_id = ""
+		var current_damage: int = int(get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+		if current_damage != previous_damage and damage_history.size() == previous_damage_history_count:
+			_record_damage_history("unknown", {}, previous_damage, current_damage)
 		if result == BaseActionInterceptor.ACTION_ACCEPTENCES.STOPPED:
 			break
 		if result == BaseActionInterceptor.ACTION_ACCEPTENCES.REJECTED:
@@ -42,12 +55,37 @@ func get_shadowed_action_values(key: String, default_value: Variant) -> Variant:
 	else:
 		return parent_action.get_action_value(key, default_value)
 
+func add_damage(delta: int) -> void:
+	var current_damage: int = int(get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+	set_damage(current_damage + delta, "add", {"amount": delta})
+
+func multiply_damage(multiplier: float) -> void:
+	var current_damage: int = int(get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+	set_damage(int(round(current_damage * multiplier)), "multiply", {"multiplier": multiplier})
+
+func set_damage(new_damage: int, operation_type: String = "set", operation_data: Dictionary = {}) -> void:
+	var previous_damage: int = int(get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+	var clamped_damage: int = max(0, new_damage)
+	shadowed_action_values[ActionValueRegistry.DAMAGE] = clamped_damage
+	if previous_damage != clamped_damage:
+		_record_damage_history(operation_type, operation_data, previous_damage, clamped_damage)
+
+func _record_damage_history(operation_type: String, operation_data: Dictionary, previous_damage: int, current_damage: int) -> void:
+	damage_history.append({
+		"action_interceptor_data": _current_action_interceptor_data,
+		"action_interceptor_object_id": _current_action_interceptor_object_id,
+		"modifies_parent": _current_action_interceptor_data != null and _current_action_interceptor_data.action_interceptor_modifies_parent,
+		"operation_type": operation_type,
+		"operation_data": operation_data.duplicate(),
+		"previous_damage": previous_damage,
+		"damage": current_damage,
+	})
+
 ## Returns a priority-sorted array of all interceptors involving an action, its parent, and its target.
 ## Both parent and target can be the same, and one or both can be null.
 ## Additional flags ignore_all_interceptors, ignored_interceptor_ids, and forced_interceptor_ids can
 ## be provided through the action's values to alter which interceptors are allowed to be populated.
-func _get_action_interceptors_modifying_pair(action: BaseAction, parent_combatant: BaseCombatant, target_combatant: BaseCombatant) -> Array[BaseActionInterceptor]:
-	var returned_action_interceptors: Array[BaseActionInterceptor] = []
+func _get_action_interceptors_modifying_pair(action: BaseAction, parent_combatant: BaseCombatant, target_combatant: BaseCombatant) -> Array[ActionInterceptorData]:
 	var interceptor_data_list: Array[ActionInterceptorData] = [] # used to sort by priority before creating returned interceptors
 	
 	### Get interceptor flags from action data
@@ -116,15 +154,7 @@ func _get_action_interceptors_modifying_pair(action: BaseAction, parent_combatan
 	### Return
 	# sort interceptor data by their priority
 	interceptor_data_list.sort_custom(_sort_action_interceptor_priorities)
-	
-	# create interceptors from data
-	for action_interceptor_data in interceptor_data_list:
-		# create interceptor
-		var action_interceptor_asset: Script = action_interceptor_data.action_interceptor_script
-		var action_interceptor: BaseActionInterceptor = action_interceptor_asset.new()
-		returned_action_interceptors.append(action_interceptor)
-	
-	return returned_action_interceptors
+	return interceptor_data_list
 
 func _sort_action_interceptor_priorities(action_interceptor_data_1: ActionInterceptorData, action_interceptor_data_2: ActionInterceptorData) -> bool:
 	# custom sort method for sorting the priorities of a given list of interceptors

@@ -4,6 +4,7 @@ class_name StatusEffectData
 
 #region General
 @export var status_effect_name: String = ""	# how this status appears in tooltips
+@export var status_effect_description: String = ""
 @export var status_effect_script: Script = preload("res://scripts/status_effects/BaseStatusEffect.gd")	# script of the BaseStatusEffect determining behavior of the status
 @export var status_effect_stacks: bool = true	# whether or not the status effect can have multiple charges
 @export var status_effect_can_be_negative: bool = false	# determines whether to remove the status when negative charges happen
@@ -37,6 +38,10 @@ enum STATUS_DECAY_TYPES_V2 {
 @export var status_effect_player_actions: Array[Dictionary] = []
 ## The actions perfomed an emey has the status. See: BaseAction.perform_status_actions()
 @export var status_effect_enemy_actions: Array[Dictionary] = []
+## Actions performed once when combat starts while the status is present.
+@export var status_effect_combat_start_player_actions: Array[Dictionary] = []
+## Actions performed once when combat starts while the status is present on an enemy.
+@export var status_effect_combat_start_enemy_actions: Array[Dictionary] = []
 
 ## When a status effect should be processed relative to the others. Higher numbers processed earlier.
 @export var status_effect_priority: int = 0

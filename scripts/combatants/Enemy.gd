@@ -273,10 +273,7 @@ func _conditions_pass(conditions: Array[Dictionary]) -> bool:
 
 func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 	var living_players: Array[Player] = Global.get_living_players()
-	var targetable_players: Array[Player] = []
-	for player: Player in living_players:
-		if player.get_status_charges("status_effect_untargetable") <= 0:
-			targetable_players.append(player)
+	var targetable_players: Array[Player] = Global.get_targetable_living_players()
 	if len(living_players) == 0:
 		return []
 	if len(targetable_players) == 0:
@@ -441,6 +438,7 @@ func _preview_intent_attack(intent_data: EnemyIntentData, targets: Array[Player]
 	if len(action_interceptor_processors) == 1:
 		var action_interceptor_processor: ActionInterceptorProcessor = action_interceptor_processors[0]
 		preview_damage = max(0, action_interceptor_processor.get_shadowed_action_values("damage", 0))
+		preview_damage = max(0, get_outgoing_damage_after_passive_filters(action_interceptor_processor))
 
 	action_data = [{
 		Scripts.ACTION_ATTACK_GENERATOR: {

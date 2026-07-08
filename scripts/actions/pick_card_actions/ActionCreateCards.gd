@@ -17,19 +17,13 @@ func perform_action():
 	for action_interceptor_processor in action_interceptor_processors:
 		var created_card_object_id: String = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.CREATED_CARD_OBJECT_ID, "")
 		var number_of_cards: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.NUMBER_OF_CARDS, 0)
+		var created_cards: Array[CardData] = []
 		if created_card_object_id != "":
 			for i in number_of_cards:
 				var card_data: CardData = Global.get_card_data_from_prototype(created_card_object_id)
-				if Global.player_data.has_party_members():
-					if card_play_request != null and card_play_request.card_data != null:
-						var source_party_member: PartyMemberData = Global.player_data.get_party_member_for_card(card_play_request.card_data)
-						if source_party_member != null:
-							Global.player_data.assign_card_owner(card_data, source_party_member.party_member_party_index)
-						else:
-							Global.player_data.ensure_card_has_owner(card_data)
-					else:
-						Global.player_data.ensure_card_has_owner(card_data)
-				picked_cards.append(card_data)
+				created_cards.append(card_data)
+		_assign_generated_card_owners(created_cards)
+		picked_cards.append_array(created_cards)
 	
 	# overwrite picked_cards action value with the generated cards, for child cardset actions
 	# as this action doesn't require user input, "picked_cards" action value and picked_cards are the same

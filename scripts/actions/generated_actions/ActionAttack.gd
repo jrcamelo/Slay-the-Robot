@@ -38,6 +38,8 @@ func perform_action():
 		if not target.is_alive():
 			return
 		var damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
+		if parent_combatant != null:
+			damage = parent_combatant.get_outgoing_damage_after_passive_filters(action_interceptor_processor)
 		var bypass_block: bool = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.BYPASS_BLOCK, false)
 		
 		var damages: Array[int] = target.damage(damage, bypass_block, self)

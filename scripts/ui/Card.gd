@@ -166,6 +166,8 @@ func get_card_description(selected_target: BaseCombatant = null) -> String:
 				
 				if action_interceptor_processor.shadowed_action_values.has(key_name):
 					var intercepted_value: int = action_interceptor_processor.get_shadowed_action_values(key_name, card_value)
+					if key_name == ActionValueRegistry.DAMAGE and player != null:
+						intercepted_value = player.get_outgoing_damage_after_passive_filters(action_interceptor_processor)
 					
 					# compare the intercepted valus to the card's values
 					if intercepted_value < card_value:

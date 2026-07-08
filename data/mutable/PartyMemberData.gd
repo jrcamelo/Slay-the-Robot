@@ -7,6 +7,7 @@ class_name PartyMemberData
 @export var party_member_character_object_id: String = ""
 @export var party_member_name: String = ""
 @export var party_member_is_removed: bool = false
+@export var party_member_disabled_character_passive_status_effect_ids: Array[String] = []
 
 @export var party_member_health: int = 50
 @export var party_member_health_max: int = 50

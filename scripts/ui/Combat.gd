@@ -290,6 +290,11 @@ func _on_player_turn_started():
 	
 	# first turn actions
 	if Global.get_combat_stats().turn_count == 1:
+		for player_combatant: Player in Global.get_living_players():
+			player_combatant.perform_combat_started_status_effect_actions()
+		if ActionHandler.actions_being_performed:
+			await ActionHandler.actions_ended
+		
 		var primary_player: Player = party_container.get_primary_player()
 		if primary_player == null:
 			primary_player = Global.get_default_player_combatant()

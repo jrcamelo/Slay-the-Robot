@@ -18,9 +18,10 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	var status_effect: StatusEffect = status_effects[0]
 	var damage_bonus: int = max(0, status_effect.status_effect_script.status_secondary_charges)
 	if damage_bonus <= 0:
+		if not preview_mode:
+			parent_combatant.remove_status(STATUS_EFFECT_ID, -1)
 		return ACTION_ACCEPTENCES.CONTINUE
-	var current_damage: int = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0)
-	action_interceptor_processor.shadowed_action_values[ActionValueRegistry.DAMAGE] = current_damage + damage_bonus
+	action_interceptor_processor.add_damage(damage_bonus)
 	if not preview_mode:
 		parent_combatant.remove_status(STATUS_EFFECT_ID, -1)
 	return ACTION_ACCEPTENCES.CONTINUE

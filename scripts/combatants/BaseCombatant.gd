@@ -3,11 +3,23 @@ extends Control
 class_name BaseCombatant
 
 const STATUS_BARRIER: String = "status_effect_barrier"
+const STATUS_CLOSED_CULTIVATION: String = "status_effect_character_passive_samurai_closed_cultivation"
+const STATUS_DAMAGE_INCREASE: String = "status_effect_damage_increase"
+const STATUS_MIGHT: String = "status_effect_might"
+const STATUS_NEXT_ATTACK_DAMAGE_BONUS: String = "status_effect_next_attack_damage_bonus"
+const STATUS_NEXT_ATTACK_DOUBLE_DAMAGE: String = "status_effect_next_attack_double_damage"
+const STATUS_NEXT_JAB_DAMAGE_BONUS: String = "status_effect_next_jab_damage_bonus"
+const STATUS_RANGER_KYR: String = "status_effect_character_passive_ranger_kyr"
 const STATUS_SHIELD: String = "status_effect_shield"
 const STATUS_BURN: String = "status_effect_burn"
 const STATUS_POISON: String = "status_effect_poison"
 const STATUS_SLEEP: String = "status_effect_sleep"
 const STATUS_PARALYZE: String = "status_effect_paralyze"
+
+const INTERCEPTOR_DAMAGE_INCREASE: String = "interceptor_damage_increase"
+const INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS: String = "interceptor_next_attack_damage_bonus"
+const INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE: String = "interceptor_next_attack_double_damage"
+const INTERCEPTOR_NEXT_JAB_DAMAGE_BONUS: String = "interceptor_next_jab_damage_bonus"
 
 @onready var block: Sprite2D = $Visible/Block
 @onready var block_amount: Label = $Visible/Block/BlockAmount
@@ -383,6 +395,161 @@ func get_status_charges(status_effect_object_id: String) -> int:
 			absolute_maximum = status_effect.status_effect_script.status_charges
 	return absolute_maximum
 
+func get_status_effects(status_effect_object_id: String) -> Array[StatusEffect]:
+	return status_id_to_status_effects.get(status_effect_object_id, [])
+
+func has_closed_cultivation_passive() -> bool:
+	return get_status_charges(STATUS_CLOSED_CULTIVATION) > 0
+
+func get_outgoing_damage_after_passive_filters(action_interceptor_processor: ActionInterceptorProcessor) -> int:
+	var damage: int = int(action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.DAMAGE, 0))
+	if not has_closed_cultivation_passive():
+		return damage
+	var filtered_damage: int = int(_get_parent_action_value(action_interceptor_processor, ActionValueRegistry.DAMAGE, damage))
+	for damage_entry: Dictionary in action_interceptor_processor.damage_history:
+		if not _should_apply_closed_cultivation_damage_entry(damage_entry):
+			continue
+		filtered_damage = _apply_closed_cultivation_damage_entry(filtered_damage, damage_entry)
+	return max(0, filtered_damage)
+
+func _get_parent_action_value(action_interceptor_processor: ActionInterceptorProcessor, key: String, default_value: Variant) -> Variant:
+	if action_interceptor_processor == null or action_interceptor_processor.parent_action == null:
+		return default_value
+	return action_interceptor_processor.parent_action.get_action_value(key, default_value)
+
+func _should_apply_closed_cultivation_damage_entry(damage_entry: Dictionary) -> bool:
+	if not bool(damage_entry.get("modifies_parent", true)):
+		return true
+	var previous_damage: int = int(damage_entry.get("previous_damage", 0))
+	var current_damage: int = int(damage_entry.get("damage", previous_damage))
+	if current_damage <= previous_damage:
+		return true
+	var action_interceptor_data: ActionInterceptorData = damage_entry.get("action_interceptor_data", null) as ActionInterceptorData
+	if action_interceptor_data == null:
+		return false
+	return action_interceptor_data.action_interceptor_closed_cultivation_allow_self_benefit
+
+func _apply_closed_cultivation_damage_entry(current_damage: int, damage_entry: Dictionary) -> int:
+	var action_interceptor_object_id: String = damage_entry.get("action_interceptor_object_id", "")
+	if bool(damage_entry.get("modifies_parent", true)):
+		match action_interceptor_object_id:
+			INTERCEPTOR_DAMAGE_INCREASE:
+				return current_damage + _get_self_sourced_positive_status_charges(STATUS_MIGHT, STATUS_DAMAGE_INCREASE)
+			INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS:
+				return current_damage + _get_self_sourced_status_secondary_charges(STATUS_NEXT_ATTACK_DAMAGE_BONUS)
+			INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE:
+				if _has_self_sourced_status_effect(STATUS_NEXT_ATTACK_DOUBLE_DAMAGE):
+					return current_damage * 2
+				return current_damage
+			INTERCEPTOR_NEXT_JAB_DAMAGE_BONUS:
+				return current_damage + _get_self_sourced_status_secondary_charges(STATUS_NEXT_JAB_DAMAGE_BONUS)
+			_:
+				return current_damage
+	var operation_type: String = damage_entry.get("operation_type", "unknown")
+	var operation_data: Dictionary = damage_entry.get("operation_data", {})
+	match operation_type:
+		"add":
+			return max(0, current_damage + int(operation_data.get("amount", 0)))
+		"multiply":
+			return max(0, int(round(current_damage * float(operation_data.get("multiplier", 1.0)))))
+		"set", "unknown":
+			return max(0, int(damage_entry.get("damage", current_damage)))
+	return max(0, int(damage_entry.get("damage", current_damage)))
+
+func _get_self_sourced_positive_status_charges(primary_status_effect_id: String, legacy_status_effect_id: String = "") -> int:
+	var primary_amount: int = _get_self_sourced_status_charges(primary_status_effect_id)
+	if primary_amount > 0 or legacy_status_effect_id == "":
+		return primary_amount
+	return _get_self_sourced_status_charges(legacy_status_effect_id)
+
+func _get_self_sourced_status_charges(status_effect_object_id: String) -> int:
+	var total_amount: int = 0
+	for status_effect: StatusEffect in get_status_effects(status_effect_object_id):
+		if status_effect == null or status_effect.status_effect_script == null:
+			continue
+		var amount: int = max(0, status_effect.status_effect_script.status_charges)
+		if amount <= 0:
+			continue
+		if _is_status_effect_self_sourced(status_effect):
+			total_amount += amount
+	return total_amount
+
+func _get_self_sourced_status_secondary_charges(status_effect_object_id: String) -> int:
+	var maximum_secondary_amount: int = 0
+	for status_effect: StatusEffect in get_status_effects(status_effect_object_id):
+		if status_effect == null or status_effect.status_effect_script == null:
+			continue
+		if status_effect.status_effect_script.status_charges <= 0:
+			continue
+		if not _is_status_effect_self_sourced(status_effect):
+			continue
+		maximum_secondary_amount = max(maximum_secondary_amount, max(0, status_effect.status_effect_script.status_secondary_charges))
+	return maximum_secondary_amount
+
+func _has_self_sourced_status_effect(status_effect_object_id: String) -> bool:
+	for status_effect: StatusEffect in get_status_effects(status_effect_object_id):
+		if status_effect == null or status_effect.status_effect_script == null:
+			continue
+		if status_effect.status_effect_script.status_charges <= 0:
+			continue
+		if _is_status_effect_self_sourced(status_effect):
+			return true
+	return false
+
+func get_ranger_kyr_status() -> StatusEffect:
+	var status_effects: Array[StatusEffect] = get_status_effects(STATUS_RANGER_KYR)
+	if status_effects.is_empty():
+		return null
+	return status_effects[0]
+
+func get_ranger_kyr_health() -> int:
+	var status_effect: StatusEffect = get_ranger_kyr_status()
+	if status_effect == null or status_effect.status_effect_script == null:
+		return 0
+	return max(0, status_effect.status_effect_script.status_secondary_charges)
+
+func get_ranger_kyr_health_max() -> int:
+	var status_effect: StatusEffect = get_ranger_kyr_status()
+	if status_effect == null or status_effect.status_effect_script == null:
+		return 10
+	if status_effect.status_effect_script.has_method("get_companion_health_max"):
+		return int(status_effect.status_effect_script.call("get_companion_health_max"))
+	return 10
+
+func has_active_ranger_kyr() -> bool:
+	return get_ranger_kyr_health() > 0
+
+func add_ranger_kyr_health(health_amount: int) -> int:
+	var status_effect: StatusEffect = get_ranger_kyr_status()
+	if status_effect == null or status_effect.status_effect_script == null:
+		return 0
+	var old_health: int = max(0, status_effect.status_effect_script.status_secondary_charges)
+	var new_health: int = clamp(old_health + health_amount, 0, get_ranger_kyr_health_max())
+	var health_delta: int = new_health - old_health
+	if health_delta == 0:
+		return 0
+	status_effect.status_effect_script.status_secondary_charges = new_health
+	status_effect.update_status_charge_display()
+	update_health_bar(false)
+	Signals.combatant_status_changed.emit(self, STATUS_RANGER_KYR)
+	if self is Player:
+		Signals.player_health_changed.emit()
+	else:
+		Signals.enemy_intent_changed.emit()
+	return health_delta
+
+func _is_status_effect_self_sourced(status_effect: StatusEffect) -> bool:
+	if status_effect == null or status_effect.status_effect_script == null:
+		return true
+	var custom_values: Dictionary = status_effect.status_effect_script.status_custom_values
+	var source_instance_id: int = int(custom_values.get("source_instance_id", -1))
+	if source_instance_id == get_instance_id():
+		return true
+	if self is Player:
+		var source_party_member_index: int = int(custom_values.get("source_party_member_index", -1))
+		return source_party_member_index == get_party_member_index()
+	return source_instance_id < 0
+
 func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> void:
 	var status_effects: Array[StatusEffect] = status_id_to_status_effects.get(status_effect_object_id, [])
 	if status_effects.is_empty():
@@ -509,6 +676,19 @@ func perform_status_effect_actions(status_effect_process_time: int = StatusEffec
 		# decay all status effects of given type
 		if status_effect_data.status_effect_use_legacy_process_decay:
 			_decay_status_effect(status_effect_object_id)
+
+func perform_combat_started_status_effect_actions(status_effect_object_ids: Array = []) -> void:
+	if status_effect_object_ids.is_empty():
+		status_effect_object_ids = status_id_to_status_effects.keys()
+	var sorted_status_effect_ids: Array[String] = []
+	for status_effect_object_id: String in status_effect_object_ids:
+		if status_id_to_status_effects.has(status_effect_object_id):
+			sorted_status_effect_ids.append(status_effect_object_id)
+	sorted_status_effect_ids.sort_custom(_sort_status_effect_priorities)
+	for status_effect_object_id: String in sorted_status_effect_ids:
+		var status_effects: Array[StatusEffect] = status_id_to_status_effects.get(status_effect_object_id, [])
+		for status_effect: StatusEffect in status_effects:
+			status_effect.status_effect_script.perform_combat_started_actions()
 
 
 ## Helper method. Gets all status effects with a given status_effect_process_time.

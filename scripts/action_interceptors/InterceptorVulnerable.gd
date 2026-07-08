@@ -17,7 +17,6 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	var vulnerable_amount: int = target_combatant.get_status_charges(STATUS_EFFECT_ID)
 	if vulnerable_amount <= 0:
 		vulnerable_amount = target_combatant.get_status_charges(LEGACY_STATUS_EFFECT_ID)
-	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	action_interceptor_processor.shadowed_action_values["damage"] = max(0, damage + vulnerable_amount)
+	action_interceptor_processor.add_damage(vulnerable_amount)
 	
 	return ACTION_ACCEPTENCES.CONTINUE

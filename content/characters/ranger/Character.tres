@@ -15,6 +15,7 @@ character_text_energy_texture_path = "external/sprites/characters/character_gree
 character_player_id = "player_ranger"
 character_starting_artifact_resource = ExtResource("1_artifacts")
 character_starting_artifact_pack_ids = Array[String](["artifact_pack_white", "artifact_pack_green"])
+character_passive_status_effect_ids = Array[String](["status_effect_character_passive_ranger_kyr"])
 character_starting_card_object_ids = Array[String](["card_ranger_headshot", "card_ranger_headshot", "card_ranger_legshot", "card_ranger_legshot", "card_ranger_bodyshot", "card_ranger_bodyshot"])
 character_starting_deck_resource = ExtResource("2_deck")
 character_starting_health = 65

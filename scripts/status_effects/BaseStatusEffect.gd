@@ -28,19 +28,20 @@ func _disconnect_signals() -> void:
 ## Override for custom logic or conditionals
 ## Called from BaseCombatant.perform_status_effect_actions()
 func perform_status_effect_actions() -> void:
-	# get actions to perform
 	var action_data: Array[Dictionary] = []
 	if parent_combatant.is_in_group("players"):
 		action_data = status_effect_data.status_effect_player_actions
 	else:
 		action_data = status_effect_data.status_effect_enemy_actions
-	
-	# perform them
-	if len(action_data) > 0:
-		var card_play_request: CardPlayRequest = _generate_status_effect_card_play_request() # generate a fake request
-		var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [parent_combatant], action_data, null)
-		generated_actions.reverse()
-		ActionHandler.add_actions(generated_actions)
+	_perform_action_data(action_data)
+
+func perform_combat_started_actions() -> void:
+	var action_data: Array[Dictionary] = []
+	if parent_combatant.is_in_group("players"):
+		action_data = status_effect_data.status_effect_combat_start_player_actions
+	else:
+		action_data = status_effect_data.status_effect_combat_start_enemy_actions
+	_perform_action_data(action_data)
 
 func get_amount() -> int:
 	return status_charges
@@ -80,6 +81,14 @@ func _generate_status_effect_card_play_request() -> CardPlayRequest:
 		"invoking_status_effect_secondary_charges": status_secondary_charges
 	}
 	return card_play_request
+
+func _perform_action_data(action_data: Array[Dictionary]) -> void:
+	if len(action_data) <= 0:
+		return
+	var card_play_request: CardPlayRequest = _generate_status_effect_card_play_request()
+	var generated_actions: Array[BaseAction] = ActionGenerator.create_actions(parent_combatant, card_play_request, [parent_combatant], action_data, null)
+	generated_actions.reverse()
+	ActionHandler.add_actions(generated_actions)
 
 ### Status Charges
 

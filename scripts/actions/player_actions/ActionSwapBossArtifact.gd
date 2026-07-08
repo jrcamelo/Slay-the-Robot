@@ -1,14 +1,19 @@
-## Swaps the player's starting artifact(s) for the next available boss artifact.
+## Swaps the primary character's starting passive/artifact slot for the next available boss artifact.
 extends BaseAction
 
 func _get_editor_relevant_value_names() -> Array[String]:
 	return []
 
 func _get_editor_description() -> String:
-	return "Replaces the player's starting artifacts with the next available boss artifact."
+	return "Disables the primary character's starting passive, removes any legacy starting artifacts, and grants the next boss artifact."
 
 func perform_action():
 	var player_character_data: CharacterData = Global.get_player_character_data()
+	var primary_party_member: PartyMemberData = Global.player_data.get_primary_party_member()
+	if primary_party_member != null:
+		for passive_status_effect_id: String in player_character_data.character_passive_status_effect_ids:
+			if not primary_party_member.party_member_disabled_character_passive_status_effect_ids.has(passive_status_effect_id):
+				primary_party_member.party_member_disabled_character_passive_status_effect_ids.append(passive_status_effect_id)
 	for starting_artifact_id: String in player_character_data.character_starting_artifact_ids:
 		Global.player_data.remove_artifact(starting_artifact_id)
 	

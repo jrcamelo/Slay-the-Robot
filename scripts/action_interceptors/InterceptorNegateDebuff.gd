@@ -31,6 +31,8 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 			status_effect_is_debuff = status_charge_amount > 0
 	
 	if status_effect_is_debuff:
+		if target_combatant.has_active_ranger_kyr():
+			return ACTION_ACCEPTENCES.REJECTED # Kyr blocks banes while active
 		if target_combatant.get_status_charges(WARD_STATUS_EFFECT_ID) > 0:
 			target_combatant.consume_flag_status(WARD_STATUS_EFFECT_ID)
 			return ACTION_ACCEPTENCES.REJECTED # prevent the debuff from processing

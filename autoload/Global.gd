@@ -400,6 +400,13 @@ func get_living_players() -> Array[Player]:
 			living_players.append(player)
 	return living_players
 
+func get_targetable_living_players() -> Array[Player]:
+	var targetable_players: Array[Player] = []
+	for player: Player in get_living_players():
+		if player.is_targetable_by_enemy():
+			targetable_players.append(player)
+	return targetable_players
+
 func get_enemies() -> Array[Enemy]:
 	var enemies: Array[Enemy] = []
 	for node in Global.get_tree().get_nodes_in_group("enemies"):
@@ -419,6 +426,12 @@ func get_primary_living_player() -> Player:
 	if len(living_players) == 0:
 		return null
 	return living_players[0]
+
+func get_primary_targetable_living_player() -> Player:
+	var targetable_players: Array[Player] = get_targetable_living_players()
+	if len(targetable_players) == 0:
+		return null
+	return targetable_players[0]
 
 func get_default_player_combatant(allow_dead_fallback: bool = true) -> Player:
 	var player: Player = get_primary_living_player()
@@ -659,6 +672,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_damage_increase: ActionInterceptorData = ActionInterceptorData.new("interceptor_damage_increase")
 	interceptor_damage_increase.action_interceptor_priority = 10000
 	interceptor_damage_increase.action_interceptor_modifies_parent = true
+	interceptor_damage_increase.action_interceptor_closed_cultivation_allow_self_benefit = true
 	interceptor_damage_increase.action_interceptor_script = load(Scripts.INTERCEPTOR_DAMAGE_INCREASE)
 	interceptor_damage_increase.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 	
@@ -764,6 +778,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_next_attack_damage_bonus: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_attack_damage_bonus")
 	interceptor_next_attack_damage_bonus.action_interceptor_priority = 10050
 	interceptor_next_attack_damage_bonus.action_interceptor_modifies_parent = true
+	interceptor_next_attack_damage_bonus.action_interceptor_closed_cultivation_allow_self_benefit = true
 	interceptor_next_attack_damage_bonus.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_DAMAGE_BONUS)
 	interceptor_next_attack_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
@@ -772,6 +787,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_next_attack_double_damage: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_attack_double_damage")
 	interceptor_next_attack_double_damage.action_interceptor_priority = 10060
 	interceptor_next_attack_double_damage.action_interceptor_modifies_parent = true
+	interceptor_next_attack_double_damage.action_interceptor_closed_cultivation_allow_self_benefit = true
 	interceptor_next_attack_double_damage.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_ATTACK_DOUBLE_DAMAGE)
 	interceptor_next_attack_double_damage.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
@@ -780,6 +796,7 @@ func add_test_action_interceptors() -> void:
 	var interceptor_next_jab_damage_bonus: ActionInterceptorData = ActionInterceptorData.new("interceptor_next_jab_damage_bonus")
 	interceptor_next_jab_damage_bonus.action_interceptor_priority = 10055
 	interceptor_next_jab_damage_bonus.action_interceptor_modifies_parent = true
+	interceptor_next_jab_damage_bonus.action_interceptor_closed_cultivation_allow_self_benefit = true
 	interceptor_next_jab_damage_bonus.action_interceptor_script = load(Scripts.INTERCEPTOR_NEXT_JAB_DAMAGE_BONUS)
 	interceptor_next_jab_damage_bonus.action_intercepted_action_paths = [Scripts.ACTION_ATTACK, Scripts.ACTION_ATTACK_POISE]
 
@@ -1047,9 +1064,9 @@ func add_test_run_start_options() -> void:
 	
 	### Complete
 	
-	# replace starting artifact with a random boss one
+	# replace the primary character's starting passive/artifact slot with a random boss artifact
 	var run_start_option_artifact_swap: RunStartOptionData = RunStartOptionData.new("run_start_option_artifact_swap")
-	run_start_option_artifact_swap.run_start_option_bb_code = "[color=green]Replace Starting Artifact With Boss Artifact[/color]"
+	run_start_option_artifact_swap.run_start_option_bb_code = "[color=green]Replace Starting Passive With Boss Artifact[/color]"
 	run_start_option_artifact_swap.run_start_option_type = RunStartOptionData.RUN_START_OPTION_TYPES.COMPLETE
 	run_start_option_artifact_swap.run_start_option_actions = [{Scripts.ACTION_SWAP_BOSS_ARTIFACT: {}}]
 	

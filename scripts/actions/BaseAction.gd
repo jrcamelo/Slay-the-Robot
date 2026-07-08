@@ -220,9 +220,13 @@ func get_adjusted_action_targets() -> Array[BaseCombatant]:
 		TARGET_OVERRIDES.PLAYER:
 			for target in targets:
 				if is_instance_valid(target) and target is Player and target.is_alive():
+					if parent_combatant is Enemy and not (target as Player).is_targetable_by_enemy():
+						continue
 					returned_targets.append(target)
 			if len(returned_targets) == 0:
 				var player: Player = Global.get_primary_living_player()
+				if parent_combatant is Enemy:
+					player = Global.get_primary_targetable_living_player()
 				if player != null:
 					returned_targets.append(player)
 		TARGET_OVERRIDES.ALL_COMBATANTS:

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_data"]
+[ext_resource type="Script" path="res://scripts/status_effects/StatusEffectRangerKyr.gd" id="2_script"]
+
+[resource]
+script = ExtResource("1_data")
+status_effect_name = "Kyr"
+status_effect_description = "Kyr joins me with 10 health. While Kyr has health, damage is dealt to Kyr first and I am immune to banes."
+status_effect_script = ExtResource("2_script")
+status_effect_stacks = false
+status_effect_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+status_effect_type = 2
+status_effect_disposition = 2
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+status_effect_action_process_times = Array[int]([])
+status_effect_healthbar_reserve_type = 2
+status_effect_healthbar_layer_color = "6bbf59"
+object_id = "status_effect_character_passive_ranger_kyr"

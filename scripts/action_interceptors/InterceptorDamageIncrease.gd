@@ -14,7 +14,6 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	var damage_increase_charges: int = parent_combatant.get_status_charges(MIGHT_STATUS_EFFECT_ID)
 	if damage_increase_charges <= 0:
 		damage_increase_charges = parent_combatant.get_status_charges(LEGACY_DAMAGE_INCREASE_STATUS_EFFECT_ID)
-	var damage: int = action_interceptor_processor.get_shadowed_action_values("damage", 0)
-	action_interceptor_processor.shadowed_action_values["damage"] = max(0, damage + damage_increase_charges)
+	action_interceptor_processor.add_damage(damage_increase_charges)
 	
 	return ACTION_ACCEPTENCES.CONTINUE
