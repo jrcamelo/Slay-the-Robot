@@ -1066,16 +1066,6 @@ func add_test_run_start_options() -> void:
 	
 	register_rod(run_start_option_draft_colorless_card)
 	
-	### Complete
-	
-	# replace the primary character's starting passive/artifact slot with a random boss artifact
-	var run_start_option_artifact_swap: RunStartOptionData = RunStartOptionData.new("run_start_option_artifact_swap")
-	run_start_option_artifact_swap.run_start_option_bb_code = "[color=green]Replace Starting Passive With Boss Artifact[/color]"
-	run_start_option_artifact_swap.run_start_option_type = RunStartOptionData.RUN_START_OPTION_TYPES.COMPLETE
-	run_start_option_artifact_swap.run_start_option_actions = [{Scripts.ACTION_SWAP_BOSS_ARTIFACT: {}}]
-	
-	register_rod(run_start_option_artifact_swap)
-	
 #endregion
 
 #region Custom UI
@@ -1215,11 +1205,6 @@ func add_test_player_data() -> void:
 	
 	register_rod(player_green)
 	
-	var player_orange: PlayerData = PlayerData.new("player_orange")
-	player_orange.player_character_object_id = "character_orange"
-	
-	register_rod(player_orange)
-
 	var player_ranger: PlayerData = PlayerData.new("player_ranger")
 	player_ranger.player_character_object_id = "character_ranger"
 	

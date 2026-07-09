@@ -1,6 +1,8 @@
 extends BaseCombatant
 class_name Enemy
 
+const STATUS_ENEMY_POISE_STATE: String = "status_effect_enemy_poise_state"
+
 @onready var enemy_intent: Control = $Visible/Intent
 @onready var enemy_intent_amount_text: Label = $Visible/Intent/IntentAmount
 @onready var enemy_intent_texture: TextureRect = $Visible/Intent/IntentTexture
@@ -47,6 +49,7 @@ func init(_enemy_data: EnemyData):
 	selection_button.mouse_exited.connect(_on_mouse_exited)
 
 	_refresh_enemy_texture()
+	_sync_enemy_poise_state_status()
 
 	for status_effect_object_id in enemy_data.enemy_initial_status_effects.keys():
 		var charge_amount: int = enemy_data.enemy_initial_status_effects[status_effect_object_id]
@@ -163,10 +166,12 @@ func add_block(amount: int) -> void:
 func set_poise(poise_amount: int, poise_max_amount: int = enemy_data.enemy_poise_max) -> void:
 	enemy_data.set_poise(poise_amount, poise_max_amount)
 	_refresh_enemy_texture()
+	_sync_enemy_poise_state_status()
 
 func add_poise(poise_amount: int, poise_max_amount: int = 0) -> void:
 	enemy_data.add_poise(poise_amount, poise_max_amount)
 	_refresh_enemy_texture()
+	_sync_enemy_poise_state_status()
 
 func get_poise() -> int:
 	return enemy_data.enemy_poise
@@ -191,6 +196,17 @@ func _refresh_enemy_texture() -> void:
 	if enemy_data.is_poise_depleted() and enemy_data.enemy_texture_path_when_broken.strip_edges() != "":
 		texture_path = enemy_data.enemy_texture_path_when_broken
 	sprite.texture = FileLoader.load_texture(texture_path)
+
+func _sync_enemy_poise_state_status() -> void:
+	var poise_state_statuses: Array[StatusEffect] = get_status_effects(STATUS_ENEMY_POISE_STATE)
+	if poise_state_statuses.is_empty():
+		apply_status(STATUS_ENEMY_POISE_STATE, 1, self)
+		poise_state_statuses = get_status_effects(STATUS_ENEMY_POISE_STATE)
+	if poise_state_statuses.is_empty():
+		return
+	var status_effect_script: BaseStatusEffect = poise_state_statuses[0].status_effect_script
+	if status_effect_script != null and status_effect_script.has_method("refresh_from_parent_state"):
+		status_effect_script.call("refresh_from_parent_state")
 
 func update_enemy_intent() -> void:
 	var active_stage_resolution: Dictionary = _resolve_active_stage()

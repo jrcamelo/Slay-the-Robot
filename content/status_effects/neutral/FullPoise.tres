@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_4bxwt"]
+[ext_resource type="Script" path="res://scripts/status_effects/StatusEffectEnemyPoiseState.gd" id="2_gwf6o"]
+
+[resource]
+script = ExtResource("1_4bxwt")
+status_effect_name = "Full Poise"
+status_effect_description = "Shows the enemy's current poise state."
+status_effect_script = ExtResource("2_gwf6o")
+status_effect_stacks = false
+status_effect_texture_path = "external/sprites/artifacts/artifact_white.png"
+status_effect_type = 2
+status_effect_use_legacy_process_decay = false
+status_effect_priority = 9999
+status_effect_action_process_times = Array[int]([])
+object_id = "status_effect_enemy_poise_state"

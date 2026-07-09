@@ -43,6 +43,23 @@ func perform_combat_started_actions() -> void:
 		action_data = status_effect_data.status_effect_combat_start_enemy_actions
 	_perform_action_data(action_data)
 
+func get_display_name() -> String:
+	return status_effect_data.status_effect_name
+
+func get_display_description() -> String:
+	return status_effect_data.status_effect_description
+
+func get_display_texture_path() -> String:
+	if status_charges < 0 and status_effect_data.status_effect_negative_charges_texture_path != "":
+		return status_effect_data.status_effect_negative_charges_texture_path
+	return status_effect_data.status_effect_texture_path
+
+func refresh_status_effect_display() -> void:
+	if parent_combatant == null:
+		return
+	for status_effect: StatusEffect in parent_combatant.get_status_effects(status_effect_data.object_id):
+		status_effect.update_status_charge_display()
+
 func get_amount() -> int:
 	return status_charges
 

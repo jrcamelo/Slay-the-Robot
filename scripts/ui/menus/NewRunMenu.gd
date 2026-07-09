@@ -76,18 +76,21 @@ func populate_character_info(character_object_id: String) -> void:
 		character_money_label.text = "Money: {0}".format([character_data.character_starting_money])
 		character_description_label.text = character_data.character_description
 		character_artifact_texture_rect.texture = null
+		character_artifact_texture_rect.tooltip_text = ""
 		character_artifact_name_label.text = ""
 		character_artifact_description_label.text = ""
 		if len(character_data.character_passive_status_effect_ids) > 0:
 			var status_effect_data: StatusEffectData = Global.get_status_effect_data(character_data.character_passive_status_effect_ids[0])
 			if status_effect_data != null:
 				character_artifact_texture_rect.texture = FileLoader.load_texture(status_effect_data.status_effect_texture_path)
+				character_artifact_texture_rect.tooltip_text = _build_passive_tooltip(status_effect_data)
 				character_artifact_name_label.text = status_effect_data.status_effect_name
 				character_artifact_description_label.text = status_effect_data.status_effect_description
 		elif len(character_data.character_starting_artifact_ids) > 0:
 			var artifact_data: ArtifactData = Global.get_artifact_data(character_data.character_starting_artifact_ids[0])
 			if artifact_data != null:
 				character_artifact_texture_rect.texture = FileLoader.load_texture(artifact_data.artifact_texture_path)
+				character_artifact_texture_rect.tooltip_text = artifact_data.artifact_name + "\n" + artifact_data.artifact_description
 				character_artifact_name_label.text = artifact_data.artifact_name
 				character_artifact_description_label.text = artifact_data.artifact_description
 
@@ -140,3 +143,9 @@ func _update_party_ui() -> void:
 func _clear_selected_characters() -> void:
 	for child in selected_characters_grid_container.get_children():
 		child.queue_free()
+
+func _build_passive_tooltip(status_effect_data: StatusEffectData) -> String:
+	var tooltip_lines: Array[String] = [status_effect_data.status_effect_name]
+	if status_effect_data.status_effect_description != "":
+		tooltip_lines.append(status_effect_data.status_effect_description)
+	return "\n".join(tooltip_lines)
