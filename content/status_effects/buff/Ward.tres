@@ -8,11 +8,9 @@ script = ExtResource("1")
 status_effect_name = "Ward"
 status_effect_script = ExtResource("2")
 status_effect_stacks = false
-status_effect_type = 0
 status_effect_disposition = 0
 status_effect_decay_type_v2 = 3
 status_effect_is_flag = true
 status_effect_use_legacy_process_decay = false
 status_effect_interceptor_ids = Array[String](["interceptor_negate_debuff"])
 object_id = "status_effect_ward"
-

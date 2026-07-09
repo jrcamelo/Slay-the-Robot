@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_lupw2"]
+
+[resource]
+script = ExtResource("1_lupw2")
+card_name = "Violent Backlash"
+card_description = "Additional Cost: Lose 5 Hit Points.
+Trigger: I am damaged by an Attack.
+Attack: [damage] Damage and [poise_amount] Poise.
+X = my Missing Health."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "JAZZ"
+card_rarity = 3
+card_values = {
+"damage": 0,
+"health_amount": 5,
+"poise_amount": 0
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_LOSE_HEALTH": {
+"target_override": 1
+}
+}, {
+"ACTION_WRITE_OWNER_MISSING_HEALTH": {
+"write_value_names": ["damage", "poise_amount"]
+}
+}, {
+"ACTION_ATTACK_POISE": {}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_OWNER_DAMAGED_BY_ATTACK_LAST_TURN": {}
+}])
+card_listeners = Array[Dictionary]([{
+"LISTENER_CARD_VALUE_OWNER_MISSING_HEALTH": {
+"multiplied_values": ["damage", "poise_amount"],
+"multiplied_values_bases": {
+"damage": 0,
+"poise_amount": 0
+},
+"multiplied_values_per_missing_health": {
+"damage": 1,
+"poise_amount": 1
+}
+}
+}])
+object_id = "card_mercenary_violent_backlash"

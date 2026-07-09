@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_pe6rn"]
+
+[resource]
+script = ExtResource("1_pe6rn")
+card_name = "Who's Next!?"
+card_description = "Discard every Jab in your hand, then deal [poise_amount] Poise to each enemy for every Jab discarded."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 2
+card_requires_target = false
+card_values = {
+"poise_amount": 0
+}
+card_description_preview_overrides = Array[Array]([["poise_amount", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_DISCARD_HAND_BY_FILTER": {
+"card_object_ids": ["card_monk_jab"],
+"write_multiplier": 4,
+"write_value_names": ["poise_amount"]
+}
+}, {
+"ACTION_ATTACK_POISE": {
+"damage": 0,
+"target_override": 4
+}
+}])
+object_id = "card_monk_whos_next"

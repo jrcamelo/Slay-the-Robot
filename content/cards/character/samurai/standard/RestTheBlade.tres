@@ -32,7 +32,6 @@ card_play_actions = Array[Dictionary]([{
 }
 }]
 }
-}
 }, {
 "ACTION_END_TURN": {
 "kind_rule": true,

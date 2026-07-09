@@ -19,7 +19,7 @@ card_play_actions = Array[Dictionary]([{
 "ACTION_DISCARD_HAND_BY_FILTER": {
 "card_object_ids": ["card_monk_jab"],
 "write_multiplier": 4,
-"write_value_names": Array[String](["damage"])
+"write_value_names": ["damage"]
 }
 }, {
 "ACTION_ATTACK": {}

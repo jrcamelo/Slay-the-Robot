@@ -7,7 +7,7 @@ script = ExtResource("1_card_pack")
 card_pack_card_ids = Array[String](["card_samurai_aikido_stance", "card_samurai_iaido_stance", "card_samurai_one_stroke", "card_samurai_silent_draw", "card_samurai_calm_before_steel", "card_samurai_closed_path", "card_samurai_stolen_moment", "card_samurai_perfect_form", "card_samurai_rest_the_blade", "card_samurai_empty_the_mind", "card_samurai_heaven_shatter", "card_samurai_horizon_strike", "card_samurai_kenjutsu_stance", "card_samurai_stillwater_form"])
 card_pack_validators = Array[Dictionary]([{
 "VALIDATOR_CARD_ID": {
-"card_object_ids": Array[String](["card_samurai_aikido_stance", "card_samurai_iaido_stance", "card_samurai_one_stroke", "card_samurai_silent_draw", "card_samurai_calm_before_steel", "card_samurai_closed_path", "card_samurai_stolen_moment", "card_samurai_perfect_form", "card_samurai_rest_the_blade", "card_samurai_empty_the_mind", "card_samurai_heaven_shatter", "card_samurai_horizon_strike", "card_samurai_kenjutsu_stance", "card_samurai_stillwater_form"])
+"card_object_ids": ["card_samurai_aikido_stance", "card_samurai_iaido_stance", "card_samurai_one_stroke", "card_samurai_silent_draw", "card_samurai_calm_before_steel", "card_samurai_closed_path", "card_samurai_stolen_moment", "card_samurai_perfect_form", "card_samurai_rest_the_blade", "card_samurai_empty_the_mind", "card_samurai_heaven_shatter", "card_samurai_horizon_strike", "card_samurai_kenjutsu_stance", "card_samurai_stillwater_form"]
 }
 }])
 object_id = "card_pack_samurai"

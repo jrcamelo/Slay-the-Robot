@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_8xlr0"]
+
+[resource]
+script = ExtResource("1_8xlr0")
+card_name = "Rain of Arrows"
+card_description = "Attack (AoE): [damage] Damage and [poise_amount] Poise."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "OUTRO"
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"damage": 8,
+"poise_amount": 8,
+"target_override": 4
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
+}
+}])
+object_id = "card_ranger_rain_of_arrows"

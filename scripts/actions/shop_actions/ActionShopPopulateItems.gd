@@ -37,17 +37,20 @@ func perform_action():
 		var shop_consumable_prices: Array[int] = action_interceptor_processor.get_shadowed_action_values(ActionValueRegistry.SHOP_CONSUMABLE_PRICES, [] as Array[int])
 		
 		# add cards
-		for i: int in len(shop_cards):
+		var shop_card_count: int = mini(len(shop_cards), len(shop_card_prices))
+		for i: int in shop_card_count:
 			var card_data: CardData = shop_cards[i]
 			var card_price: int = shop_card_prices[i]
 			shop_data.add_shop_card(card_data, card_price)
 		# add artifacts
-		for i: int in len(shop_artifact_ids):
+		var shop_artifact_count: int = mini(len(shop_artifact_ids), len(shop_artifact_prices))
+		for i: int in shop_artifact_count:
 			var shop_artifact_id: String = shop_artifact_ids[i]
 			var shop_artifact_price: int = shop_artifact_prices[i]
 			shop_data.add_shop_artifact(shop_artifact_id, shop_artifact_price)
 		# add consumables
-		for i: int in len(shop_consumable_ids):
+		var shop_consumable_count: int = mini(len(shop_consumable_ids), len(shop_consumable_prices))
+		for i: int in shop_consumable_count:
 			var shop_consumable_id: String = shop_consumable_ids[i]
 			var shop_consumable_price: int = shop_consumable_prices[i]
 			shop_data.add_shop_consumable(shop_consumable_id, shop_consumable_price)

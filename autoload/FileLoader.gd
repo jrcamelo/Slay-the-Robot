@@ -48,12 +48,13 @@ const VALID_IMAGE_EXTENSIONS: Array[String] = [
 func _ready():
 	# change the base folder path based on the build type
 	DebugLogger.log_line("FileLoader: To enable external file loading in builds, download an export template and add the custom feature tag \"exported\" to the export. See https://docs.godotengine.org/en/stable/tutorials/export/feature_tags.html",Color.YELLOW, DebugLogger.Severities.WARNING)
-	if !OS.has_feature("exported"):
-		# debug build uses project directory
+	if OS.has_feature("editor"):
+		# editor runs use project directory
 		_EXTERNAL_FILE_PREFIX = "res://"
 		DebugLogger.log_line("Debug Base Directory: " + _EXTERNAL_FILE_PREFIX, Color.LIGHT_BLUE)
 	else:
-		# release build uses exe folder for user ease of access
+		# standalone runs use exe folder for user ease of access.
+		# This includes local console builds that do not carry the custom "exported" tag.
 		_EXTERNAL_FILE_PREFIX = OS.get_executable_path().get_base_dir() + "/"
 		DebugLogger.log_line("Build Base Directory: " + _EXTERNAL_FILE_PREFIX, Color.LIGHT_BLUE)
 		
@@ -371,6 +372,8 @@ func load_game(file_dir: String = SAVE_DIR_PATH, file_name: String = SAVE_FILE_N
 		player_data.set_serializable_properties_from_json_patch(player_dict)
 		
 		# hook everything back up and regenerate caches
+		if Global.player_data != null:
+			Global.player_data.dispose_artifact_runtime_scripts()
 		Global.player_data = player_data
 		Global.is_run = true
 		player_data.init()

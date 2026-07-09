@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_ibmvv"]
+
+[resource]
+script = ExtResource("1_ibmvv")
+card_name = "Shoot First"
+card_description = "Attack for [damage]."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 0
+card_rarity = 3
+card_appears_in_card_packs = false
+card_values = {
+"damage": 12,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+card_upgrade_value_improvements = Dictionary[String, int]({
+"damage": 5
+})
+object_id = "card_ranger_shoot_first"

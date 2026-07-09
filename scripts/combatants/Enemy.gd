@@ -1,8 +1,6 @@
 extends BaseCombatant
 class_name Enemy
 
-const STATUS_BARRIER: String = "status_effect_barrier"
-
 @onready var enemy_intent: Control = $Visible/Intent
 @onready var enemy_intent_amount_text: Label = $Visible/Intent/IntentAmount
 @onready var enemy_intent_texture: TextureRect = $Visible/Intent/IntentTexture

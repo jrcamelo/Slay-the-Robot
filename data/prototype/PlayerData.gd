@@ -125,6 +125,7 @@ var player_reward_card_rarity_cache: Dictionary[int, Array] = {}
 
 ## Maps ArtifactData object_uids to prototype instances of ArtifactData owned by the player. 
 @export var player_artifact_uid_to_artifact_data: Dictionary[String, ArtifactData] = {}
+var player_artifact_uid_to_artifact_script: Dictionary[String, BaseArtifact] = {}
 
 ## Artifact ordering for all artifacts object ids the player can see.
 ## Each time an artifact is seen it is popped off. Populated in initialize_artifact_pool().
@@ -184,6 +185,7 @@ var player_status_effects: Dictionary[String, Array] = {}
 func init():
 	_connect_signals()
 	generate_cache()
+	rebuild_artifact_runtime_scripts()
 
 func _connect_signals() -> void:
 	Signals.combat_started.connect(_on_combat_started)
@@ -403,6 +405,17 @@ func get_party_member_for_card(card_data: CardData) -> PartyMemberData:
 		return get_party_member_by_character_object_id(card_data.card_owner_character_object_id)
 	return get_primary_party_member()
 
+func get_party_member_for_artifact(artifact_data: ArtifactData) -> PartyMemberData:
+	if artifact_data == null:
+		return get_primary_party_member()
+	if artifact_data.artifact_owner_party_index >= 0:
+		var party_member_data: PartyMemberData = get_party_member(artifact_data.artifact_owner_party_index)
+		if party_member_data != null and party_member_data.is_active():
+			return party_member_data
+	if artifact_data.artifact_owner_character_object_id != "":
+		return get_party_member_by_character_object_id(artifact_data.artifact_owner_character_object_id)
+	return get_primary_party_member()
+
 func get_party_member_index_for_character_object_id(character_object_id: String) -> int:
 	for party_member_data: PartyMemberData in player_party_members:
 		if party_member_data.is_active() and party_member_data.party_member_character_object_id == character_object_id:
@@ -539,8 +552,12 @@ func remove_party_member_from_run(party_member_index: int) -> void:
 		var artifact_data: ArtifactData = player_artifact_uid_to_artifact_data[artifact_uid]
 		if artifact_data == null:
 			continue
-		var artifact_script: BaseArtifact = artifact_data.artifact_script.new(artifact_data)
+		var artifact_script: BaseArtifact = player_artifact_uid_to_artifact_script.get(artifact_uid, null)
+		if artifact_script == null:
+			artifact_script = artifact_data.artifact_script.new(artifact_data, false)
 		artifact_script.remove_artifact()
+		artifact_script.dispose()
+		player_artifact_uid_to_artifact_script.erase(artifact_uid)
 		player_artifact_uid_to_artifact_data.erase(artifact_uid)
 	Signals.player_artifacts_changed.emit()
 	
@@ -742,12 +759,23 @@ func remove_artifact_from_pool(artifact_object_id: String) -> void:
 
 func add_artifact(artifact_id: String, artifact_owner_party_index: int = -1, artifact_owner_character_object_id: String = "") -> void:
 	# adds an artifact to the player as if they obtained it
-	if not player_artifact_uid_to_artifact_data.has(artifact_id):
+	if len(get_player_artifacts_with_artifact_id(artifact_id)) == 0:
 		var artifact_data: ArtifactData = Global.get_artifact_data_from_prototype(artifact_id)
 		
 		if artifact_data == null:
 			push_error("No artifact of id ", artifact_id)
 		else:
+			if has_party_members():
+				var owner_party_member: PartyMemberData = null
+				if artifact_owner_party_index >= 0:
+					owner_party_member = get_party_member(artifact_owner_party_index)
+				if owner_party_member == null and artifact_owner_character_object_id != "":
+					owner_party_member = get_party_member_by_character_object_id(artifact_owner_character_object_id)
+				if owner_party_member == null:
+					owner_party_member = get_primary_party_member()
+				if owner_party_member != null:
+					artifact_owner_party_index = owner_party_member.party_member_party_index
+					artifact_owner_character_object_id = owner_party_member.party_member_character_object_id
 			artifact_data.artifact_owner_party_index = artifact_owner_party_index
 			artifact_data.artifact_owner_character_object_id = artifact_owner_character_object_id
 			player_artifact_uid_to_artifact_data[artifact_data.object_uid] = artifact_data
@@ -755,6 +783,7 @@ func add_artifact(artifact_id: String, artifact_owner_party_index: int = -1, art
 			# use a temp artifact script to perform any logic if the artifact has effect when added
 			var artifact_script_asset: Script = artifact_data.artifact_script
 			var artifact_script: BaseArtifact = artifact_script_asset.new(artifact_data)
+			player_artifact_uid_to_artifact_script[artifact_data.object_uid] = artifact_script
 			artifact_script.add_artifact()
 			Signals.player_artifacts_changed.emit()
 			
@@ -768,11 +797,15 @@ func remove_artifact(artifact_id: String, remove_multiples: bool = true) -> void
 	var artifacts: Array[ArtifactData] = get_player_artifacts_with_artifact_id(artifact_id)
 	for artifact_data: ArtifactData in artifacts:
 		# use a temp artifact script to perform any logic if the artifact has effect when removed
-		var artifact_script_asset: Script = artifact_data.artifact_script
-		var artifact_script: BaseArtifact = artifact_script_asset.new(artifact_data)
+		var artifact_script: BaseArtifact = player_artifact_uid_to_artifact_script.get(artifact_data.object_uid, null)
+		if artifact_script == null:
+			var artifact_script_asset: Script = artifact_data.artifact_script
+			artifact_script = artifact_script_asset.new(artifact_data, false)
 		artifact_script.remove_artifact()
+		artifact_script.dispose()
 		
 		player_artifact_uid_to_artifact_data.erase(artifact_data.object_uid)
+		player_artifact_uid_to_artifact_script.erase(artifact_data.object_uid)
 		Signals.player_artifacts_changed.emit()
 		
 		# prevents multiple of an artifact from being removed
@@ -858,6 +891,22 @@ func regenerate_artifact_available_id_cache() -> void:
 	
 	# cache results
 	player_artifact_available_artifact_id_cache = artifact_unique_object_ids
+
+func rebuild_artifact_runtime_scripts() -> void:
+	dispose_artifact_runtime_scripts()
+	player_artifact_uid_to_artifact_script.clear()
+	for artifact_uid: String in player_artifact_uid_to_artifact_data.keys():
+		var artifact_data: ArtifactData = player_artifact_uid_to_artifact_data[artifact_uid]
+		if artifact_data == null:
+			continue
+		var artifact_script_asset: Script = artifact_data.artifact_script
+		player_artifact_uid_to_artifact_script[artifact_uid] = artifact_script_asset.new(artifact_data)
+
+func dispose_artifact_runtime_scripts() -> void:
+	for artifact_script: BaseArtifact in player_artifact_uid_to_artifact_script.values():
+		if artifact_script != null:
+			artifact_script.dispose()
+	player_artifact_uid_to_artifact_script.clear()
 
 func _get_native_properties() -> Dictionary:
 	return {

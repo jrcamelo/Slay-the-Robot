@@ -17,7 +17,11 @@ func perform_action():
 		# increment artifacts of a specific id (technically allows duplicates)
 		if artifact_id != "":
 			var artifacts_with_artifact_id: Array[ArtifactData] = Global.player_data.get_player_artifacts_with_artifact_id(artifact_id)
+			var owner_party_member: PartyMemberData = Global.get_context_party_member(null, parent_combatant, self)
 			for artifact_data: ArtifactData in artifacts_with_artifact_id:
+				if owner_party_member != null and artifact_data.artifact_owner_party_index >= 0:
+					if artifact_data.artifact_owner_party_index != owner_party_member.party_member_party_index:
+						continue
 				artifact_data.increment_artifact_counter(artifact_charge_increase)
 		
 		# increment a specific artifact.

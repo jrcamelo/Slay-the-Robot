@@ -165,7 +165,7 @@ func get_input_cardset() -> Array[CardData]:
 	if draft_from_card_pool:
 		return get_drafted_cards()
 	
-	return Global.player_data.get_pile(card_pick_type)
+	return _filter_input_cards_to_context_owner(Global.player_data.get_pile(card_pick_type))
 
 func perform_action():
 	# determine if its possible to select the cards from the input card set
@@ -269,6 +269,19 @@ func get_drafted_cards() -> Array[CardData]:
 		filtered_card_draft = Global.get_card_data_from_prototypes(card_ids)
 	
 	return _assign_generated_card_owners(filtered_card_draft)
+
+func _filter_input_cards_to_context_owner(cards: Array[CardData]) -> Array[CardData]:
+	if not Global.player_data.has_party_members():
+		return cards
+	var source_party_member: PartyMemberData = Global.get_context_party_member(null, parent_combatant, self)
+	if source_party_member == null:
+		return cards
+	var owner_cards: Array[CardData] = []
+	for card_data: CardData in cards:
+		Global.player_data.ensure_card_has_owner(card_data)
+		if card_data.card_owner_party_index == source_party_member.party_member_party_index:
+			owner_cards.append(card_data)
+	return owner_cards
 
 ### Picking Validation Methods
 

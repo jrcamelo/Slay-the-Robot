@@ -2,7 +2,6 @@
 extends BaseCombatant
 class_name Player
 
-const STATUS_BARRIER: String = "status_effect_barrier"
 const STATUS_UNTARGETABLE: String = "status_effect_untargetable"
 
 @onready var incoming_damage: Control = $Visible/IncomingDamage

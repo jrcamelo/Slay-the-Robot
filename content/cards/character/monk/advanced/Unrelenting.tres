@@ -10,7 +10,6 @@ Create 2 Jabs."
 card_texture_path = "external/sprites/cards/red/card_red.png"
 card_color_id = "color_red"
 card_kind = "JAZZ"
-card_energy_cost = 1
 card_type = 1
 card_rarity = 3
 card_is_playable = false

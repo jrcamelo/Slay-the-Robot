@@ -1,9 +1,7 @@
 [gd_resource type="Resource" script_class="ArtifactListResource" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_wihg1"]
-[ext_resource type="Resource" path="res://content/artifacts/green/uncommon/ArtifactDrawOnCombat.tres" id="2_6j1jj"]
 [ext_resource type="Script" path="res://data/content/ArtifactListResource.gd" id="3_nuajd"]
 
 [resource]
 script = ExtResource("3_nuajd")
-artifacts = Array[ExtResource("1_wihg1")]([ExtResource("2_6j1jj")])

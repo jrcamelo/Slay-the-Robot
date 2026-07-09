@@ -14,4 +14,3 @@ status_effect_decay_type_v2 = 3
 status_effect_is_flag = true
 status_effect_use_legacy_process_decay = false
 object_id = "status_effect_daze"
-

@@ -6,7 +6,6 @@
 [resource]
 script = ExtResource("1_status")
 status_effect_name = "Untargetable"
-status_effect_script = ExtResource("2_script")
 status_effect_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
 status_effect_type = 2
 status_effect_action_process_times = Array[int]([0])

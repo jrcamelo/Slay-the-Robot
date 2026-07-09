@@ -21,7 +21,7 @@ card_play_actions = Array[Dictionary]([{
 "card_object_id": "card_monk_jab",
 "count_multiplier": 2,
 "owner_only": true,
-"write_value_names": Array[String](["damage", "poise_amount"])
+"write_value_names": ["damage", "poise_amount"]
 }
 }, {
 "ACTION_ATTACK_POISE": {}

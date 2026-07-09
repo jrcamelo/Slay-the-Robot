@@ -203,7 +203,10 @@ func generate_rarity_weighted_card_draft(rng: RandomNumberGenerator, number_of_c
 func _get_random_party_member(rng: RandomNumberGenerator) -> PartyMemberData:
 	if not Global.player_data.has_party_members():
 		return null
-	var party_members: Array[PartyMemberData] = Global.player_data.player_party_members.duplicate()
+	var party_members: Array[PartyMemberData] = []
+	for party_member_data: PartyMemberData in Global.player_data.player_party_members:
+		if party_member_data.is_active():
+			party_members.append(party_member_data)
 	if len(party_members) == 0:
 		return null
 	party_members = Random.shuffle_array(rng, party_members)

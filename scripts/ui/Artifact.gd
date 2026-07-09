@@ -15,11 +15,16 @@ func _ready():
 func init(_artifact_data: ArtifactData):
 	artifact_data = _artifact_data
 	var artifact_script_asset: Script = artifact_data.artifact_script
-	artifact_script = artifact_script_asset.new(artifact_data)
+	artifact_script = artifact_script_asset.new(artifact_data, false)
 	texture_normal = FileLoader.load_texture(artifact_data.artifact_texture_path)
 	update_artifact_counter()
 	
 	tooltip_text = artifact_data.artifact_name
+	var owner_party_member: PartyMemberData = Global.player_data.get_party_member_for_artifact(artifact_data)
+	if owner_party_member != null:
+		var character_data: CharacterData = Global.get_character_data(owner_party_member.party_member_character_object_id)
+		if character_data != null:
+			tooltip_text += "\nEquipped: " + character_data.character_name
 	if artifact_data.artifact_description != "":
 		if len(artifact_data.ARTIFACT_RARITIES.keys()) > artifact_data.artifact_rarity:
 			tooltip_text += "\n" + artifact_data.ARTIFACT_RARITIES.keys()[artifact_data.artifact_rarity]

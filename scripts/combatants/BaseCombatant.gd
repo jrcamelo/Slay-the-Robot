@@ -341,7 +341,7 @@ func _apply_status_internal(status_effect_object_id: String, charge_amount: int,
 	if status_effect_object_id == STATUS_SHIELD:
 		sync_block_from_shield_status()
 	if self is Player and status_effect_object_id == STATUS_BARRIER:
-		self._update_barrier_display()
+		(self as Player)._update_barrier_display()
 	
 	update_health_bar(false)
 	
@@ -547,7 +547,7 @@ func _is_status_effect_self_sourced(status_effect: StatusEffect) -> bool:
 		return true
 	if self is Player:
 		var source_party_member_index: int = int(custom_values.get("source_party_member_index", -1))
-		return source_party_member_index == get_party_member_index()
+		return source_party_member_index == (self as Player).get_party_member_index()
 	return source_instance_id < 0
 
 func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> void:
@@ -568,7 +568,7 @@ func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> 
 	if status_effect_object_id == STATUS_SHIELD:
 		sync_block_from_shield_status()
 	if self is Player and status_effect_object_id == STATUS_BARRIER:
-		self._update_barrier_display()
+		(self as Player)._update_barrier_display()
 	update_health_bar(false)
 	Signals.enemy_intent_changed.emit()
 	Signals.combatant_status_changed.emit(self, status_effect_object_id)

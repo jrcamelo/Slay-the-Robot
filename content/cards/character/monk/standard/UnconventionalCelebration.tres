@@ -9,7 +9,6 @@ card_description = "I and all allies gain +[status_charge_amount] Might."
 card_texture_path = "external/sprites/cards/red/card_red.png"
 card_color_id = "color_red"
 card_kind = "OUTRO"
-card_energy_cost = 1
 card_type = 1
 card_requires_target = false
 card_values = {

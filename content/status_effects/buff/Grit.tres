@@ -7,9 +7,7 @@
 script = ExtResource("1")
 status_effect_name = "Grit"
 status_effect_script = ExtResource("2")
-status_effect_type = 0
 status_effect_disposition = 0
 status_effect_decay_type_v2 = 0
 status_effect_use_legacy_process_decay = false
 object_id = "status_effect_grit"
-

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1_gcb2g"]
+[ext_resource type="Script" path="res://scripts/status_effects/StatusEffectMonkThatLooksFun.gd" id="2_3j74t"]
+
+[resource]
+script = ExtResource("1_gcb2g")
+status_effect_name = "That Looks Fun"
+status_effect_script = ExtResource("2_3j74t")
+status_effect_texture_path = "external/sprites/characters/character_green/character_green_icon.png"
+status_effect_disposition = 0
+status_effect_action_process_times = Array[int]([2])
+status_effect_decay_rate = -1
+object_id = "status_effect_monk_that_looks_fun"

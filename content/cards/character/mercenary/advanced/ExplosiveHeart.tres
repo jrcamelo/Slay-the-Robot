@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_66l7w"]
+
+[resource]
+script = ExtResource("1_66l7w")
+card_name = "Explosive Heart"
+card_description = "Additional Cost: Reduce your Grit to 0.
+Enemies suffer [damage] Damage and [poise_amount] Poise.
+X = 10 x your lost Grit."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "OUTRO"
+card_energy_cost = 3
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"damage": 0,
+"poise_amount": 0
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_SPEND_STATUS": {
+"spend_all": true,
+"status_effect_object_id": "status_effect_grit",
+"target_override": 1,
+"value_per_status_charge": 10,
+"write_value_names": ["damage", "poise_amount"]
+}
+}, {
+"ACTION_ATTACK_POISE": {
+"target_override": 4
+}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
+}
+}])
+card_listeners = Array[Dictionary]([{
+"LISTENER_CARD_VALUE_OWNER_STATUS": {
+"multiplied_values": ["damage", "poise_amount"],
+"multiplied_values_bases": {
+"damage": 0,
+"poise_amount": 0
+},
+"multiplied_values_per_status_charge": {
+"damage": 10,
+"poise_amount": 10
+},
+"status_effect_object_id": "status_effect_grit"
+}
+}])
+object_id = "card_mercenary_explosive_heart"

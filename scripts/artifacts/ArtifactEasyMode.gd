@@ -4,6 +4,9 @@ extends BaseArtifact
 func connect_signals() -> void:
 	# override
 	Signals.player_turn_started.connect(_on_player_turn_started)
+
+func disconnect_signals() -> void:
+	_disconnect_signal(Signals.player_turn_started, _on_player_turn_started)
 	
 func _on_player_turn_started() -> void:
 	if Global.get_combat_stats().turn_count == 1:

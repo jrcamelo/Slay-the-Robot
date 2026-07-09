@@ -8,7 +8,6 @@ card_name = "Fake Out"
 card_description = "Play an Attack. My next Jab deals extra damage equal to that attack's Damage."
 card_texture_path = "external/sprites/cards/red/card_red.png"
 card_color_id = "color_red"
-card_energy_cost = 1
 card_type = 1
 card_requires_target = false
 card_values = {

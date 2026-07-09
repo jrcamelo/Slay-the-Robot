@@ -239,6 +239,8 @@ func start_run(character_object_id: String, run_seed: int, difficulty_level: int
 func start_party_run(character_object_ids: Array[String], run_seed: int, difficulty_level: int = 0, custom_run_modifier_object_ids: Array[String] = []) -> void:
 	assert(len(character_object_ids) > 0)
 	var first_character_data: CharacterData = get_character_data(character_object_ids[0])
+	if player_data != null:
+		player_data.dispose_artifact_runtime_scripts()
 	
 	# initialize player data from the first character's prototype, then overwrite the fields
 	# that become shared-party state.
@@ -251,6 +253,7 @@ func start_party_run(character_object_ids: Array[String], run_seed: int, difficu
 	player_data.player_hand = []
 	player_data.player_exhaust = []
 	player_data.player_artifact_uid_to_artifact_data = {}
+	player_data.player_artifact_uid_to_artifact_script = {}
 	player_data.player_artifact_pack_ids = []
 	player_data.reward_draft_card_pack_ids = []
 	player_data.player_reward_draft_card_id_blacklist = []
@@ -353,6 +356,7 @@ func end_run(run_end_state: int = RUN_ENDS.QUIT) -> void:
 			profile_data.win_run(player_data.player_character_object_id)
 			FileLoader.save_profile()
 	
+	player_data.dispose_artifact_runtime_scripts()
 	is_run = false
 	Signals.run_ended.emit()
 

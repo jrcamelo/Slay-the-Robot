@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_re3g5"]
+
+[resource]
+script = ExtResource("1_re3g5")
+card_name = "Warning Shot"
+card_description = "Attack: [poise_amount] Poise."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "INTRO"
+card_energy_cost = 0
+card_rarity = 3
+card_values = {
+"damage": 0,
+"poise_amount": 12
+}
+card_description_preview_overrides = Array[Array]([["damage", "ACTION_ATTACK_POISE"]])
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_POISE": {}
+}])
+card_play_validators = Array[Dictionary]([{
+"VALIDATOR_CARD_PLAY_INTRO": {
+"kind_rule": true
+}
+}])
+object_id = "card_ranger_warning_shot"

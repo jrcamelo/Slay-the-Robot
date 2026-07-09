@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_seqvm"]
+
+[resource]
+script = ExtResource("1_seqvm")
+card_name = "Fiendish Pact"
+card_description = "Additional Cost: Lose 5 Hit Points.
+Block: [block] Shield.
+Gain 1 Grit."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_energy_cost = 2
+card_type = 1
+card_rarity = 3
+card_requires_target = false
+card_values = {
+"block": 10,
+"health_amount": 5,
+"status_charge_amount": 1,
+"status_effect_object_id": "status_effect_grit"
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_LOSE_HEALTH": {
+"target_override": 1
+}
+}, {
+"ACTION_BLOCK": {
+"target_override": 1
+}
+}, {
+"ACTION_APPLY_STATUS": {
+"target_override": 1
+}
+}])
+object_id = "card_mercenary_fiendish_pact"

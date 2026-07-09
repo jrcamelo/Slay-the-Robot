@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_b60wo"]
+
+[resource]
+script = ExtResource("1_b60wo")
+card_name = "Headshot"
+card_description = "Attack: [damage] Damage."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_rarity = 3
+card_values = {
+"damage": 14,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}])
+object_id = "card_ranger_headshot"

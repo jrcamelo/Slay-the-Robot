@@ -1,3 +1,4 @@
+@tool
 # Hardcoded script paths
 extends Node
 

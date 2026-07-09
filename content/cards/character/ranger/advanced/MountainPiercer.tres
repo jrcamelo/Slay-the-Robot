@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/prototype/CardData.gd" id="1_lgqxl"]
+
+[resource]
+script = ExtResource("1_lgqxl")
+card_name = "Mountain Piercer"
+card_description = "Piercing (This Attack ignores Shield).
+Attack: [damage] Damage."
+card_texture_path = "external/sprites/cards/red/card_red.png"
+card_color_id = "color_red"
+card_kind = "OUTRO"
+card_rarity = 3
+card_values = {
+"bypass_block": true,
+"damage": 24,
+"number_of_attacks": 1
+}
+card_play_actions = Array[Dictionary]([{
+"ACTION_ATTACK_GENERATOR": {
+"actions_on_lethal": [],
+"time_delay": 0.0
+}
+}, {
+"ACTION_END_TURN": {
+"kind_rule": true,
+"time_delay": 0.05
+}
+}])
+object_id = "card_ranger_mountain_piercer"

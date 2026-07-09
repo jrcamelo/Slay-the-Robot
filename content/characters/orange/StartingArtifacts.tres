@@ -1,10 +1,7 @@
 [gd_resource type="Resource" script_class="ArtifactListResource" format=3]
 
 [ext_resource type="Script" path="res://data/prototype/ArtifactData.gd" id="1_bod34"]
-[ext_resource type="Resource" path="res://content/artifacts/orange/common/ArtifactIncreaseAttackOnRest.tres" id="2_mn2es"]
-[ext_resource type="Resource" path="res://content/artifacts/blue/common/ArtifactSeeDrawPile.tres" id="3_5124a"]
 [ext_resource type="Script" path="res://data/content/ArtifactListResource.gd" id="4_6oskk"]
 
 [resource]
 script = ExtResource("4_6oskk")
-artifacts = Array[ExtResource("1_bod34")]([ExtResource("2_mn2es"), ExtResource("3_5124a")])

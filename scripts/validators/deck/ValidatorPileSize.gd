@@ -33,5 +33,20 @@ func _validation(_card_data: CardData, _action: BaseAction, values: Dictionary[S
 		if _action != null:
 			if _action.card_play_request != null:
 				pile = _action.card_play_request.hand_at_play_time
+
+	pile = _filter_pile_to_context_owner(pile, _card_data, _action)
 	
 	return _compare(len(pile), comparison_value, operator)
+
+func _filter_pile_to_context_owner(pile: Array[CardData], context_card: CardData, action: BaseAction) -> Array[CardData]:
+	if not Global.player_data.has_party_members():
+		return pile
+	var party_member_data: PartyMemberData = Global.get_context_party_member(context_card, null, action)
+	if party_member_data == null:
+		return pile
+	var owner_pile: Array[CardData] = []
+	for card_data: CardData in pile:
+		Global.player_data.ensure_card_has_owner(card_data)
+		if card_data.card_owner_party_index == party_member_data.party_member_party_index:
+			owner_pile.append(card_data)
+	return owner_pile
