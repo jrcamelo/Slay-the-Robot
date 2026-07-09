@@ -7,7 +7,7 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 	if parent_combatant == null or not parent_combatant.is_alive():
 		return ACTION_ACCEPTENCES.REJECTED
 
-	var status_effects: Array[StatusEffect] = parent_combatant.status_id_to_status_effects.get(STATUS_EFFECT_ID, [])
+	var status_effects: Array[StatusEffect] = parent_combatant.get_status_effects(STATUS_EFFECT_ID)
 	if status_effects.is_empty():
 		return ACTION_ACCEPTENCES.CONTINUE
 

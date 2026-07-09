@@ -9,8 +9,13 @@
 *.jpeg binary
 *.ogg binary
 *.png binary
+*.JPG binary
+*.JPEG binary
+*.PNG binary
 *.pck binary
 *.so binary
 *.ttf binary
 *.wav binary
 *.webp binary
+*.SVG binary
+*.svg binary

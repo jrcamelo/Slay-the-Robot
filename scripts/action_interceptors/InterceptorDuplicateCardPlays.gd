@@ -9,7 +9,7 @@ func process_action_interception(action_interceptor_processor: ActionInterceptor
 		return ACTION_ACCEPTENCES.CONTINUE
 	
 	var parent_combatant: BaseCombatant = action_interceptor_processor.parent_action.parent_combatant
-	var status_effects: Array[StatusEffect] = parent_combatant.status_id_to_status_effects.get(DUPLICATE_CARD_PLAYS_STATUS_EFFECT_ID, [])
+	var status_effects: Array[StatusEffect] = parent_combatant.get_status_effects(DUPLICATE_CARD_PLAYS_STATUS_EFFECT_ID)
 	
 	var card_play_request: CardPlayRequest = action_interceptor_processor.parent_action.card_play_request
 	# will not duplicate duplicated plays

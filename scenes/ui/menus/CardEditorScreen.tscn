@@ -62,12 +62,12 @@ theme_override_constants/separation = 12
 [node name="LibraryCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Library: 82"
+text = "Library: 135"
 
 [node name="FilterCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100007]
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
-text = "Visible: 82"
+text = "Visible: 135"
 
 [node name="SelectionCountLabel" type="Label" parent="MainContainer/Header/ScreenSummary/StatsRow" unique_id=100100008]
 layout_mode = 2
@@ -98,7 +98,7 @@ split_offsets = PackedInt32Array(-465, 1248, 620)
 split_offset = -465
 
 [node name="LibraryPanel" type="PanelContainer" parent="MainContainer/Header/Body" unique_id=1127778842]
-custom_minimum_size = Vector2(162, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -252,7 +252,7 @@ size_flags_vertical = 3
 split_offsets = PackedInt32Array(0, 620)
 
 [node name="InspectorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=828682295]
-custom_minimum_size = Vector2(162, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -282,7 +282,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="BehaviorPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit/EditorHostPanel/EditorHostPadding/EditorSplit" unique_id=100100012]
-custom_minimum_size = Vector2(162, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -313,7 +313,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="PreviewPanel" type="PanelContainer" parent="MainContainer/Header/Body/WorkspaceSplit" unique_id=415001899]
-custom_minimum_size = Vector2(162, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

@@ -396,7 +396,7 @@ func get_status_charges(status_effect_object_id: String) -> int:
 	return absolute_maximum
 
 func get_status_effects(status_effect_object_id: String) -> Array[StatusEffect]:
-	return status_id_to_status_effects.get(status_effect_object_id, [])
+	return _get_typed_status_effects(status_effect_object_id)
 
 func has_closed_cultivation_passive() -> bool:
 	return get_status_charges(STATUS_CLOSED_CULTIVATION) > 0
@@ -551,7 +551,7 @@ func _is_status_effect_self_sourced(status_effect: StatusEffect) -> bool:
 	return source_instance_id < 0
 
 func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> void:
-	var status_effects: Array[StatusEffect] = status_id_to_status_effects.get(status_effect_object_id, [])
+	var status_effects: Array[StatusEffect] = _get_typed_status_effects(status_effect_object_id)
 	if status_effects.is_empty():
 		if status_effect_object_id == STATUS_SHIELD:
 			sync_block_from_shield_status()
@@ -579,7 +579,7 @@ func _set_status_source(status_effect_object_id: String, source_combatant: BaseC
 	var source_party_member_index: int = -1
 	if source_combatant is Player:
 		source_party_member_index = source_combatant.get_party_member_index()
-	for status_effect: StatusEffect in status_id_to_status_effects.get(status_effect_object_id, []):
+	for status_effect: StatusEffect in _get_typed_status_effects(status_effect_object_id):
 		status_effect.status_effect_script.status_custom_values["source_instance_id"] = source_combatant.get_instance_id()
 		status_effect.status_effect_script.status_custom_values["source_party_member_index"] = source_party_member_index
 		status_effect.status_effect_script.status_custom_values["source_turn_count"] = Global.get_combat_stats().turn_count if Global.get_combat_stats() != null else 1
@@ -635,6 +635,12 @@ func _create_status_effect(status_effect_object_id: String) -> StatusEffect:
 		
 		return status_effect
 	return null
+
+func _get_typed_status_effects(status_effect_object_id: String) -> Array[StatusEffect]:
+	if status_id_to_status_effects.has(status_effect_object_id):
+		return status_id_to_status_effects[status_effect_object_id]
+	var empty_status_effects: Array[StatusEffect] = []
+	return empty_status_effects
 #endregion
 
 #region Turns/Combat
@@ -686,7 +692,7 @@ func perform_combat_started_status_effect_actions(status_effect_object_ids: Arra
 			sorted_status_effect_ids.append(status_effect_object_id)
 	sorted_status_effect_ids.sort_custom(_sort_status_effect_priorities)
 	for status_effect_object_id: String in sorted_status_effect_ids:
-		var status_effects: Array[StatusEffect] = status_id_to_status_effects.get(status_effect_object_id, [])
+		var status_effects: Array[StatusEffect] = _get_typed_status_effects(status_effect_object_id)
 		for status_effect: StatusEffect in status_effects:
 			status_effect.status_effect_script.perform_combat_started_actions()
 

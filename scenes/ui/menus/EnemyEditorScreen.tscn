@@ -455,7 +455,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="LibraryList" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/LibraryScroll" unique_id=178231856]
 layout_mode = 2
@@ -472,7 +471,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="NavigatorContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/LeftPanel/LeftMargin/LeftVBox/NavigatorScroll" unique_id=58812584]
 layout_mode = 2
@@ -523,7 +521,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="EditorContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/CenterPanel/CenterMargin/CenterScroll" unique_id=97376194]
 layout_mode = 2
@@ -548,7 +545,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 follow_focus = true
-horizontal_scroll_mode = 0
 
 [node name="PreviewContent" type="VBoxContainer" parent="MainMargin/RootVBox/BodySplit/WorkspaceSplit/RightPanel/RightMargin/RightScroll" unique_id=1797162461]
 layout_mode = 2
