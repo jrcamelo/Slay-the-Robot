@@ -1,1 +1,16 @@
-* text eol=crlf
+* text=auto eol=lf
+
+*.ase binary
+*.dll binary
+*.dylib binary
+*.exe binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.ogg binary
+*.png binary
+*.pck binary
+*.so binary
+*.ttf binary
+*.wav binary
+*.webp binary
