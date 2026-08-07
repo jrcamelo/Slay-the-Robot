@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+status_effect_name = "Furtive"
+status_effect_description = "50 less aggro."
+status_effect_stacks = false
+status_effect_disposition = 0
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+status_effect_aggro_modifier = -50
+object_id = "status_effect_furtive"

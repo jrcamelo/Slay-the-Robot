@@ -6,7 +6,7 @@ const TARGETING_LOWEST_CURRENT_HEALTH_PLAYER := "lowest_current_health_player"
 const TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER := "highest_current_health_player"
 const TARGETING_LOWEST_HEALTH_PERCENT_PLAYER := "lowest_health_percent_player"
 const TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER := "highest_health_percent_player"
-const TARGETING_ALL_LIVING_PLAYERS := "all_living_players"
+const TARGETING_ALL_TARGETABLE_PLAYERS := "all_targetable_players"
 const TARGETING_RANDOM_DISTINCT_PLAYERS := "random_distinct_players"
 
 const TARGETING_RULES: Array[String] = [
@@ -15,7 +15,7 @@ const TARGETING_RULES: Array[String] = [
 	TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER,
 	TARGETING_LOWEST_HEALTH_PERCENT_PLAYER,
 	TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER,
-	TARGETING_ALL_LIVING_PLAYERS,
+	TARGETING_ALL_TARGETABLE_PLAYERS,
 	TARGETING_RANDOM_DISTINCT_PLAYERS,
 ]
 
@@ -36,6 +36,6 @@ func validate_intent() -> Array[String]:
 		errors.append("Intent number_of_attacks cannot be negative")
 	if not TARGETING_RULES.has(targeting_rule):
 		errors.append("Unsupported targeting_rule: %s" % targeting_rule)
-	if targeting_rule != TARGETING_ALL_LIVING_PLAYERS and target_count <= 0:
+	if targeting_rule != TARGETING_ALL_TARGETABLE_PLAYERS and target_count <= 0:
 		errors.append("Intent target_count must be positive unless targeting all living players")
 	return errors

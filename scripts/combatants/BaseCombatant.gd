@@ -237,15 +237,29 @@ func apply_status(status_effect_object_id: String, amount: int, source_combatant
 	if _is_shared_status(status_effect_object_id):
 		apply_shared_status(status_effect_object_id, amount, source_combatant, secondary_amount, custom_values)
 		return
-	_apply_status_internal(status_effect_object_id, amount, secondary_amount, force_new_effect, custom_values)
+	var affected_statuses: Array[StatusEffect] = _apply_status_internal(status_effect_object_id, amount, secondary_amount, force_new_effect, custom_values)
 	if source_combatant != null:
-		_set_status_source(status_effect_object_id, source_combatant)
+		_set_status_source(status_effect_object_id, source_combatant, affected_statuses)
 
 func remove_status(status_effect_object_id: String, amount: int = -1) -> void:
 	if _is_shared_status(status_effect_object_id):
 		remove_shared_status(status_effect_object_id, amount)
 		return
 	_remove_status_local(status_effect_object_id, amount)
+
+func remove_status_instance(status_effect: StatusEffect, emit_changes: bool = true) -> void:
+	if status_effect == null or status_effect.status_effect_script == null:
+		return
+	var status_effect_object_id: String = status_effect.status_effect_script.status_effect_data.object_id
+	if not get_status_effects(status_effect_object_id).has(status_effect):
+		return
+	_remove_status_effect(status_effect)
+	update_health_bar(false)
+	if not emit_changes:
+		return
+	_notify_aggro_status_changed(status_effect_object_id)
+	Signals.enemy_intent_changed.emit()
+	Signals.combatant_status_changed.emit(self, status_effect_object_id)
 
 func remove_by_disposition(status_disposition: int) -> void:
 	for status_effect_object_id: String in status_id_to_status_effects.keys().duplicate():
@@ -288,21 +302,21 @@ func add_status_effect_charges(status_effect_object_id: String, charge_amount: i
 		return
 	_apply_status_internal(status_effect_object_id, charge_amount, secondary_charge_amount, false, {})
 
-func _apply_status_internal(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, force_new_effect: bool = false, custom_values: Dictionary = {}, emit_source_update: bool = true) -> void:
+func _apply_status_internal(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, force_new_effect: bool = false, custom_values: Dictionary = {}, emit_source_update: bool = true) -> Array[StatusEffect]:
 	# general method for adding status effects and charge amounts
 	# adds charges and secondary charges to ALL instances of a given status
 	# if no status exists, create one and apply charges
 	# will remove statuses that become zero'd out
 	
 	if charge_amount == 0 and secondary_charge_amount == 0 and custom_values.is_empty():
-		return # charge applications of zero have no effect
+		return [] # charge applications of zero have no effect
 	
 	# get status data
 	var status_effect_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
 	if status_effect_data == null:
 		# status effect of given id does not exist
 		push_error("Status effect \"", status_effect_object_id,"\" does not exist")
-		return
+		return []
 	
 	#  get status effect ui elements corresponding to the status
 	var status_effects: Array[StatusEffect] = []
@@ -345,8 +359,10 @@ func _apply_status_internal(status_effect_object_id: String, charge_amount: int,
 	
 	update_health_bar(false)
 	
+	_notify_aggro_status_changed(status_effect_object_id)
 	Signals.enemy_intent_changed.emit()	# update enemy intent in case statuses affect them
 	Signals.combatant_status_changed.emit(self, status_effect_object_id)
+	return status_effects
 
 func add_new_status_effect(status_effect_object_id: String, charge_amount: int, secondary_charge_amount: int = 0, custom_values: Dictionary = {}) -> void:
 	apply_status(status_effect_object_id, charge_amount, null, secondary_charge_amount, true, custom_values)
@@ -570,24 +586,26 @@ func _remove_status_local(status_effect_object_id: String, amount: int = -1) -> 
 	if self is Player and status_effect_object_id == STATUS_BARRIER:
 		(self as Player)._update_barrier_display()
 	update_health_bar(false)
+	_notify_aggro_status_changed(status_effect_object_id)
 	Signals.enemy_intent_changed.emit()
 	Signals.combatant_status_changed.emit(self, status_effect_object_id)
 
-func _set_status_source(status_effect_object_id: String, source_combatant: BaseCombatant) -> void:
+func _set_status_source(status_effect_object_id: String, source_combatant: BaseCombatant, affected_statuses: Array[StatusEffect] = []) -> void:
 	if source_combatant == null:
 		return
 	var source_party_member_index: int = -1
 	if source_combatant is Player:
 		source_party_member_index = source_combatant.get_party_member_index()
-	for status_effect: StatusEffect in _get_typed_status_effects(status_effect_object_id):
+	var statuses: Array[StatusEffect] = affected_statuses if not affected_statuses.is_empty() else _get_typed_status_effects(status_effect_object_id)
+	for status_effect: StatusEffect in statuses:
 		status_effect.status_effect_script.status_custom_values["source_instance_id"] = source_combatant.get_instance_id()
 		status_effect.status_effect_script.status_custom_values["source_party_member_index"] = source_party_member_index
 		status_effect.status_effect_script.status_custom_values["source_turn_count"] = Global.get_combat_stats().turn_count if Global.get_combat_stats() != null else 1
+		status_effect.update_status_charge_display()
 
 func _remove_status_effect(status_effect: StatusEffect) -> void:
 	var status_effect_data: StatusEffectData = status_effect.status_effect_script.status_effect_data
 	var status_effect_object_id: String = status_effect_data.object_id
-	status_effect.status_effect_script._disconnect_signals()
 	
 	# get status list
 	var status_effects: Array[StatusEffect] = status_id_to_status_effects[status_effect_object_id]
@@ -601,7 +619,17 @@ func _remove_status_effect(status_effect: StatusEffect) -> void:
 		for interceptor_id in status_effect_data.status_effect_interceptor_ids:
 			ActionHandler.unregister_action_interceptor(self, interceptor_id)
 	
+	# Remove ownership first so callbacks cannot recursively remove this instance.
+	status_effect.status_effect_script.on_removed()
+	status_effect.status_effect_script._disconnect_signals()
 	status_effect.queue_free()
+
+func _notify_aggro_status_changed(status_effect_object_id: String) -> void:
+	var status_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+	if status_data == null:
+		return
+	if status_data.status_effect_aggro_modifier != 0 or status_data.status_effect_aggro_hard_state != StatusEffectData.AGGRO_HARD_STATES.NORMAL:
+		Signals.targeting_state_changed.emit(null)
 
 func _create_status_effect(status_effect_object_id: String) -> StatusEffect:
 	# creates a status on the combatant and creates bindings and back references for it

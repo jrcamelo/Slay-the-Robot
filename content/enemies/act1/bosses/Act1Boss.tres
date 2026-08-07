@@ -21,7 +21,7 @@ top_level_overrides = Dictionary[String, Variant]({
 
 [sub_resource type="Resource" id="Resource_mo48r"]
 script = ExtResource("4_intent")
-targeting_rule = "all_living_players"
+targeting_rule = "all_targetable_players"
 
 [sub_resource type="Resource" id="Resource_ksc1s"]
 script = ExtResource("3_variant")

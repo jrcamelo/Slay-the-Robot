@@ -251,7 +251,7 @@ static func _resolve_targets_for_intent(intent_data: EnemyIntentData, enemy_data
 		reactive_stage_id,
 	]
 	match intent_data.targeting_rule:
-		EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS:
+		EnemyIntentData.TARGETING_ALL_TARGETABLE_PLAYERS:
 			return living_players
 		EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER:
 			return _resolve_sorted_targets(living_players, target_count, intent_data.allow_repeat_targets, true, false)

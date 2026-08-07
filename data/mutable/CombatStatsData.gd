@@ -15,6 +15,7 @@ var enemy_attackers_last_turn_by_player_index: Dictionary[int, Array] = {}
 
 ## Tracks whether it is currently the player's turn in a central location.
 var is_player_turn: bool = false
+var aggro_manager: AggroManager = AggroManager.new()
 
 # stat types tracked on per turn and per combat
 # each stat listed in enum will automatically be used to generate stat tracking keys in init()
@@ -73,6 +74,8 @@ func _connect_signals():
 	Signals.combatant_blocked.connect(_on_combatant_blocked)
 	Signals.combatant_damaged.connect(_on_combatant_damaged)
 	Signals.enemy_killed.connect(_on_enemy_killed)
+	Signals.player_killed.connect(_on_player_killed)
+	Signals.party_member_removed.connect(_on_party_member_removed)
 	
 	Signals.card_drawn.connect(_on_card_drawn)
 	Signals.card_discarded.connect(_on_card_discarded)
@@ -109,6 +112,7 @@ func _on_player_turn_ended():
 	damaged_players_this_turn_by_index.clear()
 
 func _on_enemy_turn_ended():
+	aggro_manager.advance_enemy_turn_cycle()
 	damaged_players_last_turn_by_index.assign(damaged_players_this_turn_by_index)
 	damaged_players_this_turn_by_index.clear()
 	enemy_attackers_last_turn_by_player_index = {}
@@ -122,6 +126,7 @@ func _on_enemy_turn_ended():
 	cards_played_this_turn = []
 
 func _on_combat_ended():
+	aggro_manager.clear()
 	# remove these to save card plays after they're not needed for run history
 	cards_played_this_combat.clear()
 	cards_played_this_turn.clear()
@@ -259,7 +264,14 @@ func _on_combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int,
 				enemy_attackers_this_enemy_turn_by_player_index[damaged_player.get_party_member_index()] = attacker_ids
 
 func _on_enemy_killed(_enemy: Enemy):
+	aggro_manager.remove_relationships_for_combatant(_enemy)
 	add_to_enum_stat(STATS.ENEMIES_KILLED, 1)
+
+func _on_player_killed(player: Player) -> void:
+	aggro_manager.remove_relationships_for_combatant(player)
+
+func _on_party_member_removed(party_member_index: int) -> void:
+	aggro_manager.remove_relationships_for_party_member(party_member_index)
 
 func _on_card_drawn(_card_data: CardData) -> void:
 	add_to_enum_stat(STATS.CARDS_DRAWN, 1)

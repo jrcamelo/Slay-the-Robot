@@ -41,6 +41,7 @@ func _ready():
 	Signals.player_death_animation_finished.connect(_on_intent_relevant_state_changed_player)
 	Signals.enemy_death_animation_finished.connect(_on_intent_relevant_state_changed_enemy)
 	Signals.party_member_removed.connect(_on_intent_relevant_state_changed_party)
+	Signals.targeting_state_changed.connect(_on_targeting_state_changed)
 
 func init(_enemy_data: EnemyData):
 	enemy_data = _enemy_data
@@ -225,6 +226,12 @@ func refresh_enemy_intent() -> void:
 func cycle_enemy_intent():
 	refresh_enemy_intent()
 
+func provoke_by(player: Player, duration: int = 1) -> AggroRelationship:
+	var combat_stats: CombatStatsData = Global.get_combat_stats()
+	if combat_stats == null:
+		return null
+	return combat_stats.aggro_manager.create_or_refresh_provoke(self, player, duration)
+
 func hide_intent_preview() -> void:
 	intent_preview_hidden = true
 	enemy_intent.visible = false
@@ -302,9 +309,12 @@ func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 		intent_data.allow_repeat_targets,
 		enemy_active_reactive_stage_id,
 	]
+	target_signature += "|" + _get_aggro_target_signature(targetable_players)
+	if get_status_charges("status_effect_daze") > 0:
+		return _resolve_random_targets(targetable_players, 1, false, target_signature + "|daze")
 	match intent_data.targeting_rule:
-		EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS:
-			returned_targets.assign(targetable_players)
+		EnemyIntentData.TARGETING_ALL_TARGETABLE_PLAYERS:
+			returned_targets.assign(_get_targeting_candidates(targetable_players, false))
 			return returned_targets
 		EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER:
 			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, true, false)
@@ -315,72 +325,136 @@ func _resolve_targets_for_intent(intent_data: EnemyIntentData) -> Array[Player]:
 		EnemyIntentData.TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER:
 			returned_targets = _resolve_sorted_targets(targetable_players, target_count, intent_data.allow_repeat_targets, false, true)
 		EnemyIntentData.TARGETING_RANDOM_DISTINCT_PLAYERS:
-			returned_targets = _resolve_random_targets(targetable_players, target_count, false, target_signature)
+			returned_targets = _resolve_random_targets(targetable_players, target_count, true, target_signature)
 		EnemyIntentData.TARGETING_RANDOM_LIVING_PLAYER, _:
 			returned_targets = _resolve_random_targets(targetable_players, target_count, not intent_data.allow_repeat_targets, target_signature)
-	if get_status_charges("status_effect_daze") > 0:
-		returned_targets = _resolve_random_targets(targetable_players, 1, false, target_signature + "|daze")
 	return returned_targets
 
 func _resolve_sorted_targets(players: Array[Player], target_count: int, allow_repeat_targets: bool, ascending: bool, use_percent: bool) -> Array[Player]:
-	var sorted_players: Array[Player] = []
-	sorted_players.assign(players)
-	sorted_players.sort_custom(func(player_a: Player, player_b: Player):
-		var value_a: float = float(player_a.get_health())
-		var value_b: float = float(player_b.get_health())
-		if use_percent:
-			value_a = float(player_a.get_health()) / float(max(1, player_a.get_health_max()))
-			value_b = float(player_b.get_health()) / float(max(1, player_b.get_health_max()))
-		if is_equal_approx(value_a, value_b):
-			return player_a.get_party_member_index() < player_b.get_party_member_index()
-		if ascending:
-			return value_a < value_b
-		return value_a > value_b
-	)
-
 	var returned_targets: Array[Player] = []
-	if allow_repeat_targets and len(sorted_players) > 0:
-		for _i in target_count:
-			returned_targets.append(sorted_players[0])
-		return returned_targets
-
-	for player: Player in sorted_players:
-		if len(returned_targets) >= target_count:
+	var remaining_players: Array[Player] = []
+	remaining_players.assign(players)
+	for _i in target_count:
+		var sorted_players: Array[Player] = _get_targeting_candidates(remaining_players, false)
+		if sorted_players.is_empty():
 			break
-		returned_targets.append(player)
+		sorted_players.sort_custom(func(player_a: Player, player_b: Player):
+			var value_a: float = float(player_a.get_health())
+			var value_b: float = float(player_b.get_health())
+			if use_percent:
+				value_a = float(player_a.get_health()) / float(max(1, player_a.get_health_max()))
+				value_b = float(player_b.get_health()) / float(max(1, player_b.get_health_max()))
+			if is_equal_approx(value_a, value_b):
+				return player_a.get_party_member_index() < player_b.get_party_member_index()
+			if ascending:
+				return value_a < value_b
+			return value_a > value_b
+		)
+		var selected_player: Player = sorted_players[0]
+		returned_targets.append(selected_player)
+		if not allow_repeat_targets:
+			remaining_players.erase(selected_player)
 	return returned_targets
 
 func _resolve_random_targets(players: Array[Player], target_count: int, require_distinct: bool, target_signature: String) -> Array[Player]:
+	var expected_target_count: int = min(target_count, len(players)) if require_distinct else target_count
 	if cached_random_target_signature == target_signature:
 		var cached_targets: Array[Player] = []
 		var all_cached_targets_alive: bool = true
 		for party_member_index: int in cached_random_target_party_member_indices:
 			var cached_player: Player = Global.get_player_by_party_index(party_member_index)
-			if cached_player == null or not cached_player.is_alive():
+			if cached_player == null or not cached_player.is_targetable_by_enemy():
 				all_cached_targets_alive = false
 				break
 			cached_targets.append(cached_player)
-		if all_cached_targets_alive and len(cached_targets) == target_count:
+		if all_cached_targets_alive and len(cached_targets) == expected_target_count:
 			return cached_targets
 
 	var rng_targeting: RandomNumberGenerator = Global.player_data.get_player_rng("rng_enemy_targeting")
 	var returned_targets: Array[Player] = []
-	if require_distinct:
-		var shuffled_players: Array[Player] = Random.shuffle_array(rng_targeting, players)
-		for player: Player in shuffled_players:
-			if len(returned_targets) >= target_count:
-				break
-			returned_targets.append(player)
-	else:
-		for _i in target_count:
-			var random_index: int = rng_targeting.randi_range(0, len(players) - 1)
-			returned_targets.append(players[random_index])
+	var remaining_players: Array[Player] = []
+	remaining_players.assign(players)
+	for _i in target_count:
+		var candidates: Array[Player] = _get_aggro_candidates(remaining_players)
+		if candidates.is_empty():
+			break
+		var selected: Player = _weighted_aggro_choice(candidates, rng_targeting)
+		returned_targets.append(selected)
+		if require_distinct:
+			remaining_players.erase(selected)
 
 	cached_random_target_signature = target_signature
 	cached_random_target_party_member_indices.clear()
 	for player: Player in returned_targets:
 		cached_random_target_party_member_indices.append(player.get_party_member_index())
 	return returned_targets
+
+func _get_aggro_candidates(players: Array[Player]) -> Array[Player]:
+	return _get_targeting_candidates(players, true)
+
+func _get_targeting_candidates(players: Array[Player], include_targeted: bool) -> Array[Player]:
+	var eligible: Array[Player] = []
+	for player: Player in players:
+		if player != null and player.is_targetable_by_enemy():
+			eligible.append(player)
+	if eligible.is_empty():
+		return eligible
+
+	var combat_stats: CombatStatsData = Global.get_combat_stats()
+	if combat_stats != null:
+		var provoker_indices: Array[int] = combat_stats.aggro_manager.get_provoker_indices(self)
+		var provokers: Array[Player] = []
+		for player: Player in eligible:
+			if provoker_indices.has(player.get_party_member_index()):
+				provokers.append(player)
+		if not provokers.is_empty():
+			return provokers
+
+	if include_targeted:
+		var forced: Array[Player] = []
+		for player: Player in eligible:
+			if player.has_aggro_hard_state(StatusEffectData.AGGRO_HARD_STATES.FORCED):
+				forced.append(player)
+		if not forced.is_empty():
+			return forced
+
+	var visible_players: Array[Player] = []
+	for player: Player in eligible:
+		if not player.has_aggro_hard_state(StatusEffectData.AGGRO_HARD_STATES.HIDDEN):
+			visible_players.append(player)
+	return visible_players if not visible_players.is_empty() else eligible
+
+func _weighted_aggro_choice(players: Array[Player], rng: RandomNumberGenerator) -> Player:
+	var total_weight: int = 0
+	for player: Player in players:
+		total_weight += max(1, 100 + player.get_effective_aggro())
+	var roll: int = rng.randi_range(1, total_weight)
+	for player: Player in players:
+		roll -= max(1, 100 + player.get_effective_aggro())
+		if roll <= 0:
+			return player
+	return players[-1]
+
+func _get_aggro_target_signature(players: Array[Player]) -> String:
+	var parts: Array[String] = []
+	var combat_stats: CombatStatsData = Global.get_combat_stats()
+	for player: Player in players:
+		parts.append("%s:%s:%s:%s:%s" % [
+			player.get_party_member_index(),
+			player.is_targetable_by_enemy(),
+			player.get_effective_aggro(),
+			player.has_aggro_hard_state(StatusEffectData.AGGRO_HARD_STATES.FORCED),
+			player.has_aggro_hard_state(StatusEffectData.AGGRO_HARD_STATES.HIDDEN),
+		])
+	if combat_stats != null:
+		parts.append(",".join(combat_stats.aggro_manager.get_relationship_ids_for_enemy(self)))
+	return ";".join(parts)
+
+func _on_targeting_state_changed(affected_enemy: Enemy) -> void:
+	if affected_enemy != null and affected_enemy != self:
+		return
+	cached_random_target_signature = ""
+	cached_random_target_party_member_indices.clear()
 
 func _apply_active_stage_resolution(active_stage_resolution: Dictionary, intent_variant: EnemyIntentVariantData, targets: Array[Player]) -> void:
 	var stage_data = active_stage_resolution.get("stage_data", null)

@@ -24,6 +24,10 @@ func _connect_signals() -> void:
 func _disconnect_signals() -> void:
 	pass
 
+## Called exactly once immediately before this status instance is removed.
+func on_removed() -> void:
+	pass
+
 ## Status action logic
 ## Override for custom logic or conditionals
 ## Called from BaseCombatant.perform_status_effect_actions()

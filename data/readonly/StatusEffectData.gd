@@ -31,6 +31,10 @@ enum STATUS_DECAY_TYPES_V2 {
 @export var status_effect_use_legacy_process_decay: bool = true
 @export var status_effect_is_party_shared: bool = false
 
+enum AGGRO_HARD_STATES {NORMAL, FORCED, HIDDEN}
+@export var status_effect_aggro_modifier: int = 0
+@export var status_effect_aggro_hard_state: int = AGGRO_HARD_STATES.NORMAL
+
 #endregion
 
 #region Status Actions

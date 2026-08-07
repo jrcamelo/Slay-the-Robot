@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3]
+
+[ext_resource type="Script" path="res://data/readonly/StatusEffectData.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/status_effects/StatusEffectAggroRelationship.gd" id="2"]
+
+[resource]
+script = ExtResource("1")
+status_effect_name = "Provoked"
+status_effect_description = "Must randomly target the linked character first."
+status_effect_script = ExtResource("2")
+status_effect_stacks = true
+status_effect_can_be_negative = true
+status_effect_allows_multiples = true
+status_effect_type = 1
+status_effect_disposition = 1
+status_effect_decay_type_v2 = 2
+status_effect_use_legacy_process_decay = false
+object_id = "status_effect_provoked"

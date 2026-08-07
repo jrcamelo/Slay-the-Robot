@@ -215,7 +215,7 @@ intent = SubResource("Resource_je7he")
 script = ExtResource("5_intent")
 damage = 15
 number_of_attacks = 1
-targeting_rule = "all_living_players"
+targeting_rule = "all_targetable_players"
 
 [sub_resource type="Resource" id="Resource_f1o8m"]
 script = ExtResource("3_variant")

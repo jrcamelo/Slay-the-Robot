@@ -20,6 +20,7 @@ class_name CharacterData
 @export var character_starting_artifact_ids: Array[String] = []	# added to player on run start
 @export var character_starting_artifact_resource: ArtifactListResource = null
 @export var character_passive_status_effect_ids: Array[String] = []	# applied to this character at the start of each combat
+@export var character_starting_aggro: int = 0
 ## Determines what kinds of artifacts are available to the player at start of run. Should generally be
 ## [color_white, character_color_id]
 @export var character_starting_artifact_pack_ids: Array[String] = []

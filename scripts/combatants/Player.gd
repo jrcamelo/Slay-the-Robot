@@ -219,6 +219,28 @@ func add_health(health_amount: int, health_max_amount: int = 0) -> void:
 func is_targetable_by_enemy() -> bool:
 	return is_alive() and get_status_charges(STATUS_UNTARGETABLE) <= 0
 
+func get_starting_aggro() -> int:
+	var character_data: CharacterData = Global.get_player_character_data()
+	var party_member_data: PartyMemberData = get_party_member_data()
+	if party_member_data != null:
+		character_data = Global.get_character_data(party_member_data.party_member_character_object_id)
+	return character_data.character_starting_aggro if character_data != null else 0
+
+func get_effective_aggro() -> int:
+	var aggro: int = get_starting_aggro()
+	for status_effect_object_id: String in status_id_to_status_effects.keys():
+		var status_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+		if status_data != null:
+			aggro += status_data.status_effect_aggro_modifier
+	return aggro
+
+func has_aggro_hard_state(hard_state: int) -> bool:
+	for status_effect_object_id: String in status_id_to_status_effects.keys():
+		var status_data: StatusEffectData = Global.get_status_effect_data(status_effect_object_id)
+		if status_data != null and status_data.status_effect_aggro_hard_state == hard_state:
+			return true
+	return false
+
 func _sync_primary_member_state_if_needed() -> void:
 	if Global.player_data.has_party_members() and party_member_index == 0:
 		Global.player_data.synchronize_legacy_primary_member_state()

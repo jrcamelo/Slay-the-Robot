@@ -214,6 +214,8 @@ func get_adjusted_action_targets() -> Array[BaseCombatant]:
 			for target in targets:
 				if is_instance_valid(target):
 					if target.is_alive():
+						if parent_combatant is Enemy and target is Player and not (target as Player).is_targetable_by_enemy():
+							continue
 						returned_targets.append(target)
 		TARGET_OVERRIDES.PARENT:
 			return [parent_combatant]

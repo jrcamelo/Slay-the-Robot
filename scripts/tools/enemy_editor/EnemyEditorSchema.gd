@@ -110,7 +110,7 @@ static func targeting_rule_options() -> Array[Dictionary]:
 		{"label": "Highest Current HP PC", "value": EnemyIntentData.TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER},
 		{"label": "Lowest HP Percent PC", "value": EnemyIntentData.TARGETING_LOWEST_HEALTH_PERCENT_PLAYER},
 		{"label": "Highest HP Percent PC", "value": EnemyIntentData.TARGETING_HIGHEST_HEALTH_PERCENT_PLAYER},
-		{"label": "All Living PCs", "value": EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS},
+		{"label": "All Targetable PCs", "value": EnemyIntentData.TARGETING_ALL_TARGETABLE_PLAYERS},
 		{"label": "Random Distinct PCs", "value": EnemyIntentData.TARGETING_RANDOM_DISTINCT_PLAYERS},
 	]
 
@@ -167,8 +167,8 @@ static func format_targeting_summary(intent_data: EnemyIntentData) -> String:
 	if intent_data == null:
 		return "none"
 	match intent_data.targeting_rule:
-		EnemyIntentData.TARGETING_ALL_LIVING_PLAYERS:
-			return "all living PCs"
+		EnemyIntentData.TARGETING_ALL_TARGETABLE_PLAYERS:
+			return "all targetable PCs"
 		EnemyIntentData.TARGETING_LOWEST_CURRENT_HEALTH_PLAYER:
 			return "lowest current HP PC"
 		EnemyIntentData.TARGETING_HIGHEST_CURRENT_HEALTH_PLAYER:

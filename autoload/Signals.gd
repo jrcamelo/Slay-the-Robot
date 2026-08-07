@@ -127,6 +127,8 @@ signal combatant_targeted_by_attack(base_combatant: BaseCombatant, attack_action
 signal combatant_poise_depleted(base_combatant: BaseCombatant, attack_action: BaseAction)	# emitted when an attack drops an enemy's poise to 0
 signal combatant_damaged(base_combatant: BaseCombatant, unblocked_damage: int, source_action: BaseAction)	# a combatant has taken health damage. Cannot be 0
 signal combatant_status_changed(base_combatant: BaseCombatant, status_effect_object_id: String)
+## Null means every enemy; otherwise only the supplied enemy's target cache is stale.
+signal targeting_state_changed(enemy: Enemy)
 
 signal energy_added(energy_amount: int)	# when the player gains energy not at start of turn
 
